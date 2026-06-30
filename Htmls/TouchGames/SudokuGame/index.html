@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>數獨遊戲</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito','Microsoft JhengHei',sans-serif;}
+body{background:linear-gradient(135deg,#F0FDFA 0%,#CCFBF1 50%,#F0FFF4 100%);touch-action:manipulation;}
+
+/* ── Floating decorations ── */
+.deco{position:fixed;font-size:2rem;opacity:.13;pointer-events:none;animation:float 6s ease-in-out infinite;}
+.deco:nth-child(1){top:8%;left:5%;animation-delay:0s;}
+.deco:nth-child(2){top:15%;right:8%;animation-delay:1s;font-size:1.5rem;}
+.deco:nth-child(3){bottom:20%;left:3%;animation-delay:2s;}
+.deco:nth-child(4){bottom:12%;right:5%;animation-delay:3s;font-size:1.8rem;}
+.deco:nth-child(5){top:50%;left:2%;animation-delay:1.5s;font-size:1.2rem;}
+.deco:nth-child(6){top:40%;right:2%;animation-delay:2.5s;font-size:1.3rem;}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-14px) rotate(6deg);}}
+
+/* ── Home button ── */
+#home-btn{position:fixed;bottom:14px;left:16px;z-index:99999;width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.82);border:2px solid #f9a8d4;
+  box-shadow:0 4px 12px rgba(236,72,153,.22);
+  display:flex;align-items:center;justify-content:center;text-decoration:none;
+  transition:background .2s,box-shadow .2s;}
+#home-btn:hover{background:#fce7f3;box-shadow:0 6px 18px rgba(236,72,153,.38);}
+
+/* ── Screen transitions ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;}
+.screen.active{opacity:1;pointer-events:all;}
+
+/* ── Home screen ── */
+.page-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:#0f766e;text-align:center;margin-bottom:.25em;
+  text-shadow:0 2px 8px rgba(15,118,110,.15);}
+.page-subtitle{font-size:clamp(1rem,2vw,1.5rem);color:#5eead4;font-weight:700;margin-bottom:2em;}
+.mode-cards{display:flex;gap:2.5vmin;flex-wrap:wrap;justify-content:center;}
+.mode-card{background:#fff;border-radius:2rem;padding:2.5vmin 4vmin;min-width:280px;max-width:340px;
+  cursor:pointer;border:3px solid transparent;
+  box-shadow:0 6px 24px rgba(20,184,166,.14);
+  transition:transform .18s,box-shadow .18s,border-color .18s;
+  display:flex;flex-direction:column;align-items:center;gap:1rem;
+  text-align:center;}
+.mode-card:hover,.mode-card:active{transform:translateY(-6px) scale(1.03);box-shadow:0 14px 36px rgba(20,184,166,.28);border-color:#5eead4;}
+.mode-card .mc-icon{font-size:clamp(2.5rem,7vmin,5rem);line-height:1;}
+.mode-card .mc-title{font-size:clamp(1.4rem,3.5vmin,2.2rem);font-weight:900;color:#0f766e;}
+.mode-card .mc-desc{font-size:clamp(.85rem,1.8vmin,1.1rem);color:#64748b;font-weight:700;}
+
+/* ── Difficulty screen ── */
+.diff-title{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:900;color:#0f766e;margin-bottom:.5em;}
+.diff-subtitle{font-size:clamp(.9rem,2vw,1.2rem);color:#5eead4;font-weight:700;margin-bottom:2em;}
+.diff-grid{display:flex;flex-wrap:wrap;gap:1.2vmin;justify-content:center;max-width:800px;}
+.diff-btn{display:flex;align-items:center;gap:.7em;padding:.9em 2.2em;border-radius:999px;
+  font-size:clamp(1rem,2.5vmin,1.5rem);font-weight:800;cursor:pointer;
+  border:3px solid transparent;transition:transform .15s,box-shadow .15s,border-color .15s;
+  box-shadow:0 3px 12px rgba(0,0,0,.1);}
+.diff-btn:hover,.diff-btn:active{transform:scale(1.07);box-shadow:0 6px 20px rgba(0,0,0,.18);}
+.diff-btn.selected{border-color:#0f766e;box-shadow:0 0 0 4px rgba(15,118,110,.25);}
+.diff-btn .diff-icon{font-size:1.4em;}
+.btn-start{margin-top:2.5vmin;background:#14b8a6;color:#fff;border:none;border-radius:999px;
+  padding:.9em 4em;font-size:clamp(1.1rem,2.5vmin,1.6rem);font-weight:900;
+  cursor:pointer;box-shadow:0 6px 20px rgba(20,184,166,.35);
+  transition:transform .15s,box-shadow .15s;}
+.btn-start:hover,.btn-start:active{transform:scale(1.06);box-shadow:0 10px 28px rgba(20,184,166,.45);}
+.btn-back{background:#fff;color:#0f766e;border:2.5px solid #5eead4;border-radius:999px;
+  padding:.7em 2.5em;font-size:clamp(.9rem,2vmin,1.2rem);font-weight:800;cursor:pointer;
+  margin-top:1em;transition:background .15s;}
+.btn-back:hover{background:#f0fdfa;}
+
+/* ── SINGLE PLAYER GAME ── */
+#s-1p{flex-direction:column;gap:0;}
+.hud-1p{display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:.6em 4vw;background:rgba(255,255,255,.75);
+  border-bottom:2px solid #ccfbf1;flex-shrink:0;}
+.hud-badge{display:flex;align-items:center;gap:.5em;
+  background:#fff;border-radius:999px;padding:.4em 1.2em;
+  border:2px solid #99f6e4;font-size:clamp(1rem,2.5vmin,1.5rem);font-weight:900;}
+.hud-badge.mistakes .count{color:#ef4444;}
+.hud-badge .label{color:#64748b;font-size:.75em;font-weight:700;}
+.hud-badge .count{color:#0f766e;}
+.game-area-1p{flex:1;display:flex;align-items:center;justify-content:center;
+  gap:3vmin;padding:1.5vmin;}
+.game-col-1p{display:flex;flex-direction:column;align-items:center;gap:2vmin;}
+
+/* ── SUDOKU GRID ── */
+.sudoku-grid{
+  display:grid;grid-template-columns:repeat(9,1fr);
+  border:3.5px solid #1e293b;background:#1e293b;gap:0;
+  flex-shrink:0;touch-action:none;
+}
+.cell{
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;cursor:pointer;background:#fff;
+  transition:background .1s;position:relative;
+  border-right:1px solid #d1d5db;
+  border-bottom:1px solid #d1d5db;
+}
+.cell:last-child{border-right:none;}
+/* 3×3 box separators */
+.cell[data-c="2"],.cell[data-c="5"]{border-right:2.5px solid #334155;}
+.cell[data-r="2"],.cell[data-r="5"]{border-bottom:2.5px solid #334155;}
+.cell[data-c="8"]{border-right:none;}
+.cell[data-r="8"]{border-bottom:none;}
+/* States */
+.cell.highlight{background:#f0fdfa;}
+.cell.same-num{background:#ccfbf1;}
+.cell.selected{background:#99f6e4 !important;}
+.cell.given{color:#1e293b;}
+.cell.user-ok{color:#0f766e;}
+.cell.user-err{color:#ef4444;animation:shake .3s ease;}
+.cell.complete{color:#0f766e;background:#d1fae5 !important;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+
+/* ── NUMBER PAD ── */
+.numpad{display:grid;grid-template-columns:repeat(5,1fr);gap:.8vmin;
+  width:100%;}
+.np-btn{display:flex;align-items:center;justify-content:center;
+  border:none;border-radius:1rem;
+  font-family:inherit;font-weight:900;cursor:pointer;
+  background:#fff;color:#0f766e;
+  border:2.5px solid #ccfbf1;
+  transition:transform .12s,background .12s,box-shadow .12s;
+  box-shadow:0 3px 10px rgba(20,184,166,.1);}
+.np-btn:active,.np-btn:hover{background:#99f6e4;transform:scale(1.08);box-shadow:0 5px 16px rgba(20,184,166,.3);}
+.np-btn.erase{background:#fff5f5;color:#ef4444;border-color:#fecaca;}
+.np-btn.erase:hover,.np-btn.erase:active{background:#fecaca;}
+.np-btn.disabled{opacity:.35;pointer-events:none;}
+
+/* ── TWO PLAYER GAME ── */
+#s-2p{flex-direction:column;padding:0;}
+.progress-bar-row{display:flex;width:100%;height:52px;background:rgba(255,255,255,.8);
+  border-bottom:2px solid #ccfbf1;align-items:center;gap:0;flex-shrink:0;}
+.progress-side{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 1.5vw;gap:3px;}
+.progress-side .p-name{font-size:clamp(.8rem,1.8vmin,1.1rem);font-weight:900;color:#0f766e;}
+.progress-side.p2 .p-name{text-align:right;}
+.progress-bar-track{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:#14b8a6;border-radius:5px;transition:width .3s;width:0%;}
+.progress-vs{width:70px;text-align:center;font-size:1.5rem;font-weight:900;color:#f97316;flex-shrink:0;}
+.duel-row{flex:1;display:flex;overflow:hidden;}
+.player-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.5vmin;padding:1.5vmin;position:relative;}
+.player-area.p1{border-right:3px solid #ccfbf1;}
+.player-label{font-size:clamp(1rem,2.5vmin,1.5rem);font-weight:900;color:#0f766e;
+  display:flex;align-items:center;gap:.5em;}
+.player-label .mistakes-badge{background:#fff;border-radius:999px;padding:.2em .8em;
+  border:2px solid #fca5a5;color:#ef4444;font-size:.8em;}
+.winner-overlay{position:absolute;inset:0;background:rgba(240,253,250,.92);
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem;z-index:10;
+  border-radius:inherit;}
+.winner-overlay.show{display:flex;}
+.winner-text{font-size:clamp(2rem,5vmin,4rem);font-weight:900;color:#0f766e;text-align:center;}
+
+/* ── END SCREEN ── */
+.end-icon{font-size:clamp(4rem,10vmin,7rem);}
+.end-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:#0f766e;}
+.end-subtitle{font-size:clamp(1rem,2.5vw,1.7rem);color:#5eead4;font-weight:700;}
+.end-stats{display:flex;gap:2vmin;flex-wrap:wrap;justify-content:center;margin:1.5em 0;}
+.stat-box{background:#fff;border-radius:1.5rem;padding:1em 2em;border:2.5px solid #ccfbf1;text-align:center;}
+.stat-box .s-label{font-size:clamp(.75rem,1.5vmin,1rem);color:#64748b;font-weight:700;}
+.stat-box .s-value{font-size:clamp(1.5rem,3.5vmin,2.5rem);font-weight:900;color:#0f766e;}
+.end-btns{display:flex;gap:1.5vmin;flex-wrap:wrap;justify-content:center;}
+.btn-replay{background:#14b8a6;color:#fff;border:none;border-radius:999px;
+  padding:.9em 3em;font-size:clamp(1rem,2.5vmin,1.5rem);font-weight:900;
+  cursor:pointer;box-shadow:0 6px 20px rgba(20,184,166,.3);
+  transition:transform .15s;}
+.btn-replay:hover,.btn-replay:active{transform:scale(1.06);}
+.btn-home-end{background:#fff;color:#0f766e;border:2.5px solid #5eead4;border-radius:999px;
+  padding:.85em 2.5em;font-size:clamp(.9rem,2vmin,1.3rem);font-weight:800;
+  cursor:pointer;transition:background .15s;}
+.btn-home-end:hover{background:#f0fdfa;}
+</style>
+</head>
+<body>
+
+<!-- Floating decorations -->
+<span class="deco">🔢</span>
+<span class="deco">✨</span>
+<span class="deco">🧩</span>
+<span class="deco">⭐</span>
+<span class="deco">💡</span>
+<span class="deco">🎯</span>
+
+<!-- Home button -->
+<a id="home-btn" href="../index.html" title="回首頁">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899"
+       stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+</a>
+
+<!-- ═══════════════ HOME SCREEN ═══════════════ -->
+<section class="screen active" id="s-home">
+  <div class="page-title">🔢 數獨遊戲</div>
+  <div class="page-subtitle">填滿每一格，完成挑戰！</div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="pickMode('1p')">
+      <div class="mc-icon">🧠</div>
+      <div class="mc-title">單人挑戰</div>
+      <div class="mc-desc">計時解題<br>挑戰自己的極限</div>
+    </div>
+    <div class="mode-card" onclick="pickMode('2p')">
+      <div class="mc-icon">⚔️</div>
+      <div class="mc-title">雙人對戰</div>
+      <div class="mc-desc">相同題目 左右對戰<br>先完成者獲勝！</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DIFFICULTY SCREEN ═══════════════ -->
+<section class="screen" id="s-diff">
+  <div class="diff-title">選擇難度</div>
+  <div class="diff-subtitle" id="diff-mode-label">單人挑戰</div>
+  <div class="diff-grid" id="diff-grid"></div>
+  <button class="btn-start" id="btn-start" onclick="startGame()">開始遊戲 ▶</button>
+  <button class="btn-back" onclick="showScreen('s-home')">← 返回</button>
+</section>
+
+<!-- ═══════════════ SINGLE PLAYER SCREEN ═══════════════ -->
+<section class="screen" id="s-1p">
+  <div class="hud-1p">
+    <button class="btn-back" style="margin:0;padding:.4em 1.2em;font-size:clamp(.75rem,1.8vmin,1rem);"
+      onclick="confirmBack()">← 返回</button>
+    <div style="font-size:clamp(1rem,2.5vmin,1.5rem);font-weight:900;color:#0f766e;">🔢 數獨遊戲</div>
+    <div style="display:flex;gap:1vmin;">
+      <div class="hud-badge">
+        <span class="label">⏱</span>
+        <span class="count" id="timer-1p">00:00</span>
+      </div>
+      <div class="hud-badge mistakes">
+        <span class="label">❌</span>
+        <span class="count" id="mistakes-1p">0</span>
+      </div>
+    </div>
+  </div>
+  <div class="game-area-1p">
+    <div class="game-col-1p">
+      <div class="sudoku-grid" id="grid-1p"></div>
+      <div class="numpad" id="numpad-1p"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TWO PLAYER SCREEN ═══════════════ -->
+<section class="screen" id="s-2p">
+  <!-- Progress bars row -->
+  <div class="progress-bar-row">
+    <div class="progress-side p1">
+      <div class="p-name">👤 玩家一</div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-p1"></div></div>
+    </div>
+    <div class="progress-vs">VS</div>
+    <div class="progress-side p2" style="align-items:flex-end;">
+      <div class="p-name">玩家二 👤</div>
+      <div class="progress-bar-track" style="width:100%;"><div class="progress-bar-fill" id="prog-p2"></div></div>
+    </div>
+  </div>
+  <!-- Duel area -->
+  <div class="duel-row">
+    <!-- P1 -->
+    <div class="player-area p1" id="area-p1">
+      <div class="player-label">
+        玩家一
+        <span class="mistakes-badge">❌ <span id="mistakes-2p-0">0</span></span>
+      </div>
+      <div class="sudoku-grid" id="grid-2p-0"></div>
+      <div class="numpad" id="numpad-2p-0"></div>
+      <div class="winner-overlay" id="win-overlay-0">
+        <div style="font-size:4rem;">🏆</div>
+        <div class="winner-text">玩家一<br>獲勝！</div>
+      </div>
+    </div>
+    <!-- P2 -->
+    <div class="player-area p2" id="area-p2">
+      <div class="player-label">
+        玩家二
+        <span class="mistakes-badge">❌ <span id="mistakes-2p-1">0</span></span>
+      </div>
+      <div class="sudoku-grid" id="grid-2p-1"></div>
+      <div class="numpad" id="numpad-2p-1"></div>
+      <div class="winner-overlay" id="win-overlay-1">
+        <div style="font-size:4rem;">🏆</div>
+        <div class="winner-text">玩家二<br>獲勝！</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ END SCREEN (1P) ═══════════════ -->
+<section class="screen" id="s-end">
+  <div class="end-icon">🎉</div>
+  <div class="end-title">挑戰完成！</div>
+  <div class="end-subtitle" id="end-subtitle">太厲害了！</div>
+  <div class="end-stats" id="end-stats"></div>
+  <div class="end-btns">
+    <button class="btn-replay" onclick="startGame()">再玩一次</button>
+    <button class="btn-replay" style="background:#a78bfa;" onclick="showScreen('s-diff')">換難度</button>
+    <button class="btn-home-end" onclick="showScreen('s-home')">回主選單</button>
+  </div>
+</section>
+
+<script>
+'use strict';
+// ════════════════════════════════════════════════
+// 1.  SUDOKU GENERATOR
+// ════════════════════════════════════════════════
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function canPlace(b,r,c,n){
+  for(let i=0;i<9;i++) if(b[r][i]===n||b[i][c]===n) return false;
+  const br=~~(r/3)*3, bc=~~(c/3)*3;
+  for(let i=0;i<3;i++) for(let j=0;j<3;j++) if(b[br+i][bc+j]===n) return false;
+  return true;
+}
+
+function fillGrid(b,pos=0){
+  while(pos<81 && b[~~(pos/9)][pos%9]!==0) pos++;
+  if(pos===81) return true;
+  const r=~~(pos/9), c=pos%9;
+  const nums=shuffle([1,2,3,4,5,6,7,8,9]);
+  for(const n of nums){
+    if(canPlace(b,r,c,n)){
+      b[r][c]=n;
+      if(fillGrid(b,pos+1)) return true;
+      b[r][c]=0;
+    }
+  }
+  return false;
+}
+
+function countSols(b,pos=0,cnt={n:0}){
+  while(pos<81 && b[~~(pos/9)][pos%9]!==0) pos++;
+  if(pos===81){ cnt.n++; return cnt; }
+  if(cnt.n>1) return cnt;
+  const r=~~(pos/9), c=pos%9;
+  for(let n=1;n<=9;n++){
+    if(canPlace(b,r,c,n)){
+      b[r][c]=n;
+      countSols(b,pos+1,cnt);
+      b[r][c]=0;
+      if(cnt.n>1) return cnt;
+    }
+  }
+  return cnt;
+}
+
+const CLUES={ '入門':50, '簡單':38, '普通':30, '困難':24 };
+const DIFFS=[
+  { key:'入門', icon:'🌱', color:'#d1fae5', text:'#059669', label:'54個線索．輕鬆入門' },
+  { key:'簡單', icon:'⭐', color:'#dbeafe', text:'#1d4ed8', label:'38個線索．適合練習' },
+  { key:'普通', icon:'🔥', color:'#fef3c7', text:'#d97706', label:'30個線索．需要思考' },
+  { key:'困難', icon:'💀', color:'#fee2e2', text:'#dc2626', label:'24個線索．高手挑戰' },
+];
+
+function makePuzzle(diff){
+  // 1. Generate a complete solution
+  const sol=Array.from({length:9},()=>new Array(9).fill(0));
+  fillGrid(sol);
+
+  // 2. Remove cells to reach target clue count
+  const puzzle=sol.map(r=>[...r]);
+  const keep=CLUES[diff];
+  const target=81-keep;
+  const positions=shuffle([...Array(81).keys()]);
+  let removed=0;
+
+  for(const pos of positions){
+    if(removed>=target) break;
+    const r=~~(pos/9), c=pos%9;
+    const val=puzzle[r][c];
+    puzzle[r][c]=0;
+    const copy=puzzle.map(rr=>[...rr]);
+    if(countSols(copy).n===1) removed++;
+    else puzzle[r][c]=val;
+  }
+  return { solution:sol, puzzle };
+}
+
+// ════════════════════════════════════════════════
+// 2.  GAME STATE
+// ════════════════════════════════════════════════
+
+let gMode='1p';   // '1p' | '2p'
+let gDiff='簡單';
+let gSolution=null;    // 9×9 numbers
+let gTotalBlanks=0;    // cells to fill in puzzle
+
+function newPlayer(){
+  return {
+    board:null,   // 9×9, 0=blank, filled by user or given
+    given:null,   // 9×9 bool: is it a given clue?
+    wrong:null,   // 9×9 bool: user entered wrong answer
+    sel:null,     // {r,c} | null
+    mistakes:0,
+    filled:0,     // correctly filled cells
+    done:false,
+    elapsed:0,    // ms
+  };
+}
+let players=[newPlayer(),newPlayer()];
+let timerIntervalId=null;
+let timerStart=0;
+
+// ════════════════════════════════════════════════
+// 3.  SCREEN MANAGEMENT
+// ════════════════════════════════════════════════
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function pickMode(m){
+  gMode=m;
+  document.getElementById('diff-mode-label').textContent= m==='1p'?'單人挑戰':'雙人對戰';
+  buildDiffGrid();
+  showScreen('s-diff');
+}
+
+function buildDiffGrid(){
+  const el=document.getElementById('diff-grid');
+  el.innerHTML='';
+  DIFFS.forEach(d=>{
+    const btn=document.createElement('button');
+    btn.className='diff-btn'+(gDiff===d.key?' selected':'');
+    btn.style.background=d.color;
+    btn.style.color=d.text;
+    btn.innerHTML=`<span class="diff-icon">${d.icon}</span><span>${d.key}</span>
+      <span style="font-size:.75em;opacity:.8;">${d.label}</span>`;
+    btn.onclick=()=>{
+      gDiff=d.key;
+      document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    el.appendChild(btn);
+  });
+}
+
+function confirmBack(){
+  stopTimer();
+  showScreen('s-home');
+}
+
+// ════════════════════════════════════════════════
+// 4.  GRID BUILDER
+// ════════════════════════════════════════════════
+
+function buildGrid(gridEl, pidx){
+  gridEl.innerHTML='';
+  // Size the grid
+  const is2p = gMode==='2p';
+  const cellSize = is2p
+    ? `min(calc((min(46vw,62vh))/9), 9999px)`
+    : `min(calc((min(58vw,72vh))/9), 9999px)`;
+
+  gridEl.style.width  = is2p ? 'min(46vw,62vh)' : 'min(58vw,72vh)';
+  gridEl.style.height = is2p ? 'min(46vw,62vh)' : 'min(58vw,72vh)';
+
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const cell=document.createElement('div');
+      cell.className='cell';
+      cell.dataset.r=r; cell.dataset.c=c; cell.dataset.pi=pidx;
+      cell.style.fontSize= is2p
+        ? 'min(3.8vmin, calc(min(46vw,62vh)/12))'
+        : 'min(4.5vmin, calc(min(58vw,72vh)/12))';
+      cell.addEventListener('pointerdown', e=>{
+        e.stopPropagation();
+        onCellTap(r,c,pidx);
+      });
+      gridEl.appendChild(cell);
+    }
+  }
+}
+
+function buildNumpad(npEl, pidx){
+  npEl.innerHTML='';
+  const is2p=gMode==='2p';
+  const btnH=is2p?'min(7vmin,55px)':'min(9vmin,70px)';
+  const fSize=is2p?'min(3.5vmin,26px)':'min(4vmin,30px)';
+
+  for(let n=1;n<=9;n++){
+    const btn=document.createElement('button');
+    btn.className='np-btn';
+    btn.dataset.num=n; btn.dataset.pi=pidx;
+    btn.style.height=btnH;
+    btn.style.fontSize=fSize;
+    btn.textContent=n;
+    btn.addEventListener('pointerdown',e=>{e.stopPropagation(); onNumTap(n,pidx);});
+    npEl.appendChild(btn);
+  }
+  // Erase button (spans 1 col, placed after 9 nums = 10th position in 5-col grid)
+  const era=document.createElement('button');
+  era.className='np-btn erase';
+  era.dataset.num=0; era.dataset.pi=pidx;
+  era.style.height=btnH;
+  era.style.fontSize=fSize;
+  era.textContent='⌫';
+  era.addEventListener('pointerdown',e=>{e.stopPropagation(); onNumTap(0,pidx);});
+  npEl.appendChild(era);
+}
+
+// ════════════════════════════════════════════════
+// 5.  GAME LOGIC
+// ════════════════════════════════════════════════
+
+function startGame(){
+  stopTimer();
+  // Generate puzzle
+  const gen=makePuzzle(gDiff);
+  gSolution=gen.solution;
+
+  // Count blanks
+  gTotalBlanks=0;
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++) if(gen.puzzle[r][c]===0) gTotalBlanks++;
+
+  // Init player states
+  const numPlayers= gMode==='2p' ? 2 : 1;
+  players=[];
+  for(let pi=0;pi<numPlayers;pi++){
+    const p=newPlayer();
+    p.board=gen.puzzle.map(r=>[...r]);
+    p.given=gen.puzzle.map(r=>r.map(v=>v!==0));
+    p.wrong=Array.from({length:9},()=>new Array(9).fill(false));
+    p.sel=null;
+    players.push(p);
+  }
+
+  if(gMode==='1p'){
+    const gridEl=document.getElementById('grid-1p');
+    const npEl=document.getElementById('numpad-1p');
+    buildGrid(gridEl, 0);
+    buildNumpad(npEl, 0);
+    refreshGrid(0);
+    document.getElementById('mistakes-1p').textContent='0';
+    document.getElementById('timer-1p').textContent='00:00';
+    showScreen('s-1p');
+  } else {
+    // Reset winner overlays
+    document.getElementById('win-overlay-0').classList.remove('show');
+    document.getElementById('win-overlay-1').classList.remove('show');
+    document.getElementById('prog-p1').style.width='0%';
+    document.getElementById('prog-p2').style.width='0%';
+    document.getElementById('mistakes-2p-0').textContent='0';
+    document.getElementById('mistakes-2p-1').textContent='0';
+
+    for(let pi=0;pi<2;pi++){
+      buildGrid(document.getElementById(`grid-2p-${pi}`), pi);
+      buildNumpad(document.getElementById(`numpad-2p-${pi}`), pi);
+      refreshGrid(pi);
+    }
+    showScreen('s-2p');
+  }
+
+  // Start timer
+  timerStart=Date.now();
+  timerIntervalId=setInterval(tickTimer, 200);
+}
+
+function tickTimer(){
+  const elapsed=Date.now()-timerStart;
+  if(gMode==='1p'){
+    const p=players[0];
+    if(!p.done) p.elapsed=elapsed;
+    document.getElementById('timer-1p').textContent=fmtTime(elapsed);
+  }
+  // 2P: timer shown via progress bars only
+}
+
+function stopTimer(){
+  if(timerIntervalId){ clearInterval(timerIntervalId); timerIntervalId=null; }
+}
+
+function fmtTime(ms){
+  const s=Math.floor(ms/1000);
+  const m=Math.floor(s/60);
+  return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+
+// ── CELL TAP ──
+
+function onCellTap(r,c,pi){
+  const p=players[pi];
+  if(!p||p.done) return;
+  p.sel={r,c};
+  refreshGrid(pi);
+}
+
+// ── NUMBER PAD TAP ──
+
+function onNumTap(num,pi){
+  const p=players[pi];
+  if(!p||p.done) return;
+  if(!p.sel) return;
+  const {r,c}=p.sel;
+  if(p.given[r][c]) return;  // can't change a given
+
+  if(num===0){
+    // Erase
+    p.board[r][c]=0;
+    p.wrong[r][c]=false;
+  } else {
+    if(p.board[r][c]===num) return; // already correct, ignore
+    if(gSolution[r][c]===num){
+      // Correct
+      p.board[r][c]=num;
+      p.wrong[r][c]=false;
+      p.filled++;
+      checkComplete(pi);
+    } else {
+      // Wrong
+      p.board[r][c]=num;
+      p.wrong[r][c]=true;
+      p.mistakes++;
+      updateMistakeDisplay(pi);
+    }
+  }
+
+  refreshGrid(pi);
+  if(gMode==='2p') updateProgress(pi);
+}
+
+function updateMistakeDisplay(pi){
+  if(gMode==='1p'){
+    document.getElementById('mistakes-1p').textContent=players[pi].mistakes;
+  } else {
+    document.getElementById(`mistakes-2p-${pi}`).textContent=players[pi].mistakes;
+  }
+}
+
+function updateProgress(pi){
+  const p=players[pi];
+  const pct=Math.round(p.filled/gTotalBlanks*100);
+  document.getElementById(`prog-p${pi===0?'p1':'p2'}`.replace('pp','p')).style.width=pct+'%';
+  // Fix: prog-p1 for pi=0, prog-p2 for pi=1
+  const ids=['prog-p1','prog-p2'];
+  document.getElementById(ids[pi]).style.width=pct+'%';
+}
+
+function checkComplete(pi){
+  const p=players[pi];
+  // Check if all blanks filled correctly
+  if(p.filled>=gTotalBlanks){
+    p.done=true;
+    if(gMode==='1p'){
+      stopTimer();
+      showEnd1P(pi);
+    } else {
+      // First to complete wins
+      document.getElementById(`win-overlay-${pi}`).classList.add('show');
+      // Mark the other player's area as "lost" (just dim)
+      const other=1-pi;
+      if(!players[other].done){
+        // other player hasn't won; let them know game is over
+        setTimeout(()=>showScreen('s-home'),3500);
+      }
+    }
+  }
+}
+
+function showEnd1P(pi){
+  const p=players[pi];
+  const d=DIFFS.find(d=>d.key===gDiff);
+  document.getElementById('end-subtitle').textContent=
+    `${d.icon} ${gDiff} 難度完成！`;
+
+  document.getElementById('end-stats').innerHTML=`
+    <div class="stat-box">
+      <div class="s-label">⏱ 完成時間</div>
+      <div class="s-value">${fmtTime(p.elapsed)}</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">❌ 錯誤次數</div>
+      <div class="s-value">${p.mistakes}</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">難度</div>
+      <div class="s-value" style="font-size:1.8rem;">${d.icon} ${gDiff}</div>
+    </div>
+  `;
+  showScreen('s-end');
+}
+
+// ── GRID REFRESH ──
+
+function refreshGrid(pi){
+  const p=players[pi];
+  const gridEl=document.getElementById(gMode==='1p'?'grid-1p':`grid-2p-${pi}`);
+  if(!gridEl) return;
+
+  const sel=p.sel;
+  const selNum= sel ? p.board[sel.r][sel.c] : 0;
+
+  const cells=gridEl.querySelectorAll('.cell');
+  cells.forEach(cell=>{
+    const r=+cell.dataset.r, c=+cell.dataset.c;
+
+    // Determine value
+    const val=p.board[r][c];
+
+    // Text
+    cell.textContent= val? val : '';
+
+    // Classes
+    cell.className='cell';
+
+    if(p.given[r][c]){
+      cell.classList.add('given');
+    } else if(val!==0){
+      if(p.wrong[r][c]) cell.classList.add('user-err');
+      else cell.classList.add('user-ok');
+    }
+
+    if(sel){
+      // Selected
+      if(r===sel.r && c===sel.c){
+        cell.classList.add('selected');
+      }
+      // Same row/col/box
+      else if(r===sel.r || c===sel.c ||
+        (~~(r/3)===~~(sel.r/3) && ~~(c/3)===~~(sel.c/3))){
+        cell.classList.add('highlight');
+      }
+      // Same number
+      if(selNum!==0 && val===selNum && !(r===sel.r&&c===sel.c)){
+        cell.classList.add('same-num');
+      }
+    }
+  });
+}
+
+// ════════════════════════════════════════════════
+// 6.  INIT
+// ════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  buildDiffGrid();
+  // Prevent scrolling/context-menu on touch
+  document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+  document.addEventListener('contextmenu',e=>e.preventDefault());
+});
+</script>
+</body>
+</html>

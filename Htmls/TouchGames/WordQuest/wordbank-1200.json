@@ -1,0 +1,5680 @@
+{
+  "動物": {
+    "icon": "🐾",
+    "color": "#f97316",
+    "words": [
+      {
+        "word": "ANT",
+        "hint": "螞蟻",
+        "emoji": "🐜"
+      },
+      {
+        "word": "BAT",
+        "hint": "蝙蝠",
+        "emoji": "🦇"
+      },
+      {
+        "word": "BEAR",
+        "hint": "熊",
+        "emoji": "🐻"
+      },
+      {
+        "word": "BEE",
+        "hint": "蜜蜂",
+        "emoji": "🐝"
+      },
+      {
+        "word": "BIRD",
+        "hint": "鳥",
+        "emoji": "🐦"
+      },
+      {
+        "word": "BUG",
+        "hint": "小蟲",
+        "emoji": "🐛"
+      },
+      {
+        "word": "BUTTERFLY",
+        "hint": "蝴蝶",
+        "emoji": "🦋"
+      },
+      {
+        "word": "CAT",
+        "hint": "貓",
+        "emoji": "🐱"
+      },
+      {
+        "word": "CHICKEN",
+        "hint": "雞肉",
+        "emoji": "🐔"
+      },
+      {
+        "word": "DOG",
+        "hint": "狗",
+        "emoji": "🐶"
+      },
+      {
+        "word": "DUCK",
+        "hint": "鴨",
+        "emoji": "🦆"
+      },
+      {
+        "word": "ELEPHANT",
+        "hint": "大象",
+        "emoji": "🐘"
+      },
+      {
+        "word": "FISH",
+        "hint": "魚",
+        "emoji": "🐟"
+      },
+      {
+        "word": "FOX",
+        "hint": "狐狸",
+        "emoji": "🦊"
+      },
+      {
+        "word": "FROG",
+        "hint": "青蛙",
+        "emoji": "🐸"
+      },
+      {
+        "word": "HEN",
+        "hint": "母雞",
+        "emoji": "🐔"
+      },
+      {
+        "word": "HIPPO",
+        "hint": "河馬",
+        "emoji": "🐾"
+      },
+      {
+        "word": "HORSE",
+        "hint": "馬",
+        "emoji": "🐴"
+      },
+      {
+        "word": "KANGAROO",
+        "hint": "袋鼠",
+        "emoji": "🦘"
+      },
+      {
+        "word": "KOALA",
+        "hint": "無尾熊",
+        "emoji": "🐨"
+      },
+      {
+        "word": "LION",
+        "hint": "獅子",
+        "emoji": "🦁"
+      },
+      {
+        "word": "MONKEY",
+        "hint": "猴子",
+        "emoji": "🐒"
+      },
+      {
+        "word": "MOUSE",
+        "hint": "老鼠",
+        "emoji": "🐭"
+      },
+      {
+        "word": "PIG",
+        "hint": "豬",
+        "emoji": "🐷"
+      },
+      {
+        "word": "RABBIT",
+        "hint": "兔子",
+        "emoji": "🐰"
+      },
+      {
+        "word": "RAT",
+        "hint": "(大)老鼠,鼠輩",
+        "emoji": "🐾"
+      },
+      {
+        "word": "SHARK",
+        "hint": "鯊魚",
+        "emoji": "🦈"
+      },
+      {
+        "word": "SHEEP",
+        "hint": "綿羊",
+        "emoji": "🐑"
+      },
+      {
+        "word": "SNAKE",
+        "hint": "蛇",
+        "emoji": "🐍"
+      },
+      {
+        "word": "SPIDER",
+        "hint": "蜘蛛",
+        "emoji": "🕷️"
+      },
+      {
+        "word": "TIGER",
+        "hint": "老虎",
+        "emoji": "🐯"
+      },
+      {
+        "word": "TURTLE",
+        "hint": "烏龜",
+        "emoji": "🐢"
+      },
+      {
+        "word": "WHALE",
+        "hint": "鯨魚",
+        "emoji": "🐳"
+      },
+      {
+        "word": "ZEBRA",
+        "hint": "斑馬",
+        "emoji": "🦓"
+      },
+      {
+        "word": "DRAGON",
+        "hint": "龍",
+        "emoji": "📝"
+      },
+      {
+        "word": "GOAT",
+        "hint": "山羊",
+        "emoji": "📝"
+      },
+      {
+        "word": "GOOSE",
+        "hint": "鵝",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "食物與飲料": {
+    "icon": "🍎",
+    "color": "#ef4444",
+    "words": [
+      {
+        "word": "APPLE",
+        "hint": "蘋果",
+        "emoji": "🍎"
+      },
+      {
+        "word": "BANANA",
+        "hint": "香蕉",
+        "emoji": "🍌"
+      },
+      {
+        "word": "BEAN",
+        "hint": "豆",
+        "emoji": "🫘"
+      },
+      {
+        "word": "BEEF",
+        "hint": "牛肉",
+        "emoji": "🥩"
+      },
+      {
+        "word": "BREAD",
+        "hint": "麵包",
+        "emoji": "🍞"
+      },
+      {
+        "word": "BREAKFAST",
+        "hint": "早餐",
+        "emoji": "🍳"
+      },
+      {
+        "word": "BUN",
+        "hint": "小圓麵包",
+        "emoji": "🥐"
+      },
+      {
+        "word": "BUTTER",
+        "hint": "奶油",
+        "emoji": "🧈"
+      },
+      {
+        "word": "CAKE",
+        "hint": "蛋糕",
+        "emoji": "🎂"
+      },
+      {
+        "word": "CANDY",
+        "hint": "糖果",
+        "emoji": "🍬"
+      },
+      {
+        "word": "CHEESE",
+        "hint": "乳酪",
+        "emoji": "🧀"
+      },
+      {
+        "word": "CHOCOLATE",
+        "hint": "巧克力",
+        "emoji": "🍫"
+      },
+      {
+        "word": "COFFEE",
+        "hint": "咖啡",
+        "emoji": "☕"
+      },
+      {
+        "word": "COOKIE",
+        "hint": "餅乾",
+        "emoji": "🍪"
+      },
+      {
+        "word": "DINNER",
+        "hint": "晚餐",
+        "emoji": "🍽️"
+      },
+      {
+        "word": "DUMPLING",
+        "hint": "包餡食物,餃子",
+        "emoji": "🍎"
+      },
+      {
+        "word": "EGG",
+        "hint": "蛋",
+        "emoji": "🥚"
+      },
+      {
+        "word": "FRUIT",
+        "hint": "水果",
+        "emoji": "🍎"
+      },
+      {
+        "word": "GRAPE",
+        "hint": "葡萄",
+        "emoji": "🍇"
+      },
+      {
+        "word": "HAM",
+        "hint": "火腿",
+        "emoji": "🍖"
+      },
+      {
+        "word": "HONEY",
+        "hint": "蜂蜜",
+        "emoji": "🍯"
+      },
+      {
+        "word": "JUICE",
+        "hint": "果汁",
+        "emoji": "🧃"
+      },
+      {
+        "word": "LEMON",
+        "hint": "檸檬",
+        "emoji": "🍋"
+      },
+      {
+        "word": "LETTUCE",
+        "hint": "萵苣",
+        "emoji": "🥬"
+      },
+      {
+        "word": "LUNCH",
+        "hint": "午餐",
+        "emoji": "🍱"
+      },
+      {
+        "word": "MEAL",
+        "hint": "一餐",
+        "emoji": "🍽️"
+      },
+      {
+        "word": "MEAT",
+        "hint": "肉",
+        "emoji": "🥩"
+      },
+      {
+        "word": "MILK",
+        "hint": "牛奶",
+        "emoji": "🥛"
+      },
+      {
+        "word": "NOODLE",
+        "hint": "麵條",
+        "emoji": "🍜"
+      },
+      {
+        "word": "ORANGE",
+        "hint": "柳橙",
+        "emoji": "🟠"
+      },
+      {
+        "word": "PEACH",
+        "hint": "桃子",
+        "emoji": "🍑"
+      },
+      {
+        "word": "PIE",
+        "hint": "派",
+        "emoji": "🥧"
+      },
+      {
+        "word": "PIZZA",
+        "hint": "披薩",
+        "emoji": "🍕"
+      },
+      {
+        "word": "PORK",
+        "hint": "豬肉",
+        "emoji": "🥩"
+      },
+      {
+        "word": "PUMPKIN",
+        "hint": "南瓜",
+        "emoji": "🎃"
+      },
+      {
+        "word": "RICE",
+        "hint": "米飯",
+        "emoji": "🍚"
+      },
+      {
+        "word": "SALAD",
+        "hint": "沙拉",
+        "emoji": "🥗"
+      },
+      {
+        "word": "SALT",
+        "hint": "鹽",
+        "emoji": "🧂"
+      },
+      {
+        "word": "SANDWICH",
+        "hint": "三明治",
+        "emoji": "🥪"
+      },
+      {
+        "word": "SNACK",
+        "hint": "點心",
+        "emoji": "🍿"
+      },
+      {
+        "word": "SOUP",
+        "hint": "湯",
+        "emoji": "🍲"
+      },
+      {
+        "word": "STRAWBERRY",
+        "hint": "草莓",
+        "emoji": "🍓"
+      },
+      {
+        "word": "SUGAR",
+        "hint": "糖",
+        "emoji": "🍬"
+      },
+      {
+        "word": "TEA",
+        "hint": "茶",
+        "emoji": "🍵"
+      },
+      {
+        "word": "TOMATO",
+        "hint": "番茄",
+        "emoji": "🍅"
+      },
+      {
+        "word": "VEGETABLE",
+        "hint": "蔬菜",
+        "emoji": "🥦"
+      },
+      {
+        "word": "WATERMELON",
+        "hint": "西瓜",
+        "emoji": "🍉"
+      },
+      {
+        "word": "COKE",
+        "hint": "可樂",
+        "emoji": "📝"
+      },
+      {
+        "word": "DISH",
+        "hint": "盤子,菜餚",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOOD",
+        "hint": "食物",
+        "emoji": "📝"
+      },
+      {
+        "word": "GUAVA",
+        "hint": "番石榴",
+        "emoji": "📝"
+      },
+      {
+        "word": "POPCORN",
+        "hint": "爆米花",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "顏色": {
+    "icon": "🎨",
+    "color": "#a855f7",
+    "words": [
+      {
+        "word": "BLACK",
+        "hint": "黑色(的)",
+        "emoji": "⚫"
+      },
+      {
+        "word": "BLUE",
+        "hint": "藍色(的)",
+        "emoji": "🔵"
+      },
+      {
+        "word": "BROWN",
+        "hint": "棕色(的)",
+        "emoji": "🟤"
+      },
+      {
+        "word": "COLOR",
+        "hint": "顏色",
+        "emoji": "🎨"
+      },
+      {
+        "word": "GRAY",
+        "hint": "灰色的",
+        "emoji": "🩶"
+      },
+      {
+        "word": "GREEN",
+        "hint": "綠色(的)",
+        "emoji": "🟢"
+      },
+      {
+        "word": "PINK",
+        "hint": "粉紅色(的)",
+        "emoji": "🩷"
+      },
+      {
+        "word": "PURPLE",
+        "hint": "紫色的",
+        "emoji": "💜"
+      },
+      {
+        "word": "RED",
+        "hint": "紅色(的)",
+        "emoji": "🔴"
+      },
+      {
+        "word": "WHITE",
+        "hint": "白色(的)",
+        "emoji": "⚪"
+      },
+      {
+        "word": "YELLOW",
+        "hint": "黃色(的)",
+        "emoji": "🟡"
+      }
+    ]
+  },
+  "身體部位": {
+    "icon": "💪",
+    "color": "#ec4899",
+    "words": [
+      {
+        "word": "ARM",
+        "hint": "手臂,武裝",
+        "emoji": "💪"
+      },
+      {
+        "word": "BACK",
+        "hint": "在…後面",
+        "emoji": "🧍"
+      },
+      {
+        "word": "BODY",
+        "hint": "身體",
+        "emoji": "🧍"
+      },
+      {
+        "word": "EAR",
+        "hint": "耳朵",
+        "emoji": "👂"
+      },
+      {
+        "word": "EYE",
+        "hint": "眼睛",
+        "emoji": "👁️"
+      },
+      {
+        "word": "FACE",
+        "hint": "臉孔,面對",
+        "emoji": "😊"
+      },
+      {
+        "word": "FINGER",
+        "hint": "手指",
+        "emoji": "☝️"
+      },
+      {
+        "word": "FOOT",
+        "hint": "腳",
+        "emoji": "🦶"
+      },
+      {
+        "word": "HAIR",
+        "hint": "頭髮",
+        "emoji": "💇"
+      },
+      {
+        "word": "HAND",
+        "hint": "手",
+        "emoji": "✋"
+      },
+      {
+        "word": "HEAD",
+        "hint": "頭",
+        "emoji": "🗣️"
+      },
+      {
+        "word": "HEART",
+        "hint": "心",
+        "emoji": "❤️"
+      },
+      {
+        "word": "KNEE",
+        "hint": "膝蓋",
+        "emoji": "🦵"
+      },
+      {
+        "word": "LEG",
+        "hint": "腿",
+        "emoji": "🦵"
+      },
+      {
+        "word": "LIP",
+        "hint": "嘴唇",
+        "emoji": "👄"
+      },
+      {
+        "word": "MOUTH",
+        "hint": "嘴巴",
+        "emoji": "👄"
+      },
+      {
+        "word": "NAIL",
+        "hint": "釘子",
+        "emoji": "💪"
+      },
+      {
+        "word": "NECK",
+        "hint": "脖子",
+        "emoji": "🦒"
+      },
+      {
+        "word": "NOSE",
+        "hint": "鼻子",
+        "emoji": "👃"
+      },
+      {
+        "word": "SHOULDER",
+        "hint": "肩膀",
+        "emoji": "💪"
+      },
+      {
+        "word": "STOMACH",
+        "hint": "胃",
+        "emoji": "🫃"
+      },
+      {
+        "word": "THROAT",
+        "hint": "喉嚨",
+        "emoji": "💪"
+      },
+      {
+        "word": "TOE",
+        "hint": "腳趾",
+        "emoji": "💪"
+      },
+      {
+        "word": "TOOTH",
+        "hint": "牙齒",
+        "emoji": "🦷"
+      },
+      {
+        "word": "FEVER",
+        "hint": "發燒",
+        "emoji": "📝"
+      },
+      {
+        "word": "HEADACHE",
+        "hint": "頭痛",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "學校與學習": {
+    "icon": "🏫",
+    "color": "#3b82f6",
+    "words": [
+      {
+        "word": "ART",
+        "hint": "美術",
+        "emoji": "🏫"
+      },
+      {
+        "word": "BELL",
+        "hint": "鈴",
+        "emoji": "🏫"
+      },
+      {
+        "word": "BLACKBOARD",
+        "hint": "黑板",
+        "emoji": "🏫"
+      },
+      {
+        "word": "BOOK",
+        "hint": "書",
+        "emoji": "📚"
+      },
+      {
+        "word": "CHALK",
+        "hint": "粉筆",
+        "emoji": "✏️"
+      },
+      {
+        "word": "CLASS",
+        "hint": "班級",
+        "emoji": "🏫"
+      },
+      {
+        "word": "CLASSMATE",
+        "hint": "同班同學",
+        "emoji": "🏫"
+      },
+      {
+        "word": "CLASSROOM",
+        "hint": "教室",
+        "emoji": "🏫"
+      },
+      {
+        "word": "CLUB",
+        "hint": "社團",
+        "emoji": "🏫"
+      },
+      {
+        "word": "COMPUTER",
+        "hint": "電腦",
+        "emoji": "💻"
+      },
+      {
+        "word": "DESK",
+        "hint": "書桌",
+        "emoji": "🪑"
+      },
+      {
+        "word": "DICTIONARY",
+        "hint": "字典",
+        "emoji": "📖"
+      },
+      {
+        "word": "ENGLISH",
+        "hint": "英語",
+        "emoji": "🇬🇧"
+      },
+      {
+        "word": "ERASER",
+        "hint": "橡皮擦",
+        "emoji": "🗑️"
+      },
+      {
+        "word": "GRADE",
+        "hint": "成績,年級",
+        "emoji": "🏫"
+      },
+      {
+        "word": "GYM",
+        "hint": "體育館",
+        "emoji": "🏋️"
+      },
+      {
+        "word": "HISTORY",
+        "hint": "歷史",
+        "emoji": "🏫"
+      },
+      {
+        "word": "HOMEWORK",
+        "hint": "家庭作業",
+        "emoji": "📋"
+      },
+      {
+        "word": "KNOWLEDGE",
+        "hint": "知識",
+        "emoji": "🏫"
+      },
+      {
+        "word": "LANGUAGE",
+        "hint": "語言",
+        "emoji": "🏫"
+      },
+      {
+        "word": "LESSON",
+        "hint": "課",
+        "emoji": "📖"
+      },
+      {
+        "word": "LIBRARY",
+        "hint": "圖書館",
+        "emoji": "📚"
+      },
+      {
+        "word": "MAP",
+        "hint": "地圖",
+        "emoji": "🏫"
+      },
+      {
+        "word": "MATH",
+        "hint": "數學",
+        "emoji": "🏫"
+      },
+      {
+        "word": "NOTEBOOK",
+        "hint": "筆記本,筆電",
+        "emoji": "📓"
+      },
+      {
+        "word": "PAPER",
+        "hint": "紙",
+        "emoji": "📄"
+      },
+      {
+        "word": "PEN",
+        "hint": "筆",
+        "emoji": "🖊️"
+      },
+      {
+        "word": "PENCIL",
+        "hint": "鉛筆",
+        "emoji": "✏️"
+      },
+      {
+        "word": "QUIZ",
+        "hint": "小考",
+        "emoji": "🏫"
+      },
+      {
+        "word": "RULE",
+        "hint": "規則",
+        "emoji": "🏫"
+      },
+      {
+        "word": "SCHOOL",
+        "hint": "學校",
+        "emoji": "🏫"
+      },
+      {
+        "word": "SCIENCE",
+        "hint": "科學",
+        "emoji": "🔬"
+      },
+      {
+        "word": "STUDENT",
+        "hint": "學生",
+        "emoji": "👨‍🎓"
+      },
+      {
+        "word": "STUDY",
+        "hint": "研讀,學習",
+        "emoji": "🏫"
+      },
+      {
+        "word": "SUBJECT",
+        "hint": "科目",
+        "emoji": "🏫"
+      },
+      {
+        "word": "TEACHER",
+        "hint": "教師",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "TEST",
+        "hint": "考試,測試",
+        "emoji": "🏫"
+      },
+      {
+        "word": "COURSE",
+        "hint": "課程",
+        "emoji": "📝"
+      },
+      {
+        "word": "EXAMPLE",
+        "hint": "例子",
+        "emoji": "📝"
+      },
+      {
+        "word": "PROBLEM",
+        "hint": "問題",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "自然與天氣": {
+    "icon": "🌿",
+    "color": "#10b981",
+    "words": [
+      {
+        "word": "AIR",
+        "hint": "空氣",
+        "emoji": "🌿"
+      },
+      {
+        "word": "EARTH",
+        "hint": "地球",
+        "emoji": "🌍"
+      },
+      {
+        "word": "FIRE",
+        "hint": "火焰,開火",
+        "emoji": "🔥"
+      },
+      {
+        "word": "FLOWER",
+        "hint": "花朵",
+        "emoji": "🌸"
+      },
+      {
+        "word": "GRASS",
+        "hint": "草",
+        "emoji": "🌿"
+      },
+      {
+        "word": "ICE",
+        "hint": "冰",
+        "emoji": "🧊"
+      },
+      {
+        "word": "ISLAND",
+        "hint": "島嶼",
+        "emoji": "🏝️"
+      },
+      {
+        "word": "LAKE",
+        "hint": "湖",
+        "emoji": "🏞️"
+      },
+      {
+        "word": "LAND",
+        "hint": "土地",
+        "emoji": "🌿"
+      },
+      {
+        "word": "MOON",
+        "hint": "月亮",
+        "emoji": "🌙"
+      },
+      {
+        "word": "MOUNTAIN",
+        "hint": "山",
+        "emoji": "⛰️"
+      },
+      {
+        "word": "MUD",
+        "hint": "泥巴",
+        "emoji": "🌧️"
+      },
+      {
+        "word": "PLANET",
+        "hint": "行星",
+        "emoji": "🌿"
+      },
+      {
+        "word": "PLANT",
+        "hint": "植物",
+        "emoji": "🌱"
+      },
+      {
+        "word": "RAIN",
+        "hint": "下雨",
+        "emoji": "🌧️"
+      },
+      {
+        "word": "RAINBOW",
+        "hint": "彩虹",
+        "emoji": "🌈"
+      },
+      {
+        "word": "RIVER",
+        "hint": "河",
+        "emoji": "🌊"
+      },
+      {
+        "word": "ROCK",
+        "hint": "岩石",
+        "emoji": "🪨"
+      },
+      {
+        "word": "SEA",
+        "hint": "海",
+        "emoji": "🌊"
+      },
+      {
+        "word": "SEED",
+        "hint": "種子",
+        "emoji": "🌱"
+      },
+      {
+        "word": "SKY",
+        "hint": "天空",
+        "emoji": "🌤️"
+      },
+      {
+        "word": "SMOKE",
+        "hint": "煙霧,抽菸",
+        "emoji": "💨"
+      },
+      {
+        "word": "SNOW",
+        "hint": "下雪",
+        "emoji": "❄️"
+      },
+      {
+        "word": "STAR",
+        "hint": "星星",
+        "emoji": "⭐"
+      },
+      {
+        "word": "SUN",
+        "hint": "太陽",
+        "emoji": "☀️"
+      },
+      {
+        "word": "TREE",
+        "hint": "樹",
+        "emoji": "🌳"
+      },
+      {
+        "word": "WATER",
+        "hint": "水",
+        "emoji": "💧"
+      },
+      {
+        "word": "WAVE",
+        "hint": "波浪",
+        "emoji": "🌊"
+      },
+      {
+        "word": "WIND",
+        "hint": "風",
+        "emoji": "💨"
+      }
+    ]
+  },
+  "地方與場所": {
+    "icon": "🏠",
+    "color": "#0ea5e9",
+    "words": [
+      {
+        "word": "AIRPORT",
+        "hint": "機場",
+        "emoji": "✈️"
+      },
+      {
+        "word": "APARTMENT",
+        "hint": "公寓",
+        "emoji": "🏠"
+      },
+      {
+        "word": "BAKERY",
+        "hint": "麵包店",
+        "emoji": "🥖"
+      },
+      {
+        "word": "BALCONY",
+        "hint": "陽台",
+        "emoji": "🏠"
+      },
+      {
+        "word": "BANK",
+        "hint": "銀行",
+        "emoji": "🏦"
+      },
+      {
+        "word": "BATHROOM",
+        "hint": "浴室",
+        "emoji": "🚿"
+      },
+      {
+        "word": "BEACH",
+        "hint": "海灘",
+        "emoji": "🏖️"
+      },
+      {
+        "word": "BEDROOM",
+        "hint": "臥室",
+        "emoji": "🏠"
+      },
+      {
+        "word": "BENCH",
+        "hint": "長椅",
+        "emoji": "🏠"
+      },
+      {
+        "word": "BLOCK",
+        "hint": "街區",
+        "emoji": "🏠"
+      },
+      {
+        "word": "BOOKSTORE",
+        "hint": "書店",
+        "emoji": "📚"
+      },
+      {
+        "word": "BRIDGE",
+        "hint": "橋",
+        "emoji": "🌉"
+      },
+      {
+        "word": "CAMP",
+        "hint": "露營",
+        "emoji": "⛺"
+      },
+      {
+        "word": "CASTLE",
+        "hint": "城堡",
+        "emoji": "🏰"
+      },
+      {
+        "word": "CENTER",
+        "hint": "中心",
+        "emoji": "🏠"
+      },
+      {
+        "word": "CHURCH",
+        "hint": "教堂",
+        "emoji": "⛪"
+      },
+      {
+        "word": "CITY",
+        "hint": "城市",
+        "emoji": "🏙️"
+      },
+      {
+        "word": "CORNER",
+        "hint": "角落",
+        "emoji": "🏠"
+      },
+      {
+        "word": "COUNTRY",
+        "hint": "鄉村",
+        "emoji": "🏠"
+      },
+      {
+        "word": "FACTORY",
+        "hint": "工廠",
+        "emoji": "🏭"
+      },
+      {
+        "word": "FARM",
+        "hint": "農田",
+        "emoji": "🌾"
+      },
+      {
+        "word": "GARDEN",
+        "hint": "花園",
+        "emoji": "🌺"
+      },
+      {
+        "word": "HOME",
+        "hint": "家",
+        "emoji": "🏠"
+      },
+      {
+        "word": "HOSPITAL",
+        "hint": "醫院",
+        "emoji": "🏥"
+      },
+      {
+        "word": "HOTEL",
+        "hint": "旅社",
+        "emoji": "🏨"
+      },
+      {
+        "word": "HOUSE",
+        "hint": "房屋",
+        "emoji": "🏠"
+      },
+      {
+        "word": "KITCHEN",
+        "hint": "廚房",
+        "emoji": "🍳"
+      },
+      {
+        "word": "MARKET",
+        "hint": "市場",
+        "emoji": "🛒"
+      },
+      {
+        "word": "MUSEUM",
+        "hint": "博物館",
+        "emoji": "🏛️"
+      },
+      {
+        "word": "OFFICE",
+        "hint": "辦公室",
+        "emoji": "🏢"
+      },
+      {
+        "word": "PARK",
+        "hint": "公園",
+        "emoji": "🌳"
+      },
+      {
+        "word": "PLAYGROUND",
+        "hint": "操場",
+        "emoji": "🛝"
+      },
+      {
+        "word": "RESTAURANT",
+        "hint": "餐館",
+        "emoji": "🍽️"
+      },
+      {
+        "word": "ROOM",
+        "hint": "房間",
+        "emoji": "🏠"
+      },
+      {
+        "word": "SHOP",
+        "hint": "商店",
+        "emoji": "🛍️"
+      },
+      {
+        "word": "STATION",
+        "hint": "車站,站,局",
+        "emoji": "🚉"
+      },
+      {
+        "word": "STORE",
+        "hint": "商店",
+        "emoji": "🏪"
+      },
+      {
+        "word": "STREET",
+        "hint": "街道",
+        "emoji": "🏠"
+      },
+      {
+        "word": "TEMPLE",
+        "hint": "寺廟",
+        "emoji": "🏯"
+      },
+      {
+        "word": "THEATER",
+        "hint": "戲院",
+        "emoji": "🎭"
+      },
+      {
+        "word": "TOWN",
+        "hint": "城鎮",
+        "emoji": "🏘️"
+      },
+      {
+        "word": "ZOO",
+        "hint": "動物園",
+        "emoji": "🦁"
+      },
+      {
+        "word": "BOTTOM",
+        "hint": "底部",
+        "emoji": "📝"
+      },
+      {
+        "word": "FLOOR",
+        "hint": "地板",
+        "emoji": "📝"
+      },
+      {
+        "word": "FRONT",
+        "hint": "前面",
+        "emoji": "📝"
+      },
+      {
+        "word": "GATE",
+        "hint": "大門",
+        "emoji": "📝"
+      },
+      {
+        "word": "GROUND",
+        "hint": "地面",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "人物與職業": {
+    "icon": "👩‍🏫",
+    "color": "#f59e0b",
+    "words": [
+      {
+        "word": "ACTRESS",
+        "hint": "女演員",
+        "emoji": "🎭"
+      },
+      {
+        "word": "AUNT",
+        "hint": "伯(叔)母",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "BABY",
+        "hint": "嬰兒",
+        "emoji": "👶"
+      },
+      {
+        "word": "BOSS",
+        "hint": "老板",
+        "emoji": "💼"
+      },
+      {
+        "word": "BOY",
+        "hint": "男孩",
+        "emoji": "👦"
+      },
+      {
+        "word": "BROTHER",
+        "hint": "兄弟",
+        "emoji": "👦"
+      },
+      {
+        "word": "BUSINESSMAN",
+        "hint": "商人",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "CHILD",
+        "hint": "小孩",
+        "emoji": "👧"
+      },
+      {
+        "word": "CLERK",
+        "hint": "店員",
+        "emoji": "💼"
+      },
+      {
+        "word": "COOK",
+        "hint": "煮飯",
+        "emoji": "👨‍🍳"
+      },
+      {
+        "word": "DAUGHTER",
+        "hint": "女兒",
+        "emoji": "👧"
+      },
+      {
+        "word": "DENTIST",
+        "hint": "牙醫",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "DOCTOR",
+        "hint": "醫生",
+        "emoji": "👨‍⚕️"
+      },
+      {
+        "word": "DRIVER",
+        "hint": "駕駛人",
+        "emoji": "🚗"
+      },
+      {
+        "word": "ENGINEER",
+        "hint": "工程師",
+        "emoji": "⚙️"
+      },
+      {
+        "word": "FAMILY",
+        "hint": "家庭",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "FARMER",
+        "hint": "農夫",
+        "emoji": "👨‍🌾"
+      },
+      {
+        "word": "FATHER",
+        "hint": "父親",
+        "emoji": "👨"
+      },
+      {
+        "word": "FISHERMAN",
+        "hint": "漁夫",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "FRIEND",
+        "hint": "朋友",
+        "emoji": "🤝"
+      },
+      {
+        "word": "GIRL",
+        "hint": "女孩",
+        "emoji": "👧"
+      },
+      {
+        "word": "GRANDFATHER",
+        "hint": "祖父",
+        "emoji": "👴"
+      },
+      {
+        "word": "GRANDMOTHER",
+        "hint": "祖母",
+        "emoji": "👵"
+      },
+      {
+        "word": "HUSBAND",
+        "hint": "丈夫",
+        "emoji": "👨"
+      },
+      {
+        "word": "KING",
+        "hint": "國王",
+        "emoji": "👑"
+      },
+      {
+        "word": "LAWYER",
+        "hint": "律師",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "MAILMAN",
+        "hint": "郵差",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "MAN",
+        "hint": "男人",
+        "emoji": "👨"
+      },
+      {
+        "word": "MOTHER",
+        "hint": "母親",
+        "emoji": "👩"
+      },
+      {
+        "word": "NEIGHBOR",
+        "hint": "鄰居",
+        "emoji": "🏠"
+      },
+      {
+        "word": "NURSE",
+        "hint": "護士",
+        "emoji": "👩‍⚕️"
+      },
+      {
+        "word": "OFFICER",
+        "hint": "官員",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "PERSON",
+        "hint": "人",
+        "emoji": "🙍"
+      },
+      {
+        "word": "POLICE",
+        "hint": "警察",
+        "emoji": "👮"
+      },
+      {
+        "word": "QUEEN",
+        "hint": "皇后",
+        "emoji": "👑"
+      },
+      {
+        "word": "REPORTER",
+        "hint": "記者",
+        "emoji": "📰"
+      },
+      {
+        "word": "SINGER",
+        "hint": "歌手",
+        "emoji": "🎤"
+      },
+      {
+        "word": "SISTER",
+        "hint": "姊妹",
+        "emoji": "👧"
+      },
+      {
+        "word": "SOLDIER",
+        "hint": "軍人",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "SON",
+        "hint": "兒子",
+        "emoji": "👦"
+      },
+      {
+        "word": "UNCLE",
+        "hint": "伯(叔)",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "WAITER",
+        "hint": "男服務生",
+        "emoji": "👩‍🏫"
+      },
+      {
+        "word": "WIFE",
+        "hint": "妻子",
+        "emoji": "👩"
+      },
+      {
+        "word": "WOMAN",
+        "hint": "女人",
+        "emoji": "👩"
+      },
+      {
+        "word": "WORKER",
+        "hint": "工人",
+        "emoji": "👷"
+      },
+      {
+        "word": "WRITER",
+        "hint": "作家",
+        "emoji": "✍️"
+      },
+      {
+        "word": "COUSIN",
+        "hint": "堂,表兄弟姊妹",
+        "emoji": "📝"
+      },
+      {
+        "word": "COWBOY",
+        "hint": "牛仔",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOREIGNER",
+        "hint": "外國人",
+        "emoji": "📝"
+      },
+      {
+        "word": "GHOST",
+        "hint": "鬼",
+        "emoji": "📝"
+      },
+      {
+        "word": "LEADER",
+        "hint": "領導者",
+        "emoji": "📝"
+      },
+      {
+        "word": "PLAYER",
+        "hint": "球員,玩家",
+        "emoji": "📝"
+      },
+      {
+        "word": "PRINCESS",
+        "hint": "公主",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "交通與出行": {
+    "icon": "🚗",
+    "color": "#6366f1",
+    "words": [
+      {
+        "word": "AIRPLANE",
+        "hint": "飛機",
+        "emoji": "✈️"
+      },
+      {
+        "word": "BIKE",
+        "hint": "腳踏車",
+        "emoji": "🚲"
+      },
+      {
+        "word": "BOAT",
+        "hint": "船",
+        "emoji": "⛵"
+      },
+      {
+        "word": "BUS",
+        "hint": "公車",
+        "emoji": "🚌"
+      },
+      {
+        "word": "CAR",
+        "hint": "車子",
+        "emoji": "🚗"
+      },
+      {
+        "word": "GAS",
+        "hint": "瓦斯",
+        "emoji": "🚗"
+      },
+      {
+        "word": "MOTORCYCLE",
+        "hint": "機車",
+        "emoji": "🏍️"
+      },
+      {
+        "word": "SCOOTER",
+        "hint": "速克達機車",
+        "emoji": "🚗"
+      },
+      {
+        "word": "SHIP",
+        "hint": "船",
+        "emoji": "🚢"
+      },
+      {
+        "word": "TAXI",
+        "hint": "計程車",
+        "emoji": "🚕"
+      },
+      {
+        "word": "TICKET",
+        "hint": "票券",
+        "emoji": "🎫"
+      },
+      {
+        "word": "TRAFFIC",
+        "hint": "交通",
+        "emoji": "🚗"
+      },
+      {
+        "word": "TRAIN",
+        "hint": "火車",
+        "emoji": "🚂"
+      },
+      {
+        "word": "TRIP",
+        "hint": "(短程)旅行",
+        "emoji": "🚗"
+      },
+      {
+        "word": "TRUCK",
+        "hint": "卡車",
+        "emoji": "🚚"
+      },
+      {
+        "word": "EAST",
+        "hint": "東方",
+        "emoji": "📝"
+      },
+      {
+        "word": "LEFT",
+        "hint": "左邊",
+        "emoji": "📝"
+      },
+      {
+        "word": "NORTH",
+        "hint": "北方",
+        "emoji": "📝"
+      },
+      {
+        "word": "ROAD",
+        "hint": "道路",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIGN",
+        "hint": "標誌",
+        "emoji": "📝"
+      },
+      {
+        "word": "SOUTH",
+        "hint": "南方",
+        "emoji": "📝"
+      },
+      {
+        "word": "WEST",
+        "hint": "西方",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "衣物與外觀": {
+    "icon": "👕",
+    "color": "#84cc16",
+    "words": [
+      {
+        "word": "BELT",
+        "hint": "皮帶",
+        "emoji": "👔"
+      },
+      {
+        "word": "CAP",
+        "hint": "(無邊)帽",
+        "emoji": "🧢"
+      },
+      {
+        "word": "CLOTHES",
+        "hint": "衣服",
+        "emoji": "👕"
+      },
+      {
+        "word": "COAT",
+        "hint": "大衣",
+        "emoji": "🧥"
+      },
+      {
+        "word": "DRESS",
+        "hint": "洋裝",
+        "emoji": "👗"
+      },
+      {
+        "word": "GLASSES",
+        "hint": "眼鏡",
+        "emoji": "👓"
+      },
+      {
+        "word": "GLOVE",
+        "hint": "手套",
+        "emoji": "🧤"
+      },
+      {
+        "word": "HAT",
+        "hint": "帽子",
+        "emoji": "🎩"
+      },
+      {
+        "word": "JACKET",
+        "hint": "夾克",
+        "emoji": "🧥"
+      },
+      {
+        "word": "JEANS",
+        "hint": "牛仔褲",
+        "emoji": "👖"
+      },
+      {
+        "word": "PANTS",
+        "hint": "長褲",
+        "emoji": "👖"
+      },
+      {
+        "word": "POCKET",
+        "hint": "口袋",
+        "emoji": "👕"
+      },
+      {
+        "word": "RING",
+        "hint": "戒指",
+        "emoji": "💍"
+      },
+      {
+        "word": "SHIRT",
+        "hint": "襯衫",
+        "emoji": "👕"
+      },
+      {
+        "word": "SHORTS",
+        "hint": "短褲",
+        "emoji": "🩳"
+      },
+      {
+        "word": "SKIRT",
+        "hint": "裙子",
+        "emoji": "👗"
+      },
+      {
+        "word": "SWEATER",
+        "hint": "毛衣",
+        "emoji": "🧶"
+      },
+      {
+        "word": "TIE",
+        "hint": "領帶,捆,繫",
+        "emoji": "👔"
+      },
+      {
+        "word": "UNIFORM",
+        "hint": "制服",
+        "emoji": "👔"
+      },
+      {
+        "word": "VEST",
+        "hint": "背心",
+        "emoji": "👕"
+      },
+      {
+        "word": "WATCH",
+        "hint": "看",
+        "emoji": "⌚"
+      },
+      {
+        "word": "WEAR",
+        "hint": "穿",
+        "emoji": "👕"
+      }
+    ]
+  },
+  "時間與節日": {
+    "icon": "⏰",
+    "color": "#0891b2",
+    "words": [
+      {
+        "word": "AFTERNOON",
+        "hint": "下午",
+        "emoji": "🌤️"
+      },
+      {
+        "word": "AGE",
+        "hint": "年齡",
+        "emoji": "⏰"
+      },
+      {
+        "word": "APRIL",
+        "hint": "四月",
+        "emoji": "🌷"
+      },
+      {
+        "word": "AUGUST",
+        "hint": "八月",
+        "emoji": "🌞"
+      },
+      {
+        "word": "AUTUMN",
+        "hint": "秋天",
+        "emoji": "🍂"
+      },
+      {
+        "word": "BIRTHDAY",
+        "hint": "生日",
+        "emoji": "🎂"
+      },
+      {
+        "word": "CHRISTMAS",
+        "hint": "聖誕節",
+        "emoji": "🎄"
+      },
+      {
+        "word": "DATE",
+        "hint": "日期",
+        "emoji": "⏰"
+      },
+      {
+        "word": "DAY",
+        "hint": "日子",
+        "emoji": "☀️"
+      },
+      {
+        "word": "DECEMBER",
+        "hint": "十二月",
+        "emoji": "❄️"
+      },
+      {
+        "word": "EASTER",
+        "hint": "復活節",
+        "emoji": "⏰"
+      },
+      {
+        "word": "EVENING",
+        "hint": "傍晚",
+        "emoji": "🌆"
+      },
+      {
+        "word": "FEBRUARY",
+        "hint": "二月",
+        "emoji": "💝"
+      },
+      {
+        "word": "FESTIVAL",
+        "hint": "節慶",
+        "emoji": "⏰"
+      },
+      {
+        "word": "FRIDAY",
+        "hint": "星期五",
+        "emoji": "🎉"
+      },
+      {
+        "word": "FUTURE",
+        "hint": "未來",
+        "emoji": "⏰"
+      },
+      {
+        "word": "HALLOWEEN",
+        "hint": "萬聖節",
+        "emoji": "⏰"
+      },
+      {
+        "word": "HOLIDAY",
+        "hint": "假日",
+        "emoji": "🎊"
+      },
+      {
+        "word": "HOUR",
+        "hint": "小時",
+        "emoji": "⏰"
+      },
+      {
+        "word": "JANUARY",
+        "hint": "一月",
+        "emoji": "❄️"
+      },
+      {
+        "word": "JULY",
+        "hint": "七月",
+        "emoji": "🏖️"
+      },
+      {
+        "word": "JUNE",
+        "hint": "六月",
+        "emoji": "☀️"
+      },
+      {
+        "word": "MARCH",
+        "hint": "三月",
+        "emoji": "🌸"
+      },
+      {
+        "word": "MAY",
+        "hint": "可能",
+        "emoji": "🌻"
+      },
+      {
+        "word": "MINUTE",
+        "hint": "分鐘",
+        "emoji": "⏱️"
+      },
+      {
+        "word": "MONDAY",
+        "hint": "星期一",
+        "emoji": "📅"
+      },
+      {
+        "word": "MONTH",
+        "hint": "月份",
+        "emoji": "📅"
+      },
+      {
+        "word": "MORNING",
+        "hint": "早上",
+        "emoji": "🌅"
+      },
+      {
+        "word": "NIGHT",
+        "hint": "晚上",
+        "emoji": "🌙"
+      },
+      {
+        "word": "NOON",
+        "hint": "中午",
+        "emoji": "🌞"
+      },
+      {
+        "word": "NOVEMBER",
+        "hint": "十一月",
+        "emoji": "🍂"
+      },
+      {
+        "word": "OCTOBER",
+        "hint": "十月",
+        "emoji": "🎃"
+      },
+      {
+        "word": "PAST",
+        "hint": "經過",
+        "emoji": "⏰"
+      },
+      {
+        "word": "QUARTER",
+        "hint": "15 分鐘,1/4",
+        "emoji": "⏰"
+      },
+      {
+        "word": "SATURDAY",
+        "hint": "星期六",
+        "emoji": "🎉"
+      },
+      {
+        "word": "SEASON",
+        "hint": "季節",
+        "emoji": "🍂"
+      },
+      {
+        "word": "SECOND",
+        "hint": "第二(的)",
+        "emoji": "⏱️"
+      },
+      {
+        "word": "SEPTEMBER",
+        "hint": "九月",
+        "emoji": "🍂"
+      },
+      {
+        "word": "SPRING",
+        "hint": "春天",
+        "emoji": "🌸"
+      },
+      {
+        "word": "SUMMER",
+        "hint": "夏天",
+        "emoji": "☀️"
+      },
+      {
+        "word": "SUNDAY",
+        "hint": "星期日",
+        "emoji": "☀️"
+      },
+      {
+        "word": "THURSDAY",
+        "hint": "星期四",
+        "emoji": "📅"
+      },
+      {
+        "word": "TIME",
+        "hint": "時間",
+        "emoji": "⏰"
+      },
+      {
+        "word": "TODAY",
+        "hint": "今天",
+        "emoji": "📅"
+      },
+      {
+        "word": "TOMORROW",
+        "hint": "明天",
+        "emoji": "🌅"
+      },
+      {
+        "word": "TUESDAY",
+        "hint": "星期二",
+        "emoji": "📅"
+      },
+      {
+        "word": "VACATION",
+        "hint": "假期",
+        "emoji": "🏖️"
+      },
+      {
+        "word": "WEDNESDAY",
+        "hint": "星期三",
+        "emoji": "📅"
+      },
+      {
+        "word": "WEEK",
+        "hint": "星期",
+        "emoji": "📅"
+      },
+      {
+        "word": "WEEKEND",
+        "hint": "週末",
+        "emoji": "🎉"
+      },
+      {
+        "word": "WINTER",
+        "hint": "冬天",
+        "emoji": "❄️"
+      },
+      {
+        "word": "YEAR",
+        "hint": "年",
+        "emoji": "📅"
+      },
+      {
+        "word": "YESTERDAY",
+        "hint": "昨天",
+        "emoji": "📅"
+      },
+      {
+        "word": "DOZEN",
+        "hint": "〈一〉打",
+        "emoji": "📝"
+      },
+      {
+        "word": "EIGHT",
+        "hint": "八",
+        "emoji": "📝"
+      },
+      {
+        "word": "EIGHTEEN",
+        "hint": "十八",
+        "emoji": "📝"
+      },
+      {
+        "word": "EIGHTH",
+        "hint": "第八",
+        "emoji": "📝"
+      },
+      {
+        "word": "EIGHTY",
+        "hint": "八十",
+        "emoji": "📝"
+      },
+      {
+        "word": "ELEVEN",
+        "hint": "十一",
+        "emoji": "📝"
+      },
+      {
+        "word": "ELEVENTH",
+        "hint": "第十一(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "FIFTEEN",
+        "hint": "十五",
+        "emoji": "📝"
+      },
+      {
+        "word": "FIFTEENTH",
+        "hint": "第十五(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "FIFTH",
+        "hint": "第五(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "FIFTY",
+        "hint": "五十",
+        "emoji": "📝"
+      },
+      {
+        "word": "FIRST",
+        "hint": "第一(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "FIVE",
+        "hint": "五",
+        "emoji": "📝"
+      },
+      {
+        "word": "FORTY",
+        "hint": "四十",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOUR",
+        "hint": "四",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOURTEEN",
+        "hint": "十四",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOURTEENTH",
+        "hint": "第十四(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOURTH",
+        "hint": "第四(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "HUNDRED",
+        "hint": "百",
+        "emoji": "📝"
+      },
+      {
+        "word": "MILLION",
+        "hint": "百萬",
+        "emoji": "📝"
+      },
+      {
+        "word": "NINE",
+        "hint": "九",
+        "emoji": "📝"
+      },
+      {
+        "word": "NINETEEN",
+        "hint": "十九",
+        "emoji": "📝"
+      },
+      {
+        "word": "NINETEENTH",
+        "hint": "第十九",
+        "emoji": "📝"
+      },
+      {
+        "word": "NINETY",
+        "hint": "九十",
+        "emoji": "📝"
+      },
+      {
+        "word": "NINTH",
+        "hint": "第九",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEVEN",
+        "hint": "七",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEVENTEEN",
+        "hint": "十七",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEVENTEENTH",
+        "hint": "第十七(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEVENTH",
+        "hint": "第七(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEVENTY",
+        "hint": "七十",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIXTEEN",
+        "hint": "十六",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIXTEENTH",
+        "hint": "第十六〈的〉",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIXTH",
+        "hint": "第六〈的〉",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIXTY",
+        "hint": "六十",
+        "emoji": "📝"
+      },
+      {
+        "word": "TENTH",
+        "hint": "第十〈的〉",
+        "emoji": "📝"
+      },
+      {
+        "word": "THIRD",
+        "hint": "第三〈的〉",
+        "emoji": "📝"
+      },
+      {
+        "word": "THIRTEEN",
+        "hint": "十三",
+        "emoji": "📝"
+      },
+      {
+        "word": "THIRTEENTH",
+        "hint": "第十三",
+        "emoji": "📝"
+      },
+      {
+        "word": "THIRTY",
+        "hint": "三十",
+        "emoji": "📝"
+      },
+      {
+        "word": "THOUSAND",
+        "hint": "千",
+        "emoji": "📝"
+      },
+      {
+        "word": "THREE",
+        "hint": "三",
+        "emoji": "📝"
+      },
+      {
+        "word": "TWELFTH",
+        "hint": "第十二(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "TWELVE",
+        "hint": "十二",
+        "emoji": "📝"
+      },
+      {
+        "word": "TWENTY",
+        "hint": "二十",
+        "emoji": "📝"
+      },
+      {
+        "word": "TWENTIETH",
+        "hint": "第二十(的)",
+        "emoji": "📝"
+      },
+      {
+        "word": "ZERO",
+        "hint": "零",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "運動與休閒": {
+    "icon": "⚽",
+    "color": "#16a34a",
+    "words": [
+      {
+        "word": "BADMINTON",
+        "hint": "羽毛球",
+        "emoji": "🏸"
+      },
+      {
+        "word": "BASEBALL",
+        "hint": "棒球",
+        "emoji": "⚾"
+      },
+      {
+        "word": "BASKETBALL",
+        "hint": "籃球",
+        "emoji": "🏀"
+      },
+      {
+        "word": "CHESS",
+        "hint": "西洋棋",
+        "emoji": "♟️"
+      },
+      {
+        "word": "DANCE",
+        "hint": "跳舞",
+        "emoji": "💃"
+      },
+      {
+        "word": "EXERCISE",
+        "hint": "運動",
+        "emoji": "🏃"
+      },
+      {
+        "word": "GAME",
+        "hint": "比賽,遊戲",
+        "emoji": "🎮"
+      },
+      {
+        "word": "HOBBY",
+        "hint": "嗜好",
+        "emoji": "🎨"
+      },
+      {
+        "word": "MUSIC",
+        "hint": "音樂",
+        "emoji": "🎵"
+      },
+      {
+        "word": "RACE",
+        "hint": "賽跑",
+        "emoji": "⚽"
+      },
+      {
+        "word": "SOCCER",
+        "hint": "足球",
+        "emoji": "⚽"
+      },
+      {
+        "word": "SPORT",
+        "hint": "運動",
+        "emoji": "🏅"
+      },
+      {
+        "word": "TEAM",
+        "hint": "團隊",
+        "emoji": "👥"
+      },
+      {
+        "word": "TENNIS",
+        "hint": "網球",
+        "emoji": "🎾"
+      },
+      {
+        "word": "COMIC",
+        "hint": "連環漫畫",
+        "emoji": "📝"
+      },
+      {
+        "word": "FRISBEE",
+        "hint": "飛盤",
+        "emoji": "📝"
+      },
+      {
+        "word": "TRICK",
+        "hint": "惡作劇",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "日常用品": {
+    "icon": "🏠",
+    "color": "#78716c",
+    "words": [
+      {
+        "word": "BAG",
+        "hint": "袋子",
+        "emoji": "👜"
+      },
+      {
+        "word": "BALL",
+        "hint": "球",
+        "emoji": "⚽"
+      },
+      {
+        "word": "BAND",
+        "hint": "樂團",
+        "emoji": "🎵"
+      },
+      {
+        "word": "BARBECUE",
+        "hint": "烤肉",
+        "emoji": "🍖"
+      },
+      {
+        "word": "BASKET",
+        "hint": "籃子",
+        "emoji": "🧺"
+      },
+      {
+        "word": "BATH",
+        "hint": "洗澡",
+        "emoji": "🏠"
+      },
+      {
+        "word": "BED",
+        "hint": "床",
+        "emoji": "🛏️"
+      },
+      {
+        "word": "BLANKET",
+        "hint": "毯子",
+        "emoji": "🛏️"
+      },
+      {
+        "word": "BOTTLE",
+        "hint": "瓶子",
+        "emoji": "🍶"
+      },
+      {
+        "word": "BOWL",
+        "hint": "碗",
+        "emoji": "🍜"
+      },
+      {
+        "word": "BOX",
+        "hint": "盒子",
+        "emoji": "📦"
+      },
+      {
+        "word": "BRUSH",
+        "hint": "刷",
+        "emoji": "🪥"
+      },
+      {
+        "word": "CAMERA",
+        "hint": "照相機",
+        "emoji": "📷"
+      },
+      {
+        "word": "CANDLE",
+        "hint": "蠟燭",
+        "emoji": "🕯️"
+      },
+      {
+        "word": "CARD",
+        "hint": "卡片",
+        "emoji": "💳"
+      },
+      {
+        "word": "CHAIR",
+        "hint": "椅子",
+        "emoji": "🪑"
+      },
+      {
+        "word": "CHOPSTICKS",
+        "hint": "筷子",
+        "emoji": "🥢"
+      },
+      {
+        "word": "CIRCLE",
+        "hint": "圓圈",
+        "emoji": "⭕"
+      },
+      {
+        "word": "CLOCK",
+        "hint": "時鐘",
+        "emoji": "🕐"
+      },
+      {
+        "word": "CUP",
+        "hint": "茶杯",
+        "emoji": "☕"
+      },
+      {
+        "word": "DOOR",
+        "hint": "門",
+        "emoji": "🚪"
+      },
+      {
+        "word": "GIFT",
+        "hint": "禮物",
+        "emoji": "🎁"
+      },
+      {
+        "word": "INTERNET",
+        "hint": "網路",
+        "emoji": "🌐"
+      },
+      {
+        "word": "KEY",
+        "hint": "鑰匙",
+        "emoji": "🔑"
+      },
+      {
+        "word": "LAMP",
+        "hint": "燈",
+        "emoji": "💡"
+      },
+      {
+        "word": "MONEY",
+        "hint": "錢",
+        "emoji": "💰"
+      },
+      {
+        "word": "RADIO",
+        "hint": "收音機",
+        "emoji": "📻"
+      },
+      {
+        "word": "ROPE",
+        "hint": "繩子",
+        "emoji": "🏠"
+      },
+      {
+        "word": "SOFA",
+        "hint": "沙發",
+        "emoji": "🛋️"
+      },
+      {
+        "word": "STAMP",
+        "hint": "郵票",
+        "emoji": "🏠"
+      },
+      {
+        "word": "TABLE",
+        "hint": "桌子",
+        "emoji": "🪑"
+      },
+      {
+        "word": "TELEVISION",
+        "hint": "電視",
+        "emoji": "📺"
+      },
+      {
+        "word": "TOWEL",
+        "hint": "毛巾",
+        "emoji": "🏊"
+      },
+      {
+        "word": "UMBRELLA",
+        "hint": "雨傘",
+        "emoji": "☂️"
+      },
+      {
+        "word": "WALLET",
+        "hint": "皮夾",
+        "emoji": "👛"
+      },
+      {
+        "word": "WINDOW",
+        "hint": "窗戶",
+        "emoji": "🏠"
+      },
+      {
+        "word": "CAGE",
+        "hint": "籠子",
+        "emoji": "📝"
+      },
+      {
+        "word": "COMB",
+        "hint": "梳子",
+        "emoji": "📝"
+      },
+      {
+        "word": "COUCH",
+        "hint": "沙發",
+        "emoji": "📝"
+      },
+      {
+        "word": "DOLLAR",
+        "hint": "元",
+        "emoji": "📝"
+      },
+      {
+        "word": "DRAWER",
+        "hint": "抽屜",
+        "emoji": "📝"
+      },
+      {
+        "word": "DRUM",
+        "hint": "鼓",
+        "emoji": "📝"
+      },
+      {
+        "word": "ENVELOPE",
+        "hint": "信",
+        "emoji": "📝"
+      },
+      {
+        "word": "FLUTE",
+        "hint": "笛",
+        "emoji": "📝"
+      },
+      {
+        "word": "FORK",
+        "hint": "叉子",
+        "emoji": "📝"
+      },
+      {
+        "word": "GLASS",
+        "hint": "玻璃,玻璃杯",
+        "emoji": "📝"
+      },
+      {
+        "word": "GLUE",
+        "hint": "膠水",
+        "emoji": "📝"
+      },
+      {
+        "word": "GUITAR",
+        "hint": "吉他",
+        "emoji": "📝"
+      },
+      {
+        "word": "KNIFE",
+        "hint": "刀子",
+        "emoji": "📝"
+      },
+      {
+        "word": "PIANO",
+        "hint": "鋼琴",
+        "emoji": "📝"
+      },
+      {
+        "word": "PLATE",
+        "hint": "盤子",
+        "emoji": "📝"
+      },
+      {
+        "word": "SPOON",
+        "hint": "湯匙",
+        "emoji": "📝"
+      },
+      {
+        "word": "TAPE",
+        "hint": "錄音帶",
+        "emoji": "📝"
+      },
+      {
+        "word": "VIOLIN",
+        "hint": "小提琴",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "日常動詞": {
+    "icon": "🏃",
+    "color": "#dc2626",
+    "words": [
+      {
+        "word": "AGREE",
+        "hint": "同意",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ANSWER",
+        "hint": "回答",
+        "emoji": "💬"
+      },
+      {
+        "word": "APPEAR",
+        "hint": "出現",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ARRIVE",
+        "hint": "到達",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ASK",
+        "hint": "問",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BAKE",
+        "hint": "烘烤",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BECOME",
+        "hint": "變成",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BEGIN",
+        "hint": "開始",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BELIEVE",
+        "hint": "相信",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BELONG",
+        "hint": "屬於",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BITE",
+        "hint": "咬",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BLOW",
+        "hint": "吹",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BOIL",
+        "hint": "煮沸",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BORN",
+        "hint": "出生",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BORROW",
+        "hint": "借入",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BOW",
+        "hint": "敬禮",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BREAK",
+        "hint": "打破",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BRING",
+        "hint": "帶來",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BUILD",
+        "hint": "建造",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BURN",
+        "hint": "燃燒",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BUY",
+        "hint": "買",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CALL",
+        "hint": "打電話",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CARRY",
+        "hint": "攜帶",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CATCH",
+        "hint": "趕上",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CELEBRATE",
+        "hint": "慶祝",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CHANGE",
+        "hint": "交換,零錢",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CHECK",
+        "hint": "檢查",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CHEER",
+        "hint": "歡呼",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CHOOSE",
+        "hint": "選擇",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CLAP",
+        "hint": "拍手",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CLEAN",
+        "hint": "打掃",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CLIMB",
+        "hint": "爬",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CLOSE",
+        "hint": "關上",
+        "emoji": "🏃"
+      },
+      {
+        "word": "COLLECT",
+        "hint": "收集",
+        "emoji": "🏃"
+      },
+      {
+        "word": "COPY",
+        "hint": "抄寫,複製",
+        "emoji": "🏃"
+      },
+      {
+        "word": "COUNT",
+        "hint": "計算",
+        "emoji": "🏃"
+      },
+      {
+        "word": "COVER",
+        "hint": "覆蓋,封面,掩護",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CROSS",
+        "hint": "越過",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CRY",
+        "hint": "哭",
+        "emoji": "🏃"
+      },
+      {
+        "word": "CUT",
+        "hint": "切",
+        "emoji": "🏃"
+      },
+      {
+        "word": "DECIDE",
+        "hint": "決定",
+        "emoji": "🏃"
+      },
+      {
+        "word": "DO",
+        "hint": "做",
+        "emoji": "🏃"
+      },
+      {
+        "word": "DRAW",
+        "hint": "畫",
+        "emoji": "🏃"
+      },
+      {
+        "word": "DREAM",
+        "hint": "〈做〉夢",
+        "emoji": "💭"
+      },
+      {
+        "word": "DRINK",
+        "hint": "喝",
+        "emoji": "🏃"
+      },
+      {
+        "word": "DRIVE",
+        "hint": "駕駛",
+        "emoji": "🏃"
+      },
+      {
+        "word": "DROP",
+        "hint": "掉落",
+        "emoji": "🏃"
+      },
+      {
+        "word": "EAT",
+        "hint": "吃",
+        "emoji": "🏃"
+      },
+      {
+        "word": "END",
+        "hint": "結束",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ENJOY",
+        "hint": "喜愛",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ENTER",
+        "hint": "進入",
+        "emoji": "🏃"
+      },
+      {
+        "word": "EXPERIENCE",
+        "hint": "經驗",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FAIL",
+        "hint": "失敗",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FALL",
+        "hint": "秋天",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FEED",
+        "hint": "餵",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FEEL",
+        "hint": "覺得",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FIGHT",
+        "hint": "打架",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FILL",
+        "hint": "裝滿",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FIND",
+        "hint": "找到",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FINISH",
+        "hint": "完成",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FIX",
+        "hint": "修理",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FLY",
+        "hint": "飛",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FOLLOW",
+        "hint": "遵循,跟隨",
+        "emoji": "🏃"
+      },
+      {
+        "word": "FORGET",
+        "hint": "忘記",
+        "emoji": "🏃"
+      },
+      {
+        "word": "GET",
+        "hint": "得到",
+        "emoji": "🏃"
+      },
+      {
+        "word": "GIVE",
+        "hint": "給予",
+        "emoji": "🏃"
+      },
+      {
+        "word": "GO",
+        "hint": "去",
+        "emoji": "🏃"
+      },
+      {
+        "word": "GROW",
+        "hint": "種植",
+        "emoji": "🏃"
+      },
+      {
+        "word": "GUESS",
+        "hint": "猜想",
+        "emoji": "🏃"
+      },
+      {
+        "word": "HAPPEN",
+        "hint": "發生",
+        "emoji": "🏃"
+      },
+      {
+        "word": "HAVE",
+        "hint": "有",
+        "emoji": "🏃"
+      },
+      {
+        "word": "HEAR",
+        "hint": "聽",
+        "emoji": "🏃"
+      },
+      {
+        "word": "HELP",
+        "hint": "幫忙",
+        "emoji": "🏃"
+      },
+      {
+        "word": "HIT",
+        "hint": "打擊",
+        "emoji": "🏃"
+      },
+      {
+        "word": "HOPE",
+        "hint": "希望",
+        "emoji": "🌟"
+      },
+      {
+        "word": "HURRY",
+        "hint": "趕忙",
+        "emoji": "🏃"
+      },
+      {
+        "word": "INVITE",
+        "hint": "邀請",
+        "emoji": "🏃"
+      },
+      {
+        "word": "JOIN",
+        "hint": "加入",
+        "emoji": "🏃"
+      },
+      {
+        "word": "JUMP",
+        "hint": "跳躍",
+        "emoji": "🏃"
+      },
+      {
+        "word": "KEEP",
+        "hint": "保持",
+        "emoji": "🏃"
+      },
+      {
+        "word": "KILL",
+        "hint": "殺",
+        "emoji": "🏃"
+      },
+      {
+        "word": "KNOW",
+        "hint": "知道",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LEAD",
+        "hint": "引導",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LEARN",
+        "hint": "學習",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LEAVE",
+        "hint": "離開",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LEND",
+        "hint": "借出",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LIKE",
+        "hint": "喜歡",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LISTEN",
+        "hint": "聽",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LIVE",
+        "hint": "住,活的,實況",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LOOK",
+        "hint": "看",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LOSE",
+        "hint": "遺失",
+        "emoji": "🏃"
+      },
+      {
+        "word": "LOVE",
+        "hint": "喜愛",
+        "emoji": "🏃"
+      },
+      {
+        "word": "MAKE",
+        "hint": "製作",
+        "emoji": "🏃"
+      },
+      {
+        "word": "MEET",
+        "hint": "遇見",
+        "emoji": "🏃"
+      },
+      {
+        "word": "MISS",
+        "hint": "小姐",
+        "emoji": "🏃"
+      },
+      {
+        "word": "MOVE",
+        "hint": "移動",
+        "emoji": "🏃"
+      },
+      {
+        "word": "NEED",
+        "hint": "需要",
+        "emoji": "🏃"
+      },
+      {
+        "word": "OPEN",
+        "hint": "打開,開放",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ORDER",
+        "hint": "點餐,秩序",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PAINT",
+        "hint": "繪畫",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PASS",
+        "hint": "通過",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PAY",
+        "hint": "付錢",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PICK",
+        "hint": "撿拾",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PLAN",
+        "hint": "計畫",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PLAY",
+        "hint": "玩",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PRACTICE",
+        "hint": "練習",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PREPARE",
+        "hint": "準備",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PULL",
+        "hint": "拉",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PUSH",
+        "hint": "推",
+        "emoji": "🏃"
+      },
+      {
+        "word": "PUT",
+        "hint": "放",
+        "emoji": "🏃"
+      },
+      {
+        "word": "RAISE",
+        "hint": "舉起,養育",
+        "emoji": "🏃"
+      },
+      {
+        "word": "READ",
+        "hint": "讀",
+        "emoji": "🏃"
+      },
+      {
+        "word": "REMEMBER",
+        "hint": "記得",
+        "emoji": "🏃"
+      },
+      {
+        "word": "REPEAT",
+        "hint": "重複",
+        "emoji": "🏃"
+      },
+      {
+        "word": "REST",
+        "hint": "休息",
+        "emoji": "🏃"
+      },
+      {
+        "word": "RIDE",
+        "hint": "騎",
+        "emoji": "🏃"
+      },
+      {
+        "word": "ROLL",
+        "hint": "滾",
+        "emoji": "🏃"
+      },
+      {
+        "word": "RUN",
+        "hint": "跑",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SAVE",
+        "hint": "節省,挽救",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SAY",
+        "hint": "說",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SEE",
+        "hint": "看",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SELL",
+        "hint": "賣",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SEND",
+        "hint": "寄",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SHARE",
+        "hint": "分享",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SHOW",
+        "hint": "指示,表演",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SING",
+        "hint": "唱歌",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SIT",
+        "hint": "坐",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SLEEP",
+        "hint": "睡覺",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SPEAK",
+        "hint": "說",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SPEND",
+        "hint": "花(錢,時間)",
+        "emoji": "🏃"
+      },
+      {
+        "word": "STAND",
+        "hint": "站立",
+        "emoji": "🏃"
+      },
+      {
+        "word": "START",
+        "hint": "開始",
+        "emoji": "🏃"
+      },
+      {
+        "word": "STAY",
+        "hint": "停留",
+        "emoji": "🏃"
+      },
+      {
+        "word": "STOP",
+        "hint": "停",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SURPRISE",
+        "hint": "使…驚訝",
+        "emoji": "🏃"
+      },
+      {
+        "word": "SWIM",
+        "hint": "游泳",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TAKE",
+        "hint": "拿",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TALK",
+        "hint": "說話",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TEACH",
+        "hint": "教導",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TELL",
+        "hint": "告訴",
+        "emoji": "🏃"
+      },
+      {
+        "word": "THINK",
+        "hint": "想,思考",
+        "emoji": "🏃"
+      },
+      {
+        "word": "THROW",
+        "hint": "丟",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TOUCH",
+        "hint": "碰觸",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TRY",
+        "hint": "嘗試",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TURN",
+        "hint": "轉動,轉彎",
+        "emoji": "🏃"
+      },
+      {
+        "word": "TYPE",
+        "hint": "打字",
+        "emoji": "🏃"
+      },
+      {
+        "word": "UNDERSTAND",
+        "hint": "了解",
+        "emoji": "🏃"
+      },
+      {
+        "word": "USE",
+        "hint": "使用",
+        "emoji": "🏃"
+      },
+      {
+        "word": "VISIT",
+        "hint": "參觀",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WAIT",
+        "hint": "等待",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WALK",
+        "hint": "走路",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WANT",
+        "hint": "想要",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WASH",
+        "hint": "清洗",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WIN",
+        "hint": "贏",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WISH",
+        "hint": "祝福…",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WORK",
+        "hint": "工作",
+        "emoji": "🏃"
+      },
+      {
+        "word": "WRITE",
+        "hint": "寫",
+        "emoji": "🏃"
+      }
+    ]
+  },
+  "形容詞與描述": {
+    "icon": "💡",
+    "color": "#7c3aed",
+    "words": [
+      {
+        "word": "ABLE",
+        "hint": "能夠…的",
+        "emoji": "💡"
+      },
+      {
+        "word": "AFRAID",
+        "hint": "害怕的",
+        "emoji": "💡"
+      },
+      {
+        "word": "ANGRY",
+        "hint": "生氣的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BAD",
+        "hint": "壞的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BEAUTIFUL",
+        "hint": "美麗的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BIG",
+        "hint": "大的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BLIND",
+        "hint": "瞎的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BORED",
+        "hint": "感到厭煩的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BORING",
+        "hint": "無聊的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BRIGHT",
+        "hint": "明亮的",
+        "emoji": "💡"
+      },
+      {
+        "word": "BUSY",
+        "hint": "忙碌的",
+        "emoji": "💡"
+      },
+      {
+        "word": "CAREFUL",
+        "hint": "仔細的",
+        "emoji": "💡"
+      },
+      {
+        "word": "CHEAP",
+        "hint": "便宜的",
+        "emoji": "💡"
+      },
+      {
+        "word": "CLEAR",
+        "hint": "清楚的",
+        "emoji": "💡"
+      },
+      {
+        "word": "COLD",
+        "hint": "寒冷的",
+        "emoji": "💡"
+      },
+      {
+        "word": "COMFORTABLE",
+        "hint": "舒適的",
+        "emoji": "💡"
+      },
+      {
+        "word": "COMMON",
+        "hint": "共同的",
+        "emoji": "💡"
+      },
+      {
+        "word": "COOL",
+        "hint": "涼爽的",
+        "emoji": "💡"
+      },
+      {
+        "word": "CORRECT",
+        "hint": "正確的",
+        "emoji": "💡"
+      },
+      {
+        "word": "CUTE",
+        "hint": "可愛的",
+        "emoji": "💡"
+      },
+      {
+        "word": "DANGEROUS",
+        "hint": "危險的",
+        "emoji": "💡"
+      },
+      {
+        "word": "DARK",
+        "hint": "黑暗的",
+        "emoji": "💡"
+      },
+      {
+        "word": "DELICIOUS",
+        "hint": "美味的",
+        "emoji": "💡"
+      },
+      {
+        "word": "DIFFERENT",
+        "hint": "不同的",
+        "emoji": "💡"
+      },
+      {
+        "word": "DIFFICULT",
+        "hint": "困難的",
+        "emoji": "💡"
+      },
+      {
+        "word": "DIRTY",
+        "hint": "骯髒的",
+        "emoji": "💡"
+      },
+      {
+        "word": "EASY",
+        "hint": "容易的",
+        "emoji": "💡"
+      },
+      {
+        "word": "EXCITED",
+        "hint": "感到興奮的",
+        "emoji": "💡"
+      },
+      {
+        "word": "EXCITING",
+        "hint": "令人興奮的",
+        "emoji": "💡"
+      },
+      {
+        "word": "EXPENSIVE",
+        "hint": "昂貴的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FAMOUS",
+        "hint": "有名的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FAST",
+        "hint": "快的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FAT",
+        "hint": "胖的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FINE",
+        "hint": "很好的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FREE",
+        "hint": "空閒的,免費",
+        "emoji": "💡"
+      },
+      {
+        "word": "FRESH",
+        "hint": "新鮮的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FRIENDLY",
+        "hint": "友善的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FULL",
+        "hint": "滿的",
+        "emoji": "💡"
+      },
+      {
+        "word": "FUNNY",
+        "hint": "好笑的",
+        "emoji": "💡"
+      },
+      {
+        "word": "GLAD",
+        "hint": "高興的",
+        "emoji": "💡"
+      },
+      {
+        "word": "GOOD",
+        "hint": "好的",
+        "emoji": "💡"
+      },
+      {
+        "word": "GREAT",
+        "hint": "很棒的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HAPPY",
+        "hint": "快樂的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HARD",
+        "hint": "困難的,硬的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HEALTHY",
+        "hint": "健康的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HEAVY",
+        "hint": "重的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HELPFUL",
+        "hint": "有幫助的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HONEST",
+        "hint": "誠實的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HOT",
+        "hint": "熱的",
+        "emoji": "💡"
+      },
+      {
+        "word": "HUNGRY",
+        "hint": "飢餓的",
+        "emoji": "💡"
+      },
+      {
+        "word": "IMPORTANT",
+        "hint": "重要的",
+        "emoji": "💡"
+      },
+      {
+        "word": "INTERESTING",
+        "hint": "有趣的",
+        "emoji": "💡"
+      },
+      {
+        "word": "KIND",
+        "hint": "種類",
+        "emoji": "💡"
+      },
+      {
+        "word": "LARGE",
+        "hint": "大的",
+        "emoji": "💡"
+      },
+      {
+        "word": "LAZY",
+        "hint": "懶惰的",
+        "emoji": "💡"
+      },
+      {
+        "word": "LITTLE",
+        "hint": "小的",
+        "emoji": "💡"
+      },
+      {
+        "word": "LONG",
+        "hint": "長的",
+        "emoji": "💡"
+      },
+      {
+        "word": "LOUD",
+        "hint": "大聲的",
+        "emoji": "💡"
+      },
+      {
+        "word": "LOVELY",
+        "hint": "可愛的",
+        "emoji": "💡"
+      },
+      {
+        "word": "LUCKY",
+        "hint": "幸運的",
+        "emoji": "💡"
+      },
+      {
+        "word": "MAD",
+        "hint": "瘋狂的",
+        "emoji": "💡"
+      },
+      {
+        "word": "MODERN",
+        "hint": "現代化的",
+        "emoji": "💡"
+      },
+      {
+        "word": "NEW",
+        "hint": "新的",
+        "emoji": "💡"
+      },
+      {
+        "word": "NICE",
+        "hint": "好的",
+        "emoji": "💡"
+      },
+      {
+        "word": "OLD",
+        "hint": "老的",
+        "emoji": "💡"
+      },
+      {
+        "word": "POLITE",
+        "hint": "有禮貌的",
+        "emoji": "💡"
+      },
+      {
+        "word": "POOR",
+        "hint": "貧困的,可憐的",
+        "emoji": "💡"
+      },
+      {
+        "word": "POPULAR",
+        "hint": "受歡迎的",
+        "emoji": "💡"
+      },
+      {
+        "word": "POSSIBLE",
+        "hint": "可能的",
+        "emoji": "💡"
+      },
+      {
+        "word": "PRETTY",
+        "hint": "漂亮的,非常",
+        "emoji": "💡"
+      },
+      {
+        "word": "PROUD",
+        "hint": "驕傲的",
+        "emoji": "💡"
+      },
+      {
+        "word": "PUBLIC",
+        "hint": "公立的,公眾的",
+        "emoji": "💡"
+      },
+      {
+        "word": "QUIET",
+        "hint": "安靜的",
+        "emoji": "💡"
+      },
+      {
+        "word": "READY",
+        "hint": "準備好的",
+        "emoji": "💡"
+      },
+      {
+        "word": "REAL",
+        "hint": "真的",
+        "emoji": "💡"
+      },
+      {
+        "word": "RICH",
+        "hint": "有錢的",
+        "emoji": "💡"
+      },
+      {
+        "word": "RIGHT",
+        "hint": "右邊",
+        "emoji": "💡"
+      },
+      {
+        "word": "ROUND",
+        "hint": "圓形的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SAD",
+        "hint": "悲傷的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SAFE",
+        "hint": "安全的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SERIOUS",
+        "hint": "嚴重的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SHORT",
+        "hint": "短的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SHY",
+        "hint": "害羞的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SICK",
+        "hint": "生病的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SIMPLE",
+        "hint": "簡單的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SLOW",
+        "hint": "慢的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SMALL",
+        "hint": "小的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SMART",
+        "hint": "聰明的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SORRY",
+        "hint": "抱歉〈的〉",
+        "emoji": "💡"
+      },
+      {
+        "word": "SPECIAL",
+        "hint": "特別的",
+        "emoji": "💡"
+      },
+      {
+        "word": "STRAIGHT",
+        "hint": "直的",
+        "emoji": "💡"
+      },
+      {
+        "word": "STRANGE",
+        "hint": "奇怪的",
+        "emoji": "💡"
+      },
+      {
+        "word": "STRONG",
+        "hint": "強壯的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SURE",
+        "hint": "確定的",
+        "emoji": "💡"
+      },
+      {
+        "word": "SWEET",
+        "hint": "甜的",
+        "emoji": "💡"
+      },
+      {
+        "word": "TALL",
+        "hint": "高的",
+        "emoji": "💡"
+      },
+      {
+        "word": "TERRIBLE",
+        "hint": "可怕的",
+        "emoji": "💡"
+      },
+      {
+        "word": "THICK",
+        "hint": "厚的",
+        "emoji": "💡"
+      },
+      {
+        "word": "THIN",
+        "hint": "瘦的",
+        "emoji": "💡"
+      },
+      {
+        "word": "TIRED",
+        "hint": "疲倦的",
+        "emoji": "💡"
+      },
+      {
+        "word": "TRUE",
+        "hint": "真實的",
+        "emoji": "💡"
+      },
+      {
+        "word": "USEFUL",
+        "hint": "有用的",
+        "emoji": "💡"
+      },
+      {
+        "word": "WARM",
+        "hint": "溫暖的",
+        "emoji": "💡"
+      },
+      {
+        "word": "WEAK",
+        "hint": "弱的",
+        "emoji": "💡"
+      },
+      {
+        "word": "WISE",
+        "hint": "明智的",
+        "emoji": "💡"
+      },
+      {
+        "word": "WONDERFUL",
+        "hint": "極好的",
+        "emoji": "💡"
+      },
+      {
+        "word": "WRONG",
+        "hint": "錯誤的",
+        "emoji": "💡"
+      },
+      {
+        "word": "YOUNG",
+        "hint": "年輕的",
+        "emoji": "💡"
+      },
+      {
+        "word": "CLOUDY",
+        "hint": "多雲的",
+        "emoji": "📝"
+      },
+      {
+        "word": "CONVENIENT",
+        "hint": "方便的",
+        "emoji": "📝"
+      },
+      {
+        "word": "CRAZY",
+        "hint": "瘋狂的",
+        "emoji": "📝"
+      },
+      {
+        "word": "DEAD",
+        "hint": "死的",
+        "emoji": "📝"
+      },
+      {
+        "word": "DEAR",
+        "hint": "親愛的",
+        "emoji": "📝"
+      },
+      {
+        "word": "EARLY",
+        "hint": "早的",
+        "emoji": "📝"
+      },
+      {
+        "word": "EXCELLENT",
+        "hint": "極好的",
+        "emoji": "📝"
+      },
+      {
+        "word": "FAVORITE",
+        "hint": "最喜愛的",
+        "emoji": "📝"
+      },
+      {
+        "word": "FOREIGN",
+        "hint": "外國的",
+        "emoji": "📝"
+      },
+      {
+        "word": "GIANT",
+        "hint": "巨大的,巨人",
+        "emoji": "📝"
+      },
+      {
+        "word": "MAGIC",
+        "hint": "神奇的,魔術",
+        "emoji": "📝"
+      },
+      {
+        "word": "SLIM",
+        "hint": "苗條的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SURPRISED",
+        "hint": "感到驚訝的",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "國家與文化": {
+    "icon": "🌍",
+    "color": "#0284c7",
+    "words": [
+      {
+        "word": "AMERICA",
+        "hint": "美國",
+        "emoji": "🇺🇸"
+      },
+      {
+        "word": "AMERICAN",
+        "hint": "美國人；美國的",
+        "emoji": "🇺🇸"
+      },
+      {
+        "word": "CHINA",
+        "hint": "中國",
+        "emoji": "🇨🇳"
+      },
+      {
+        "word": "CHINESE",
+        "hint": "中國人,中文",
+        "emoji": "🇨🇳"
+      },
+      {
+        "word": "TAIWAN",
+        "hint": "臺灣",
+        "emoji": "🇹🇼"
+      },
+      {
+        "word": "WORLD",
+        "hint": "世界",
+        "emoji": "🌍"
+      },
+      {
+        "word": "NATIONAL",
+        "hint": "國家的",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "副詞與介系詞": {
+    "icon": "📌",
+    "color": "#94a3b8",
+    "words": [
+      {
+        "word": "ABOUT",
+        "hint": "關於",
+        "emoji": "📌"
+      },
+      {
+        "word": "ABOVE",
+        "hint": "在…上方",
+        "emoji": "📌"
+      },
+      {
+        "word": "ABROAD",
+        "hint": "在國外",
+        "emoji": "📌"
+      },
+      {
+        "word": "ACROSS",
+        "hint": "在…對面",
+        "emoji": "📌"
+      },
+      {
+        "word": "AFTER",
+        "hint": "在…之後",
+        "emoji": "📌"
+      },
+      {
+        "word": "AGAIN",
+        "hint": "再一次",
+        "emoji": "📌"
+      },
+      {
+        "word": "AGO",
+        "hint": "以前",
+        "emoji": "📌"
+      },
+      {
+        "word": "AHEAD",
+        "hint": "在前方",
+        "emoji": "📌"
+      },
+      {
+        "word": "ALL",
+        "hint": "全部的",
+        "emoji": "📌"
+      },
+      {
+        "word": "ALMOST",
+        "hint": "幾乎",
+        "emoji": "📌"
+      },
+      {
+        "word": "ALONG",
+        "hint": "沿著",
+        "emoji": "📌"
+      },
+      {
+        "word": "ALREADY",
+        "hint": "已經",
+        "emoji": "📌"
+      },
+      {
+        "word": "ALSO",
+        "hint": "也",
+        "emoji": "📌"
+      },
+      {
+        "word": "ALWAYS",
+        "hint": "總是",
+        "emoji": "📌"
+      },
+      {
+        "word": "AND",
+        "hint": "和",
+        "emoji": "📌"
+      },
+      {
+        "word": "ANOTHER",
+        "hint": "另一個的",
+        "emoji": "📌"
+      },
+      {
+        "word": "ANY",
+        "hint": "任何的",
+        "emoji": "📌"
+      },
+      {
+        "word": "ANYONE",
+        "hint": "任何人",
+        "emoji": "📌"
+      },
+      {
+        "word": "ANYTHING",
+        "hint": "任何事物",
+        "emoji": "📌"
+      },
+      {
+        "word": "AROUND",
+        "hint": "在…四周",
+        "emoji": "📌"
+      },
+      {
+        "word": "AS",
+        "hint": "與…一樣",
+        "emoji": "📌"
+      },
+      {
+        "word": "AT",
+        "hint": "在",
+        "emoji": "📌"
+      },
+      {
+        "word": "AWAY",
+        "hint": "遠離",
+        "emoji": "📌"
+      },
+      {
+        "word": "BECAUSE",
+        "hint": "因為",
+        "emoji": "📌"
+      },
+      {
+        "word": "BEFORE",
+        "hint": "在…之前",
+        "emoji": "📌"
+      },
+      {
+        "word": "BEHIND",
+        "hint": "在…後面",
+        "emoji": "📌"
+      },
+      {
+        "word": "BELOW",
+        "hint": "在…下方",
+        "emoji": "📌"
+      },
+      {
+        "word": "BESIDE",
+        "hint": "在…旁邊",
+        "emoji": "📌"
+      },
+      {
+        "word": "BETWEEN",
+        "hint": "在…之間",
+        "emoji": "📌"
+      },
+      {
+        "word": "BOTH",
+        "hint": "兩者都",
+        "emoji": "📌"
+      },
+      {
+        "word": "BY",
+        "hint": "藉著",
+        "emoji": "📌"
+      },
+      {
+        "word": "DOWN",
+        "hint": "向下",
+        "emoji": "📌"
+      },
+      {
+        "word": "DURING",
+        "hint": "在…期間",
+        "emoji": "📌"
+      },
+      {
+        "word": "EACH",
+        "hint": "每一〈的〉",
+        "emoji": "📌"
+      },
+      {
+        "word": "ELSE",
+        "hint": "其他的",
+        "emoji": "📌"
+      },
+      {
+        "word": "ENOUGH",
+        "hint": "足夠的",
+        "emoji": "📌"
+      },
+      {
+        "word": "EVEN",
+        "hint": "甚至",
+        "emoji": "📌"
+      },
+      {
+        "word": "EVER",
+        "hint": "曾經",
+        "emoji": "📌"
+      },
+      {
+        "word": "EVERY",
+        "hint": "每一個(的)",
+        "emoji": "📌"
+      },
+      {
+        "word": "EVERYONE",
+        "hint": "每一個人",
+        "emoji": "📌"
+      },
+      {
+        "word": "EVERYTHING",
+        "hint": "每件事",
+        "emoji": "📌"
+      },
+      {
+        "word": "EXCEPT",
+        "hint": "除了…之外",
+        "emoji": "📌"
+      },
+      {
+        "word": "FAR",
+        "hint": "遠的",
+        "emoji": "📌"
+      },
+      {
+        "word": "FINALLY",
+        "hint": "最後",
+        "emoji": "📌"
+      },
+      {
+        "word": "FOR",
+        "hint": "為了",
+        "emoji": "📌"
+      },
+      {
+        "word": "FROM",
+        "hint": "從",
+        "emoji": "📌"
+      },
+      {
+        "word": "HERE",
+        "hint": "這裡",
+        "emoji": "📌"
+      },
+      {
+        "word": "HOW",
+        "hint": "如何",
+        "emoji": "📌"
+      },
+      {
+        "word": "HOWEVER",
+        "hint": "然而",
+        "emoji": "📌"
+      },
+      {
+        "word": "IF",
+        "hint": "如果",
+        "emoji": "📌"
+      },
+      {
+        "word": "IN",
+        "hint": "在…裡面",
+        "emoji": "📌"
+      },
+      {
+        "word": "INSIDE",
+        "hint": "在…內部",
+        "emoji": "📌"
+      },
+      {
+        "word": "INTO",
+        "hint": "到…之內",
+        "emoji": "📌"
+      },
+      {
+        "word": "JUST",
+        "hint": "只是,剛才",
+        "emoji": "📌"
+      },
+      {
+        "word": "LATER",
+        "hint": "稍後",
+        "emoji": "📌"
+      },
+      {
+        "word": "MAYBE",
+        "hint": "也許",
+        "emoji": "📌"
+      },
+      {
+        "word": "NEAR",
+        "hint": "在…附近",
+        "emoji": "📌"
+      },
+      {
+        "word": "NEVER",
+        "hint": "從不",
+        "emoji": "📌"
+      },
+      {
+        "word": "NEXT",
+        "hint": "下一個",
+        "emoji": "📌"
+      },
+      {
+        "word": "NOBODY",
+        "hint": "沒有人",
+        "emoji": "📌"
+      },
+      {
+        "word": "NOT",
+        "hint": "不,不是",
+        "emoji": "📌"
+      },
+      {
+        "word": "NOTHING",
+        "hint": "沒東西,沒事",
+        "emoji": "📌"
+      },
+      {
+        "word": "NOW",
+        "hint": "現在",
+        "emoji": "📌"
+      },
+      {
+        "word": "OF",
+        "hint": "...的",
+        "emoji": "📌"
+      },
+      {
+        "word": "OFF",
+        "hint": "自…離開",
+        "emoji": "📌"
+      },
+      {
+        "word": "OFTEN",
+        "hint": "時常",
+        "emoji": "📌"
+      },
+      {
+        "word": "ON",
+        "hint": "在…上面",
+        "emoji": "📌"
+      },
+      {
+        "word": "ONCE",
+        "hint": "一次",
+        "emoji": "📌"
+      },
+      {
+        "word": "ONLY",
+        "hint": "只有",
+        "emoji": "📌"
+      },
+      {
+        "word": "OR",
+        "hint": "或",
+        "emoji": "📌"
+      },
+      {
+        "word": "OTHER",
+        "hint": "其他的",
+        "emoji": "📌"
+      },
+      {
+        "word": "OUT",
+        "hint": "在外",
+        "emoji": "📌"
+      },
+      {
+        "word": "OUTSIDE",
+        "hint": "在…外部",
+        "emoji": "📌"
+      },
+      {
+        "word": "OVER",
+        "hint": "結束",
+        "emoji": "📌"
+      },
+      {
+        "word": "PERHAPS",
+        "hint": "或許",
+        "emoji": "📌"
+      },
+      {
+        "word": "PLEASE",
+        "hint": "請",
+        "emoji": "📌"
+      },
+      {
+        "word": "QUITE",
+        "hint": "相當",
+        "emoji": "📌"
+      },
+      {
+        "word": "REALLY",
+        "hint": "真地",
+        "emoji": "📌"
+      },
+      {
+        "word": "SINCE",
+        "hint": "自從",
+        "emoji": "📌"
+      },
+      {
+        "word": "SO",
+        "hint": "如此地",
+        "emoji": "📌"
+      },
+      {
+        "word": "SOME",
+        "hint": "一些",
+        "emoji": "📌"
+      },
+      {
+        "word": "SOMEONE",
+        "hint": "某人",
+        "emoji": "📌"
+      },
+      {
+        "word": "SOMETHING",
+        "hint": "某事",
+        "emoji": "📌"
+      },
+      {
+        "word": "SOMETIMES",
+        "hint": "有時候",
+        "emoji": "📌"
+      },
+      {
+        "word": "SOON",
+        "hint": "不久,即將",
+        "emoji": "📌"
+      },
+      {
+        "word": "STILL",
+        "hint": "仍然",
+        "emoji": "📌"
+      },
+      {
+        "word": "THAN",
+        "hint": "比…",
+        "emoji": "📌"
+      },
+      {
+        "word": "THAT",
+        "hint": "那個",
+        "emoji": "📌"
+      },
+      {
+        "word": "THE",
+        "hint": "這/那",
+        "emoji": "📌"
+      },
+      {
+        "word": "THEN",
+        "hint": "那時",
+        "emoji": "📌"
+      },
+      {
+        "word": "THERE",
+        "hint": "那裡",
+        "emoji": "📌"
+      },
+      {
+        "word": "THOUGH",
+        "hint": "雖然",
+        "emoji": "📌"
+      },
+      {
+        "word": "TOGETHER",
+        "hint": "一起",
+        "emoji": "📌"
+      },
+      {
+        "word": "TOO",
+        "hint": "也,太...",
+        "emoji": "📌"
+      },
+      {
+        "word": "UNDER",
+        "hint": "在…之下",
+        "emoji": "📌"
+      },
+      {
+        "word": "UNTIL",
+        "hint": "直到",
+        "emoji": "📌"
+      },
+      {
+        "word": "UP",
+        "hint": "向上",
+        "emoji": "📌"
+      },
+      {
+        "word": "USUALLY",
+        "hint": "通常",
+        "emoji": "📌"
+      },
+      {
+        "word": "VERY",
+        "hint": "非常",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHAT",
+        "hint": "什麼",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHEN",
+        "hint": "何時",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHERE",
+        "hint": "何處",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHETHER",
+        "hint": "是否",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHICH",
+        "hint": "哪一個",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHO",
+        "hint": "誰",
+        "emoji": "📌"
+      },
+      {
+        "word": "WHY",
+        "hint": "為什麼",
+        "emoji": "📌"
+      },
+      {
+        "word": "WITH",
+        "hint": "和",
+        "emoji": "📌"
+      },
+      {
+        "word": "WITHOUT",
+        "hint": "沒有",
+        "emoji": "📌"
+      },
+      {
+        "word": "YET",
+        "hint": "尚未",
+        "emoji": "📌"
+      },
+      {
+        "word": "EITHER",
+        "hint": "也不",
+        "emoji": "📝"
+      }
+    ]
+  },
+  "常用名詞": {
+    "icon": "📝",
+    "color": "#64748b",
+    "words": [
+      {
+        "word": "ANIMAL",
+        "hint": "動物",
+        "emoji": "📝"
+      },
+      {
+        "word": "BUSINESS",
+        "hint": "生意",
+        "emoji": "📝"
+      },
+      {
+        "word": "CARE",
+        "hint": "關心",
+        "emoji": "📝"
+      },
+      {
+        "word": "CASE",
+        "hint": "情形",
+        "emoji": "📝"
+      },
+      {
+        "word": "CENT",
+        "hint": "〈一〉分錢",
+        "emoji": "📝"
+      },
+      {
+        "word": "CENTIMETER",
+        "hint": "公分",
+        "emoji": "📝"
+      },
+      {
+        "word": "CHANCE",
+        "hint": "機會",
+        "emoji": "📝"
+      },
+      {
+        "word": "COST",
+        "hint": "價值",
+        "emoji": "📝"
+      },
+      {
+        "word": "FACT",
+        "hint": "事實",
+        "emoji": "📝"
+      },
+      {
+        "word": "GARBAGE",
+        "hint": "垃圾",
+        "emoji": "📝"
+      },
+      {
+        "word": "GRAM",
+        "hint": "公克",
+        "emoji": "📝"
+      },
+      {
+        "word": "GROUP",
+        "hint": "團體",
+        "emoji": "📝"
+      },
+      {
+        "word": "HEALTH",
+        "hint": "健康",
+        "emoji": "📝"
+      },
+      {
+        "word": "IDEA",
+        "hint": "主意",
+        "emoji": "📝"
+      },
+      {
+        "word": "INTEREST",
+        "hint": "使…感興趣",
+        "emoji": "📝"
+      },
+      {
+        "word": "LIFE",
+        "hint": "生活",
+        "emoji": "📝"
+      },
+      {
+        "word": "LIST",
+        "hint": "表,名單",
+        "emoji": "📝"
+      },
+      {
+        "word": "MATTER",
+        "hint": "事情",
+        "emoji": "📝"
+      },
+      {
+        "word": "MIND",
+        "hint": "介意",
+        "emoji": "📝"
+      },
+      {
+        "word": "MISTAKE",
+        "hint": "錯誤",
+        "emoji": "📝"
+      },
+      {
+        "word": "MOMENT",
+        "hint": "片刻",
+        "emoji": "📝"
+      },
+      {
+        "word": "NEWS",
+        "hint": "消息,新聞",
+        "emoji": "📝"
+      },
+      {
+        "word": "NOISE",
+        "hint": "噪音",
+        "emoji": "📝"
+      },
+      {
+        "word": "NOTE",
+        "hint": "筆記",
+        "emoji": "📝"
+      },
+      {
+        "word": "NOTICE",
+        "hint": "注意到",
+        "emoji": "📝"
+      },
+      {
+        "word": "NUMBER",
+        "hint": "號碼",
+        "emoji": "📝"
+      },
+      {
+        "word": "PART",
+        "hint": "部分",
+        "emoji": "📝"
+      },
+      {
+        "word": "PEOPLE",
+        "hint": "人們,人民",
+        "emoji": "📝"
+      },
+      {
+        "word": "PICTURE",
+        "hint": "圖片,照片",
+        "emoji": "📝"
+      },
+      {
+        "word": "PLACE",
+        "hint": "地方",
+        "emoji": "📝"
+      },
+      {
+        "word": "POINT",
+        "hint": "指著,得分",
+        "emoji": "📝"
+      },
+      {
+        "word": "PRICE",
+        "hint": "價格",
+        "emoji": "📝"
+      },
+      {
+        "word": "PROGRAM",
+        "hint": "節目",
+        "emoji": "📝"
+      },
+      {
+        "word": "QUESTION",
+        "hint": "問題",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIZE",
+        "hint": "尺寸",
+        "emoji": "📝"
+      },
+      {
+        "word": "SOUND",
+        "hint": "聲音,聽起來",
+        "emoji": "📝"
+      },
+      {
+        "word": "SPACE",
+        "hint": "空間",
+        "emoji": "📝"
+      },
+      {
+        "word": "STORY",
+        "hint": "故事",
+        "emoji": "📝"
+      },
+      {
+        "word": "THING",
+        "hint": "事情",
+        "emoji": "📝"
+      },
+      {
+        "word": "TROUBLE",
+        "hint": "麻煩",
+        "emoji": "📝"
+      },
+      {
+        "word": "VOICE",
+        "hint": "聲音",
+        "emoji": "📝"
+      },
+      {
+        "word": "WORD",
+        "hint": "字",
+        "emoji": "📝"
+      },
+      {
+        "word": "CHEAT",
+        "hint": "欺騙",
+        "emoji": "📝"
+      },
+      {
+        "word": "COME",
+        "hint": "來",
+        "emoji": "📝"
+      },
+      {
+        "word": "DOLL",
+        "hint": "洋娃娃",
+        "emoji": "📝"
+      },
+      {
+        "word": "E-MAIL",
+        "hint": "電子郵件",
+        "emoji": "📝"
+      },
+      {
+        "word": "EXCUSE",
+        "hint": "原諒",
+        "emoji": "📝"
+      },
+      {
+        "word": "GOODBYE",
+        "hint": "再見",
+        "emoji": "📝"
+      },
+      {
+        "word": "HABIT",
+        "hint": "習慣",
+        "emoji": "📝"
+      },
+      {
+        "word": "HALF",
+        "hint": "一半",
+        "emoji": "📝"
+      },
+      {
+        "word": "HAMBURGER",
+        "hint": "漢堡",
+        "emoji": "📝"
+      },
+      {
+        "word": "HANDSOME",
+        "hint": "英俊的",
+        "emoji": "📝"
+      },
+      {
+        "word": "HANG",
+        "hint": "懸掛",
+        "emoji": "📝"
+      },
+      {
+        "word": "HARD-WORKING",
+        "hint": "努力工作的",
+        "emoji": "📝"
+      },
+      {
+        "word": "HATE",
+        "hint": "討厭",
+        "emoji": "📝"
+      },
+      {
+        "word": "HEAT",
+        "hint": "熱度,加熱",
+        "emoji": "📝"
+      },
+      {
+        "word": "HELLO",
+        "hint": "喂",
+        "emoji": "📝"
+      },
+      {
+        "word": "HIDE",
+        "hint": "隱藏",
+        "emoji": "📝"
+      },
+      {
+        "word": "HIGH",
+        "hint": "高的",
+        "emoji": "📝"
+      },
+      {
+        "word": "HIKE",
+        "hint": "徒步旅行",
+        "emoji": "📝"
+      },
+      {
+        "word": "HILL",
+        "hint": "小山",
+        "emoji": "📝"
+      },
+      {
+        "word": "HOLD",
+        "hint": "拿著",
+        "emoji": "📝"
+      },
+      {
+        "word": "HOUSEWIFE",
+        "hint": "家庭主婦",
+        "emoji": "📝"
+      },
+      {
+        "word": "HUNT",
+        "hint": "打獵",
+        "emoji": "📝"
+      },
+      {
+        "word": "HURT",
+        "hint": "受傷,疼痛",
+        "emoji": "📝"
+      },
+      {
+        "word": "INSECT",
+        "hint": "昆蟲",
+        "emoji": "📝"
+      },
+      {
+        "word": "INTERESTED",
+        "hint": "感興趣的",
+        "emoji": "📝"
+      },
+      {
+        "word": "INTERVIEW",
+        "hint": "訪問,面試",
+        "emoji": "📝"
+      },
+      {
+        "word": "KICK",
+        "hint": "踢",
+        "emoji": "📝"
+      },
+      {
+        "word": "KILO(GRAM",
+        "hint": "公斤",
+        "emoji": "📝"
+      },
+      {
+        "word": "KISS",
+        "hint": "吻",
+        "emoji": "📝"
+      },
+      {
+        "word": "KITE",
+        "hint": "風箏",
+        "emoji": "📝"
+      },
+      {
+        "word": "KNOCK",
+        "hint": "敲",
+        "emoji": "📝"
+      },
+      {
+        "word": "LANTERN",
+        "hint": "燈籠",
+        "emoji": "📝"
+      },
+      {
+        "word": "LAST",
+        "hint": "最後的",
+        "emoji": "📝"
+      },
+      {
+        "word": "LATE",
+        "hint": "晚的",
+        "emoji": "📝"
+      },
+      {
+        "word": "LAUGH",
+        "hint": "笑",
+        "emoji": "📝"
+      },
+      {
+        "word": "LEAST",
+        "hint": "最少〈的〉",
+        "emoji": "📝"
+      },
+      {
+        "word": "LESS",
+        "hint": "較少的",
+        "emoji": "📝"
+      },
+      {
+        "word": "LETTER",
+        "hint": "信",
+        "emoji": "📝"
+      },
+      {
+        "word": "LIGHT",
+        "hint": "燈光,輕的",
+        "emoji": "📝"
+      },
+      {
+        "word": "LINE",
+        "hint": "隊伍,線條",
+        "emoji": "📝"
+      },
+      {
+        "word": "LONELY",
+        "hint": "寂寞的",
+        "emoji": "📝"
+      },
+      {
+        "word": "MACHINE",
+        "hint": "機器",
+        "emoji": "📝"
+      },
+      {
+        "word": "MAIL",
+        "hint": "信件",
+        "emoji": "📝"
+      },
+      {
+        "word": "MANY",
+        "hint": "許多的",
+        "emoji": "📝"
+      },
+      {
+        "word": "MARK",
+        "hint": "做記號",
+        "emoji": "📝"
+      },
+      {
+        "word": "MARKER",
+        "hint": "簽字筆",
+        "emoji": "📝"
+      },
+      {
+        "word": "MARRIED",
+        "hint": "已婚的",
+        "emoji": "📝"
+      },
+      {
+        "word": "MASK",
+        "hint": "面具",
+        "emoji": "📝"
+      },
+      {
+        "word": "MEAN",
+        "hint": "意指",
+        "emoji": "📝"
+      },
+      {
+        "word": "MEDICINE",
+        "hint": "藥",
+        "emoji": "📝"
+      },
+      {
+        "word": "MEDIUM",
+        "hint": "中號〈的〉",
+        "emoji": "📝"
+      },
+      {
+        "word": "MEETING",
+        "hint": "會議",
+        "emoji": "📝"
+      },
+      {
+        "word": "MENU",
+        "hint": "菜單,選單",
+        "emoji": "📝"
+      },
+      {
+        "word": "MILE",
+        "hint": "英里,哩",
+        "emoji": "📝"
+      },
+      {
+        "word": "MORE",
+        "hint": "更多的",
+        "emoji": "📝"
+      },
+      {
+        "word": "MOST",
+        "hint": "大部分的",
+        "emoji": "📝"
+      },
+      {
+        "word": "MOVIE",
+        "hint": "電影",
+        "emoji": "📝"
+      },
+      {
+        "word": "MUCH",
+        "hint": "許多(不可數)",
+        "emoji": "📝"
+      },
+      {
+        "word": "MUST",
+        "hint": "必須",
+        "emoji": "📝"
+      },
+      {
+        "word": "NAME",
+        "hint": "名字",
+        "emoji": "📝"
+      },
+      {
+        "word": "PACK",
+        "hint": "包",
+        "emoji": "📝"
+      },
+      {
+        "word": "PACKAGE",
+        "hint": "包裹",
+        "emoji": "📝"
+      },
+      {
+        "word": "PAGE",
+        "hint": "頁",
+        "emoji": "📝"
+      },
+      {
+        "word": "PAIR",
+        "hint": "一雙",
+        "emoji": "📝"
+      },
+      {
+        "word": "PAPAYA",
+        "hint": "木瓜",
+        "emoji": "📝"
+      },
+      {
+        "word": "PARENT(S",
+        "hint": "父(母)親",
+        "emoji": "📝"
+      },
+      {
+        "word": "PARTY",
+        "hint": "派對",
+        "emoji": "📝"
+      },
+      {
+        "word": "PASTE",
+        "hint": "黏貼,漿糊",
+        "emoji": "📝"
+      },
+      {
+        "word": "PEAR",
+        "hint": "梨子",
+        "emoji": "📝"
+      },
+      {
+        "word": "PHOTO",
+        "hint": "相片",
+        "emoji": "📝"
+      },
+      {
+        "word": "PICNIC",
+        "hint": "野餐",
+        "emoji": "📝"
+      },
+      {
+        "word": "PIECE",
+        "hint": "片",
+        "emoji": "📝"
+      },
+      {
+        "word": "PIPE",
+        "hint": "管",
+        "emoji": "📝"
+      },
+      {
+        "word": "PLEASURE",
+        "hint": "樂趣,使高興",
+        "emoji": "📝"
+      },
+      {
+        "word": "POND",
+        "hint": "池塘",
+        "emoji": "📝"
+      },
+      {
+        "word": "POOL",
+        "hint": "游泳池",
+        "emoji": "📝"
+      },
+      {
+        "word": "POSTCARD",
+        "hint": "明信片",
+        "emoji": "📝"
+      },
+      {
+        "word": "POUND",
+        "hint": "磅",
+        "emoji": "📝"
+      },
+      {
+        "word": "PRAY",
+        "hint": "祈禱",
+        "emoji": "📝"
+      },
+      {
+        "word": "PRESENT",
+        "hint": "禮物",
+        "emoji": "📝"
+      },
+      {
+        "word": "PRIZE",
+        "hint": "獎品,獎金",
+        "emoji": "📝"
+      },
+      {
+        "word": "QUICK",
+        "hint": "迅速的",
+        "emoji": "📝"
+      },
+      {
+        "word": "RAILROAD",
+        "hint": "鐵路",
+        "emoji": "📝"
+      },
+      {
+        "word": "RAINY",
+        "hint": "下雨的",
+        "emoji": "📝"
+      },
+      {
+        "word": "RECORDER",
+        "hint": "錄音機",
+        "emoji": "📝"
+      },
+      {
+        "word": "REFRIGERATOR",
+        "hint": "冰箱",
+        "emoji": "📝"
+      },
+      {
+        "word": "RESTROOM",
+        "hint": "洗手間",
+        "emoji": "📝"
+      },
+      {
+        "word": "ROBOT",
+        "hint": "機器人",
+        "emoji": "📝"
+      },
+      {
+        "word": "ROLLER-",
+        "hint": "溜冰",
+        "emoji": "📝"
+      },
+      {
+        "word": "ROSE",
+        "hint": "玫瑰",
+        "emoji": "📝"
+      },
+      {
+        "word": "SAIL",
+        "hint": "航行",
+        "emoji": "📝"
+      },
+      {
+        "word": "SALE",
+        "hint": "出售",
+        "emoji": "📝"
+      },
+      {
+        "word": "SALESMAN",
+        "hint": "推銷員",
+        "emoji": "📝"
+      },
+      {
+        "word": "SAME",
+        "hint": "相同的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SACRED",
+        "hint": "神聖的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SCREEN",
+        "hint": "螢幕",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEAT",
+        "hint": "座位",
+        "emoji": "📝"
+      },
+      {
+        "word": "SECRETARY",
+        "hint": "秘書",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEESAW",
+        "hint": "蹺蹺板",
+        "emoji": "📝"
+      },
+      {
+        "word": "SELDOM",
+        "hint": "很少",
+        "emoji": "📝"
+      },
+      {
+        "word": "SENTENCE",
+        "hint": "句子",
+        "emoji": "📝"
+      },
+      {
+        "word": "SEVERAL",
+        "hint": "幾個的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHAKE",
+        "hint": "搖動",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHALL",
+        "hint": "將會,好嗎?",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHAPE",
+        "hint": "形狀",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHOE(S",
+        "hint": "鞋子",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHOPKEEPER",
+        "hint": "店主",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHOULD",
+        "hint": "應該",
+        "emoji": "📝"
+      },
+      {
+        "word": "SHOUT",
+        "hint": "喊叫",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIDE",
+        "hint": "旁邊,邊,面",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIDEWALK",
+        "hint": "人行道",
+        "emoji": "📝"
+      },
+      {
+        "word": "SIGHT",
+        "hint": "視力",
+        "emoji": "📝"
+      },
+      {
+        "word": "SKATE",
+        "hint": "溜冰",
+        "emoji": "📝"
+      },
+      {
+        "word": "SLIDE",
+        "hint": "滑坡,滑動",
+        "emoji": "📝"
+      },
+      {
+        "word": "SMELL",
+        "hint": "聞起來",
+        "emoji": "📝"
+      },
+      {
+        "word": "SMILE",
+        "hint": "微笑",
+        "emoji": "📝"
+      },
+      {
+        "word": "SNOWMAN",
+        "hint": "雪人",
+        "emoji": "📝"
+      },
+      {
+        "word": "SNOWY",
+        "hint": "下雪的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SOCKS",
+        "hint": "襪子",
+        "emoji": "📝"
+      },
+      {
+        "word": "SOMEWHERE",
+        "hint": "某處",
+        "emoji": "📝"
+      },
+      {
+        "word": "SONG",
+        "hint": "歌曲",
+        "emoji": "📝"
+      },
+      {
+        "word": "SORE",
+        "hint": "疼痛的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SPAGHETTI",
+        "hint": "義大利麵",
+        "emoji": "📝"
+      },
+      {
+        "word": "SPELL",
+        "hint": "拼字",
+        "emoji": "📝"
+      },
+      {
+        "word": "SQUARE",
+        "hint": "正方形的",
+        "emoji": "📝"
+      },
+      {
+        "word": "STAIRS",
+        "hint": "樓梯",
+        "emoji": "📝"
+      },
+      {
+        "word": "STRANGER",
+        "hint": "陌生人",
+        "emoji": "📝"
+      },
+      {
+        "word": "STUPID",
+        "hint": "笨的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SUCCESSFUL",
+        "hint": "成功的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SUNNY",
+        "hint": "晴朗的",
+        "emoji": "📝"
+      },
+      {
+        "word": "SUPERMARKE",
+        "hint": "超級市場",
+        "emoji": "📝"
+      },
+      {
+        "word": "SURF",
+        "hint": "衝浪",
+        "emoji": "📝"
+      },
+      {
+        "word": "SWING",
+        "hint": "鞦韆,搖擺",
+        "emoji": "📝"
+      },
+      {
+        "word": "TAIL",
+        "hint": "尾巴",
+        "emoji": "📝"
+      },
+      {
+        "word": "TASTE",
+        "hint": "品嚐",
+        "emoji": "📝"
+      },
+      {
+        "word": "TEENAGER",
+        "hint": "青少年",
+        "emoji": "📝"
+      },
+      {
+        "word": "TELEPHONE",
+        "hint": "電話",
+        "emoji": "📝"
+      },
+      {
+        "word": "THANK",
+        "hint": "謝謝",
+        "emoji": "📝"
+      },
+      {
+        "word": "THESE",
+        "hint": "這些",
+        "emoji": "📝"
+      },
+      {
+        "word": "THEY",
+        "hint": "他們",
+        "emoji": "📝"
+      },
+      {
+        "word": "THIRSTY",
+        "hint": "口渴的",
+        "emoji": "📝"
+      },
+      {
+        "word": "THIS",
+        "hint": "這個",
+        "emoji": "📝"
+      },
+      {
+        "word": "THOSE",
+        "hint": "那些",
+        "emoji": "📝"
+      },
+      {
+        "word": "TIDY",
+        "hint": "整潔的",
+        "emoji": "📝"
+      },
+      {
+        "word": "TOAST",
+        "hint": "土司,烘烤",
+        "emoji": "📝"
+      },
+      {
+        "word": "TONIGHT",
+        "hint": "今晚",
+        "emoji": "📝"
+      },
+      {
+        "word": "TOTAL",
+        "hint": "總計",
+        "emoji": "📝"
+      },
+      {
+        "word": "TRASH",
+        "hint": "垃圾",
+        "emoji": "📝"
+      },
+      {
+        "word": "TREAT",
+        "hint": "請客,對待",
+        "emoji": "📝"
+      },
+      {
+        "word": "T-SHIRT",
+        "hint": "T 恤",
+        "emoji": "📝"
+      },
+      {
+        "word": "TURKEY",
+        "hint": "火雞",
+        "emoji": "📝"
+      },
+      {
+        "word": "TWICE",
+        "hint": "兩次",
+        "emoji": "📝"
+      },
+      {
+        "word": "TYPHOON",
+        "hint": "颱風",
+        "emoji": "📝"
+      },
+      {
+        "word": "UNHAPPY",
+        "hint": "不快樂的",
+        "emoji": "📝"
+      },
+      {
+        "word": "VIDEO",
+        "hint": "錄影帶",
+        "emoji": "📝"
+      },
+      {
+        "word": "WAITRESS",
+        "hint": "女服務生",
+        "emoji": "📝"
+      },
+      {
+        "word": "WAKE",
+        "hint": "醒來",
+        "emoji": "📝"
+      },
+      {
+        "word": "WALL",
+        "hint": "牆壁",
+        "emoji": "📝"
+      },
+      {
+        "word": "WEATHER",
+        "hint": "天氣",
+        "emoji": "📝"
+      },
+      {
+        "word": "WELCOME",
+        "hint": "受歡迎的",
+        "emoji": "📝"
+      },
+      {
+        "word": "WELL",
+        "hint": "好地",
+        "emoji": "📝"
+      },
+      {
+        "word": "WHOSE",
+        "hint": "誰的",
+        "emoji": "📝"
+      },
+      {
+        "word": "WILL",
+        "hint": "將會...",
+        "emoji": "📝"
+      },
+      {
+        "word": "WINDY",
+        "hint": "多風的",
+        "emoji": "📝"
+      },
+      {
+        "word": "WORKBOOK",
+        "hint": "作業本",
+        "emoji": "📝"
+      },
+      {
+        "word": "WORRY",
+        "hint": "擔心",
+        "emoji": "📝"
+      },
+      {
+        "word": "YARD",
+        "hint": "庭院",
+        "emoji": "📝"
+      },
+      {
+        "word": "YUMMY",
+        "hint": "好吃的",
+        "emoji": "📝"
+      }
+    ]
+  }
+}

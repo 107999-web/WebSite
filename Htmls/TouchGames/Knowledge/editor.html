@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 題庫編輯器 — 校園知識王</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family:'M PLUS Rounded 1c','Nunito','Microsoft JhengHei',sans-serif;
+  background: linear-gradient(135deg,#FFF0F5 0%,#E3F2FD 50%,#F0FFF4 100%);
+  color:#5D4037;
+  font-size:15px;
+  line-height:1.6;
+}
+button { font-family:inherit; cursor:pointer; }
+input, textarea, select { font-family:inherit; }
+
+/* ── 圓點背景 ── */
+body::before {
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:radial-gradient(rgba(255,143,171,.10) 6px, transparent 7px);
+  background-size:72px 72px;
+}
+
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+.header {
+  position:relative; z-index:10;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:12px 20px;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(8px);
+  border-bottom:2px solid #FADADD;
+  box-shadow:0 4px 16px rgba(255,182,193,.28);
+}
+.header-title {
+  font-size:1.25rem; font-weight:800; letter-spacing:.04em;
+  background:linear-gradient(135deg,#FF8FAB,#FFB74D);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  white-space:nowrap;
+}
+.header-file {
+  flex:1; min-width:0;
+  font-size:.82rem; color:#A1887F; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.header-btns { display:flex; gap:8px; flex-shrink:0; }
+
+.hbtn {
+  display:flex; align-items:center; gap:6px;
+  padding:8px 18px; border-radius:50px; border:2px solid;
+  font-size:.85rem; font-weight:800;
+  transition:transform .15s, box-shadow .15s;
+}
+.hbtn:active { transform:scale(.94); }
+.hbtn-open  { background:#FFF; border-color:#FADADD; color:#E57373;
+               box-shadow:0 4px 10px rgba(255,182,193,.35); }
+.hbtn-open:hover  { box-shadow:0 6px 16px rgba(255,182,193,.5); }
+.hbtn-save  { background:#FF8FAB; border-color:#FFF; color:#FFF;
+               box-shadow:0 4px 10px rgba(255,143,171,.4); }
+.hbtn-save:hover  { box-shadow:0 6px 16px rgba(255,143,171,.6); }
+.hbtn-save:disabled { background:#E0D7D0; border-color:#FFF; color:#A1887F; box-shadow:none; cursor:default; }
+.hbtn-gem   { background:#FFF; border-color:#C5E1A5; color:#558B2F;
+               box-shadow:0 4px 10px rgba(139,195,74,.25); }
+.hbtn-gem:hover { box-shadow:0 6px 16px rgba(139,195,74,.45); }
+.hbtn-saveas { background:#FFF; border-color:#B3E5FC; color:#0277BD;
+               box-shadow:0 4px 10px rgba(3,169,244,.2); }
+.hbtn-saveas:hover { box-shadow:0 6px 16px rgba(3,169,244,.4); }
+.hbtn-saveas:disabled { background:#F5F5F5; border-color:#E0E0E0; color:#BDBDBD; box-shadow:none; cursor:default; }
+.dirty-dot { width:8px; height:8px; border-radius:50%; background:#FFB74D; display:none; }
+.dirty-dot.show { display:inline-block; }
+
+/* ══════════════════════════════
+   MAIN LAYOUT
+══════════════════════════════ */
+.app {
+  position:relative; z-index:1;
+  display:flex; height:calc(100vh - 57px);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width:230px; flex-shrink:0;
+  display:flex; flex-direction:column;
+  background:rgba(255,255,255,.65);
+  backdrop-filter:blur(6px);
+  border-right:2px solid #FADADD;
+  overflow:hidden;
+}
+.sidebar-head {
+  padding:14px 16px 10px;
+  font-size:.78rem; font-weight:800; color:#A1887F; letter-spacing:.08em;
+  border-bottom:1.5px dashed #FADADD;
+}
+.subject-list {
+  flex:1; overflow-y:auto; padding:10px 10px 4px;
+  display:flex; flex-direction:column; gap:6px;
+}
+.subject-list::-webkit-scrollbar { width:5px; }
+.subject-list::-webkit-scrollbar-thumb { background:#FADADD; border-radius:8px; }
+
+.sbtn {
+  display:flex; align-items:center; gap:8px;
+  padding:9px 12px; border-radius:16px; border:2px solid transparent;
+  background:transparent; color:#5D4037; text-align:left;
+  transition:background .15s, border-color .15s;
+  cursor:pointer;
+}
+.sbtn:hover  { background:#FFF0F5; border-color:#FADADD; }
+.sbtn.active { background:#FFE3EC; border-color:#FF8FAB; }
+.sbtn-icon { font-size:1.3rem; flex-shrink:0; }
+.sbtn-name { flex:1; font-size:.88rem; font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sbtn-cnt  { font-size:.72rem; background:#FFD7E2; color:#C2607A; border-radius:50px; padding:1px 8px; font-weight:800; flex-shrink:0; }
+.sbtn.active .sbtn-cnt { background:#FF8FAB; color:#FFF; }
+
+.sidebar-foot {
+  padding:10px;
+  border-top:1.5px dashed #FADADD;
+}
+.add-subj-btn {
+  width:100%; padding:9px; border-radius:16px; border:2px dashed #FFADC5;
+  background:transparent; color:#E57373; font-size:.85rem; font-weight:800;
+  transition:background .15s;
+}
+.add-subj-btn:hover { background:#FFF0F5; }
+
+/* ── Content ── */
+.content {
+  flex:1; min-width:0;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+/* No-file state */
+.no-file {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px; padding:40px;
+  text-align:center;
+}
+.no-file .nf-icon { font-size:5rem; }
+.no-file h2 { font-size:1.5rem; font-weight:800; color:#8D6E63; }
+.no-file p  { font-size:.92rem; color:#A1887F; max-width:380px; line-height:1.7; }
+.no-file .nf-hint {
+  background:#FFF; border:2px solid #FADADD; border-radius:16px;
+  padding:14px 20px; font-size:.82rem; color:#A1887F; text-align:left; max-width:420px;
+}
+.no-file .nf-hint code {
+  font-family:monospace; background:#FFF0F5; color:#E57373;
+  padding:1px 5px; border-radius:4px; font-size:.8rem;
+}
+
+/* Subject header */
+.subj-header {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 20px;
+  border-bottom:2px solid #FADADD;
+  background:rgba(255,255,255,.5);
+  flex-shrink:0;
+}
+.subj-icon  { font-size:1.8rem; }
+.subj-name  { font-size:1.1rem; font-weight:800; }
+.subj-count { font-size:.8rem; color:#A1887F; font-weight:700;
+              background:#FFF0F5; border:1.5px solid #FADADD; border-radius:50px; padding:2px 10px; }
+.subj-del-btn {
+  margin-left:auto; padding:6px 14px; border-radius:50px; border:2px solid #FFB3B3;
+  background:#FFF; color:#E57373; font-size:.8rem; font-weight:800;
+  transition:background .15s;
+}
+.subj-del-btn:hover { background:#FFEBEE; }
+
+/* Question list */
+.q-area {
+  flex:1; min-height:0; overflow-y:auto;
+  padding:12px 16px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.q-area::-webkit-scrollbar { width:10px; }
+.q-area::-webkit-scrollbar-track { background:#FFF0F5; border-radius:8px; }
+.q-area::-webkit-scrollbar-thumb { background:#FFADC5; border-radius:8px; border:2px solid #FFF0F5; }
+.q-area::-webkit-scrollbar-thumb:hover { background:#FF8FAB; }
+
+.q-empty {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  padding:40px 20px; color:#A1887F; font-size:.92rem; text-align:center;
+}
+.q-empty .qe-icon { font-size:3rem; }
+
+.q-card {
+  flex-shrink:0;                           /* 不讓卡片被壓縮，由容器捲動 */
+  background:#FFF; border:2px solid #F0E6EA; border-radius:16px;
+  box-shadow:0 3px 10px rgba(255,182,193,.2);
+  overflow:hidden; transition:border-color .15s;
+}
+.q-card:hover { border-color:#FFADC5; }
+.q-card-head {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:10px 14px;
+}
+.q-num {
+  flex-shrink:0; width:28px; height:28px; border-radius:50%;
+  background:#FFD7E2; color:#C2607A; font-size:.78rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center; margin-top:1px;
+}
+.q-text { flex:1; font-size:.9rem; font-weight:700; line-height:1.55; }
+.q-actions { display:flex; gap:6px; flex-shrink:0; }
+.q-toggle-btn, .q-del-btn {
+  width:28px; height:28px; border-radius:50%; border:2px solid;
+  font-size:.85rem; display:flex; align-items:center; justify-content:center;
+  transition:transform .15s;
+}
+.q-toggle-btn { background:#E3F2FD; border-color:#A8CFF5; color:#1976D2; }
+.q-del-btn    { background:#FFF; border-color:#FFB3B3; color:#E57373; }
+.q-toggle-btn:hover, .q-del-btn:hover { transform:scale(1.12); }
+
+.q-opts {
+  display:none; padding:0 14px 10px 52px;
+  display:grid; grid-template-columns:1fr 1fr; gap:4px;
+}
+.q-opts.hide { display:none; }
+.q-opt {
+  padding:5px 10px; border-radius:10px; font-size:.8rem; font-weight:700;
+  border:1.5px solid #E0D7D0; background:#FFF8FA; color:#5D4037;
+}
+.q-opt.correct { background:#E8F5E9; border-color:#81C784; color:#2E7D32; }
+
+/* ── Add section ── */
+.add-section {
+  flex-shrink:0;
+  background:rgba(255,255,255,.75);
+  border-top:2px solid #FADADD;
+  padding:14px 16px;
+  max-height:42%;
+  overflow-y:auto;
+}
+.add-section::-webkit-scrollbar { width:6px; }
+.add-section::-webkit-scrollbar-thumb { background:#FADADD; border-radius:8px; }
+
+.add-tabs { display:flex; gap:8px; margin-bottom:12px; }
+.add-tab {
+  padding:7px 18px; border-radius:50px; border:2px solid #FADADD;
+  background:#FFF; color:#8D6E63; font-size:.83rem; font-weight:800;
+  transition:background .15s, border-color .15s;
+}
+.add-tab.active { background:#FF8FAB; border-color:#FFF; color:#FFF; }
+
+/* Paste tab */
+.paste-hint {
+  background:#FFF8FA; border:1.5px solid #FADADD; border-radius:12px;
+  padding:8px 14px; margin-bottom:8px;
+  font-size:.76rem; color:#A1887F; line-height:1.7;
+}
+.paste-hint code {
+  font-family:monospace; background:#FFE3EC; color:#C2607A;
+  padding:1px 4px; border-radius:4px;
+}
+.paste-area {
+  width:100%; min-height:80px; max-height:180px;
+  border:2px solid #FADADD; border-radius:14px;
+  padding:10px 14px; font-size:.82rem; color:#5D4037;
+  background:#FAFAFA; resize:vertical; outline:none;
+  transition:border-color .15s;
+}
+.paste-area:focus { border-color:#FF8FAB; background:#FFF; }
+.paste-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
+.parse-count { font-size:.8rem; color:#A1887F; font-weight:700; flex:1; }
+
+.preview-list {
+  display:none; margin-top:10px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.preview-list.hide { display:none; }
+.preview-item {
+  background:#E8F5E9; border:1.5px solid #A5D6A7; border-radius:10px;
+  padding:6px 12px; font-size:.8rem; color:#2E7D32; font-weight:700;
+}
+.preview-err {
+  background:#FFEBEE; border:1.5px solid #FF8A80; border-radius:10px;
+  padding:8px 14px; font-size:.82rem; color:#C62828; font-weight:700;
+  margin-top:8px;
+}
+
+/* Manual tab */
+.manual-form { display:flex; flex-direction:column; gap:8px; }
+.manual-row  { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.form-label  { font-size:.75rem; font-weight:800; color:#A1887F; margin-bottom:2px; display:block; }
+.form-input {
+  width:100%; padding:8px 12px; border:2px solid #FADADD; border-radius:12px;
+  font-size:.85rem; color:#5D4037; background:#FFF; outline:none;
+  transition:border-color .15s;
+}
+.form-input:focus { border-color:#FF8FAB; }
+.form-input.correct-ans { border-color:#81C784; background:#F1F8E9; }
+.correct-note { font-size:.72rem; color:#81C784; font-weight:700; margin-top:2px; }
+
+/* Shared btn styles */
+.act-btn {
+  padding:8px 20px; border-radius:50px; border:2px solid;
+  font-size:.83rem; font-weight:800;
+  transition:transform .15s, box-shadow .15s;
+}
+.act-btn:active { transform:scale(.93); }
+.act-btn:disabled { opacity:.45; cursor:default; }
+.btn-parse   { background:#E3F2FD; border-color:#A8CFF5; color:#1976D2; }
+.btn-confirm { background:#81C784; border-color:#FFF; color:#FFF; box-shadow:0 3px 8px rgba(129,199,132,.4); }
+.btn-add-m   { background:#FF8FAB; border-color:#FFF; color:#FFF; box-shadow:0 3px 8px rgba(255,143,171,.4); }
+
+/* ══════════════════════════════
+   MODAL
+══════════════════════════════ */
+.modal-mask {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(93,64,55,.25); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center;
+}
+.modal-mask.open { display:flex; }
+.modal-box {
+  background:#FFF; border:3px solid #FADADD; border-radius:28px;
+  padding:28px 30px; width:min(92vw, 420px);
+  box-shadow:0 16px 40px rgba(255,182,193,.5);
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-title { font-size:1.1rem; font-weight:800; margin-bottom:18px; }
+.modal-field { margin-bottom:12px; }
+.emoji-grid {
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;
+}
+.emoji-opt {
+  width:36px; height:36px; border-radius:10px; border:2px solid #FADADD;
+  font-size:1.3rem; background:#FFF8FA;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background .15s, border-color .15s;
+}
+.emoji-opt.sel { background:#FFE3EC; border-color:#FF8FAB; }
+.color-grid { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.color-opt {
+  width:32px; height:32px; border-radius:50%; border:3px solid transparent;
+  cursor:pointer; transition:transform .15s;
+}
+.color-opt.sel { border-color:#5D4037; transform:scale(1.18); }
+.modal-btns { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }
+.modal-cancel { background:#FFF; border:2px solid #E0D7D0; color:#8D6E63; border-radius:50px; padding:8px 20px; font-size:.85rem; font-weight:800; }
+.modal-ok     { background:#FF8FAB; border:2px solid #FFF; color:#FFF; border-radius:50px; padding:8px 20px; font-size:.85rem; font-weight:800; box-shadow:0 4px 10px rgba(255,143,171,.4); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:#5D4037; color:#FFF; border-radius:50px; padding:10px 24px;
+  font-size:.88rem; font-weight:700; z-index:300; opacity:0;
+  transition:opacity .3s, transform .3s; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <span class="header-title">📚 題庫編輯器</span>
+  <span class="header-file" id="hdr-file">尚未開啟檔案</span>
+  <div class="header-btns">
+    <button class="hbtn hbtn-gem" onclick="window.open('https://gemini.google.com/gem/1QdYK0HgXgfaF_ufq3tUg4KZuHI_8-SP2?usp=sharing','_blank')">✨ 開啟 Gemini 出題</button>
+    <button class="hbtn hbtn-open" id="btn-open">📂 開啟 questions.js</button>
+    <button class="hbtn hbtn-save" id="btn-save" disabled>
+      <span class="dirty-dot" id="dirty-dot"></span>💾 儲存
+    </button>
+    <button class="hbtn hbtn-saveas" id="btn-saveas" disabled>📄 另存新檔</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">📂 科目列表</div>
+    <div class="subject-list" id="subject-list">
+      <!-- rendered by JS -->
+    </div>
+    <div class="sidebar-foot">
+      <button class="add-subj-btn" id="btn-add-subj" disabled>＋ 新增科目</button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="content">
+
+    <!-- No-file splash -->
+    <div class="no-file" id="no-file">
+      <div class="nf-icon">📖</div>
+      <h2>開啟題庫檔案開始編輯</h2>
+      <p>點擊上方「開啟 questions.js」，選擇 Knowledge 資料夾裡的 <strong>questions.js</strong> 檔案，即可管理所有題目。</p>
+      <div class="nf-hint">
+        ✨ <strong>貼上格式提示</strong><br>
+        從 Google Gemini 複製題目，格式需為：<br>
+        <code>{ q: "題目", options: ["正確答案","錯誤1","錯誤2","錯誤3"], answer: 0 },</code><br>
+        可一次貼上多題，遊戲會自動打亂選項順序。
+      </div>
+    </div>
+
+    <!-- Subject view (hidden until file loaded) -->
+    <div id="subj-view" style="display:none; flex:1; min-height:0; flex-direction:column; overflow:hidden;">
+
+      <div class="subj-header" id="subj-header">
+        <span class="subj-icon" id="sh-icon">📖</span>
+        <span class="subj-name" id="sh-name">科目名稱</span>
+        <span class="subj-count" id="sh-count">0 題</span>
+        <button class="subj-del-btn" id="btn-del-subj">🗑 刪除此科目</button>
+      </div>
+
+      <div class="q-area" id="q-area">
+        <!-- questions rendered by JS -->
+      </div>
+
+      <!-- Add section -->
+      <div class="add-section">
+        <div class="add-tabs">
+          <button class="add-tab active" data-tab="paste">📋 貼上批次新增</button>
+          <button class="add-tab"        data-tab="manual">✏️ 手動輸入</button>
+        </div>
+
+        <!-- Paste tab -->
+        <div id="tab-paste">
+          <div class="paste-hint">
+            從 Google Gemini 複製後直接貼入，可一次貼多題。<br>
+            格式：<code>{ q: "題目", options: ["正確","錯1","錯2","錯3"], answer: 0 },</code>
+          </div>
+          <textarea class="paste-area" id="paste-area" placeholder="在此貼上從 Gemini 複製的題目…"></textarea>
+          <div class="paste-row">
+            <span class="parse-count" id="parse-count"></span>
+            <button class="act-btn btn-parse" id="btn-parse">🔍 解析</button>
+            <button class="act-btn btn-confirm" id="btn-confirm" disabled>✅ 加入題庫</button>
+          </div>
+          <div class="preview-list hide" id="preview-list"></div>
+          <div class="preview-err" id="preview-err" style="display:none"></div>
+        </div>
+
+        <!-- Manual tab -->
+        <div id="tab-manual" style="display:none">
+          <div class="manual-form">
+            <div class="modal-field">
+              <label class="form-label">❓ 題目文字</label>
+              <input class="form-input" id="man-q" placeholder="輸入題目內容…" type="text">
+            </div>
+            <div class="modal-field">
+              <label class="form-label">✅ 正確答案（選項 A）</label>
+              <input class="form-input correct-ans" id="man-a0" placeholder="正確答案" type="text">
+              <div class="correct-note">✓ 此欄為正確答案，遊戲會自動打亂位置</div>
+            </div>
+            <div class="manual-row">
+              <div>
+                <label class="form-label">❌ 選項 B</label>
+                <input class="form-input" id="man-a1" placeholder="錯誤選項" type="text">
+              </div>
+              <div>
+                <label class="form-label">❌ 選項 C</label>
+                <input class="form-input" id="man-a2" placeholder="錯誤選項" type="text">
+              </div>
+            </div>
+            <div class="modal-field">
+              <label class="form-label">❌ 選項 D（可留空，只有三個選項時）</label>
+              <input class="form-input" id="man-a3" placeholder="錯誤選項（選填）" type="text">
+            </div>
+            <div style="display:flex; justify-content:flex-end">
+              <button class="act-btn btn-add-m" id="btn-add-manual">➕ 新增此題</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /subj-view -->
+
+  </main>
+</div>
+
+<!-- NEW SUBJECT MODAL -->
+<div class="modal-mask" id="modal-new-subj">
+  <div class="modal-box">
+    <div class="modal-title">✨ 新增科目</div>
+    <div class="modal-field">
+      <label class="form-label">科目名稱</label>
+      <input class="form-input" id="ns-name" placeholder="例：閩南語、健康、藝術…" type="text">
+    </div>
+    <div class="modal-field">
+      <label class="form-label">圖示 Emoji</label>
+      <div class="emoji-grid" id="ns-emoji-grid"></div>
+    </div>
+    <div class="modal-field">
+      <label class="form-label">顏色</label>
+      <div class="color-grid" id="ns-color-grid"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="ns-cancel">取消</button>
+      <button class="modal-ok"     id="ns-ok">✅ 建立科目</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+let fileHandle   = null;
+let questionBank = {};       // parsed QUESTION_BANK
+let currentSubj  = null;     // selected subject key
+let isDirty      = false;
+let parsedBuf    = [];        // parsed questions from paste, pending confirm
+let nsEmoji      = '📝';
+let nsColor      = '#FF8FAB';
+
+/* ═══════════════════════════════════════════════════
+   FILE I/O
+═══════════════════════════════════════════════════ */
+async function openFile() {
+  if (!window.showOpenFilePicker) {
+    toast('⚠️ 此瀏覽器不支援 File System Access API，請使用 Chrome');
+    return;
+  }
+  try {
+    const [h] = await window.showOpenFilePicker({
+      types: [{ description: 'JavaScript 題庫', accept: { 'text/javascript': ['.js'] } }],
+      excludeAcceptAllOption: false,
+    });
+    fileHandle = h;
+    const file = await h.getFile();
+    const text = await file.text();
+    parseAndLoad(text);
+    document.getElementById('hdr-file').textContent = file.name + '  ·  ' + file.size + ' bytes';
+    setDirty(false);
+  } catch (e) {
+    if (e.name !== 'AbortError') toast('⚠️ 開啟失敗：' + e.message);
+  }
+}
+
+async function saveFile() {
+  if (!fileHandle) { toast('請先開啟 questions.js'); return; }
+  try {
+    const writable = await fileHandle.createWritable();
+    await writable.write(serialize(questionBank));
+    await writable.close();
+    setDirty(false);
+    toast('✅ 儲存完成！');
+  } catch (e) {
+    downloadFallback();
+  }
+}
+
+async function saveAsFile() {
+  if (!Object.keys(questionBank).length) { toast('題庫是空的，無法另存'); return; }
+  try {
+    const h = await window.showSaveFilePicker({
+      suggestedName: 'questions.js',
+      types: [{ description: 'JavaScript 題庫', accept: { 'text/javascript': ['.js'] } }],
+    });
+    const writable = await h.createWritable();
+    await writable.write(serialize(questionBank));
+    await writable.close();
+    fileHandle = h;
+    document.getElementById('hdr-file').textContent = h.name;
+    setDirty(false);
+    toast('✅ 另存完成：' + h.name);
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    downloadFallback();
+  }
+}
+
+function downloadFallback(name) {
+  const blob = new Blob([serialize(questionBank)], { type: 'text/javascript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name || 'questions.js';
+  a.click();
+  toast('⬇️ 已下載，請手動放到遊戲目錄');
+}
+
+/* ═══════════════════════════════════════════════════
+   PARSE / SERIALIZE
+═══════════════════════════════════════════════════ */
+function parseAndLoad(code) {
+  try {
+    // Execute the file code and grab QUESTION_BANK
+    const fn = new Function(code + '\n; return QUESTION_BANK;');
+    questionBank = fn();
+    if (!questionBank || typeof questionBank !== 'object') throw new Error('無法解析 QUESTION_BANK');
+    document.getElementById('no-file').style.display   = 'none';
+    document.getElementById('subj-view').style.display = 'flex';
+    document.getElementById('btn-add-subj').disabled   = false;
+    renderSidebar();
+    // Select first subject
+    const keys = Object.keys(questionBank);
+    if (keys.length) selectSubject(keys[0]);
+    enableSaveAs(true);
+    toast('📂 題庫載入成功，共 ' + keys.length + ' 個科目');
+  } catch (e) {
+    toast('⚠️ 解析失敗：' + e.message);
+  }
+}
+
+function serialize(bank) {
+  const hdr =
+`/* ============================================================
+   校園知識王 — 題庫檔（questions.js）
+   ============================================================
+   ★ 如何新增題目？
+     { q: "題目文字", options: ["選項A","選項B","選項C","選項D"], answer: 0 }
+     answer 是「正確答案的編號」：0=第一個選項、1=第二個…
+
+   ★ 如何新增科目？
+     "閩南語": { icon: "🗣️", color: "#B39DDB", questions: [ ...題目... ] }
+
+   ★ 選項順序會在遊戲中自動打亂，不用擔心答案都放第一個。
+   ============================================================ */
+
+const QUESTION_BANK = {
+
+`;
+  const parts = Object.entries(bank).map(([name, data]) => {
+    const qs = data.questions.map(q => {
+      const opts = q.options.map(o => JSON.stringify(o)).join(', ');
+      return `      { q: ${JSON.stringify(q.q)}, options: [${opts}], answer: ${q.answer} }`;
+    }).join(',\n');
+    return `  ${JSON.stringify(name)}: {\n    icon: ${JSON.stringify(data.icon)},\n    color: ${JSON.stringify(data.color)},\n    questions: [\n${qs}\n    ]\n  }`;
+  });
+  return hdr + parts.join(',\n\n') + '\n\n};\n';
+}
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR / SUBJECT SELECT
+═══════════════════════════════════════════════════ */
+function renderSidebar() {
+  const list = document.getElementById('subject-list');
+  list.innerHTML = '';
+  Object.entries(questionBank).forEach(([key, data]) => {
+    const btn = document.createElement('button');
+    btn.className = 'sbtn' + (key === currentSubj ? ' active' : '');
+    btn.innerHTML =
+      `<span class="sbtn-icon">${data.icon}</span>` +
+      `<span class="sbtn-name">${key}</span>` +
+      `<span class="sbtn-cnt">${data.questions.length}</span>`;
+    btn.addEventListener('click', () => selectSubject(key));
+    list.appendChild(btn);
+  });
+}
+
+function selectSubject(key) {
+  currentSubj = key;
+  renderSidebar();
+  renderQuestions(key);
+  // Reset add section
+  resetPaste();
+}
+
+/* ═══════════════════════════════════════════════════
+   QUESTION LIST
+═══════════════════════════════════════════════════ */
+function renderQuestions(key) {
+  const data = questionBank[key];
+  document.getElementById('sh-icon').textContent  = data.icon;
+  document.getElementById('sh-name').textContent  = key;
+  document.getElementById('sh-count').textContent = data.questions.length + ' 題';
+
+  const area = document.getElementById('q-area');
+  area.innerHTML = '';
+
+  if (!data.questions.length) {
+    area.innerHTML =
+      '<div class="q-empty"><div class="qe-icon">📭</div><div>此科目尚無題目<br>請在下方新增！</div></div>';
+    return;
+  }
+
+  data.questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+
+    const optsHtml = q.options.map((opt, oi) => {
+      const cls = oi === q.answer ? 'q-opt correct' : 'q-opt';
+      const label = oi === q.answer ? '✓ ' : '';
+      return `<div class="${cls}">${label}${escHtml(opt)}</div>`;
+    }).join('');
+
+    card.innerHTML =
+      `<div class="q-card-head">
+        <span class="q-num">${i + 1}</span>
+        <span class="q-text">${escHtml(q.q)}</span>
+        <div class="q-actions">
+          <button class="q-toggle-btn" title="展開選項" data-idx="${i}">▾</button>
+          <button class="q-del-btn"    title="刪除"     data-idx="${i}">✕</button>
+        </div>
+      </div>
+      <div class="q-opts hide" id="qopts-${i}">${optsHtml}</div>`;
+
+    card.querySelector('.q-toggle-btn').addEventListener('click', () => {
+      const opts = document.getElementById('qopts-' + i);
+      opts.classList.toggle('hide');
+    });
+    card.querySelector('.q-del-btn').addEventListener('click', () => deleteQuestion(key, i));
+    area.appendChild(card);
+  });
+}
+
+function deleteQuestion(key, idx) {
+  if (!confirm(`確定刪除第 ${idx + 1} 題？`)) return;
+  questionBank[key].questions.splice(idx, 1);
+  setDirty(true);
+  renderSidebar();
+  renderQuestions(key);
+  toast('🗑 已刪除第 ' + (idx + 1) + ' 題');
+}
+
+/* ═══════════════════════════════════════════════════
+   PASTE & PARSE
+═══════════════════════════════════════════════════ */
+/* 正規化引號：把各種彎引號、全形引號全部換成 ASCII 直引號 */
+function normalizeQuotes(str) {
+  str = str.replace(/[\u201C\u201D\u201E\u201F\uFF02\u275D\u275E]/g, "");
+  str = str.replace(/[\u2018\u2019\u201A\u201B\uFF07\u275B\u275C]/g, '');
+  return str;
+}
+
+/* 前處理：逐字元掃描，把字串「內部」的裸引號補上 \\"逸出
+   同時把字串內的換行符號換成空格，避免多行字串語法錯誤 */
+function preprocessForParse(raw) {
+  var out = '', inStr = false, i = 0;
+  var n = raw.length;
+  while (i < n) {
+    var c = raw[i];
+    if (!inStr) {
+      out += c;
+      if (c === "\"") inStr = true;
+      i++;
+    } else if (c === '\\' && i + 1 < n) {
+      out += c + raw[i + 1]; i += 2;
+    } else if (c === '\n' || c === '\r') {
+      out += ' '; i++;
+    } else if (c === "\"") {
+      var j = i + 1;
+      while (j < n && ' \t\n\r'.includes(raw[j])) j++;
+      var nxt = j < n ? raw[j] : '';
+      if (',]}: \t\n\r'.includes(nxt) || nxt === '') {
+        out += "\""; inStr = false; i++;
+      } else {
+        out += '\\\"'; i++;
+      }
+    } else {
+      out += c; i++;
+    }
+  }
+  return out;
+}
+
+function parsePasted() {
+  const raw  = document.getElementById('paste-area').value.trim();
+  const text = preprocessForParse(normalizeQuotes(raw));
+  const errEl    = document.getElementById('preview-err');
+  const prevList = document.getElementById('preview-list');
+  const countEl  = document.getElementById('parse-count');
+  const confirmBtn = document.getElementById('btn-confirm');
+
+  errEl.style.display = 'none';
+  prevList.classList.add('hide');
+  prevList.innerHTML = '';
+  parsedBuf = [];
+  confirmBtn.disabled = true;
+  countEl.textContent = '';
+
+  if (!text) { toast('請先貼入題目'); return; }
+
+  try {
+    const result = new Function('return [' + text.replace(/,\s*$/, '') + ']')();
+    const valid = result.filter(q =>
+      q && typeof q.q === 'string' && Array.isArray(q.options) &&
+      q.options.length >= 2 && typeof q.answer === 'number'
+    );
+    if (!valid.length) throw new Error('沒有符合格式的題目，請確認格式正確');
+
+    parsedBuf = valid;
+    countEl.textContent = '✅ 解析到 ' + valid.length + ' 題';
+    prevList.classList.remove('hide');
+    valid.forEach((q, i) => {
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      item.textContent = (i + 1) + '. ' + q.q;
+      prevList.appendChild(item);
+    });
+    confirmBtn.disabled = false;
+  } catch (e) {
+    errEl.style.display = 'block';
+    errEl.textContent   = '⚠️ 解析錯誤：' + e.message +
+      '。請確認格式為 { q: "...", options: [...], answer: 數字 }，每題之間用逗號分隔。';
+    countEl.textContent = '';
+  }
+}
+
+function confirmAdd() {
+  if (!parsedBuf.length || !currentSubj) return;
+  questionBank[currentSubj].questions.push(...parsedBuf);
+  setDirty(true);
+  renderSidebar();
+  renderQuestions(currentSubj);
+  toast('✅ 已新增 ' + parsedBuf.length + ' 題到「' + currentSubj + '」！');
+  resetPaste();
+}
+
+function resetPaste() {
+  document.getElementById('paste-area').value    = '';
+  document.getElementById('parse-count').textContent = '';
+  document.getElementById('preview-list').classList.add('hide');
+  document.getElementById('preview-list').innerHTML   = '';
+  document.getElementById('preview-err').style.display = 'none';
+  document.getElementById('btn-confirm').disabled = true;
+  parsedBuf = [];
+}
+
+/* ═══════════════════════════════════════════════════
+   MANUAL ADD
+═══════════════════════════════════════════════════ */
+function addManual() {
+  const q  = document.getElementById('man-q').value.trim();
+  const a0 = document.getElementById('man-a0').value.trim();
+  const a1 = document.getElementById('man-a1').value.trim();
+  const a2 = document.getElementById('man-a2').value.trim();
+  const a3 = document.getElementById('man-a3').value.trim();
+
+  if (!q || !a0 || !a1 || !a2) { toast('⚠️ 題目、正確答案、選項B/C 為必填'); return; }
+
+  const options = [a0, a1, a2];
+  if (a3) options.push(a3);
+
+  questionBank[currentSubj].questions.push({ q, options, answer: 0 });
+  setDirty(true);
+  renderSidebar();
+  renderQuestions(currentSubj);
+  toast('✅ 已新增「' + q.substring(0, 15) + '…」');
+
+  // Clear fields
+  ['man-q','man-a0','man-a1','man-a2','man-a3'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   DELETE SUBJECT
+═══════════════════════════════════════════════════ */
+function deleteSubject() {
+  if (!currentSubj) return;
+  const cnt = questionBank[currentSubj].questions.length;
+  if (!confirm(`確定刪除科目「${currentSubj}」及其 ${cnt} 道題目？此動作無法復原。`)) return;
+  delete questionBank[currentSubj];
+  setDirty(true);
+  currentSubj = null;
+  renderSidebar();
+  const keys = Object.keys(questionBank);
+  if (keys.length) {
+    selectSubject(keys[0]);
+  } else {
+    document.getElementById('q-area').innerHTML =
+      '<div class="q-empty"><div class="qe-icon">📭</div><div>題庫空了，請新增科目</div></div>';
+    document.getElementById('sh-name').textContent  = '—';
+    document.getElementById('sh-icon').textContent  = '📂';
+    document.getElementById('sh-count').textContent = '0 題';
+  }
+  toast('🗑 已刪除科目');
+}
+
+/* ═══════════════════════════════════════════════════
+   NEW SUBJECT MODAL
+═══════════════════════════════════════════════════ */
+const EMOJIS = ['📖','🔢','🔬','🌏','🔤','🗣️','🎨','🎵','💻','⚽','🍀','🧪','📐','🌿','🏛️','🧠'];
+const COLORS = ['#FF8FAB','#FFB74D','#81C784','#64B5F6','#BA68C8','#FFD54F',
+                '#FF7043','#4DB6AC','#9575CD','#F06292','#AED581','#4FC3F7'];
+
+function openNewSubjModal() {
+  nsEmoji = EMOJIS[0];
+  nsColor = COLORS[0];
+  document.getElementById('ns-name').value = '';
+
+  // Emoji grid
+  const eg = document.getElementById('ns-emoji-grid');
+  eg.innerHTML = '';
+  EMOJIS.forEach(e => {
+    const btn = document.createElement('button');
+    btn.className = 'emoji-opt' + (e === nsEmoji ? ' sel' : '');
+    btn.textContent = e;
+    btn.addEventListener('click', () => {
+      nsEmoji = e;
+      eg.querySelectorAll('.emoji-opt').forEach(x => x.classList.remove('sel'));
+      btn.classList.add('sel');
+    });
+    eg.appendChild(btn);
+  });
+
+  // Color grid
+  const cg = document.getElementById('ns-color-grid');
+  cg.innerHTML = '';
+  COLORS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'color-opt' + (c === nsColor ? ' sel' : '');
+    btn.style.background = c;
+    btn.addEventListener('click', () => {
+      nsColor = c;
+      cg.querySelectorAll('.color-opt').forEach(x => x.classList.remove('sel'));
+      btn.classList.add('sel');
+    });
+    cg.appendChild(btn);
+  });
+
+  document.getElementById('modal-new-subj').classList.add('open');
+  setTimeout(() => document.getElementById('ns-name').focus(), 100);
+}
+
+function confirmNewSubj() {
+  const name = document.getElementById('ns-name').value.trim();
+  if (!name) { toast('⚠️ 請輸入科目名稱'); return; }
+  if (questionBank[name]) { toast('⚠️ 「' + name + '」已存在'); return; }
+  questionBank[name] = { icon: nsEmoji, color: nsColor, questions: [] };
+  setDirty(true);
+  renderSidebar();
+  selectSubject(name);
+  document.getElementById('modal-new-subj').classList.remove('open');
+  toast('✨ 已建立科目「' + name + '」！');
+}
+
+/* ═══════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════ */
+document.querySelectorAll('.add-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.add-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const which = tab.dataset.tab;
+    document.getElementById('tab-paste').style.display  = which === 'paste'  ? '' : 'none';
+    document.getElementById('tab-manual').style.display = which === 'manual' ? '' : 'none';
+  });
+});
+
+/* ═══════════════════════════════════════════════════
+   DIRTY / TOAST / UTIL
+═══════════════════════════════════════════════════ */
+function setDirty(val) {
+  isDirty = val;
+  document.getElementById('btn-save').disabled = !val;
+  document.getElementById('dirty-dot').classList.toggle('show', val);
+}
+function enableSaveAs(val) {
+  document.getElementById('btn-saveas').disabled = !val;
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ═══════════════════════════════════════════════════
+   WIRE UP BUTTONS
+═══════════════════════════════════════════════════ */
+document.getElementById('btn-open').addEventListener('click', openFile);
+document.getElementById('btn-save').addEventListener('click', saveFile);
+document.getElementById('btn-saveas').addEventListener('click', saveAsFile);
+document.getElementById('btn-parse').addEventListener('click', parsePasted);
+document.getElementById('btn-confirm').addEventListener('click', confirmAdd);
+document.getElementById('btn-add-manual').addEventListener('click', addManual);
+document.getElementById('btn-add-subj').addEventListener('click', openNewSubjModal);
+document.getElementById('ns-cancel').addEventListener('click', () => {
+  document.getElementById('new-subj-modal').classList.remove('open');
+});
+document.getElementById('ns-ok').addEventListener('click', confirmNewSubj);
+document.getElementById('ns-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmNewSubj();
+});
+
+// Ctrl+S to save
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+});
+
+// Warn on close if dirty
+window.addEventListener('beforeunload', e => {
+  if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>

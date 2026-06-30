@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎯 互動分類大冒險</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+/* ═══════════════════════════════════════════════
+   BASE RESET & VARIABLES
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green:   #6BCB77; --green2:  #4D9A57;
+  --blue:    #4FC3F7; --blue2:   #0288D1;
+  --purple:  #C77DFF; --purple2: #9B51E0;
+  --pink:    #FF8FAB; --pink2:   #E05080;
+  --orange:  #FFB347; --yellow:  #FFE66D;
+  --red:     #FF6B6B; --teal:    #26C6DA;
+  --text:    #4A4A4A; --textW:   rgba(255,255,255,0.85);
+  --glass:   rgba(255,255,255,0.09);
+  --glassBd: rgba(255,255,255,0.18);
+}
+body {
+  font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif;
+  background: #0d1117; min-height: 100vh;
+  overflow: hidden; user-select: none;
+  -webkit-user-select: none; touch-action: none;
+}
+input, textarea, select, button { font-family: inherit; }
+textarea { resize: none; }
+
+/* ═══════════════════════════════════════════════
+   CANVAS LAYERS
+═══════════════════════════════════════════════ */
+#bg-canvas, #particle-canvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  pointer-events: none;
+}
+#bg-canvas    { z-index: 0; }
+#particle-canvas { z-index: 400; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN SYSTEM
+═══════════════════════════════════════════════ */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10; transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.96); }
+
+/* ═══════════════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════════════ */
+#home-screen {
+  flex-direction: column; gap: 36px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(26,26,60,0.97) 0%, rgba(10,10,20,0.99) 100%);
+}
+.home-logo { font-size: clamp(72px,11vw,128px); animation: floatIcon 3.2s ease-in-out infinite; filter: drop-shadow(0 0 36px rgba(107,203,119,.6)); }
+.home-title { text-align: center; }
+.home-title h1 {
+  font-size: clamp(28px,4.5vw,58px); font-weight: 900;
+  background: linear-gradient(135deg,#6BCB77,#4FC3F7,#C77DFF);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  letter-spacing: 2px;
+}
+.home-title p { color: rgba(255,255,255,.6); font-size: clamp(14px,2vw,20px); margin-top:10px; font-weight:600; }
+
+.home-buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.home-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 28px 40px; border-radius: 28px; border: 3px solid var(--glassBd);
+  background: var(--glass); backdrop-filter: blur(14px);
+  cursor: pointer; transition: all .3s; color: white; min-width: 200px;
+}
+.home-btn:hover { background: rgba(255,255,255,.16); transform: translateY(-6px) scale(1.04); border-color: rgba(255,255,255,.4); }
+.home-btn .hb-icon  { font-size: 52px; }
+.home-btn .hb-title { font-size: 20px; font-weight: 900; }
+.home-btn .hb-sub   { font-size: 13px; color: rgba(255,255,255,.55); font-weight: 600; text-align:center; }
+.home-btn.primary { border-color: rgba(107,203,119,.5); box-shadow: 0 0 32px rgba(107,203,119,.2); }
+.home-btn.teacher { border-color: rgba(199,125,255,.5); box-shadow: 0 0 32px rgba(199,125,255,.2); }
+
+/* ═══════════════════════════════════════════════
+   TEACHER SCREEN
+═══════════════════════════════════════════════ */
+#teacher-screen {
+  flex-direction: column; gap: 0; align-items: stretch; justify-content: flex-start;
+  background: rgba(10,10,20,0.97); overflow: hidden;
+}
+.teacher-header {
+  display: flex; align-items: center; gap: 14px; padding: 16px 24px;
+  background: rgba(199,125,255,.08); border-bottom: 2px solid rgba(199,125,255,.2);
+  flex-shrink: 0;
+}
+.teacher-header h2 { color: white; font-size: 20px; font-weight: 900; flex: 1; }
+.t-btn {
+  padding: 10px 20px; border-radius: 50px; border: 2px solid var(--glassBd);
+  background: var(--glass); color: white; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all .25s; white-space: nowrap;
+}
+.t-btn:hover { background: rgba(255,255,255,.18); transform: scale(1.04); }
+.t-btn.purple { border-color: rgba(199,125,255,.5); background: rgba(199,125,255,.12); }
+.t-btn.purple:hover { background: rgba(199,125,255,.25); }
+.t-btn.green  { border-color: rgba(107,203,119,.5); background: rgba(107,203,119,.12); }
+.t-btn.green:hover  { background: rgba(107,203,119,.25); }
+.t-btn.blue   { border-color: rgba(79,195,247,.5); background: rgba(79,195,247,.12); }
+.t-btn.blue:hover   { background: rgba(79,195,247,.25); }
+.t-btn.orange { border-color: rgba(255,179,71,.5); background: rgba(255,179,71,.12); }
+.t-btn.orange:hover { background: rgba(255,179,71,.25); }
+
+/* Bank meta area */
+.teacher-meta {
+  display: flex; gap: 14px; padding: 14px 24px;
+  background: rgba(255,255,255,.04); border-bottom: 1px solid rgba(255,255,255,.08);
+  align-items: center; flex-shrink: 0; flex-wrap: wrap;
+}
+.meta-input {
+  background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.15);
+  border-radius: 14px; padding: 10px 16px; color: white; font-size: 15px; font-weight: 700;
+  outline: none; transition: border-color .2s;
+}
+.meta-input:focus { border-color: rgba(199,125,255,.6); }
+.meta-input.name-field { flex: 1; min-width: 200px; }
+.zone-label-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.zone-label-tag { font-size: 12px; color: rgba(255,255,255,.4); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.zone-label-inp {
+  background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.12);
+  border-radius: 10px; padding: 7px 12px; color: white; font-size: 13px; font-weight: 700;
+  width: 130px; outline: none;
+}
+.zone-label-inp:focus { border-color: rgba(107,203,119,.5); }
+
+/* Organism grid */
+.teacher-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.t-grid-label {
+  color: rgba(255,255,255,.5); font-size: 13px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 2px;
+}
+.t-org-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;
+}
+.t-org-card {
+  background: var(--glass); border: 2px solid var(--glassBd);
+  border-radius: 20px; padding: 16px 12px; text-align: center;
+  cursor: pointer; transition: all .25s; position: relative;
+}
+.t-org-card:hover { background: rgba(255,255,255,.16); transform: translateY(-3px); border-color: rgba(199,125,255,.5); }
+.t-org-card .toc-img { width: 64px; height: 64px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,.2); display: block; margin: 0 auto 8px; }
+.t-org-card .toc-emoji { font-size: 48px; display: block; margin-bottom: 8px; line-height: 1; }
+.t-org-card .toc-name  { color: white; font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.t-org-card .toc-level { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 20px; display: inline-block; }
+.t-org-card .toc-del {
+  position: absolute; top: 8px; right: 8px; background: rgba(255,107,107,.2);
+  border: none; color: #FF6B6B; font-size: 16px; width: 26px; height: 26px;
+  border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s;
+}
+.t-org-card:hover .toc-del { opacity: 1; }
+.t-org-card .toc-del:hover { background: rgba(255,107,107,.5); }
+
+.t-add-card {
+  background: rgba(255,255,255,.05); border: 2px dashed rgba(255,255,255,.2);
+  border-radius: 20px; padding: 32px 12px; text-align: center;
+  cursor: pointer; transition: all .25s; color: rgba(255,255,255,.4); font-weight: 800; font-size: 14px;
+}
+.t-add-card:hover { background: rgba(199,125,255,.1); border-color: rgba(199,125,255,.5); color: rgba(199,125,255,.9); }
+.t-add-card .add-icon { font-size: 36px; display: block; margin-bottom: 8px; }
+
+/* Level colours for badges */
+.lvl-1 { background: rgba(107,203,119,.2); color: #6BCB77; }
+.lvl-2 { background: rgba(255,230,109,.2); color: #FFE66D; }
+.lvl-3 { background: rgba(255,179,71,.2);  color: #FFB347; }
+.lvl-4 { background: rgba(255,107,107,.2); color: #FF6B6B; }
+
+/* ═══════════════════════════════════════════════
+   EDIT MODAL
+═══════════════════════════════════════════════ */
+#edit-modal {
+  position: fixed; inset: 0; z-index: 800;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+#edit-modal.show { opacity: 1; pointer-events: all; }
+.edit-card {
+  background: linear-gradient(135deg, rgba(30,20,50,.97), rgba(15,15,30,.98));
+  border: 2px solid rgba(199,125,255,.3); border-radius: 32px;
+  padding: 36px; width: min(580px, 94vw); max-height: 92vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,.6);
+  animation: modalIn .4s cubic-bezier(.175,.885,.32,1.275);
+}
+.edit-card h3 { color: white; font-size: 22px; font-weight: 900; margin-bottom: 24px; }
+.edit-section { margin-bottom: 22px; }
+.edit-label { color: rgba(255,255,255,.6); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; display: block; }
+
+/* Image upload area */
+.img-upload-area {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.img-preview-box {
+  width: 100px; height: 100px; border-radius: 18px;
+  border: 3px dashed rgba(255,255,255,.25); background: rgba(255,255,255,.05);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden; flex-shrink: 0; transition: border-color .2s; position: relative;
+}
+.img-preview-box:hover { border-color: rgba(199,125,255,.6); }
+.img-preview-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 15px; }
+.img-preview-box .img-placeholder { font-size: 36px; }
+.img-preview-box .img-change-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,.6);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 12px; font-weight: 800; opacity: 0; transition: opacity .2s;
+  border-radius: 15px;
+}
+.img-preview-box:hover .img-change-overlay { opacity: 1; }
+
+.img-options { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.emoji-row { display: flex; gap: 8px; align-items: center; }
+.emoji-input-field {
+  background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.15);
+  border-radius: 12px; padding: 10px 14px; color: white; font-size: 24px;
+  width: 70px; text-align: center; outline: none;
+}
+.emoji-input-field:focus { border-color: rgba(199,125,255,.6); }
+.img-hint { color: rgba(255,255,255,.35); font-size: 12px; font-weight: 600; line-height: 1.5; }
+.clear-img-btn {
+  background: rgba(255,107,107,.15); border: 1px solid rgba(255,107,107,.3);
+  color: #FF6B6B; border-radius: 10px; padding: 6px 14px;
+  font-size: 12px; font-weight: 800; cursor: pointer; transition: all .2s; align-self: flex-start;
+}
+.clear-img-btn:hover { background: rgba(255,107,107,.3); }
+
+/* Text inputs */
+.edit-input {
+  width: 100%; background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.15);
+  border-radius: 14px; padding: 12px 16px; color: white; font-size: 16px; font-weight: 700;
+  outline: none; transition: border-color .2s;
+}
+.edit-input:focus { border-color: rgba(199,125,255,.6); }
+.edit-textarea {
+  width: 100%; background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.15);
+  border-radius: 14px; padding: 12px 16px; color: white; font-size: 14px; font-weight: 600;
+  outline: none; min-height: 100px; line-height: 1.6; transition: border-color .2s;
+}
+.edit-textarea:focus { border-color: rgba(199,125,255,.6); }
+::placeholder { color: rgba(255,255,255,.25); }
+
+/* Level picker */
+.level-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.lvl-btn {
+  flex: 1; min-width: 110px; padding: 12px 10px; border-radius: 14px;
+  border: 2px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.6); font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all .25s; text-align: center;
+}
+.lvl-btn.active-1 { border-color: #6BCB77; background: rgba(107,203,119,.18); color: #6BCB77; }
+.lvl-btn.active-2 { border-color: #FFE66D; background: rgba(255,230,109,.18); color: #FFE66D; }
+.lvl-btn.active-3 { border-color: #FFB347; background: rgba(255,179,71,.18); color: #FFB347; }
+.lvl-btn.active-4 { border-color: #FF6B6B; background: rgba(255,107,107,.18); color: #FF6B6B; }
+.lvl-btn:hover:not(.active-1):not(.active-2):not(.active-3):not(.active-4) { background: rgba(255,255,255,.14); color: white; }
+.lvl-btn .lb-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.lvl-btn .lb-name { font-size: 12px; }
+
+.edit-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+.btn-cancel {
+  padding: 12px 28px; border-radius: 50px; border: 2px solid rgba(255,255,255,.2);
+  background: transparent; color: rgba(255,255,255,.6); font-size: 15px; font-weight: 800; cursor: pointer; transition: all .25s;
+}
+.btn-cancel:hover { background: rgba(255,255,255,.1); color: white; }
+.btn-save {
+  padding: 12px 36px; border-radius: 50px; border: none;
+  background: linear-gradient(135deg, #C77DFF, #9B51E0); color: white;
+  font-size: 15px; font-weight: 900; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(199,125,255,.4); transition: all .25s;
+}
+.btn-save:hover { transform: scale(1.05); }
+
+/* hidden file input */
+#file-import, #img-file-input { display: none; }
+
+/* ═══════════════════════════════════════════════
+   GAME SCREEN HEADER
+═══════════════════════════════════════════════ */
+#header {
+  position: fixed; top: 0; left: 0; right: 0; height: 70px;
+  background: rgba(10,10,20,.88); backdrop-filter: blur(16px);
+  border-bottom: 2px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; padding: 0 24px; gap: 16px; z-index: 100;
+}
+.hdr-title {
+  font-size: clamp(14px,1.8vw,20px); font-weight: 900;
+  background: linear-gradient(135deg,#6BCB77,#4FC3F7);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hdr-sep { flex: 1; }
+.hdr-round {
+  color: white; font-weight: 800; font-size: 15px;
+  background: rgba(255,255,255,.1); padding: 6px 16px; border-radius: 20px;
+  border: 2px solid rgba(255,255,255,.12);
+}
+.hdr-score { color: var(--yellow); font-weight: 900; font-size: 20px; display: flex; align-items: center; gap: 6px; }
+.progress-wrap { width: 140px; height: 12px; background: rgba(255,255,255,.1); border-radius: 8px; overflow: hidden; border: 2px solid rgba(255,255,255,.12); }
+.progress-fill { height: 100%; background: linear-gradient(90deg,#6BCB77,#4FC3F7); border-radius: 8px; transition: width .5s ease; width: 0%; }
+
+/* ═══════════════════════════════════════════════
+   GAME AREA
+═══════════════════════════════════════════════ */
+#game-area {
+  position: fixed; top: 70px; left: 0; right: 0; bottom: 0;
+  display: flex; overflow: hidden;
+}
+
+/* Card bank */
+#card-bank {
+  width: 42%; height: 100%; padding: 20px 20px 20px 24px;
+  display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+}
+.bank-label {
+  color: rgba(255,255,255,.55); font-size: 13px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 2px; text-align: center;
+  padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,.08);
+}
+#cards-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+  flex: 1; align-content: start; overflow-y: auto; padding-right: 4px;
+}
+
+/* Organism card */
+.org-card {
+  background: rgba(255,255,255,.09); border: 3px solid rgba(255,255,255,.18);
+  border-radius: 22px; padding: 16px 12px; text-align: center;
+  cursor: grab; transition: all .25s; backdrop-filter: blur(6px); touch-action: none;
+}
+.org-card:not(.placed):not(.dragging):hover {
+  background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.38);
+  transform: translateY(-4px) scale(1.03); box-shadow: 0 12px 32px rgba(107,203,119,.25);
+}
+.org-card .card-media { width: 68px; height: 68px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+.org-card .card-media img { width: 68px; height: 68px; object-fit: cover; border-radius: 14px; border: 3px solid rgba(255,255,255,.25); }
+.org-card .card-emoji { font-size: clamp(38px,4.5vw,58px); line-height: 1; }
+.org-card .card-name { color: white; font-weight: 800; font-size: clamp(13px,1.5vw,17px); margin-bottom: 4px; }
+.org-card .card-hint { color: rgba(255,255,255,.4); font-size: 11px; font-weight: 600; }
+.org-card.placed { opacity: .2; pointer-events: none; transform: scale(.9); }
+.org-card.dragging { opacity: .45; cursor: grabbing; }
+.org-card.shake { animation: shake .5s ease; }
+
+/* Drag ghost */
+#drag-ghost {
+  position: fixed; pointer-events: none; z-index: 9999;
+  background: rgba(255,255,255,.14); border: 3px solid rgba(255,255,255,.45);
+  border-radius: 22px; padding: 16px 12px; text-align: center;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 32px rgba(107,203,119,.25);
+  transform: scale(1.1) rotate(2.5deg); display: none; min-width: 130px;
+}
+#drag-ghost .card-media { width: 60px; height: 60px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
+#drag-ghost .card-media img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 3px solid rgba(255,255,255,.3); }
+#drag-ghost .card-emoji { font-size: 48px; line-height: 1; }
+#drag-ghost .card-name { color: white; font-weight: 800; font-size: 14px; }
+
+/* Pyramid panel */
+#pyramid-panel {
+  width: 58%; height: 100%; padding: 16px 28px 24px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.pyramid-label {
+  color: rgba(255,255,255,.6); font-size: 14px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 2px; text-align: center;
+  margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,.08);
+}
+#pyramid { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+/* Drop zones */
+.drop-zone {
+  flex: 1; border-radius: 20px; border: 3px dashed rgba(255,255,255,.18);
+  display: flex; align-items: center; padding: 0 18px; gap: 14px;
+  position: relative; transition: all .3s; overflow: hidden;
+}
+.drop-zone.drag-over { border-style: solid; transform: scale(1.02); }
+.drop-zone[data-level="1"] { background: rgba(107,203,119,.1); border-color: rgba(107,203,119,.32); }
+.drop-zone[data-level="1"].drag-over { border-color: #6BCB77; box-shadow: 0 0 28px rgba(107,203,119,.4); }
+.drop-zone[data-level="2"] { background: rgba(255,230,109,.09); border-color: rgba(255,230,109,.32); }
+.drop-zone[data-level="2"].drag-over { border-color: #FFE66D; box-shadow: 0 0 28px rgba(255,230,109,.4); }
+.drop-zone[data-level="3"] { background: rgba(255,179,71,.09); border-color: rgba(255,179,71,.32); }
+.drop-zone[data-level="3"].drag-over { border-color: #FFB347; box-shadow: 0 0 28px rgba(255,179,71,.4); }
+.drop-zone[data-level="4"] { background: rgba(255,107,107,.09); border-color: rgba(255,107,107,.32); }
+.drop-zone[data-level="4"].drag-over { border-color: #FF6B6B; box-shadow: 0 0 28px rgba(255,107,107,.4); }
+
+.zone-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
+.drop-zone[data-level="1"] .zone-dot { background: #6BCB77; box-shadow: 0 0 10px rgba(107,203,119,.6); }
+.drop-zone[data-level="2"] .zone-dot { background: #FFE66D; box-shadow: 0 0 10px rgba(255,230,109,.6); }
+.drop-zone[data-level="3"] .zone-dot { background: #FFB347; box-shadow: 0 0 10px rgba(255,179,71,.6); }
+.drop-zone[data-level="4"] .zone-dot { background: #FF6B6B; box-shadow: 0 0 10px rgba(255,107,107,.6); }
+
+.zone-info { flex: 1; min-width: 0; }
+.zone-title { font-weight: 900; font-size: clamp(15px,1.8vw,21px); color: white; }
+.zone-desc  { font-size: clamp(10px,1.1vw,13px); color: rgba(255,255,255,.45); margin-top: 2px; font-weight: 600; }
+.zone-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
+.zone-chip  {
+  background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.18);
+  border-radius: 40px; padding: 5px 12px; font-size: clamp(12px,1.3vw,15px);
+  color: white; font-weight: 700; display: flex; align-items: center; gap: 5px;
+  animation: chipBounce .45s cubic-bezier(.175,.885,.32,1.275);
+}
+.zone-chip img { width: 22px; height: 22px; object-fit: cover; border-radius: 5px; }
+.zone-level-tag {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; font-weight: 800; color: rgba(255,255,255,.22);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════════
+   FACT POPUP
+═══════════════════════════════════════════════ */
+#fact-popup {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(7px);
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+#fact-popup.show { opacity: 1; pointer-events: all; }
+.fact-card {
+  background: linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.05));
+  border: 3px solid rgba(255,255,255,.22); border-radius: 32px;
+  padding: 44px 48px; max-width: 540px; width: 90%; text-align: center;
+  backdrop-filter: blur(20px); box-shadow: 0 32px 80px rgba(0,0,0,.55);
+  animation: factCardIn .5s cubic-bezier(.175,.885,.32,1.275);
+}
+.fact-badge { background: linear-gradient(135deg,#6BCB77,#4FC3F7); color: white; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 7px 22px; border-radius: 40px; display: inline-block; margin-bottom: 22px; }
+.fact-media { width: 90px; height: 90px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; }
+.fact-media img { width: 90px; height: 90px; object-fit: cover; border-radius: 18px; border: 4px solid rgba(255,255,255,.3); animation: bounceEmoji .6s ease; }
+.fact-emoji-lg { font-size: 84px; display: block; animation: bounceEmoji .6s ease; filter: drop-shadow(0 8px 16px rgba(0,0,0,.3)); }
+.fact-name { color: white; font-weight: 900; font-size: 26px; margin-bottom: 14px; }
+.fact-text { color: rgba(255,255,255,.82); font-size: 17px; line-height: 1.75; font-weight: 600; }
+.fact-bonus { color: var(--yellow); font-weight: 900; font-size: 20px; margin-top: 14px; }
+.fact-btn {
+  margin-top: 28px; background: linear-gradient(135deg,#6BCB77,#4FC3F7);
+  color: white; border: none; border-radius: 50px; padding: 15px 44px;
+  font-size: 17px; font-family: 'Nunito',sans-serif; font-weight: 900; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(107,203,119,.4); transition: all .25s;
+}
+.fact-btn:hover { transform: scale(1.06); }
+
+/* ═══════════════════════════════════════════════
+   LEVEL COMPLETE / FINAL
+═══════════════════════════════════════════════ */
+#level-complete {
+  position: fixed; inset: 0; z-index: 600;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+  background: rgba(0,0,0,.72); backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none; transition: opacity .4s;
+}
+#level-complete.show { opacity: 1; pointer-events: all; }
+.lc-trophy { font-size: 96px; animation: trophyBounce 1s ease infinite alternate; filter: drop-shadow(0 0 30px rgba(255,230,109,.8)); }
+.lc-title { color: white; font-size: clamp(28px,5vw,52px); font-weight: 900; text-align: center; }
+.lc-sub   { color: rgba(255,255,255,.65); font-size: 20px; font-weight: 700; text-align: center; }
+.lc-score { color: var(--yellow); font-size: 34px; font-weight: 900; }
+.lc-btn {
+  background: linear-gradient(135deg,#C77DFF,#FF8FAB); color: white; border: none;
+  border-radius: 60px; padding: 18px 60px; font-size: 20px;
+  font-family: 'Nunito',sans-serif; font-weight: 900; cursor: pointer;
+  box-shadow: 0 8px 30px rgba(199,125,255,.45); transition: all .3s;
+}
+.lc-btn:hover { transform: scale(1.07); }
+
+#final-screen {
+  flex-direction: column; gap: 26px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(26,26,60,.97) 0%, rgba(8,8,18,.99) 100%);
+}
+.final-stars { font-size: 60px; letter-spacing: 8px; animation: starsPulse 2s ease infinite; }
+.final-title { color: white; font-size: clamp(32px,6vw,68px); font-weight: 900; text-align: center; }
+.final-score-box {
+  background: rgba(255,255,255,.07); border: 3px solid rgba(255,230,109,.35);
+  border-radius: 28px; padding: 28px 60px; text-align: center;
+}
+.fsl { color: rgba(255,255,255,.55); font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.fsn { color: var(--yellow); font-size: clamp(56px,9vw,96px); font-weight: 900; line-height: 1; }
+.fsm { color: rgba(255,255,255,.35); font-size: 20px; font-weight: 700; }
+.fsg { font-size: 24px; font-weight: 900; margin-top: 6px; }
+.btn-replay {
+  background: linear-gradient(135deg,#6BCB77,#4FC3F7); color: white; border: none;
+  border-radius: 60px; padding: 18px 60px; font-size: 20px;
+  font-family: 'Nunito',sans-serif; font-weight: 900; cursor: pointer;
+  box-shadow: 0 8px 30px rgba(107,203,119,.45); transition: all .3s;
+}
+.btn-replay:hover { transform: scale(1.07); }
+
+/* ═══════════════════════════════════════════════
+   TOAST NOTIFICATION
+═══════════════════════════════════════════════ */
+#toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: rgba(30,30,50,.95); border: 2px solid rgba(255,255,255,.18);
+  border-radius: 50px; padding: 12px 28px; color: white; font-weight: 800; font-size: 15px;
+  z-index: 9000; transition: transform .35s ease, opacity .35s;
+  opacity: 0; white-space: nowrap; backdrop-filter: blur(12px);
+}
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,.04); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 4px; }
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes floatIcon  { 0%,100%{transform:translateY(0)rotate(-3deg)}50%{transform:translateY(-18px)rotate(3deg)} }
+@keyframes shake      { 0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)rotate(-3deg)}40%{transform:translateX(12px)rotate(3deg)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)} }
+@keyframes factCardIn { from{transform:scale(.5)translateY(40px);opacity:0}to{transform:scale(1)translateY(0);opacity:1} }
+@keyframes modalIn    { from{transform:scale(.6)translateY(30px);opacity:0}to{transform:scale(1)translateY(0);opacity:1} }
+@keyframes bounceEmoji{ 0%{transform:scale(0)rotate(-20deg)}60%{transform:scale(1.3)rotate(5deg)}80%{transform:scale(.9)}100%{transform:scale(1)rotate(0)} }
+@keyframes chipBounce { 0%{transform:scale(0)rotate(-15deg)}70%{transform:scale(1.2)rotate(3deg)}100%{transform:scale(1)rotate(0)} }
+@keyframes trophyBounce{ from{transform:translateY(0)scale(1)}to{transform:translateY(-14px)scale(1.05)} }
+@keyframes starsPulse { 0%,100%{filter:drop-shadow(0 0 8px rgba(255,230,109,.5))}50%{filter:drop-shadow(0 0 28px rgba(255,230,109,1))} }
+@keyframes rippleOut  { 0%{transform:scale(1);opacity:.7}100%{transform:scale(2.6);opacity:0} }
+
+.success-ripple {
+  position: absolute; width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(107,203,119,.45); pointer-events: none;
+  animation: rippleOut .8s ease forwards; z-index: 5;
+}
+
+@media (max-width: 768px) {
+  #game-area { flex-direction: column; }
+  #card-bank { width: 100%; height: 44%; }
+  #pyramid-panel { width: 100%; height: 56%; }
+}
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="particle-canvas"></canvas>
+<input type="file" id="file-import" accept=".json">
+<input type="file" id="img-file-input" accept="image/*">
+<div id="toast"></div>
+
+<!-- DRAG GHOST -->
+<div id="drag-ghost">
+  <div class="card-media" id="ghost-media"></div>
+  <div class="card-name" id="ghost-name"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HOME SCREEN
+════════════════════════════════════════ -->
+<div id="home-screen" class="screen">
+  <div style="text-align:center">
+    <div class="home-logo">🎯</div>
+    <div class="home-title">
+      <h1>互動分類大冒險</h1>
+      <p>拖拉卡牌到正確分類，學習知識輕鬆又有趣！</p>
+    </div>
+  </div>
+  <div class="home-buttons">
+    <div class="home-btn primary" id="btn-builtin">
+      <span class="hb-icon">🌍</span>
+      <span class="hb-title">內建題庫</span>
+      <span class="hb-sub">森林・海洋・草原<br>三個生態系食物鏈</span>
+    </div>
+    <div class="home-btn teacher" id="btn-teacher-mode">
+      <span class="hb-icon">🎒</span>
+      <span class="hb-title">教師匯入題庫</span>
+      <span class="hb-sub">自訂卡牌 + 圖片<br>製作專屬題庫</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TEACHER SCREEN
+════════════════════════════════════════ -->
+<div id="teacher-screen" class="screen hidden" style="flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:hidden;background:rgba(8,8,18,0.98)">
+  <div class="teacher-header">
+    <button class="t-btn" id="btn-back-home">← 返回</button>
+    <h2>🎒 教師題庫管理</h2>
+    <button class="t-btn blue"   id="btn-download-template">⬇ 下載題庫範本</button>
+    <button class="t-btn purple" id="btn-import-json">📂 匯入 JSON</button>
+    <button class="t-btn blue"   id="btn-export-json">💾 匯出 JSON</button>
+    <button class="t-btn green"  id="btn-play-custom">▶ 開始遊戲</button>
+  </div>
+
+  <div class="teacher-meta">
+    <input class="meta-input name-field" id="bank-name" placeholder="題庫名稱（例：恐龍時代分類）" type="text">
+    <div class="zone-label-row">
+      <span class="zone-label-tag">L1</span>
+      <input class="zone-label-inp" id="zn1" placeholder="第一層（生產者）">
+      <span class="zone-label-tag">L2</span>
+      <input class="zone-label-inp" id="zn2" placeholder="第二層（初級消費者）">
+      <span class="zone-label-tag">L3</span>
+      <input class="zone-label-inp" id="zn3" placeholder="第三層（次級消費者）">
+      <span class="zone-label-tag">L4</span>
+      <input class="zone-label-inp" id="zn4" placeholder="第四層（頂級掠食者）">
+    </div>
+  </div>
+
+  <div class="teacher-body">
+    <div class="t-grid-label">卡牌列表 — 點擊卡牌編輯，點 + 新增</div>
+    <div class="t-org-grid" id="teacher-grid">
+      <div class="t-add-card" id="btn-add-org">
+        <span class="add-icon">＋</span>
+        新增生物卡牌
+      </div>
+    </div>
+    <div style="color:rgba(255,255,255,.25);font-size:12px;font-weight:600;line-height:1.7;padding:8px 0;">
+      💡 提示：每個關卡建議 6–12 張卡牌，每個層級至少各 1 張。圖片建議 200×200px 以上，支援 JPG / PNG / GIF / WebP。<br>
+      匯入 JSON 後可繼續編輯，再匯出儲存。「下載題庫範本」可取得填寫說明與範例格式。
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EDIT MODAL
+════════════════════════════════════════ -->
+<div id="edit-modal">
+  <div class="edit-card">
+    <h3 id="modal-title">✏️ 新增卡牌</h3>
+
+    <div class="edit-section">
+      <label class="edit-label">圖片 / Emoji</label>
+      <div class="img-upload-area">
+        <div class="img-preview-box" id="img-preview-box">
+          <span class="img-placeholder" id="img-placeholder">🖼️</span>
+          <img id="img-preview" style="display:none">
+          <div class="img-change-overlay">更換圖片</div>
+        </div>
+        <div class="img-options">
+          <button class="t-btn blue" id="btn-upload-img" style="align-self:flex-start">📁 上傳圖片</button>
+          <button class="clear-img-btn" id="btn-clear-img">✕ 移除圖片，改用 Emoji</button>
+          <div class="emoji-row">
+            <span style="color:rgba(255,255,255,.5);font-size:13px;font-weight:700;">Emoji：</span>
+            <input class="emoji-input-field" id="emoji-input" type="text" maxlength="4" placeholder="🌿">
+          </div>
+          <div class="img-hint">圖片優先於 Emoji 顯示<br>建議尺寸：200×200px，PNG/JPG</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="edit-section">
+      <label class="edit-label">名稱</label>
+      <input class="edit-input" id="edit-name" type="text" placeholder="例：野草、鯊魚、孔子...">
+    </div>
+
+    <div class="edit-section">
+      <label class="edit-label">分類層級</label>
+      <div class="level-picker" id="level-picker">
+        <button class="lvl-btn" data-level="1"><span class="lb-icon">🟢</span><span class="lb-name" id="lb1">第一層</span></button>
+        <button class="lvl-btn" data-level="2"><span class="lb-icon">🟡</span><span class="lb-name" id="lb2">第二層</span></button>
+        <button class="lvl-btn" data-level="3"><span class="lb-icon">🟠</span><span class="lb-name" id="lb3">第三層</span></button>
+        <button class="lvl-btn" data-level="4"><span class="lb-icon">🔴</span><span class="lb-name" id="lb4">第四層</span></button>
+      </div>
+    </div>
+
+    <div class="edit-section">
+      <label class="edit-label">教育知識（答對後顯示）</label>
+      <textarea class="edit-textarea" id="edit-fact" placeholder="輸入有趣的知識或說明，學生答對後會看到這段文字..."></textarea>
+    </div>
+
+    <div class="edit-actions">
+      <button class="btn-cancel" id="modal-cancel">取消</button>
+      <button class="btn-save"   id="modal-save">💾 儲存卡牌</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GAME SCREEN
+════════════════════════════════════════ -->
+<div id="game-screen" class="screen hidden">
+  <div id="header">
+    <div class="hdr-title" id="hdr-title">🌍 互動分類大冒險</div>
+    <div class="hdr-sep"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="color:rgba(255,255,255,.4);font-size:12px;font-weight:700;">進度</span>
+      <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="hdr-round" id="hdr-round">關卡 1/1</div>
+    <div class="hdr-score">⭐ <span id="hdr-score">0</span></div>
+  </div>
+
+  <div id="game-area">
+    <div id="card-bank">
+      <div class="bank-label" id="bank-label">🃏 卡牌庫 — 拖拉到右側正確層級</div>
+      <div id="cards-grid"></div>
+    </div>
+
+    <div id="pyramid-panel">
+      <div class="pyramid-label" id="eco-title">分類金字塔</div>
+      <div id="pyramid">
+        <div class="drop-zone" data-level="4" id="zone-4">
+          <div class="zone-dot"></div>
+          <div class="zone-info">
+            <div class="zone-title" id="zt4">第四層</div>
+            <div class="zone-desc"  id="zd4">最高層級</div>
+            <div class="zone-chips" id="chips-4"></div>
+          </div>
+          <div class="zone-level-tag">L4</div>
+        </div>
+        <div class="drop-zone" data-level="3" id="zone-3">
+          <div class="zone-dot"></div>
+          <div class="zone-info">
+            <div class="zone-title" id="zt3">第三層</div>
+            <div class="zone-desc"  id="zd3">次高層級</div>
+            <div class="zone-chips" id="chips-3"></div>
+          </div>
+          <div class="zone-level-tag">L3</div>
+        </div>
+        <div class="drop-zone" data-level="2" id="zone-2">
+          <div class="zone-dot"></div>
+          <div class="zone-info">
+            <div class="zone-title" id="zt2">第二層</div>
+            <div class="zone-desc"  id="zd2">中間層級</div>
+            <div class="zone-chips" id="chips-2"></div>
+          </div>
+          <div class="zone-level-tag">L2</div>
+        </div>
+        <div class="drop-zone" data-level="1" id="zone-1">
+          <div class="zone-dot"></div>
+          <div class="zone-info">
+            <div class="zone-title" id="zt1">第一層</div>
+            <div class="zone-desc"  id="zd1">基礎層級</div>
+            <div class="zone-chips" id="chips-1"></div>
+          </div>
+          <div class="zone-level-tag">L1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FACT POPUP -->
+<div id="fact-popup">
+  <div class="fact-card">
+    <div class="fact-badge">✅ 答對了！</div>
+    <div class="fact-media" id="fact-media"></div>
+    <div class="fact-name"  id="fact-name"></div>
+    <div class="fact-text"  id="fact-text"></div>
+    <div class="fact-bonus" id="fact-bonus"></div>
+    <button class="fact-btn" id="fact-close-btn">繼續 →</button>
+  </div>
+</div>
+
+<!-- LEVEL COMPLETE -->
+<div id="level-complete">
+  <div class="lc-trophy">🏆</div>
+  <div class="lc-title" id="lc-title">關卡完成！🎉</div>
+  <div class="lc-sub"   id="lc-sub">太厲害了！</div>
+  <div class="lc-score">⭐ <span id="lc-score">0</span> 分</div>
+  <button class="lc-btn" id="lc-next-btn">下一關 →</button>
+</div>
+
+<!-- FINAL SCREEN -->
+<div id="final-screen" class="screen hidden">
+  <div class="final-stars">⭐⭐⭐</div>
+  <div class="final-title">全部完成！</div>
+  <div class="final-score-box">
+    <div class="fsl">最終分數</div>
+    <div class="fsn" id="final-score-num">0</div>
+    <div class="fsm">/ <span id="final-score-max">0</span> 分</div>
+    <div class="fsg" id="final-grade">🌟 太厲害了！</div>
+  </div>
+  <button class="btn-replay" id="btn-replay">🔄 再玩一次</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   BUILT-IN DATA
+════════════════════════════════════════════════════ */
+const BUILTIN_ROUNDS = [
+  {
+    name:'🌲 森林生態食物鏈',
+    zones:{1:'生產者',2:'初級消費者',3:'次級消費者',4:'頂級掠食者'},
+    bgColors:['#0a1f0a','#1a472a','#2d5a27'],
+    organisms:[
+      {id:'g1',name:'野草',   emoji:'🌿',image:null,level:1,fact:'野草透過光合作用將太陽能轉化為有機物，是森林能量的起點！全球草本植物每年固定數十億噸的碳。'},
+      {id:'g2',name:'大樹',   emoji:'🌳',image:null,level:1,fact:'一棵成熟大樹每年可吸收約22公斤二氧化碳，並釋放足夠一個人呼吸整年的氧氣！'},
+      {id:'g3',name:'兔子',   emoji:'🐰',image:null,level:2,fact:'兔子每天需要吃相當於體重10%的食物！牠們的牙齒會不斷生長，必須靠啃食植物來磨短牙齒。'},
+      {id:'g4',name:'梅花鹿', emoji:'🦌',image:null,level:2,fact:'梅花鹿是反芻動物，胃分為四個室，可以將草反覆消化，充分吸收植物養分！'},
+      {id:'g5',name:'狐狸',   emoji:'🦊',image:null,level:3,fact:'狐狸聽力極佳，甚至能聽到土壤下方的老鼠挖地聲！牠主要捕食兔子和齧齒類。'},
+      {id:'g6',name:'蛇',     emoji:'🐍',image:null,level:3,fact:'蛇靠感應獵物體溫（紅外線）捕獵，沒有耳朵，用下巴貼地感受震動！'},
+      {id:'g7',name:'老鷹',   emoji:'🦅',image:null,level:4,fact:'老鷹視力是人類的8倍！可以從300公尺高空看到地面的小鼠，俯衝速度超過時速150公里。'},
+      {id:'g8',name:'棕熊',   emoji:'🐻',image:null,level:4,fact:'棕熊是生態系「關鍵物種」！牠吃魚後留下的魚骸，會成為森林植物的重要養分來源。'},
+    ]
+  },
+  {
+    name:'🌊 海洋生態食物鏈',
+    zones:{1:'生產者',2:'初級消費者',3:'次級消費者',4:'頂級掠食者'},
+    bgColors:['#010d1a','#022f6b','#0060a0'],
+    organisms:[
+      {id:'o1',name:'浮游植物',emoji:'🌱',image:null,level:1,fact:'浮游植物雖小，卻產生地球約50%的氧氣！是整個海洋生態系的能量基礎。'},
+      {id:'o2',name:'海藻',    emoji:'🪸',image:null,level:1,fact:'巨型海藻（Kelp）可生長超過50公尺，形成「海底森林」，是無數海洋生物的棲息地！'},
+      {id:'o3',name:'蝦子',    emoji:'🦐',image:null,level:2,fact:'蝦子的心臟長在頭部，對水中化學物質的感知能力極為敏銳！'},
+      {id:'o4',name:'沙丁魚',  emoji:'🐟',image:null,level:2,fact:'沙丁魚群可多達數百萬條！同步游泳形成的「魚球」是對抗掠食者的防禦策略。'},
+      {id:'o5',name:'章魚',    emoji:'🐙',image:null,level:3,fact:'章魚有三個心臟和藍色血液！被認為是無脊椎動物中最聰明的，能解複雜謎題。'},
+      {id:'o6',name:'魷魚',    emoji:'🦑',image:null,level:3,fact:'魷魚透過噴水產生反作用力前進，緊急情況下可瞬間加速逃脫！'},
+      {id:'o7',name:'鯊魚',    emoji:'🦈',image:null,level:4,fact:'鯊魚在地球已存活超過4.5億年，比恐龍還古老！皮膚的「盾鱗」使游泳速度極快。'},
+      {id:'o8',name:'海豚',    emoji:'🐬',image:null,level:4,fact:'海豚用超聲波（回聲定位）捕獵！大腦佔體重比例僅次於人類，會使用工具。'},
+    ]
+  },
+  {
+    name:'🌾 草原生態食物鏈',
+    zones:{1:'生產者',2:'初級消費者',3:'次級消費者',4:'頂級掠食者'},
+    bgColors:['#150a00','#4a2800','#7a4f10'],
+    organisms:[
+      {id:'p1',name:'草',   emoji:'🌾',image:null,level:1,fact:'草原草類覆蓋地球陸地約25%！根系可深入土壤數公尺，儲存大量碳並防止水土流失。'},
+      {id:'p2',name:'野花', emoji:'🌻',image:null,level:1,fact:'野花是授粉昆蟲最重要的食物來源！全球約75%的農作物依賴蜜蜂等昆蟲授粉。'},
+      {id:'p3',name:'蚱蜢', emoji:'🦗',image:null,level:2,fact:'蚱蜢後腿可跳到自身長度20倍的距離！成群的蝗蟲每天能吃掉與自重相等的食物。'},
+      {id:'p4',name:'斑馬', emoji:'🦓',image:null,level:2,fact:'每隻斑馬的條紋都是獨一無二的！科學家認為條紋可以干擾吸血蟲的降落。'},
+      {id:'p5',name:'狐獴', emoji:'🦡',image:null,level:3,fact:'狐獴是合作狩獵高手！群體中永遠有成員站崗放哨，發現危險立刻發出警報聲。'},
+      {id:'p6',name:'鬣狗', emoji:'🐺',image:null,level:3,fact:'鬣狗咬合力是陸地動物中最強的之一，可輕鬆咬碎骨頭，消化系統能分解骨質吸收鈣！'},
+      {id:'p7',name:'獅子', emoji:'🦁',image:null,level:4,fact:'獅子是唯一群居的大型貓科動物！母獅負責主要狩獵，雄獅保護群體領土。'},
+      {id:'p8',name:'獵豹', emoji:'🐆',image:null,level:4,fact:'獵豹是陸地上最快的動物，時速可達120公里！但衝刺只能維持20-30秒後需大量恢復時間。'},
+    ]
+  }
+];
+
+/* ════════════════════════════════════════════════════
+   TEACHER STATE
+════════════════════════════════════════════════════ */
+let teacherBank = {
+  name: '',
+  zones: { 1:'生產者', 2:'初級消費者', 3:'次級消費者', 4:'頂級掠食者' },
+  organisms: []
+};
+let editingOrgId = null;
+let editImageData = null; // base64
+
+/* ════════════════════════════════════════════════════
+   CANVAS / PARTICLES
+════════════════════════════════════════════════════ */
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx    = bgCanvas.getContext('2d');
+let bgParticles = [], currentBgColors = ['#0d1117','#1a1a2e','#0f0f20'];
+
+function initBg(colors) {
+  bgCanvas.width  = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  bgParticles = [];
+  for (let i=0;i<55;i++) bgParticles.push({
+    x:Math.random()*bgCanvas.width, y:Math.random()*bgCanvas.height,
+    r:Math.random()*2.5+.8,
+    vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35,
+    alpha:Math.random()*.45+.08
+  });
+}
+function drawBg(colors) {
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  const g = bgCtx.createLinearGradient(0,0,bgCanvas.width,bgCanvas.height);
+  g.addColorStop(0,colors[0]); g.addColorStop(.5,colors[1]); g.addColorStop(1,colors[2]);
+  bgCtx.fillStyle = g; bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgParticles.forEach(p => {
+    bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    bgCtx.fillStyle = `rgba(255,255,255,${p.alpha})`; bgCtx.fill();
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0) p.x=bgCanvas.width; if(p.x>bgCanvas.width) p.x=0;
+    if(p.y<0) p.y=bgCanvas.height; if(p.y>bgCanvas.height) p.y=0;
+  });
+}
+
+const pCanvas = document.getElementById('particle-canvas');
+const pCtx    = pCanvas.getContext('2d');
+let particles = [];
+function resizeP() { pCanvas.width=window.innerWidth; pCanvas.height=window.innerHeight; }
+resizeP(); window.addEventListener('resize', () => { resizeP(); initBg(currentBgColors); });
+
+function spawnConfetti(x,y,n=30) {
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, s=Math.random()*8+4;
+    particles.push({
+      x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-5,
+      r:Math.random()*6+3, color:`hsl(${Math.random()*360},80%,65%)`,
+      life:1, decay:Math.random()*.015+.012,
+      shape:Math.random()>.5?'circle':'rect'
+    });
+  }
+}
+function animP() {
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  particles=particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    pCtx.globalAlpha=p.life; pCtx.fillStyle=p.color;
+    pCtx.beginPath();
+    if(p.shape==='circle') pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    else pCtx.rect(p.x-p.r/2,p.y-p.r/2,p.r,p.r*1.4);
+    pCtx.fill(); p.x+=p.vx; p.y+=p.vy; p.vy+=.3; p.life-=p.decay;
+  });
+  pCtx.globalAlpha=1; requestAnimationFrame(animP);
+}
+animP();
+
+function mainLoop() { drawBg(currentBgColors); requestAnimationFrame(mainLoop); }
+initBg(currentBgColors); mainLoop();
+
+/* ════════════════════════════════════════════════════
+   SCREEN HELPERS
+════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+let toastTimer;
+function showToast(msg, dur=2800) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+/* ════════════════════════════════════════════════════
+   HOME SCREEN
+════════════════════════════════════════════════════ */
+document.getElementById('btn-builtin').addEventListener('click',()=>{
+  showScreen('home-screen'); // keep as base
+  startBuiltinGame();
+});
+document.getElementById('btn-teacher-mode').addEventListener('click',()=>{
+  showScreen('teacher-screen');
+  renderTeacherGrid();
+});
+
+/* ════════════════════════════════════════════════════
+   TEACHER SCREEN
+════════════════════════════════════════════════════ */
+document.getElementById('btn-back-home').addEventListener('click',()=>showScreen('home-screen'));
+
+// Zone label inputs sync
+['1','2','3','4'].forEach(n=>{
+  const inp = document.getElementById('zn'+n);
+  inp.value = teacherBank.zones[n];
+  inp.addEventListener('input',()=>{ teacherBank.zones[n]=inp.value||`第${n}層`; });
+});
+document.getElementById('bank-name').addEventListener('input',e=>{ teacherBank.name=e.target.value; });
+
+// Download template
+document.getElementById('btn-download-template').addEventListener('click',()=>{
+  const template = {
+    "_readme": "填寫說明：organisms 陣列中每項代表一張卡牌。level 為 1~4（對應四個層級）。image 欄位填 null 即使用 emoji；若要加圖片，請透過遊戲介面上傳（匯出後會自動填入 base64）。",
+    "name": "我的題庫名稱",
+    "zones": { "1":"第一層名稱", "2":"第二層名稱", "3":"第三層名稱", "4":"第四層名稱" },
+    "organisms": [
+      {"id":"item1","name":"範例生物A","emoji":"🌿","image":null,"level":1,"fact":"輸入學生答對後看到的知識說明..."},
+      {"id":"item2","name":"範例生物B","emoji":"🐰","image":null,"level":2,"fact":"有趣的生物知識或歷史背景..."},
+      {"id":"item3","name":"範例生物C","emoji":"🦊","image":null,"level":3,"fact":"記得每個層級至少要有一張卡牌！"},
+      {"id":"item4","name":"範例生物D","emoji":"🦁","image":null,"level":4,"fact":"最多可建立 20 張卡牌。"}
+    ]
+  };
+  const blob=new Blob([JSON.stringify(template,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='題庫範本.json'; a.click();
+  showToast('✅ 範本已下載，用文字編輯器開啟填寫後再匯入！');
+});
+
+// Import JSON
+document.getElementById('btn-import-json').addEventListener('click',()=>{
+  document.getElementById('file-import').click();
+});
+document.getElementById('file-import').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try {
+      const data=JSON.parse(ev.target.result);
+      if(!data.organisms||!Array.isArray(data.organisms)) throw new Error('格式錯誤');
+      teacherBank.name = data.name||'';
+      teacherBank.zones = Object.assign({1:'第一層',2:'第二層',3:'第三層',4:'第四層'}, data.zones||{});
+      teacherBank.organisms = data.organisms.map((o,i)=>({
+        id: o.id||'org_'+Date.now()+'_'+i,
+        name: o.name||'未命名',
+        emoji: o.emoji||'❓',
+        image: o.image||null,
+        level: parseInt(o.level)||1,
+        fact: o.fact||''
+      }));
+      document.getElementById('bank-name').value = teacherBank.name;
+      ['1','2','3','4'].forEach(n=>{
+        document.getElementById('zn'+n).value = teacherBank.zones[n];
+      });
+      renderTeacherGrid();
+      showToast(`✅ 已匯入「${teacherBank.name}」，共 ${teacherBank.organisms.length} 張卡牌`);
+    } catch(err) {
+      showToast('❌ 匯入失敗：JSON 格式不正確，請確認檔案內容');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+
+// Export JSON
+document.getElementById('btn-export-json').addEventListener('click',()=>{
+  if(!teacherBank.organisms.length){showToast('❌ 題庫是空的，請先新增卡牌');return;}
+  const blob=new Blob([JSON.stringify(teacherBank,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  const fname=(teacherBank.name||'題庫')+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.download=fname; a.click();
+  showToast('✅ 題庫已匯出：'+fname);
+});
+
+// Play custom
+document.getElementById('btn-play-custom').addEventListener('click',()=>{
+  if(!teacherBank.organisms.length){showToast('❌ 請先新增至少一張卡牌');return;}
+  const hasAll=[1,2,3,4].every(l=>teacherBank.organisms.some(o=>o.level===l));
+  if(!hasAll){showToast('⚠️ 建議每個層級至少各有一張卡牌！');} // soft warning, allow play
+  startCustomGame();
+});
+
+// Add org
+document.getElementById('btn-add-org').addEventListener('click',()=>openModal(null));
+
+/* ════════════════════════════════════════════════════
+   RENDER TEACHER GRID
+════════════════════════════════════════════════════ */
+function renderTeacherGrid() {
+  const grid=document.getElementById('teacher-grid');
+  grid.innerHTML='';
+  teacherBank.organisms.forEach(org=>{
+    const card=document.createElement('div');
+    card.className='t-org-card';
+    const mediaHTML = org.image
+      ? `<img class="toc-img" src="${org.image}" alt="${org.name}">`
+      : `<span class="toc-emoji">${org.emoji||'❓'}</span>`;
+    card.innerHTML=`
+      ${mediaHTML}
+      <div class="toc-name">${org.name}</div>
+      <span class="toc-level lvl-${org.level}">${teacherBank.zones[org.level]||'L'+org.level}</span>
+      <button class="toc-del" data-id="${org.id}">✕</button>
+    `;
+    card.addEventListener('click',(e)=>{
+      if(e.target.classList.contains('toc-del')) return;
+      openModal(org.id);
+    });
+    card.querySelector('.toc-del').addEventListener('click',(e)=>{
+      e.stopPropagation();
+      teacherBank.organisms=teacherBank.organisms.filter(o=>o.id!==org.id);
+      renderTeacherGrid();
+    });
+    grid.appendChild(card);
+  });
+  // Add button
+  const addBtn=document.createElement('div');
+  addBtn.className='t-add-card'; addBtn.id='btn-add-org';
+  addBtn.innerHTML='<span class="add-icon">＋</span>新增卡牌';
+  addBtn.addEventListener('click',()=>openModal(null));
+  grid.appendChild(addBtn);
+}
+
+/* ════════════════════════════════════════════════════
+   EDIT MODAL
+════════════════════════════════════════════════════ */
+function openModal(orgId) {
+  editingOrgId = orgId;
+  const modal = document.getElementById('edit-modal');
+  const org   = orgId ? teacherBank.organisms.find(o=>o.id===orgId) : null;
+
+  document.getElementById('modal-title').textContent = org ? '✏️ 編輯卡牌' : '✨ 新增卡牌';
+  document.getElementById('edit-name').value  = org?.name||'';
+  document.getElementById('edit-fact').value  = org?.fact||'';
+  document.getElementById('emoji-input').value = org?.emoji||'';
+  editImageData = org?.image||null;
+
+  // Image preview
+  updateImgPreview(editImageData);
+
+  // Level picker
+  updateLevelPicker(org?.level||1);
+
+  // Update level button labels
+  ['1','2','3','4'].forEach(n=>{
+    document.getElementById('lb'+n).textContent = teacherBank.zones[n]||('第'+n+'層');
+  });
+
+  modal.classList.add('show');
+}
+function closeModal() { document.getElementById('edit-modal').classList.remove('show'); }
+
+document.getElementById('modal-cancel').addEventListener('click',closeModal);
+document.getElementById('edit-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('edit-modal')) closeModal();
+});
+
+document.getElementById('modal-save').addEventListener('click',()=>{
+  const name = document.getElementById('edit-name').value.trim();
+  if(!name){showToast('❌ 請輸入名稱');return;}
+  const level = parseInt(document.querySelector('.lvl-btn[class*="active-"]')?.dataset.level)||1;
+  const fact  = document.getElementById('edit-fact').value.trim();
+  const emoji = document.getElementById('emoji-input').value||'❓';
+
+  if(editingOrgId) {
+    const org = teacherBank.organisms.find(o=>o.id===editingOrgId);
+    if(org){ org.name=name; org.level=level; org.fact=fact; org.emoji=emoji; org.image=editImageData; }
+  } else {
+    teacherBank.organisms.push({
+      id:'org_'+Date.now(), name, emoji, image:editImageData, level, fact
+    });
+  }
+  closeModal();
+  renderTeacherGrid();
+});
+
+// Level picker logic
+document.getElementById('level-picker').addEventListener('click',e=>{
+  const btn=e.target.closest('.lvl-btn'); if(!btn) return;
+  const level=parseInt(btn.dataset.level);
+  updateLevelPicker(level);
+});
+function updateLevelPicker(level) {
+  document.querySelectorAll('.lvl-btn').forEach(b=>{
+    b.className='lvl-btn';
+    if(parseInt(b.dataset.level)===level) b.classList.add('active-'+level);
+  });
+}
+
+// Image upload
+document.getElementById('btn-upload-img').addEventListener('click',()=>{
+  document.getElementById('img-file-input').click();
+});
+document.getElementById('img-preview-box').addEventListener('click',()=>{
+  document.getElementById('img-file-input').click();
+});
+document.getElementById('img-file-input').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  if(file.size>5*1024*1024){showToast('⚠️ 圖片過大，建議 5MB 以下');return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{ editImageData=ev.target.result; updateImgPreview(editImageData); };
+  reader.readAsDataURL(file);
+  e.target.value='';
+});
+document.getElementById('btn-clear-img').addEventListener('click',()=>{
+  editImageData=null; updateImgPreview(null);
+});
+function updateImgPreview(src) {
+  const box=document.getElementById('img-preview-box');
+  const img=document.getElementById('img-preview');
+  const ph =document.getElementById('img-placeholder');
+  if(src){ img.src=src; img.style.display='block'; ph.style.display='none'; }
+  else   { img.style.display='none'; ph.style.display=''; }
+}
+
+/* ════════════════════════════════════════════════════
+   GAME STATE
+════════════════════════════════════════════════════ */
+let gameState = {
+  rounds: [], currentRoundIdx: 0,
+  score: 0, placedCount: 0
+};
+
+function startBuiltinGame() {
+  currentBgColors = BUILTIN_ROUNDS[0].bgColors;
+  initBg(currentBgColors);
+  gameState = { rounds: BUILTIN_ROUNDS, currentRoundIdx:0, score:0, placedCount:0 };
+  document.getElementById('hdr-title').textContent = '🌍 生態食物鏈大冒險';
+  showScreen('game-screen');
+  loadRound(0);
+}
+
+function startCustomGame() {
+  const round = {
+    name: teacherBank.name||'自訂題庫',
+    zones: Object.assign({}, teacherBank.zones),
+    bgColors: ['#100d1a','#1e1040','#2d1860'],
+    organisms: teacherBank.organisms.map(o=>({...o}))
+  };
+  currentBgColors = round.bgColors;
+  initBg(currentBgColors);
+  gameState = { rounds:[round], currentRoundIdx:0, score:0, placedCount:0 };
+  document.getElementById('hdr-title').textContent = '🎯 '+round.name;
+  showScreen('game-screen');
+  loadRound(0);
+}
+
+/* ════════════════════════════════════════════════════
+   ROUND LOADER
+════════════════════════════════════════════════════ */
+function loadRound(idx) {
+  const rd = gameState.rounds[idx];
+  gameState.placedCount = 0;
+
+  currentBgColors = rd.bgColors;
+  initBg(currentBgColors);
+
+  // Zone labels
+  document.getElementById('eco-title').textContent = rd.name;
+  [1,2,3,4].forEach(l=>{
+    document.getElementById('zt'+l).textContent = rd.zones[l]||'第'+l+'層';
+    document.getElementById('zd'+l).textContent = '';
+    document.getElementById('chips-'+l).innerHTML='';
+  });
+
+  // Header
+  document.getElementById('hdr-round').textContent = `關卡 ${idx+1}/${gameState.rounds.length}`;
+  updateScore(); updateProgress();
+
+  // Shuffle cards
+  const orgs=[...rd.organisms].sort(()=>Math.random()-.5);
+  const grid=document.getElementById('cards-grid');
+  grid.innerHTML='';
+  orgs.forEach(org=>{
+    const card=document.createElement('div');
+    card.className='org-card'; card.dataset.id=org.id;
+    const mediaHTML = org.image
+      ? `<div class="card-media"><img src="${org.image}" alt="${org.name}"></div>`
+      : `<div class="card-media"><span class="card-emoji">${org.emoji||'❓'}</span></div>`;
+    card.innerHTML=`${mediaHTML}<div class="card-name">${org.name}</div><div class="card-hint">拖拉到正確層級</div>`;
+    card.addEventListener('mousedown',onPointerDown);
+    card.addEventListener('touchstart',onPointerDown,{passive:false});
+    grid.appendChild(card);
+  });
+}
+
+function updateScore() { document.getElementById('hdr-score').textContent=gameState.score; }
+function updateProgress() {
+  const total=gameState.rounds.reduce((a,r)=>a+r.organisms.length,0);
+  const prev =gameState.rounds.slice(0,gameState.currentRoundIdx).reduce((a,r)=>a+r.organisms.length,0);
+  document.getElementById('progress-fill').style.width=Math.round(((prev+gameState.placedCount)/total)*100)+'%';
+}
+
+/* ════════════════════════════════════════════════════
+   DRAG & DROP
+════════════════════════════════════════════════════ */
+const ghost=document.getElementById('drag-ghost');
+const ghostMedia=document.getElementById('ghost-media');
+const ghostName=document.getElementById('ghost-name');
+let drag={active:false,cardEl:null,orgId:null,offsetX:0,offsetY:0};
+
+function onPointerDown(e) {
+  if(e.button!==undefined&&e.button!==0) return;
+  e.preventDefault();
+  const card=e.currentTarget;
+  if(card.classList.contains('placed')) return;
+  const touch=e.touches?e.touches[0]:e;
+  const rect=card.getBoundingClientRect();
+  drag={active:true,cardEl:card,orgId:card.dataset.id,
+        offsetX:touch.clientX-rect.left,offsetY:touch.clientY-rect.top};
+
+  // Build ghost media
+  const rd=gameState.rounds[gameState.currentRoundIdx];
+  const org=rd.organisms.find(o=>o.id===drag.orgId);
+  if(org?.image) ghostMedia.innerHTML=`<img src="${org.image}" alt="${org?.name}">`;
+  else           ghostMedia.innerHTML=`<span class="card-emoji">${org?.emoji||'❓'}</span>`;
+  ghostName.textContent=org?.name||'';
+
+  ghost.style.width=rect.width+'px';
+  ghost.style.left=(touch.clientX-drag.offsetX)+'px';
+  ghost.style.top =(touch.clientY-drag.offsetY)+'px';
+  ghost.style.display='block';
+  card.classList.add('dragging');
+  updateDragOver(touch.clientX,touch.clientY);
+}
+document.addEventListener('mousemove',e=>{if(!drag.active)return;e.preventDefault();
+  ghost.style.left=(e.clientX-drag.offsetX)+'px';ghost.style.top=(e.clientY-drag.offsetY)+'px';
+  updateDragOver(e.clientX,e.clientY);});
+document.addEventListener('touchmove',e=>{if(!drag.active)return;e.preventDefault();
+  const t=e.touches[0];ghost.style.left=(t.clientX-drag.offsetX)+'px';ghost.style.top=(t.clientY-drag.offsetY)+'px';
+  updateDragOver(t.clientX,t.clientY);},{passive:false});
+document.addEventListener('mouseup',e=>{if(!drag.active)return;
+  ghost.style.display='none';drag.cardEl.classList.remove('dragging');clearDragOver();
+  const z=getZoneAt(e.clientX,e.clientY);
+  if(z) handleDrop(drag.orgId,z,drag.cardEl,e.clientX,e.clientY);
+  drag.active=false;drag.cardEl=null;});
+document.addEventListener('touchend',e=>{if(!drag.active)return;e.preventDefault();
+  const t=e.changedTouches[0];ghost.style.display='none';drag.cardEl.classList.remove('dragging');clearDragOver();
+  const z=getZoneAt(t.clientX,t.clientY);
+  if(z) handleDrop(drag.orgId,z,drag.cardEl,t.clientX,t.clientY);
+  drag.active=false;drag.cardEl=null;},{passive:false});
+
+function getZoneAt(x,y) {
+  for(const z of document.querySelectorAll('.drop-zone')){
+    const r=z.getBoundingClientRect();
+    if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return z;
+  }return null;
+}
+function updateDragOver(x,y){clearDragOver();const z=getZoneAt(x,y);if(z)z.classList.add('drag-over');}
+function clearDragOver(){document.querySelectorAll('.drop-zone.drag-over').forEach(z=>z.classList.remove('drag-over'));}
+
+/* ════════════════════════════════════════════════════
+   DROP HANDLER
+════════════════════════════════════════════════════ */
+function handleDrop(orgId,zoneEl,cardEl,dropX,dropY){
+  const rd=gameState.rounds[gameState.currentRoundIdx];
+  const org=rd.organisms.find(o=>o.id===orgId); if(!org) return;
+  const zl=parseInt(zoneEl.dataset.level);
+
+  if(zl===org.level){
+    const bonus=10; gameState.score+=bonus; gameState.placedCount++;
+    cardEl.classList.add('placed'); updateScore(); updateProgress();
+
+    // Chip
+    const chips=document.getElementById('chips-'+zl);
+    const chip=document.createElement('div'); chip.className='zone-chip';
+    if(org.image) chip.innerHTML=`<img src="${org.image}" alt="${org.name}"> ${org.name}`;
+    else          chip.innerHTML=`${org.emoji||'❓'} ${org.name}`;
+    chips.appendChild(chip);
+
+    // Ripple
+    const zr=zoneEl.getBoundingClientRect();
+    const rpl=document.createElement('div'); rpl.className='success-ripple';
+    rpl.style.left=(dropX-zr.left-28)+'px'; rpl.style.top=(dropY-zr.top-28)+'px';
+    zoneEl.appendChild(rpl); setTimeout(()=>rpl.remove(),900);
+
+    spawnConfetti(dropX,dropY,22);
+    showFact(org,bonus);
+  } else {
+    cardEl.classList.add('shake'); setTimeout(()=>cardEl.classList.remove('shake'),600);
+    const cz=document.getElementById('zone-'+org.level);
+    cz.style.boxShadow='0 0 28px rgba(255,255,255,.5)';
+    setTimeout(()=>cz.style.boxShadow='',800);
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   FACT POPUP
+════════════════════════════════════════════════════ */
+function showFact(org,bonus){
+  const fm=document.getElementById('fact-media');
+  if(org.image) fm.innerHTML=`<img src="${org.image}" alt="${org.name}" style="width:90px;height:90px;object-fit:cover;border-radius:18px;border:4px solid rgba(255,255,255,.3);animation:bounceEmoji .6s ease">`;
+  else          fm.innerHTML=`<span class="fact-emoji-lg">${org.emoji||'❓'}</span>`;
+  document.getElementById('fact-name').textContent=org.name;
+  document.getElementById('fact-text').textContent=org.fact||'太棒了！繼續加油！';
+  document.getElementById('fact-bonus').textContent=`＋${bonus} 分！（共 ${gameState.score} 分）`;
+  document.getElementById('fact-popup').classList.add('show');
+}
+document.getElementById('fact-close-btn').addEventListener('click',()=>{
+  document.getElementById('fact-popup').classList.remove('show');
+  const rd=gameState.rounds[gameState.currentRoundIdx];
+  if(gameState.placedCount>=rd.organisms.length) setTimeout(showLevelComplete,300);
+});
+
+/* ════════════════════════════════════════════════════
+   LEVEL COMPLETE
+════════════════════════════════════════════════════ */
+function showLevelComplete(){
+  const rd=gameState.rounds[gameState.currentRoundIdx];
+  document.getElementById('lc-title').textContent='關卡完成！🎉';
+  document.getElementById('lc-sub').textContent=`你完成了「${rd.name}」！`;
+  document.getElementById('lc-score').textContent=gameState.score;
+  const isLast=gameState.currentRoundIdx>=gameState.rounds.length-1;
+  document.getElementById('lc-next-btn').textContent=isLast?'查看最終結果 🏆':'下一關 →';
+  document.getElementById('level-complete').classList.add('show');
+  spawnConfetti(window.innerWidth/2,window.innerHeight/2,80);
+  setTimeout(()=>spawnConfetti(window.innerWidth*.3,200,40),400);
+  setTimeout(()=>spawnConfetti(window.innerWidth*.7,200,40),700);
+}
+document.getElementById('lc-next-btn').addEventListener('click',()=>{
+  document.getElementById('level-complete').classList.remove('show');
+  gameState.currentRoundIdx++;
+  if(gameState.currentRoundIdx<gameState.rounds.length) loadRound(gameState.currentRoundIdx);
+  else showFinalScreen();
+});
+
+/* ════════════════════════════════════════════════════
+   FINAL SCREEN
+════════════════════════════════════════════════════ */
+function showFinalScreen(){
+  showScreen('final-screen');
+  const max=gameState.rounds.reduce((a,r)=>a+r.organisms.length*10,0);
+  document.getElementById('final-score-num').textContent=gameState.score;
+  document.getElementById('final-score-max').textContent=max;
+  const r=max>0?gameState.score/max:0;
+  document.getElementById('final-grade').textContent=
+    r>=.9?'🌟 知識大師！滿分達成！':
+    r>=.7?'🎓 學習高手！非常優秀！':
+    r>=.5?'🌿 努力的探索者！繼續加油！':
+          '🌱 好的開始！多練習會更進步！';
+  spawnConfetti(window.innerWidth/2,150,100);
+}
+document.getElementById('btn-replay').addEventListener('click',()=>showScreen('home-screen'));
+document.addEventListener('contextmenu',e=>e.preventDefault());
+</script>
+    <!-- 回首頁按鈕 -->
+    <a href="../index.html" id="back-home-btn" title="回首頁" style="
+        position:fixed; bottom:14px; left:16px; z-index:99999;
+        width:44px; height:44px; border-radius:50%;
+        background:rgba(255,255,255,0.82);
+        border:2px solid #f9a8d4;
+        box-shadow:0 4px 12px rgba(236,72,153,0.22);
+        display:flex; align-items:center; justify-content:center;
+        text-decoration:none; transition:background 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+       onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+    </a>
+</body>
+</html>

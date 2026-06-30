@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>甜點慶典 SWEET POP! 🍩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
+    color: #5D4037;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(255,255,255,.55) 0 6px, transparent 7px),
+      radial-gradient(circle at 72% 14%, rgba(255,255,255,.45) 0 5px, transparent 6px),
+      radial-gradient(circle at 88% 64%, rgba(255,255,255,.4) 0 6px, transparent 7px),
+      radial-gradient(circle at 30% 80%, rgba(255,255,255,.4) 0 5px, transparent 6px),
+      linear-gradient(180deg, #E3F2FD 0%, #FFF0F5 55%, #FFFDE7 100%);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ─── 漂浮雲朵裝飾 ─── */
+  .cloud {
+    position: fixed; background: rgba(255,255,255,.85);
+    border-radius: 50px; pointer-events: none; z-index: 1;
+    filter: drop-shadow(0 6px 10px rgba(180,200,255,.25));
+    animation: drift linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute; background: inherit; border-radius: 50%;
+  }
+  .cloud::before { width: 55%; height: 160%; left: 14%; top: -70%; }
+  .cloud::after  { width: 40%; height: 120%; right: 16%; top: -45%; }
+  .c1 { width: 180px; height: 56px; top: 10%;  animation-duration: 70s; }
+  .c2 { width: 130px; height: 42px; top: 26%;  animation-duration: 95s;  animation-delay: -40s; }
+  .c3 { width: 220px; height: 64px; top: 64%;  animation-duration: 110s; animation-delay: -70s; }
+  @keyframes drift { from { left: -260px; } to { left: 105%; } }
+
+  canvas#game  { position: fixed; inset: 0; z-index: 2; }
+  canvas#trail { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+
+  /* ─── HUD ─── */
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: clamp(14px, 2.2vmin, 30px); gap: 16px; pointer-events: none;
+    opacity: 0; transition: opacity .4s;
+  }
+  #hud.show { opacity: 1; }
+  .pill {
+    background: rgba(255,255,255,.88);
+    border: 3px solid #FADADD;
+    border-radius: 50px;
+    box-shadow: 0 8px 16px rgba(255,182,193,.4);
+    padding: clamp(10px,1.6vmin,18px) clamp(22px,3vmin,40px);
+    font-weight: 800; font-size: clamp(1.2rem, 3.2vmin, 2.2rem);
+    line-height: 1.2; white-space: nowrap;
+  }
+  .pill small {
+    display: block; font-size: .52em; font-weight: 700; color: #B98A7B; letter-spacing: .12em;
+  }
+  #scorePill  { color: #FF8FAB; }
+  #bestPill   { color: #FFB74D; }
+
+  #timerWrap { flex: 1; max-width: 520px; margin-top: 6px; }
+  #timerBar {
+    height: clamp(20px, 2.8vmin, 30px);
+    background: rgba(255,255,255,.8);
+    border: 3px solid #FADADD; border-radius: 50px; overflow: hidden;
+    box-shadow: 0 8px 16px rgba(255,182,193,.35);
+  }
+  #timerFill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #FF8FAB, #FFB74D);
+    border-radius: 50px; transition: width .2s linear;
+  }
+  #timerWrap small{
+    display:block; text-align:center; margin-top:6px;
+    font-weight:800; color:#B98A7B; font-size: clamp(.8rem,1.8vmin,1.1rem); letter-spacing:.2em;
+  }
+
+  #combo {
+    position: fixed; top: 17%; left: 50%; transform: translateX(-50%) scale(0);
+    z-index: 5; pointer-events: none;
+    font-weight: 800; font-size: clamp(2rem, 6vmin, 4rem);
+    color: #FF8FAB; text-shadow: 0 3px 0 #fff, 0 8px 18px rgba(255,143,171,.45);
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1);
+  }
+  #combo.show { transform: translateX(-50%) scale(1); }
+
+  /* ─── 浮動得分 ─── */
+  .pop-score {
+    position: fixed; z-index: 6; pointer-events: none;
+    font-weight: 900; font-size: clamp(1.6rem, 4.4vmin, 3rem);
+    text-shadow: 0 2px 0 #fff, 0 6px 14px rgba(0,0,0,.12);
+    transform: translate(-50%, -50%);
+    animation: rise .9s ease-out forwards;
+  }
+  @keyframes rise {
+    0%   { opacity: 0; transform: translate(-50%,-30%) scale(.5); }
+    20%  { opacity: 1; transform: translate(-50%,-60%) scale(1.15); }
+    100% { opacity: 0; transform: translate(-50%,-180%) scale(1); }
+  }
+
+  /* ─── 全螢幕紅閃（誤擊辣椒） ─── */
+  #flash {
+    position: fixed; inset: 0; z-index: 4; pointer-events: none;
+    background: radial-gradient(circle, transparent 40%, rgba(255,80,80,.45) 100%);
+    opacity: 0; transition: opacity .35s;
+  }
+  #flash.on { opacity: 1; transition: opacity .05s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-12px); } 40% { transform: translateX(10px); }
+    60% { transform: translateX(-7px); }  80% { transform: translateX(5px); }
+  }
+  #hud.shake { animation: shake .45s; }
+
+  /* ─── 覆蓋層（開始 / 結束） ─── */
+  .overlay {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,240,245,.72);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    opacity: 1; transition: opacity .45s;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .panel {
+    background: #fff;
+    border: 4px solid #FADADD; border-radius: 36px;
+    box-shadow: 0 18px 40px rgba(255,182,193,.45);
+    padding: clamp(30px,5vmin,64px) clamp(34px,6vmin,84px);
+    text-align: center; max-width: min(92vw, 760px);
+    animation: pop-in .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop-in { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .panel h1 {
+    font-size: clamp(2.4rem, 7.5vmin, 5rem); font-weight: 800;
+    background: linear-gradient(90deg, #FF8FAB, #FFB74D, #FF8FAB);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    line-height: 1.25; margin-bottom: .2em;
+  }
+  .panel .sub {
+    font-size: clamp(1rem, 2.6vmin, 1.5rem); font-weight: 700;
+    color: #8D6E63; line-height: 1.7; margin-bottom: 1.4em;
+  }
+  .rules {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: clamp(10px,1.8vmin,20px); margin-bottom: 2em;
+  }
+  .rule {
+    background: #FFF0F5; border: 3px solid #FADADD; border-radius: 24px;
+    padding: clamp(12px,2vmin,22px) clamp(16px,2.4vmin,28px);
+    font-size: clamp(.95rem, 2.2vmin, 1.35rem); font-weight: 800; line-height: 1.6;
+    min-width: 150px;
+  }
+  .rule .emoji { display: block; font-size: 2.1em; margin-bottom: .15em; }
+
+  .kawaii-btn {
+    background: #FF8FAB; color: #fff; border: none; cursor: pointer;
+    border-radius: 60px;
+    padding: clamp(16px,2.6vmin,26px) clamp(48px,8vmin,90px);
+    font-family: inherit; font-weight: 800;
+    font-size: clamp(1.3rem, 3.4vmin, 2.2rem);
+    box-shadow: 0 8px 0 #E8779B, 0 16px 28px rgba(255,143,171,.45);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .kawaii-btn:hover  { transform: scale(1.06); }
+  .kawaii-btn:active { transform: translateY(6px) scale(.98); box-shadow: 0 2px 0 #E8779B, 0 8px 16px rgba(255,143,171,.4); }
+
+  #rank {
+    font-size: clamp(4rem, 13vmin, 8.5rem); font-weight: 900;
+    color: #FFB74D; text-shadow: 0 4px 0 #fff, 0 12px 24px rgba(255,183,77,.5);
+    line-height: 1.1;
+  }
+  #finalScore { font-size: clamp(2rem, 5.6vmin, 3.6rem); color: #FF8FAB; font-weight: 800; margin: .15em 0 .4em; }
+  #verdict { font-size: clamp(1.05rem, 2.6vmin, 1.5rem); color: #8D6E63; font-weight: 700; margin-bottom: 1.4em; line-height: 1.7; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cloud { animation: none; }
+    .panel { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+
+<canvas id="game"></canvas>
+<canvas id="trail"></canvas>
+<div id="flash"></div>
+
+<div id="hud">
+  <div class="pill" id="scorePill"><small>SCORE 分數</small><span id="score">0</span></div>
+  <div id="timerWrap">
+    <div id="timerBar"><div id="timerFill"></div></div>
+    <small id="timeText">60 秒</small>
+  </div>
+  <div class="pill" id="bestPill"><small>BEST 最佳</small><span id="best">0</span></div>
+</div>
+<div id="combo"></div>
+
+<!-- 開始畫面 -->
+<div class="overlay" id="startOverlay">
+  <div class="panel">
+    <h1>🍩 甜點慶典 ✨<br>SWEET POP!</h1>
+    <div class="sub">甜點們飛上天空啦！<br>用手指<strong>滑過</strong>或<strong>點擊</strong>甜點，在 60 秒內搶下高分吧 🎀</div>
+    <div class="rules">
+      <div class="rule"><span class="emoji">🍩🍓🧁</span>擊中甜點<br>+10 分</div>
+      <div class="rule"><span class="emoji">⭐</span>幸運星星<br>+50 分</div>
+      <div class="rule"><span class="emoji">🌶️</span>小心辣椒！<br>−30 分</div>
+      <div class="rule"><span class="emoji">✨</span>連續擊中<br>Combo 加成</div>
+    </div>
+    <button class="kawaii-btn" id="startBtn">開始遊戲 🌸</button>
+  </div>
+</div>
+
+<!-- 結束畫面 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="panel">
+    <div id="rank">S</div>
+    <div id="finalScore">0 分</div>
+    <div id="verdict"></div>
+    <button class="kawaii-btn" id="retryBtn">再玩一次 🍬</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  /* ════════════ 基本設定 ════════════ */
+  const GAME_TIME   = 60;          // 一局秒數
+  const GRAVITY     = -10.5;
+  const HIT_PAD     = 38;          // 觸控判定額外像素（大螢幕友善）
+  const COMBO_GAP   = 1.15;        // 連擊允許間隔（秒）
+
+  const PASTELS = [0xFF8FAB, 0xFFB74D, 0xA5D6A7, 0x90CAF9, 0xCE93D8, 0xFFF59D];
+
+  /* ════════════ Three.js 場景 ════════════ */
+  const canvas   = document.getElementById('game');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0, 14);
+
+  scene.add(new THREE.HemisphereLight(0xfff6fb, 0xffe3ec, 0.95));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.85);
+  sun.position.set(4, 8, 10);
+  scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xbBdEFb, 0.35);
+  fill.position.set(-6, -3, 6);
+  scene.add(fill);
+
+  let viewH = 6, viewW = 8;   // 世界座標可視半高 / 半寬（z=0 平面）
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    viewH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+    viewW = viewH * camera.aspect;
+    trailCv.width  = w * trailDPR;
+    trailCv.height = h * trailDPR;
+    trailCtx.setTransform(trailDPR, 0, 0, trailDPR, 0, 0);
+  }
+
+  /* ════════════ 材質工具 ════════════ */
+  const mat = (color, opt = {}) =>
+    new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.65, metalness: 0.05 }, opt));
+
+  /* 可愛表情：兩顆眼睛 + 粉紅腮紅 */
+  function addFace(group, y = 0, z = 0.6, spread = 0.32, scale = 1) {
+    const eyeM   = mat(0x4A3228, { roughness: 0.4 });
+    const cheekM = mat(0xFFAEC0, { roughness: 0.8 });
+    const eyeG   = new THREE.SphereGeometry(0.085 * scale, 10, 10);
+    const cheekG = new THREE.SphereGeometry(0.1 * scale, 10, 10);
+    [-1, 1].forEach(s => {
+      const eye = new THREE.Mesh(eyeG, eyeM);
+      eye.position.set(s * spread, y + 0.08 * scale, z);
+      group.add(eye);
+      const cheek = new THREE.Mesh(cheekG, cheekM);
+      cheek.scale.set(1, 0.7, 0.45);
+      cheek.position.set(s * (spread + 0.22 * scale), y - 0.1 * scale, z);
+      group.add(cheek);
+    });
+  }
+
+  /* ════════════ 甜點模型 ════════════ */
+  function makeDonut() {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.3, 18, 36), mat(0xE8B27D)));
+    const icing = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.27, 18, 36),
+                                 mat(PASTELS[Math.random() * PASTELS.length | 0]));
+    icing.scale.z = 0.62;
+    icing.position.z = 0.14;
+    g.add(icing);
+    const sg = new THREE.BoxGeometry(0.07, 0.16, 0.05);
+    for (let i = 0; i < 12; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.42 + Math.random() * 0.4;
+      const s = new THREE.Mesh(sg, mat(PASTELS[Math.random() * PASTELS.length | 0], { roughness: 0.4 }));
+      s.position.set(Math.cos(a) * r, Math.sin(a) * r, 0.32);
+      s.rotation.set(Math.random(), Math.random(), Math.random());
+      g.add(s);
+    }
+    addFace(g, -0.02, 0.95, 0.24, 0.9);
+    return { mesh: g, r: 1.0 };
+  }
+
+  function makeMacaron() {
+    const g = new THREE.Group();
+    const c = PASTELS[Math.random() * PASTELS.length | 0];
+    const shellG = new THREE.SphereGeometry(0.78, 22, 16);
+    const top = new THREE.Mesh(shellG, mat(c));
+    top.scale.set(1, 0.42, 1); top.position.y = 0.2;
+    const bot = top.clone(); bot.position.y = -0.2;
+    const cream = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.72, 0.22, 24), mat(0xFFFBF2, { roughness: 0.9 }));
+    g.add(top, bot, cream);
+    addFace(g, 0, 0.74, 0.3, 1);
+    return { mesh: g, r: 0.95 };
+  }
+
+  function makeStrawberry() {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.72, 22, 18), mat(0xFF6B81));
+    body.scale.set(0.88, 1.12, 0.88);
+    g.add(body);
+    const seedG = new THREE.SphereGeometry(0.045, 6, 6);
+    const seedM = mat(0xFFF59D, { roughness: 0.4 });
+    for (let i = 0; i < 14; i++) {
+      const phi = Math.random() * Math.PI * 2, th = 0.45 + Math.random() * 1.9;
+      const s = new THREE.Mesh(seedG, seedM);
+      s.position.setFromSphericalCoords(0.72, th, phi);
+      s.position.y *= 1.08; s.position.x *= 0.9; s.position.z *= 0.9;
+      g.add(s);
+    }
+    const leafG = new THREE.ConeGeometry(0.16, 0.42, 6);
+    const leafM = mat(0x81C784);
+    for (let i = 0; i < 5; i++) {
+      const leaf = new THREE.Mesh(leafG, leafM);
+      const a = i / 5 * Math.PI * 2;
+      leaf.position.set(Math.cos(a) * 0.26, 0.78, Math.sin(a) * 0.26);
+      leaf.rotation.set(Math.sin(a) * 0.9, 0, -Math.cos(a) * 0.9);
+      g.add(leaf);
+    }
+    addFace(g, -0.08, 0.66, 0.27, 1);
+    return { mesh: g, r: 0.95 };
+  }
+
+  function makePudding() {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.85, 0.92, 26), mat(0xFFD680)));
+    const caramel = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.64, 0.3, 26), mat(0xB5651D, { roughness: 0.45 }));
+    caramel.position.y = 0.4;
+    const cherry = new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 12), mat(0xE53950, { roughness: 0.35 }));
+    cherry.position.y = 0.68;
+    g.add(caramel, cherry);
+    addFace(g, -0.08, 0.78, 0.3, 1);
+    return { mesh: g, r: 1.0 };
+  }
+
+  function makePepper() {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 20, 16), mat(0xE53935, { roughness: 0.35 }));
+    body.scale.set(0.62, 1.5, 0.62);
+    g.add(body);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 12), mat(0xC62828, { roughness: 0.35 }));
+    tip.position.y = -0.92; tip.rotation.x = Math.PI;
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 0.4, 8), mat(0x558B2F));
+    stem.position.y = 0.95; stem.rotation.z = 0.35;
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.3, 8), mat(0x66BB6A));
+    cap.position.y = 0.76;
+    g.add(tip, stem, cap);
+    /* 兇兇的眉毛眼睛 */
+    const browG = new THREE.BoxGeometry(0.2, 0.05, 0.04);
+    const browM = mat(0x4A3228);
+    [-1, 1].forEach(s => {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), browM);
+      eye.position.set(s * 0.17, 0.18, 0.36);
+      const brow = new THREE.Mesh(browG, browM);
+      brow.position.set(s * 0.18, 0.32, 0.36);
+      brow.rotation.z = s * -0.5;
+      g.add(eye, brow);
+    });
+    return { mesh: g, r: 0.9 };
+  }
+
+  function makeStar() {
+    const shape = new THREE.Shape();
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? 0.85 : 0.38;
+      const a = i / 10 * Math.PI * 2 - Math.PI / 2;
+      const x = Math.cos(a) * r, y = -Math.sin(a) * r;
+      i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
+    }
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.3, bevelEnabled: true, bevelSize: 0.07, bevelThickness: 0.07, bevelSegments: 2 });
+    geo.center();
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(geo, mat(0xFFD54F, { roughness: 0.25, emissive: 0xFFB300, emissiveIntensity: 0.35 })));
+    addFace(g, -0.05, 0.3, 0.2, 0.85);
+    return { mesh: g, r: 1.0 };
+  }
+
+  const SWEETS = [makeDonut, makeMacaron, makeStrawberry, makePudding];
+
+  /* ════════════ 遊戲狀態 ════════════ */
+  let state = 'menu';                  // menu | play | over
+  let items = [];                      // 飛行中的物件
+  let particles = [];
+  let score = 0, best = 0;
+  let combo = 0, lastPopAt = -99;
+  let timeLeft = GAME_TIME, elapsed = 0, spawnTimer = 0;
+
+  /* ════════════ 生成與發射 ════════════ */
+  function spawnWave() {
+    const n = 1 + Math.min(3, Math.floor(elapsed / 14)) + (Math.random() < 0.35 ? 1 : 0);
+    for (let i = 0; i < n; i++) setTimeout(spawnOne, i * 130);
+  }
+
+  function spawnOne() {
+    if (state !== 'play') return;
+    let kind = 'sweet', maker;
+    const roll = Math.random();
+    if (elapsed > 8 && roll < 0.16)      { kind = 'pepper'; maker = makePepper; }
+    else if (roll > 0.94)                { kind = 'star';   maker = makeStar; }
+    else                                 { maker = SWEETS[Math.random() * SWEETS.length | 0]; }
+
+    const { mesh, r } = maker();
+    const x = (Math.random() * 2 - 1) * viewW * 0.62;
+    mesh.position.set(x, -viewH - 1.6, (Math.random() - 0.5) * 1.5);
+    const s = 0.92 + Math.random() * 0.35;
+    mesh.scale.setScalar(s);
+    scene.add(mesh);
+
+    items.push({
+      mesh, kind,
+      r: r * s,
+      vx: -x * (0.16 + Math.random() * 0.14),
+      vy: 11.4 + Math.random() * 2.8,
+      rx: (Math.random() - 0.5) * 3.2,
+      ry: (Math.random() - 0.5) * 3.2,
+      dead: false
+    });
+  }
+
+  /* ════════════ 粒子煙火 ════════════ */
+  const partGeo = new THREE.SphereGeometry(0.14, 8, 8);
+  function burst(pos, colorList, count = 14) {
+    for (let i = 0; i < count; i++) {
+      const m = new THREE.Mesh(partGeo, mat(colorList[Math.random() * colorList.length | 0], { roughness: 0.4 }));
+      m.position.copy(pos);
+      const a = Math.random() * Math.PI * 2, sp = 3 + Math.random() * 5;
+      scene.add(m);
+      particles.push({
+        mesh: m, life: 0.7 + Math.random() * 0.3, age: 0,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp + 2, vz: (Math.random() - 0.5) * 3
+      });
+    }
+  }
+
+  /* ════════════ 音效（WebAudio 合成） ════════════ */
+  let actx = null;
+  const audio = () => actx || (actx = new (window.AudioContext || window.webkitAudioContext)());
+  function tone(freq, dur, type = 'triangle', vol = 0.18, when = 0) {
+    try {
+      const ctx = audio(), t = ctx.currentTime + when;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g).connect(ctx.destination);
+      o.start(t); o.stop(t + dur);
+    } catch (e) { /* 音效失敗不影響遊戲 */ }
+  }
+  const sndPop  = () => { tone(520 + Math.min(combo, 12) * 45, 0.16); tone(780 + Math.min(combo, 12) * 45, 0.12, 'sine', 0.1, 0.03); };
+  const sndStar = () => { [660, 880, 1100, 1320].forEach((f, i) => tone(f, 0.22, 'sine', 0.16, i * 0.07)); };
+  const sndBad  = () => { tone(160, 0.3, 'sawtooth', 0.22); tone(110, 0.36, 'sawtooth', 0.18, 0.06); };
+  const sndEnd  = () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.3, 'triangle', 0.16, i * 0.12)); };
+
+  /* ════════════ 觸控 / 指標輸入（多點） ════════════ */
+  const trailCv  = document.getElementById('trail');
+  const trailCtx = trailCv.getContext('2d');
+  const trailDPR = Math.min(window.devicePixelRatio, 2);
+  const pointers = new Map();   // id → { x, y, px, py, pts:[{x,y,t}] }
+
+  function onDown(e) {
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, px: e.clientX, py: e.clientY, pts: [{ x: e.clientX, y: e.clientY, t: performance.now() }] });
+    if (state === 'play') hitTest(e.clientX, e.clientY, e.clientX, e.clientY);
+  }
+  function onMove(e) {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    p.px = p.x; p.py = p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    p.pts.push({ x: p.x, y: p.y, t: performance.now() });
+    if (p.pts.length > 24) p.pts.shift();
+    if (state === 'play') hitTest(p.px, p.py, p.x, p.y);
+  }
+  const onUp = e => pointers.delete(e.pointerId);
+  canvas.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+
+  /* 世界座標 → 螢幕像素 */
+  const _v = new THREE.Vector3();
+  function toScreen(pos) {
+    _v.copy(pos).project(camera);
+    return { x: (_v.x + 1) / 2 * window.innerWidth, y: (1 - _v.y) / 2 * window.innerHeight };
+  }
+  /* 點到線段距離 */
+  function distSeg(px, py, ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay;
+    const L2 = dx * dx + dy * dy;
+    const t = L2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L2));
+    const cx = ax + t * dx, cy = ay + t * dy;
+    return Math.hypot(px - cx, py - cy);
+  }
+
+  function hitTest(ax, ay, bx, by) {
+    const pxPerUnit = (window.innerHeight / 2) / viewH;   // z=0 平面換算
+    for (const it of items) {
+      if (it.dead) continue;
+      const sc = toScreen(it.mesh.position);
+      const rad = it.r * pxPerUnit * (14 / (14 - it.mesh.position.z)) + HIT_PAD;
+      if (distSeg(sc.x, sc.y, ax, ay, bx, by) <= rad) popItem(it, sc);
+    }
+  }
+
+  /* ════════════ 擊中處理 ════════════ */
+  const $ = id => document.getElementById(id);
+  function popItem(it, sc) {
+    it.dead = true;
+    scene.remove(it.mesh);
+    const now = elapsed;
+
+    if (it.kind === 'pepper') {
+      score = Math.max(0, score - 30);
+      combo = 0;
+      burst(it.mesh.position, [0xE53935, 0xC62828, 0xFF7043], 16);
+      showScore(sc, '−30 🌶️', '#E53935');
+      sndBad();
+      $('flash').classList.add('on');
+      setTimeout(() => $('flash').classList.remove('on'), 90);
+      $('hud').classList.remove('shake'); void $('hud').offsetWidth;
+      $('hud').classList.add('shake');
+    } else {
+      combo = (now - lastPopAt <= COMBO_GAP) ? combo + 1 : 1;
+      lastPopAt = now;
+      const bonus = (combo - 1) * 5;
+      const gain = (it.kind === 'star' ? 50 : 10) + bonus;
+      score += gain;
+      if (it.kind === 'star') {
+        burst(it.mesh.position, [0xFFD54F, 0xFFF59D, 0xFFB300, 0xFFFFFF], 22);
+        showScore(sc, `+${gain} ⭐`, '#FFB74D');
+        sndStar();
+      } else {
+        burst(it.mesh.position, PASTELS, 13);
+        showScore(sc, `+${gain}`, '#FF8FAB');
+        sndPop();
+      }
+      if (combo >= 2) {
+        const c = $('combo');
+        c.textContent = `連擊 x${combo} ✨`;
+        c.classList.remove('show'); void c.offsetWidth;
+        c.classList.add('show');
+        clearTimeout(c._t);
+        c._t = setTimeout(() => c.classList.remove('show'), 900);
+      }
+    }
+    $('score').textContent = score;
+  }
+
+  function showScore(sc, text, color) {
+    const el = document.createElement('div');
+    el.className = 'pop-score';
+    el.textContent = text;
+    el.style.color = color;
+    el.style.left = sc.x + 'px';
+    el.style.top  = sc.y + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 950);
+  }
+
+  /* ════════════ 軌跡繪製 ════════════ */
+  function drawTrails() {
+    trailCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    if (state !== 'play') return;
+    const now = performance.now();
+    trailCtx.lineCap = trailCtx.lineJoin = 'round';
+    pointers.forEach(p => {
+      p.pts = p.pts.filter(pt => now - pt.t < 240);
+      for (let i = 1; i < p.pts.length; i++) {
+        const a = p.pts[i - 1], b = p.pts[i];
+        const k = 1 - (now - b.t) / 240;
+        trailCtx.strokeStyle = `rgba(255,143,171,${0.65 * k})`;
+        trailCtx.lineWidth = 22 * k + 4;
+        trailCtx.beginPath(); trailCtx.moveTo(a.x, a.y); trailCtx.lineTo(b.x, b.y); trailCtx.stroke();
+        trailCtx.strokeStyle = `rgba(255,255,255,${0.8 * k})`;
+        trailCtx.lineWidth = 8 * k + 2;
+        trailCtx.beginPath(); trailCtx.moveTo(a.x, a.y); trailCtx.lineTo(b.x, b.y); trailCtx.stroke();
+      }
+    });
+  }
+
+  /* ════════════ 遊戲流程 ════════════ */
+  function startGame() {
+    items.forEach(it => scene.remove(it.mesh));
+    particles.forEach(p => scene.remove(p.mesh));
+    items = []; particles = [];
+    score = 0; combo = 0; lastPopAt = -99;
+    timeLeft = GAME_TIME; elapsed = 0; spawnTimer = 0;
+    $('score').textContent = '0';
+    $('best').textContent = best;
+    $('timerFill').style.width = '100%';
+    $('timeText').textContent = `${GAME_TIME} 秒`;
+    $('startOverlay').classList.add('hidden');
+    $('endOverlay').classList.add('hidden');
+    $('hud').classList.add('show');
+    if (actx && actx.state === 'suspended') actx.resume();
+    state = 'play';
+    spawnWave();
+  }
+
+  function endGame() {
+    state = 'over';
+    best = Math.max(best, score);
+    $('best').textContent = best;
+    let rank, verdict;
+    if      (score >= 1200) { rank = 'S'; verdict = '甜點大師誕生！全場都被你的手速閃到了 ✨🏆'; }
+    else if (score >= 800)  { rank = 'A'; verdict = '超厲害！甜點們都心服口服啦 🎀'; }
+    else if (score >= 450)  { rank = 'B'; verdict = '不錯唷！再多抓幾顆星星就能更上一層 ⭐'; }
+    else                    { rank = 'C'; verdict = '熱身完成！記得用「滑」的可以一次掃過好幾個甜點 🍩'; }
+    $('rank').textContent = rank;
+    $('finalScore').textContent = `${score} 分`;
+    $('verdict').textContent = verdict;
+    sndEnd();
+    setTimeout(() => {
+      $('hud').classList.remove('show');
+      $('endOverlay').classList.remove('hidden');
+    }, 550);
+  }
+
+  $('startBtn').addEventListener('click', () => { audio(); startGame(); });
+  $('retryBtn').addEventListener('click', startGame);
+
+  /* ════════════ 主迴圈 ════════════ */
+  let lastT = performance.now();
+  function loop(now) {
+    requestAnimationFrame(loop);
+    const dt = Math.min((now - lastT) / 1000, 0.033);
+    lastT = now;
+
+    if (state === 'play') {
+      elapsed += dt;
+      timeLeft -= dt;
+      $('timerFill').style.width = Math.max(0, timeLeft / GAME_TIME * 100) + '%';
+      $('timeText').textContent = `${Math.max(0, Math.ceil(timeLeft))} 秒`;
+
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnWave();
+        spawnTimer = Math.max(0.55, 1.25 - elapsed * 0.01) + Math.random() * 0.4;
+      }
+      if (timeLeft <= 0) endGame();
+    }
+
+    /* 物件物理 */
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      if (it.dead) { items.splice(i, 1); continue; }
+      it.vy += GRAVITY * dt;
+      it.mesh.position.x += it.vx * dt;
+      it.mesh.position.y += it.vy * dt;
+      it.mesh.rotation.x += it.rx * dt;
+      it.mesh.rotation.y += it.ry * dt;
+      if (it.vy < 0 && it.mesh.position.y < -viewH - 2.5) {
+        scene.remove(it.mesh);
+        items.splice(i, 1);
+      }
+    }
+
+    /* 粒子 */
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.age += dt;
+      if (p.age >= p.life) { scene.remove(p.mesh); particles.splice(i, 1); continue; }
+      p.vy += GRAVITY * 0.6 * dt;
+      p.mesh.position.x += p.vx * dt;
+      p.mesh.position.y += p.vy * dt;
+      p.mesh.position.z += p.vz * dt;
+      const k = 1 - p.age / p.life;
+      p.mesh.scale.setScalar(Math.max(0.001, k));
+    }
+
+    drawTrails();
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(loop);
+})();
+</script>
+    <!-- 回首頁按鈕 -->
+    <a href="../index.html" id="home-btn" title="回首頁" style="
+        position:fixed; bottom:14px; left:16px; z-index:99999;
+        width:44px; height:44px; border-radius:50%;
+        background:rgba(255,255,255,0.82);
+        border:2px solid #f9a8d4;
+        box-shadow:0 4px 12px rgba(236,72,153,0.22);
+        display:flex; align-items:center; justify-content:center;
+        text-decoration:none; transition:background 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+       onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+    </a>
+</body>
+</html>

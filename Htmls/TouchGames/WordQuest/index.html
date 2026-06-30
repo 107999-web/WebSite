@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>字母尋寶 Word Quest</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="words.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;700;800;900&display=swap');
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
+  box-sizing: border-box;
+}
+html, body {
+  width: 100%; height: 100%; margin: 0; padding: 0;
+  font-family: 'M PLUS Rounded 1c', 'Nunito', 'Microsoft JhengHei', sans-serif;
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #F0F9FF 100%);
+  overflow: hidden;
+}
+/* 圓點裝飾背景 */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(147,197,253,.22) 7px, transparent 8px);
+  background-size: 80px 80px;
+}
+
+/* ── 右上角按鈕群 ── */
+.corner-btns {
+  position: fixed; top: 2.4vmin; right: 2.4vmin;
+  display: flex; gap: 1.6vmin; z-index: 50;
+}
+.icon-btn {
+  width: 7vmin; height: 7vmin; min-width: 40px; min-height: 40px;
+  border-radius: 50%; border: 3px solid #fff;
+  font-size: 3.2vmin; background: #BFDBFE; color: #1d4ed8;
+  box-shadow: 0 .6vmin 1.4vmin rgba(96,165,250,.4);
+  transition: transform .15s; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-btn:active { transform: scale(.88); }
+
+/* 題庫來源標籤 */
+#bank-label {
+  position: fixed; top: calc(2.4vmin + 7vmin + 1vmin); right: 2.4vmin;
+  background: rgba(255,255,255,0.9); border: 1.5px solid #93c5fd;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: clamp(10px, 1.4vmin, 13px); font-weight: 700; color: #1d4ed8;
+  display: none; z-index: 50; max-width: 30vw;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── 漂浮裝飾 ── */
+.float-deco {
+  position: fixed; font-size: 3.2vmin; opacity: .45; z-index: 0;
+  pointer-events: none; animation: floaty 6s ease-in-out infinite;
+}
+@keyframes floaty {
+  0%,100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(-2.6vmin) rotate(6deg); }
+}
+
+/* ── Screens ── */
+.screen { display: none; }
+.screen.active { display: flex; }
+#screen-home, #screen-category, #screen-result, #screen-gameover {
+  min-height: 100vh; flex-direction: column;
+  align-items: center; justify-content: center; padding: 16px;
+}
+#screen-game {
+  flex-direction: column; align-items: center;
+  justify-content: flex-start;
+  padding: clamp(8px, 2vw, 16px);
+  min-height: 100vh; overflow-y: auto;
+}
+/* Dual game: full-screen split — no scroll */
+#screen-dual-game {
+  width: 100vw; height: 100vh; overflow: hidden;
+}
+
+/* ══════════════════════════════════════════
+   DUAL GAME LAYOUT
+══════════════════════════════════════════ */
+.dual-container {
+  display: flex;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+}
+
+/* Each player's half */
+.dual-side {
+  flex: 1;
+  display: flex; flex-direction: column;
+  padding: 12px 10px 10px;
+  position: relative; overflow: hidden;
+}
+.dual-side.p1-side {
+  background: linear-gradient(160deg, #eff6ff 0%, #dbeafe 100%);
+  border-right: none;
+}
+.dual-side.p2-side {
+  background: linear-gradient(160deg, #fff0f8 0%, #fce7f3 100%);
+  border-left: none;
+}
+
+/* Center strip */
+.dual-center {
+  width: clamp(130px, 11vw, 180px);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0284c7, #0ea5e9 40%, #38bdf8);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; padding: 12px 6px;
+  box-shadow: 0 0 40px rgba(14,165,233,0.45);
+  z-index: 10;
+}
+
+/* Player header inside each side */
+.dual-player-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; margin-bottom: 6px;
+  padding: 6px 10px; border-radius: 14px;
+}
+.p1-side .dual-player-header { background: rgba(37,99,235,0.12); border: 2px solid #93c5fd; }
+.p2-side .dual-player-header { background: rgba(219,39,119,0.10); border: 2px solid #f9a8d4; }
+
+/* Hearts row */
+.dual-hearts { display: flex; gap: 4px; align-items: center; }
+.dual-heart { font-size: clamp(1.1rem, 1.6vh, 1.5rem); transition: all 0.3s; line-height: 1; }
+.dual-heart.lost { filter: grayscale(1); opacity: 0.2; transform: scale(0.75); }
+
+/* Tile display */
+.dual-tiles {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: clamp(3px, 0.5vw, 6px);
+  align-items: center;
+  flex-shrink: 0;
+  min-height: clamp(60px, 9vh, 85px);
+  margin: 4px 0;
+}
+
+/* Word tiles in dual mode */
+.dtile {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: clamp(42px, 5.5vw, 62px);
+  height: clamp(50px, 6.5vh, 72px);
+  border-radius: 10px;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  font-weight: 900;
+  border: 3px solid;
+  transition: transform 0.15s;
+}
+.dtile.p1-tile { background: white; border-color: #93c5fd; box-shadow: 0 4px 0 #60a5fa; color: #1d4ed8; }
+.dtile.p2-tile { background: white; border-color: #f9a8d4; box-shadow: 0 4px 0 #f472b6; color: #be185d; }
+.dtile.blank   { color: transparent; }
+.dtile.p1-tile.blank { border-color: #bfdbfe; box-shadow: 0 3px 0 #93c5fd; }
+.dtile.p2-tile.blank { border-color: #fbcfe8; box-shadow: 0 3px 0 #f9a8d4; }
+.dtile.miss-tile { background: #fee2e2 !important; border-color: #fca5a5 !important; box-shadow: 0 3px 0 #f87171 !important; color: #dc2626 !important; }
+
+/* Wrong letters bar */
+.dual-wrong-bar {
+  text-align: center; font-weight: 700;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  color: #94a3b8; min-height: 18px; flex-shrink: 0;
+  margin: 2px 0;
+}
+
+/* Status banner (win / fail) */
+.dual-status-banner {
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 8px 16px; border-radius: 12px;
+  font-weight: 900; font-size: clamp(1rem, 2vw, 1.4rem);
+  flex-shrink: 0; margin: 4px 0;
+  text-align: center;
+}
+.dual-status-banner.win-banner  { background: #fef9c3; color: #92400e; border: 2px solid #fde68a; }
+.dual-status-banner.fail-banner { background: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; }
+
+/* Keyboard wrapper */
+.dual-keyboard-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center; gap: clamp(2px, 0.4vh, 5px);
+}
+.dual-key-row {
+  display: flex; justify-content: center;
+  gap: clamp(2px, 0.35vw, 5px);
+}
+.dkey {
+  width: clamp(40px, calc(4.3vw - 10px), 64px);
+  height: clamp(40px, calc(4.3vw - 10px), 64px);
+  border-radius: 10px;
+  font-size: clamp(0.8rem, 1vw, 1.2rem);
+  font-weight: 900;
+  border: 2px solid;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.08s, box-shadow 0.08s;
+  flex-shrink: 0;
+}
+.dkey:active:not(:disabled) { transform: translateY(3px); }
+.p1-key { background: white; border-color: #93c5fd; box-shadow: 0 3px 0 #60a5fa; color: #1d4ed8; }
+.p2-key { background: white; border-color: #f9a8d4; box-shadow: 0 3px 0 #f472b6; color: #be185d; }
+.dkey.k-correct.p1-key { background: #dbeafe; box-shadow: 0 3px 0 #93c5fd; pointer-events: none; }
+.dkey.k-correct.p2-key { background: #fce7f3; box-shadow: 0 3px 0 #f9a8d4; pointer-events: none; }
+.dkey.k-wrong  { background: #f1f5f9; border-color: #e2e8f0; box-shadow: 0 3px 0 #cbd5e1; color: #94a3b8; pointer-events: none; }
+.dkey:disabled { opacity: 0.35; pointer-events: none; cursor: default; }
+
+/* Fail overlay on keyboard */
+.dual-fail-overlay {
+  display: none;
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.55);
+  z-index: 5; border-radius: 8px;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+}
+.dual-kb-wrapper { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+/* ══════════════════════════════════════════
+   SINGLE PLAYER GAME
+══════════════════════════════════════════ */
+.word-tile {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: clamp(34px, 11vw, 58px);
+  height: clamp(42px, 13vw, 70px);
+  margin: clamp(2px, 0.6vw, 4px);
+  border-radius: clamp(8px, 2.5vw, 14px);
+  font-size: clamp(1.1rem, 4.5vw, 2rem); font-weight: 900;
+  background: white; border: 3px solid #bae6fd;
+  box-shadow: 0 clamp(3px,1vw,5px) 0 #7dd3fc; color: #0369a1;
+}
+.word-tile.blank { color: transparent; border-color: #e0f2fe; box-shadow: 0 4px 0 #bae6fd; }
+.word-tile.space  { background: transparent; border: none; box-shadow: none; width: clamp(10px,3vw,20px); }
+
+.heart { font-size: clamp(1rem,4vw,1.5rem); transition: all 0.3s; display: inline-block; }
+.heart.lost { filter: grayscale(1); opacity: 0.25; transform: scale(0.8); }
+
+.key-row { display: flex; justify-content: center; gap: clamp(2px,0.7vw,5px); margin: clamp(1px,0.5vh,3px) 0; }
+.key-btn {
+  width: clamp(28px, calc(9vw - 2px), 56px);
+  height: clamp(34px, calc(9.5vw - 2px), 56px);
+  border-radius: clamp(7px, 2vw, 12px);
+  background: white; border: 2px solid #bae6fd;
+  box-shadow: 0 clamp(2px,0.8vw,4px) 0 #7dd3fc;
+  font-size: clamp(0.72rem, 2.4vw, 1.3rem); font-weight: 900; color: #0369a1;
+  cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.key-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #7dd3fc; }
+.key-btn.used-correct { background: #bbf7d0; border-color: #86efac; box-shadow: 0 4px 0 #4ade80; color: #15803d; pointer-events: none; }
+.key-btn.used-wrong   { background: #f1f5f9; border-color: #e2e8f0; box-shadow: 0 4px 0 #cbd5e1; color: #94a3b8; pointer-events: none; }
+
+/* ── Shared Buttons ── */
+.big-btn {
+  border-radius: 24px; padding: 18px 36px;
+  font-size: 1.35rem; font-weight: 900; border: none; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  display: flex; align-items: center; gap: 14px;
+  min-width: 240px; justify-content: center;
+}
+.big-btn:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+.big-btn:active { transform: translateY(0); }
+.btn-sky   { background: linear-gradient(135deg,#0ea5e9,#38bdf8); color: white; }
+.btn-pink  { background: linear-gradient(135deg,#ec4899,#f472b6); color: white; }
+.btn-ghost { background: white; color: #0369a1; border: 3px solid #bae6fd !important; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+
+.cat-btn {
+  padding: clamp(12px,2.4vmin,22px) clamp(14px,2.8vmin,26px);
+  border-radius: clamp(14px,3vmin,26px);
+  border: 3px solid rgba(255,255,255,0.55);
+  font-size: clamp(14px,3.2vmin,26px); font-weight: 800;
+  color: #FFF;
+  cursor: pointer;
+  display: flex; align-items: center; gap: clamp(8px,1.4vmin,14px);
+  box-shadow: 0 clamp(4px,1vmin,10px) clamp(8px,2vmin,20px) rgba(0,0,0,0.18);
+  transition: transform .18s ease, box-shadow .18s ease;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  white-space: nowrap;
+}
+.cat-btn:hover { transform: scale(1.07); box-shadow: 0 clamp(6px,1.4vmin,14px) clamp(12px,2.8vmin,28px) rgba(0,0,0,0.28); }
+.cat-btn:active { transform: scale(.95); }
+
+/* ── Animations ── */
+@keyframes pop-in {
+  0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.25) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-10px); }
+  40%     { transform: translateX(10px); }
+  60%     { transform: translateX(-6px); }
+  80%     { transform: translateX(6px); }
+}
+@keyframes float-y {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-12px); }
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(90px) rotate(400deg); opacity: 0; }
+}
+@keyframes winner-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(250,204,21,0.6); }
+  50%     { box-shadow: 0 0 0 16px rgba(250,204,21,0); }
+}
+.shake    { animation: shake 0.45s ease-in-out; }
+.floating { animation: float-y 2.5s ease-in-out infinite; }
+.pop-in   { animation: pop-in 0.35s cubic-bezier(0.17,0.67,0.3,1.4) both; }
+.winner-glow { animation: winner-pulse 1s ease-in-out infinite; border: 3px solid #fde68a !important; }
+
+.confetti-piece {
+  position: fixed; border-radius: 3px;
+  animation: confetti-fall 1.2s ease-in forwards;
+  pointer-events: none; z-index: 9999;
+}
+</style>
+</head>
+<body>
+
+<!-- ── 回 TouchGames 首頁 ── -->
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:2.4vmin;left:2.4vmin;z-index:99999;width:7vmin;height:7vmin;min-width:40px;min-height:40px;border-radius:50%;background:#BFDBFE;border:3px solid #fff;box-shadow:0 .6vmin 1.4vmin rgba(96,165,250,.4);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:transform .15s;"
+  onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+</a>
+
+<!-- ── 右上角按鈕群 ── -->
+<div class="corner-btns">
+  <button class="icon-btn" id="btn-bank" title="載入自訂題庫">📂</button>
+  <button class="icon-btn" id="btn-reset-bank" title="恢復預設題庫" style="display:none;background:#FEE2E2;color:#991b1b;">🔄</button>
+</div>
+<div id="bank-label"></div>
+<input type="file" id="bank-file-input" accept=".js,.json" style="display:none;" onchange="handleBankFile(event)">
+
+<!-- ── 漂浮裝飾 ── -->
+<span class="float-deco" style="top:8%;left:5%;animation-delay:0s">🔤</span>
+<span class="float-deco" style="top:12%;right:14%;animation-delay:1.2s">⭐</span>
+<span class="float-deco" style="bottom:14%;left:8%;animation-delay:2.1s">🌟</span>
+<span class="float-deco" style="bottom:18%;right:6%;animation-delay:.7s">🔡</span>
+<span class="float-deco" style="top:55%;left:2%;animation-delay:3s">✨</span>
+
+<!-- ════════════════ SCREEN: HOME ════════════════ -->
+<div id="screen-home" class="screen active" style="z-index:1;">
+  <!-- Logo 標籤 -->
+  <div style="font-size:clamp(12px,2.2vmin,18px);background:#fff;border:2px solid #BFDBFE;border-radius:50px;padding:.6vmin 2.8vmin;box-shadow:0 .6vmin 1.4vmin rgba(147,197,253,.35);margin-bottom:1.5vmin;color:#1d4ed8;font-weight:800;">
+    🏠 寓教於樂・字母尋寶
+  </div>
+
+  <!-- 標題 -->
+  <div style="display:flex;align-items:center;gap:.8vmin;animation:titleBounce 2.6s ease-in-out infinite;margin-bottom:.5vmin;">
+    <span style="font-size:clamp(32px,9vmin,80px);line-height:1;-webkit-text-fill-color:initial;">🔤</span>
+    <h1 style="font-size:clamp(32px,9vmin,80px);font-weight:800;letter-spacing:.5vmin;line-height:1.2;margin:0;
+      background:linear-gradient(180deg,#3b82f6,#0ea5e9);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 .5vmin 0 rgba(255,255,255,.9)) drop-shadow(0 1vmin 1.4vmin rgba(96,165,250,.35));">
+      字母尋寶
+    </h1>
+  </div>
+  <p style="font-size:clamp(11px,2.6vmin,20px);font-weight:700;color:#60a5fa;margin-bottom:clamp(20px,4vmin,40px);letter-spacing:.3vmin;">
+    猜對字母，解鎖英文單字！
+  </p>
+
+  <!-- 模式卡片 -->
+  <div style="display:flex;gap:clamp(12px,3.5vmin,32px);flex-wrap:wrap;justify-content:center;">
+    <button onclick="selectMode('single')" style="
+      width:clamp(140px,28vmin,240px);padding:clamp(16px,3.4vmin,32px) clamp(10px,2vmin,20px);
+      border:none;border-radius:clamp(16px,3.4vmin,28px);
+      background:#FFFFFF;border:3px solid #BFDBFE;
+      box-shadow:0 clamp(6px,1.4vmin,14px) clamp(10px,2.6vmin,24px) rgba(147,197,253,.45);
+      transition:transform .18s ease,box-shadow .18s ease;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.2vmin,12px);">
+      <span style="font-size:clamp(32px,8vmin,72px);">🧑</span>
+      <span style="font-size:clamp(16px,3.4vmin,28px);font-weight:800;color:#1d4ed8;">單人練習</span>
+      <span style="font-size:clamp(10px,2vmin,16px);color:#60a5fa;line-height:1.5;">練習英文字母<br>一個人挑戰！</span>
+    </button>
+
+    <button onclick="selectMode('dual')" style="
+      width:clamp(140px,28vmin,240px);padding:clamp(16px,3.4vmin,32px) clamp(10px,2vmin,20px);
+      border:none;border-radius:clamp(16px,3.4vmin,28px);
+      background:#FFFFFF;border:3px solid #FBCFE8;
+      box-shadow:0 clamp(6px,1.4vmin,14px) clamp(10px,2.6vmin,24px) rgba(249,168,212,.45);
+      transition:transform .18s ease,box-shadow .18s ease;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.2vmin,12px);">
+      <span style="font-size:clamp(32px,8vmin,72px);">👥</span>
+      <span style="font-size:clamp(16px,3.4vmin,28px);font-weight:800;color:#be185d;">雙人競賽</span>
+      <span style="font-size:clamp(10px,2vmin,16px);color:#f472b6;line-height:1.5;">左右分屏同場對決<br>誰先猜完誰獲勝！</span>
+    </button>
+  </div>
+
+  <style>
+    @keyframes titleBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-1vmin)} }
+    #screen-home button:hover { transform:scale(1.07) rotate(-1deg); }
+    #screen-home button:active { transform:scale(.96); }
+  </style>
+</div>
+
+<!-- ════════════════ SCREEN: CATEGORY ════════════════ -->
+<div id="screen-category" class="screen" style="z-index:1;overflow-y:auto;justify-content:flex-start;padding-top:clamp(20px,5vmin,50px);">
+  <h2 style="font-size:clamp(20px,5vmin,42px);font-weight:800;color:#1d4ed8;margin-bottom:clamp(4px,1vmin,10px);text-align:center;">
+    🔡 選擇單字類別
+  </h2>
+  <p id="cat-subtitle" style="font-size:clamp(12px,2.2vmin,18px);color:#60a5fa;font-weight:700;margin-bottom:clamp(16px,3vmin,32px);text-align:center;">
+    選擇你想練習的英文單字類別
+  </p>
+
+  <div id="cat-grid" style="display:flex;flex-wrap:wrap;gap:clamp(8px,2vmin,18px);justify-content:center;max-width:140vmin;width:100%;margin-bottom:clamp(10px,2vmin,20px);padding:0 clamp(8px,2vmin,20px);"></div>
+
+  <button onclick="selectCategory('all')" class="cat-btn"
+    style="background:linear-gradient(135deg,#0ea5e9,#38bdf8);justify-content:center;
+           min-width:clamp(200px,40vmin,360px);font-size:clamp(15px,3.4vmin,28px);
+           margin-bottom:clamp(12px,2.5vmin,24px);">
+    <span style="font-size:clamp(18px,4vmin,32px);">🌟</span><span>全部類別混合</span>
+  </button>
+
+  <button onclick="showScreen('home')"
+    style="background:#fff;border:2px solid #bae6fd;border-radius:50px;
+           padding:clamp(8px,1.4vmin,14px) clamp(20px,4vmin,40px);
+           font-size:clamp(12px,2.4vmin,20px);font-weight:700;color:#60a5fa;
+           box-shadow:0 .5vmin 1.2vmin rgba(147,197,253,.35);cursor:pointer;
+           transition:transform .15s;margin-bottom:clamp(16px,3vmin,32px);"
+    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    ← 回主畫面
+  </button>
+</div>
+
+<!-- ════════════════ SCREEN: GAME (Single) ════════════════ -->
+<div id="screen-game" class="screen">
+  <div class="w-full max-w-3xl flex items-center justify-between px-2" style="margin-bottom:clamp(4px,1.5vh,16px)">
+    <div class="flex flex-col items-start gap-1">
+      <button onclick="showScreen('home')"
+        class="text-sky-400 hover:text-sky-600 font-bold text-xs bg-white border border-sky-200 rounded-xl px-3 py-1 transition-colors cursor-pointer"
+        style="box-shadow:0 2px 0 #bae6fd;">← 回選單</button>
+      <div id="hearts-display" class="flex gap-1"></div>
+    </div>
+    <div class="text-center">
+      <div class="text-sky-400 font-bold text-sm">第 <span id="word-count">1</span> / <span id="word-total">10</span> 題</div>
+      <div class="text-sky-600 text-xs font-bold" id="category-name-badge"></div>
+    </div>
+    <div class="text-right">
+      <div class="text-sky-400 text-xs font-bold">得分</div>
+      <div class="text-2xl font-black text-sky-600" id="single-score">0</div>
+    </div>
+  </div>
+  <div class="text-center" style="margin-bottom:clamp(4px,1.5vh,12px)">
+    <div style="font-size:clamp(2rem,8vw,3rem);line-height:1.2;margin-bottom:2px" id="word-emoji">🔤</div>
+    <div style="font-size:clamp(0.9rem,3.5vw,1.125rem)" class="text-sky-500 font-bold">提示：<span id="word-hint" class="text-sky-800 font-black"></span></div>
+  </div>
+  <div id="word-display" class="flex flex-wrap justify-center max-w-3xl w-full px-2" style="margin-bottom:clamp(4px,1.5vh,16px)"></div>
+  <div id="wrong-letters-bar" class="text-slate-400 text-sm font-bold text-center" style="min-height:1.2rem;margin-bottom:clamp(2px,1vh,12px)"></div>
+  <div id="keyboard" style="max-width:680px;width:100%;padding:0 8px;">
+    <div class="key-row" id="key-row-1"></div>
+    <div class="key-row" id="key-row-2"></div>
+    <div class="key-row" id="key-row-3"></div>
+  </div>
+</div>
+
+<!-- ════════════════ SCREEN: DUAL GAME (Split) ════════════════ -->
+<div id="screen-dual-game" class="screen">
+<div class="dual-container">
+
+  <!-- ═══ PLAYER 1 (Left) ═══ -->
+  <div class="dual-side p1-side">
+
+    <!-- Player Header -->
+    <div class="dual-player-header">
+      <div style="font-size:clamp(1rem,1.8vw,1.4rem);font-weight:900;color:#1d4ed8;">🔵 玩家 1</div>
+      <div id="p1-hearts" class="dual-hearts"></div>
+      <div style="text-align:right;">
+        <div style="color:#94a3b8;font-size:0.75rem;font-weight:700;">得分</div>
+        <div id="p1-dual-score" style="color:#1d4ed8;font-weight:900;font-size:clamp(1.2rem,2.5vw,1.8rem);">0</div>
+      </div>
+    </div>
+
+    <!-- Wins row -->
+    <div style="text-align:center;color:#60a5fa;font-weight:800;font-size:0.8rem;margin-bottom:4px;" id="p1-wins-row">0 局勝</div>
+
+    <!-- Status banner (hidden until win/fail) -->
+    <div id="p1-status-banner" class="dual-status-banner"></div>
+
+    <!-- Tiles -->
+    <div id="p1-tiles" class="dual-tiles"></div>
+
+    <!-- Wrong letters -->
+    <div id="p1-wrong-bar" class="dual-wrong-bar"></div>
+
+    <!-- Keyboard with fail overlay wrapper -->
+    <div class="dual-kb-wrapper">
+      <div id="p1-keyboard" class="dual-keyboard-wrap">
+        <div class="dual-key-row" id="p1-row-1"></div>
+        <div class="dual-key-row" id="p1-row-2"></div>
+        <div class="dual-key-row" id="p1-row-3"></div>
+      </div>
+      <div id="p1-fail-overlay" class="dual-fail-overlay"></div>
+    </div>
+
+  </div><!-- /p1-side -->
+
+  <!-- ═══ CENTER STRIP ═══ -->
+  <div class="dual-center">
+    <div style="color:rgba(255,255,255,0.8);font-weight:800;font-size:clamp(0.7rem,1.1vw,0.95rem);text-align:center;">
+      第 <span id="dc-round">1</span>/<span id="dc-total">5</span> 題
+    </div>
+    <div id="dc-emoji" style="font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;">🔤</div>
+    <div style="width:100%;height:2px;background:rgba(255,255,255,0.3);border-radius:2px;"></div>
+    <div id="dc-hint" style="color:white;font-weight:900;font-size:clamp(0.85rem,1.5vw,1.15rem);text-align:center;word-break:break-all;line-height:1.3;"></div>
+    <div style="width:100%;height:2px;background:rgba(255,255,255,0.3);border-radius:2px;"></div>
+    <div style="color:rgba(255,255,255,0.6);font-size:1.4rem;">⚔️</div>
+    <div style="display:flex;flex-direction:column;gap:4px;width:100%;align-items:center;">
+      <div style="display:flex;justify-content:space-between;width:100%;padding:0 4px;">
+        <div style="color:white;font-weight:900;font-size:clamp(0.75rem,1.2vw,0.95rem);">🔵 P1</div>
+        <div id="dc-p1-wins" style="color:#fde68a;font-weight:900;font-size:clamp(0.85rem,1.4vw,1.1rem);">0 勝</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;width:100%;padding:0 4px;">
+        <div style="color:white;font-weight:900;font-size:clamp(0.75rem,1.2vw,0.95rem);">🩷 P2</div>
+        <div id="dc-p2-wins" style="color:#fde68a;font-weight:900;font-size:clamp(0.85rem,1.4vw,1.1rem);">0 勝</div>
+      </div>
+    </div>
+    <div style="width:100%;height:2px;background:rgba(255,255,255,0.3);border-radius:2px;"></div>
+    <div style="color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:700;text-align:center;">先猜完者獲勝</div>
+    <button onclick="showScreen('home')"
+      style="margin-top:6px;background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.4);border-radius:12px;padding:5px 10px;font-size:clamp(0.6rem,0.9vw,0.8rem);font-weight:800;cursor:pointer;width:100%;transition:background 0.2s;"
+      onmouseover="this.style.background='rgba(255,255,255,0.28)'"
+      onmouseout="this.style.background='rgba(255,255,255,0.15)'">← 回選單</button>
+  </div>
+
+  <!-- ═══ PLAYER 2 (Right) ═══ -->
+  <div class="dual-side p2-side">
+
+    <!-- Player Header -->
+    <div class="dual-player-header">
+      <div style="text-align:left;">
+        <div style="color:#94a3b8;font-size:0.75rem;font-weight:700;">得分</div>
+        <div id="p2-dual-score" style="color:#be185d;font-weight:900;font-size:clamp(1.2rem,2.5vw,1.8rem);">0</div>
+      </div>
+      <div id="p2-hearts" class="dual-hearts"></div>
+      <div style="font-size:clamp(1rem,1.8vw,1.4rem);font-weight:900;color:#be185d;">玩家 2 🩷</div>
+    </div>
+
+    <!-- Wins row -->
+    <div style="text-align:center;color:#f472b6;font-weight:800;font-size:0.8rem;margin-bottom:4px;" id="p2-wins-row">0 局勝</div>
+
+    <!-- Status banner -->
+    <div id="p2-status-banner" class="dual-status-banner"></div>
+
+    <!-- Tiles -->
+    <div id="p2-tiles" class="dual-tiles"></div>
+
+    <!-- Wrong letters -->
+    <div id="p2-wrong-bar" class="dual-wrong-bar"></div>
+
+    <!-- Keyboard -->
+    <div class="dual-kb-wrapper">
+      <div id="p2-keyboard" class="dual-keyboard-wrap">
+        <div class="dual-key-row" id="p2-row-1"></div>
+        <div class="dual-key-row" id="p2-row-2"></div>
+        <div class="dual-key-row" id="p2-row-3"></div>
+      </div>
+      <div id="p2-fail-overlay" class="dual-fail-overlay"></div>
+    </div>
+
+  </div><!-- /p2-side -->
+
+</div><!-- /dual-container -->
+</div><!-- /screen-dual-game -->
+
+<!-- ════════════════ SCREEN: RESULT ════════════════ -->
+<div id="screen-result" class="screen">
+  <div id="result-emoji-big" class="text-8xl mb-4 pop-in">🎉</div>
+  <div id="result-title" class="text-4xl font-black mb-3 text-sky-600"></div>
+  <div id="result-answer-word" class="text-4xl font-black text-sky-800 tracking-widest mb-1"></div>
+  <div id="result-answer-hint" class="text-xl text-sky-500 font-bold mb-6"></div>
+
+  <!-- Single -->
+  <div id="single-round-result" class="bg-sky-50 border-2 border-sky-200 rounded-2xl px-8 py-4 text-center mb-6">
+    <div id="round-pts-text" class="text-2xl font-black text-sky-600"></div>
+    <div id="round-wrong-text" class="text-sm text-sky-400 font-bold mt-1"></div>
+  </div>
+
+  <!-- Dual -->
+  <div id="dual-round-result" class="text-center mb-6" style="display:none">
+    <div id="round-winner-banner" class="text-2xl font-black mb-4 px-6 py-3 rounded-2xl"></div>
+    <div class="flex gap-10 justify-center">
+      <div class="text-center">
+        <div class="text-blue-500 font-bold text-sm mb-1">玩家 1 猜出</div>
+        <div class="text-4xl font-black text-blue-700" id="p1-round-count">0</div>
+        <div class="text-blue-400 text-xs">個字母</div>
+      </div>
+      <div class="text-center self-center text-2xl text-slate-300 font-black">vs</div>
+      <div class="text-center">
+        <div class="text-pink-500 font-bold text-sm mb-1">玩家 2 猜出</div>
+        <div class="text-4xl font-black text-pink-700" id="p2-round-count">0</div>
+        <div class="text-pink-400 text-xs">個字母</div>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="nextRound()" class="big-btn btn-sky">繼續 →</button>
+</div>
+
+<!-- ════════════════ SCREEN: GAME OVER ════════════════ -->
+<div id="screen-gameover" class="screen">
+  <div id="go-icon" class="text-8xl mb-4 floating">🏆</div>
+  <h2 id="go-title" class="text-4xl font-black mb-6 text-sky-600"></h2>
+
+  <!-- Single final -->
+  <div id="single-go">
+    <div class="text-center mb-8">
+      <div class="text-sky-400 font-bold mb-1">最終得分</div>
+      <div class="text-7xl font-black text-sky-600 my-2" id="final-score">0</div>
+      <div class="text-sky-500 font-bold mb-4" id="final-words-text"></div>
+      <div id="rank-badge" class="inline-block px-6 py-3 rounded-2xl font-black text-lg"></div>
+    </div>
+  </div>
+
+  <!-- Dual final -->
+  <div id="dual-go" style="display:none" class="text-center mb-8">
+    <div id="go-winner-text" class="text-3xl font-black mb-6"></div>
+    <div class="flex gap-8 justify-center mb-4">
+      <div id="go-p1-box" style="background:#dbeafe;border:3px solid #93c5fd;border-radius:20px;padding:12px 24px;text-align:center;">
+        <div style="color:#1d4ed8;font-weight:900;margin-bottom:4px;">🔵 玩家 1</div>
+        <div id="go-p1-score" style="color:#1d4ed8;font-size:3rem;font-weight:900;">0</div>
+        <div id="go-p1-wins" style="color:#60a5fa;font-size:0.9rem;font-weight:800;margin-top:4px;">0 局勝</div>
+      </div>
+      <div id="go-p2-box" style="background:#fce7f3;border:3px solid #f9a8d4;border-radius:20px;padding:12px 24px;text-align:center;">
+        <div style="color:#be185d;font-weight:900;margin-bottom:4px;">玩家 2 🩷</div>
+        <div id="go-p2-score" style="color:#be185d;font-size:3rem;font-weight:900;">0</div>
+        <div id="go-p2-wins" style="color:#f472b6;font-size:0.9rem;font-weight:800;margin-top:4px;">0 局勝</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-4 flex-wrap justify-center">
+    <button onclick="replayGame()" class="big-btn btn-sky">🔄 再玩一次</button>
+    <button onclick="showScreen('home')" class="big-btn btn-ghost">🏠 回選單</button>
+  </div>
+</div>
+
+<!-- ════════════════ JAVASCRIPT ════════════════ -->
+<script>
+/* ── QWERTY ── */
+const ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['Z','X','C','V','B','N','M']
+];
+
+/* ── Game State ── */
+const G = {
+  mode: 'single',
+  category: 'all',
+  words: [],
+  wordIndex: 0,
+  current: null,
+  /* Single */
+  guessed: new Set(), wrong: new Set(), maxWrong: 6,
+  singleScore: 0, wordsWon: 0, totalWords: 10,
+  /* Dual */
+  p1Guessed: new Set(), p1Wrong: new Set(),
+  p2Guessed: new Set(), p2Wrong: new Set(),
+  p1Failed: false, p2Failed: false,
+  p1Score: 0, p2Score: 0,
+  p1Wins: 0, p2Wins: 0,
+  dualTotal: 5,
+  roundEnded: false,
+};
+
+/* ── Screen ── */
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+/* ── Utilities ── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ── Category Grid ── */
+function populateCategoryGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  Object.entries(WORD_BANK).forEach(([name, data]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn';
+    btn.style.background = data.color;
+    btn.innerHTML = `
+      <span style="font-size:clamp(18px,4vmin,32px);line-height:1;">${data.icon}</span>
+      <span>${name}</span>
+      <span style="margin-left:auto;opacity:0.75;font-size:clamp(10px,1.8vmin,15px);font-weight:700;">${data.words.length}詞</span>
+    `;
+    btn.onclick = () => selectCategory(name);
+    grid.appendChild(btn);
+  });
+}
+
+/* ── Mode Select ── */
+function selectMode(mode) {
+  G.mode = mode;
+  populateCategoryGrid();
+  document.getElementById('cat-subtitle').textContent =
+    mode === 'single' ? '選擇你想練習的英文單字類別' : '選擇雙人競賽的單字類別';
+  showScreen('category');
+}
+
+/* ── Category Select ── */
+function selectCategory(cat) {
+  G.category = cat;
+  let pool = cat === 'all'
+    ? Object.values(WORD_BANK).flatMap(d => d.words)
+    : [...WORD_BANK[cat].words];
+  pool = shuffle(pool);
+
+  if (G.mode === 'single') {
+    G.totalWords = Math.min(10, pool.length);
+    G.words = pool.slice(0, G.totalWords);
+    G.singleScore = 0; G.wordsWon = 0;
+  } else {
+    G.dualTotal = Math.min(5, pool.length);
+    G.words = pool.slice(0, G.dualTotal);
+    G.p1Score = 0; G.p2Score = 0;
+    G.p1Wins = 0; G.p2Wins = 0;
+  }
+  G.wordIndex = 0;
+
+  if (G.mode === 'single') { buildSingleKeyboard(); showScreen('game'); }
+  else                      { buildDualKeyboards();  showScreen('dual-game'); }
+
+  startRound();
+}
+
+/* ════════════════════════════════════
+   SINGLE PLAYER
+════════════════════════════════════ */
+function buildSingleKeyboard() {
+  document.getElementById('word-total').textContent = G.totalWords;
+  const catLabel = G.category === 'all' ? '🌟 全部混合' : (WORD_BANK[G.category]?.icon + ' ' + G.category);
+  document.getElementById('category-name-badge').textContent = catLabel;
+  ROWS.forEach((row, ri) => {
+    const el = document.getElementById('key-row-' + (ri + 1));
+    el.innerHTML = '';
+    row.forEach(letter => {
+      const btn = document.createElement('button');
+      btn.id = 'key-' + letter;
+      btn.className = 'key-btn';
+      btn.textContent = letter;
+      btn.onclick = () => singleGuess(letter);
+      el.appendChild(btn);
+    });
+  });
+}
+
+function singleRenderTiles() {
+  const wrap = document.getElementById('word-display');
+  wrap.innerHTML = '';
+  G.current.word.split('').forEach((ch, i) => {
+    const t = document.createElement('div');
+    if (ch === ' ') { t.className = 'word-tile space'; }
+    else {
+      t.className = 'word-tile' + (G.guessed.has(ch) ? '' : ' blank');
+      t.textContent = ch; t.id = 'stile-' + i;
+    }
+    wrap.appendChild(t);
+  });
+}
+
+function singleReveal(letter) {
+  G.current.word.split('').forEach((ch, i) => {
+    if (ch === letter) {
+      const t = document.getElementById('stile-' + i);
+      if (t) { t.classList.remove('blank'); t.classList.add('pop-in'); setTimeout(() => t.classList.remove('pop-in'), 400); }
+    }
+  });
+}
+
+function refreshSingleHearts() {
+  const c = document.getElementById('hearts-display');
+  c.innerHTML = '';
+  const remaining = G.maxWrong - G.wrong.size;
+  for (let i = 0; i < G.maxWrong; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart' + (i < remaining ? '' : ' lost');
+    h.textContent = '❤️'; c.appendChild(h);
+  }
+}
+
+function singleGuess(letter) {
+  if (G.guessed.has(letter) || G.wrong.has(letter)) return;
+  const btn = document.getElementById('key-' + letter);
+  if (!btn || btn.disabled) return;
+
+  if (G.current.word.includes(letter)) {
+    G.guessed.add(letter);
+    btn.className = 'key-btn used-correct';
+    btn.disabled = true;
+    singleReveal(letter);
+    if ([...G.current.word].every(ch => ch === ' ' || G.guessed.has(ch))) {
+      setTimeout(() => finishSingleRound(true), 600);
+    }
+  } else {
+    G.wrong.add(letter);
+    btn.className = 'key-btn used-wrong'; btn.disabled = true;
+    const wrap = document.getElementById('word-display');
+    wrap.classList.add('shake'); setTimeout(() => wrap.classList.remove('shake'), 450);
+    refreshSingleHearts();
+    const wArr = [...G.wrong];
+    document.getElementById('wrong-letters-bar').textContent = wArr.length ? '❌ 試過：' + wArr.join('  ') : '';
+    if (G.wrong.size >= G.maxWrong) setTimeout(() => finishSingleRound(false), 500);
+  }
+}
+
+function finishSingleRound(won) {
+  const word = G.current.word;
+  document.getElementById('result-answer-word').textContent = word;
+  document.getElementById('result-answer-hint').textContent = G.current.hint + '  ' + G.current.emoji;
+  document.getElementById('single-round-result').style.display = 'block';
+  document.getElementById('dual-round-result').style.display = 'none';
+
+  if (won) {
+    const wc = G.wrong.size;
+    const pts = Math.max(5, 10 - wc);
+    G.singleScore += pts; G.wordsWon++;
+    document.getElementById('result-emoji-big').textContent = wc === 0 ? '🌟' : '🎉';
+    document.getElementById('result-title').textContent = wc === 0 ? '完美！零錯誤！' : '猜對了！真棒！';
+    document.getElementById('result-title').style.color = '#0369a1';
+    document.getElementById('round-pts-text').textContent = '+' + pts + ' 分';
+    document.getElementById('round-wrong-text').textContent = '錯誤次數：' + wc + ' 次';
+    spawnConfetti();
+  } else {
+    // Reveal all blanks
+    word.split('').forEach((ch, i) => {
+      const t = document.getElementById('stile-' + i);
+      if (t) t.classList.remove('blank');
+    });
+    document.getElementById('result-emoji-big').textContent = '😅';
+    document.getElementById('result-title').textContent = '沒猜出來…';
+    document.getElementById('result-title').style.color = '#f97316';
+    document.getElementById('round-pts-text').textContent = '+0 分';
+    document.getElementById('round-wrong-text').textContent = '加油！下次一定行 💪';
+  }
+  showScreen('result');
+}
+
+/* ════════════════════════════════════
+   DUAL PLAYER (Split Screen)
+════════════════════════════════════ */
+function buildDualKeyboards() {
+  [1, 2].forEach(p => {
+    ROWS.forEach((row, ri) => {
+      const el = document.getElementById('p' + p + '-row-' + (ri + 1));
+      el.innerHTML = '';
+      row.forEach(letter => {
+        const btn = document.createElement('button');
+        btn.id = 'dkey-p' + p + '-' + letter;
+        btn.className = 'dkey ' + (p === 1 ? 'p1-key' : 'p2-key');
+        btn.textContent = letter;
+        btn.onclick = () => dualGuess(p, letter);
+        el.appendChild(btn);
+      });
+    });
+  });
+}
+
+function dualRenderTiles(player) {
+  const wrap = document.getElementById('p' + player + '-tiles');
+  wrap.innerHTML = '';
+  const cls = player === 1 ? 'p1-tile' : 'p2-tile';
+  const guessed = player === 1 ? G.p1Guessed : G.p2Guessed;
+  G.current.word.split('').forEach((ch, i) => {
+    const t = document.createElement('div');
+    if (ch === ' ') { t.style.width = '14px'; }
+    else {
+      t.className = 'dtile ' + cls + (guessed.has(ch) ? '' : ' blank');
+      t.textContent = ch;
+      t.id = 'dtile-p' + player + '-' + i;
+    }
+    wrap.appendChild(t);
+  });
+}
+
+function dualReveal(player, letter) {
+  const guessed = player === 1 ? G.p1Guessed : G.p2Guessed;
+  G.current.word.split('').forEach((ch, i) => {
+    if (ch === letter) {
+      const t = document.getElementById('dtile-p' + player + '-' + i);
+      if (t) {
+        t.classList.remove('blank');
+        t.classList.add('pop-in');
+        setTimeout(() => t.classList.remove('pop-in'), 400);
+      }
+    }
+  });
+}
+
+function refreshDualHearts(player) {
+  const wrong = player === 1 ? G.p1Wrong : G.p2Wrong;
+  const container = document.getElementById('p' + player + '-hearts');
+  container.innerHTML = '';
+  const remaining = G.maxWrong - wrong.size;
+  for (let i = 0; i < G.maxWrong; i++) {
+    const h = document.createElement('span');
+    h.className = 'dual-heart' + (i < remaining ? '' : ' lost');
+    h.textContent = '❤️';
+    container.appendChild(h);
+  }
+}
+
+function refreshDualCenter() {
+  document.getElementById('dc-round').textContent  = G.wordIndex + 1;
+  document.getElementById('dc-total').textContent  = G.dualTotal;
+  document.getElementById('dc-emoji').textContent  = G.current.emoji;
+  document.getElementById('dc-hint').textContent   = G.current.hint;
+  document.getElementById('dc-p1-wins').textContent = G.p1Wins + ' 勝';
+  document.getElementById('dc-p2-wins').textContent = G.p2Wins + ' 勝';
+  document.getElementById('p1-wins-row').textContent = G.p1Wins + ' 局勝';
+  document.getElementById('p2-wins-row').textContent = G.p2Wins + ' 局勝';
+  document.getElementById('p1-dual-score').textContent = G.p1Score;
+  document.getElementById('p2-dual-score').textContent = G.p2Score;
+}
+
+function dualGuess(player, letter) {
+  if (G.roundEnded) return;
+  const guessed = player === 1 ? G.p1Guessed : G.p2Guessed;
+  const wrong   = player === 1 ? G.p1Wrong   : G.p2Wrong;
+  const failed  = player === 1 ? G.p1Failed  : G.p2Failed;
+  if (failed || guessed.has(letter) || wrong.has(letter)) return;
+
+  const btn = document.getElementById('dkey-p' + player + '-' + letter);
+  if (!btn || btn.disabled) return;
+
+  if (G.current.word.includes(letter)) {
+    guessed.add(letter);
+    btn.classList.add('k-correct'); btn.disabled = true;
+    dualReveal(player, letter);
+
+    if (player === 1) G.p1Score++;
+    else              G.p2Score++;
+
+    refreshDualCenter();
+
+    // Check win
+    if ([...G.current.word].every(ch => ch === ' ' || guessed.has(ch))) {
+      G.roundEnded = true;
+      // winner glow
+      const side = document.querySelector('.p' + player + '-side');
+      if (side) side.style.boxShadow = 'inset 0 0 60px rgba(250,204,21,0.4)';
+      setTimeout(() => finishDualRound(player, false), 700);
+    }
+  } else {
+    wrong.add(letter);
+    btn.classList.add('k-wrong'); btn.disabled = true;
+
+    const tiles = document.getElementById('p' + player + '-tiles');
+    tiles.classList.add('shake');
+    setTimeout(() => tiles.classList.remove('shake'), 450);
+
+    refreshDualHearts(player);
+    const wArr = [...wrong];
+    document.getElementById('p' + player + '-wrong-bar').textContent =
+      wArr.length ? '❌ ' + wArr.join('  ') : '';
+
+    if (wrong.size >= G.maxWrong) {
+      if (player === 1) G.p1Failed = true;
+      else              G.p2Failed = true;
+      setPlayerFailed(player);
+
+      if (G.p1Failed && G.p2Failed) {
+        G.roundEnded = true;
+        setTimeout(() => {
+          const w = G.p1Guessed.size > G.p2Guessed.size ? 1
+                  : G.p2Guessed.size > G.p1Guessed.size ? 2 : 0;
+          finishDualRound(w, true);
+        }, 800);
+      }
+    }
+  }
+}
+
+function setPlayerFailed(player) {
+  const guessed = player === 1 ? G.p1Guessed : G.p2Guessed;
+  // Reveal missed tiles in red
+  G.current.word.split('').forEach((ch, i) => {
+    if (ch !== ' ' && !guessed.has(ch)) {
+      const t = document.getElementById('dtile-p' + player + '-' + i);
+      if (t) { t.classList.remove('blank'); t.classList.add('miss-tile'); }
+    }
+  });
+  // Dim keyboard
+  document.querySelectorAll('#p' + player + '-keyboard .dkey').forEach(b => {
+    if (!b.classList.contains('k-correct')) { b.disabled = true; }
+  });
+  // Show banner
+  const banner = document.getElementById('p' + player + '-status-banner');
+  banner.className = 'dual-status-banner fail-banner';
+  banner.textContent = '💔 用完機會了！等對方猜…';
+  banner.style.display = 'flex';
+}
+
+function finishDualRound(winner, bothFailed) {
+  const word = G.current.word;
+  document.getElementById('result-answer-word').textContent = word;
+  document.getElementById('result-answer-hint').textContent = G.current.hint + '  ' + G.current.emoji;
+  document.getElementById('single-round-result').style.display = 'none';
+  document.getElementById('dual-round-result').style.display = 'block';
+  document.getElementById('p1-round-count').textContent = G.p1Guessed.size;
+  document.getElementById('p2-round-count').textContent = G.p2Guessed.size;
+
+  const banner = document.getElementById('round-winner-banner');
+  if (winner === 1) {
+    G.p1Wins++;
+    document.getElementById('result-emoji-big').textContent = bothFailed ? '🔵' : '🏆';
+    document.getElementById('result-title').textContent = bothFailed ? '玩家 1 猜得較多！' : '玩家 1 率先完成！';
+    document.getElementById('result-title').style.color = '#1d4ed8';
+    banner.textContent = '🔵 玩家 1 贏得這局！';
+    banner.style.cssText = 'background:#dbeafe;color:#1d4ed8;';
+  } else if (winner === 2) {
+    G.p2Wins++;
+    document.getElementById('result-emoji-big').textContent = bothFailed ? '🩷' : '🏆';
+    document.getElementById('result-title').textContent = bothFailed ? '玩家 2 猜得較多！' : '玩家 2 率先完成！';
+    document.getElementById('result-title').style.color = '#be185d';
+    banner.textContent = '🩷 玩家 2 贏得這局！';
+    banner.style.cssText = 'background:#fce7f3;color:#be185d;';
+  } else {
+    document.getElementById('result-emoji-big').textContent = '🤝';
+    document.getElementById('result-title').textContent = '平手！勢均力敵！';
+    document.getElementById('result-title').style.color = '#0369a1';
+    banner.textContent = '🤝 本局平手！';
+    banner.style.cssText = 'background:#f0fdf4;color:#15803d;';
+  }
+
+  if (!bothFailed) spawnConfetti();
+  showScreen('result');
+}
+
+/* ════════════════════════════════════
+   SHARED ROUND START
+════════════════════════════════════ */
+function startRound() {
+  G.current = G.words[G.wordIndex];
+  G.roundEnded = false;
+
+  if (G.mode === 'single') {
+    G.guessed = new Set(); G.wrong = new Set();
+    document.getElementById('word-count').textContent = G.wordIndex + 1;
+    document.getElementById('single-score').textContent = G.singleScore;
+    document.getElementById('word-emoji').textContent = G.current.emoji;
+    document.getElementById('word-hint').textContent  = G.current.hint;
+    document.getElementById('wrong-letters-bar').textContent = '';
+    refreshSingleHearts();
+    singleRenderTiles();
+    // Reset single keyboard
+    ROWS.flat().forEach(letter => {
+      const btn = document.getElementById('key-' + letter);
+      if (btn) { btn.className = 'key-btn'; btn.disabled = false; }
+    });
+  } else {
+    G.p1Guessed = new Set(); G.p1Wrong = new Set(); G.p1Failed = false;
+    G.p2Guessed = new Set(); G.p2Wrong = new Set(); G.p2Failed = false;
+
+    // Reset side styles
+    document.querySelector('.p1-side').style.boxShadow = '';
+    document.querySelector('.p2-side').style.boxShadow = '';
+
+    // Reset banners
+    ['p1','p2'].forEach(p => {
+      const b = document.getElementById(p + '-status-banner');
+      b.style.display = 'none'; b.textContent = '';
+      document.getElementById(p + '-wrong-bar').textContent = '';
+    });
+
+    // Reset fail overlays
+    ['p1-fail-overlay','p2-fail-overlay'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+    refreshDualCenter();
+    refreshDualHearts(1);
+    refreshDualHearts(2);
+    dualRenderTiles(1);
+    dualRenderTiles(2);
+
+    // Reset dual keyboards
+    [1, 2].forEach(p => {
+      ROWS.flat().forEach(letter => {
+        const btn = document.getElementById('dkey-p' + p + '-' + letter);
+        if (btn) {
+          btn.className = 'dkey ' + (p === 1 ? 'p1-key' : 'p2-key');
+          btn.disabled = false;
+          btn.style.opacity = '';
+        }
+      });
+    });
+  }
+}
+
+/* ── Next Round ── */
+function nextRound() {
+  G.wordIndex++;
+  const total = G.mode === 'single' ? G.totalWords : G.dualTotal;
+  if (G.wordIndex >= total) {
+    showGameOver();
+  } else {
+    startRound();
+    showScreen(G.mode === 'single' ? 'game' : 'dual-game');
+  }
+}
+
+/* ════════════════════════════════════
+   GAME OVER
+════════════════════════════════════ */
+function showGameOver() {
+  if (G.mode === 'single') {
+    document.getElementById('single-go').style.display = 'block';
+    document.getElementById('dual-go').style.display   = 'none';
+    document.getElementById('final-score').textContent = G.singleScore;
+    document.getElementById('final-words-text').textContent = `成功猜出 ${G.wordsWon} / ${G.totalWords} 個單字`;
+    const pct = G.wordsWon / G.totalWords;
+    const rank = document.getElementById('rank-badge');
+    if (pct === 1) {
+      rank.textContent = '🏆 完美表現！你是字母尋寶王！';
+      rank.style.cssText = 'background:#fef9c3;color:#92400e;';
+      document.getElementById('go-icon').textContent = '🏆';
+    } else if (pct >= 0.8) {
+      rank.textContent = '🌟 非常棒！繼續努力！';
+      rank.style.cssText = 'background:#e0f2fe;color:#0369a1;';
+      document.getElementById('go-icon').textContent = '🌟';
+    } else if (pct >= 0.5) {
+      rank.textContent = '👍 不錯！再接再厲！';
+      rank.style.cssText = 'background:#f0fdf4;color:#15803d;';
+      document.getElementById('go-icon').textContent = '👍';
+    } else {
+      rank.textContent = '💪 加油！多練習就會進步！';
+      rank.style.cssText = 'background:#fff7ed;color:#c2410c;';
+      document.getElementById('go-icon').textContent = '💪';
+    }
+    document.getElementById('go-title').textContent = '遊戲結束！';
+
+  } else {
+    document.getElementById('single-go').style.display = 'none';
+    document.getElementById('dual-go').style.removeProperty('display');
+    document.getElementById('go-p1-score').textContent = G.p1Score;
+    document.getElementById('go-p2-score').textContent = G.p2Score;
+    document.getElementById('go-p1-wins').textContent  = G.p1Wins + ' 局勝';
+    document.getElementById('go-p2-wins').textContent  = G.p2Wins + ' 局勝';
+
+    const wt = document.getElementById('go-winner-text');
+    const p1b = document.getElementById('go-p1-box');
+    const p2b = document.getElementById('go-p2-box');
+    p1b.style.removeProperty('box-shadow'); p2b.style.removeProperty('box-shadow');
+
+    if (G.p1Wins > G.p2Wins) {
+      wt.textContent = '🏆 玩家 1 獲勝！恭喜！'; wt.style.color = '#1d4ed8';
+      p1b.style.boxShadow = '0 0 0 4px #fde68a'; p1b.style.border = '3px solid #fde68a';
+      document.getElementById('go-icon').textContent = '🏆';
+    } else if (G.p2Wins > G.p1Wins) {
+      wt.textContent = '🏆 玩家 2 獲勝！恭喜！'; wt.style.color = '#be185d';
+      p2b.style.boxShadow = '0 0 0 4px #fde68a'; p2b.style.border = '3px solid #fde68a';
+      document.getElementById('go-icon').textContent = '🏆';
+    } else {
+      wt.textContent = '🤝 雙方平手！都很厲害！'; wt.style.color = '#0369a1';
+      document.getElementById('go-icon').textContent = '🤝';
+    }
+    document.getElementById('go-title').textContent = '對戰結束！';
+  }
+
+  showScreen('gameover');
+  spawnConfetti(40);
+}
+
+function replayGame() { selectCategory(G.category); }
+
+/* ── Confetti ── */
+function spawnConfetti(n = 24) {
+  const colors = ['#0ea5e9','#38bdf8','#f472b6','#fbbf24','#34d399','#a78bfa','#fb923c'];
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      const size = 8 + Math.random() * 10;
+      el.style.cssText = `left:${5+Math.random()*90}vw;top:${5+Math.random()*20}vh;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'3px'};animation-delay:${Math.random()*.5}s;animation-duration:${.9+Math.random()*.8}s;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }, i * 40);
+  }
+}
+
+/* ════════════════════════════════════
+   自訂題庫載入
+════════════════════════════════════ */
+let _defaultWordBank = null; // 保存預設題庫備份
+
+function handleBankFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  // 清除 input 值，讓同一個檔案可以重複載入
+  event.target.value = '';
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target.result;
+    try {
+      let newBank;
+      if (file.name.toLowerCase().endsWith('.json')) {
+        // JSON 格式
+        newBank = JSON.parse(content);
+      } else {
+        // JS 格式：與 words.js 相同，取出 WORD_BANK 變數
+        const cleaned = content.replace(/\bconst\b|\blet\b/g, 'var');
+        const fn = new Function(cleaned + '\nreturn WORD_BANK;');
+        newBank = fn();
+      }
+
+      // 基本結構驗證
+      if (!newBank || typeof newBank !== 'object' || Array.isArray(newBank))
+        throw new Error('題庫格式錯誤：根物件必須為 Object');
+      const cats = Object.entries(newBank);
+      if (cats.length === 0)
+        throw new Error('題庫為空，請確認格式');
+      cats.forEach(([name, data]) => {
+        if (!Array.isArray(data.words) || data.words.length === 0)
+          throw new Error(`「${name}」類別缺少 words 陣列`);
+        data.words.forEach((w, i) => {
+          if (!w.word || !w.hint)
+            throw new Error(`「${name}」第 ${i+1} 筆單字缺少 word 或 hint`);
+        });
+      });
+
+      // 備份預設並套用
+      if (!_defaultWordBank) _defaultWordBank = WORD_BANK;
+      WORD_BANK = newBank;
+      populateCategoryGrid();
+
+      updateBankStatus(file.name, true);
+    } catch (err) {
+      alert('❌ 載入失敗：' + err.message + '\n\n請下載範本確認格式。');
+    }
+  };
+  reader.onerror = () => alert('❌ 讀取檔案失敗，請重試。');
+  reader.readAsText(file, 'UTF-8');
+}
+
+function resetWordBank() {
+  if (!_defaultWordBank) return;
+  WORD_BANK = _defaultWordBank;
+  _defaultWordBank = null;
+  populateCategoryGrid();
+  updateBankStatus('', false);
+}
+
+function updateBankStatus(filename, isCustom) {
+  const label = document.getElementById('bank-label');
+  const resetBtn = document.getElementById('btn-reset-bank');
+  if (isCustom) {
+    label.textContent = '📂 ' + filename;
+    label.style.display = 'block';
+    if (resetBtn) resetBtn.style.display = 'flex';
+  } else {
+    label.style.display = 'none';
+    if (resetBtn) resetBtn.style.display = 'none';
+  }
+}
+
+/* ── Init ── */
+// 右上角📂按鈕
+document.getElementById('btn-bank').onclick = () => {
+  document.getElementById('bank-file-input').click();
+};
+// 🔄恢復預設按鈕
+const _resetBtn = document.getElementById('btn-reset-bank');
+if (_resetBtn) _resetBtn.onclick = resetWordBank;
+
+populateCategoryGrid();
+</script>
+</body>
+</html>

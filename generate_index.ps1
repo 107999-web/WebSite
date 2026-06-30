@@ -1,8 +1,27 @@
 $htmlsFolder = Join-Path $PSScriptRoot "Htmls"
-$files = Get-ChildItem -Path $htmlsFolder -Filter "*.html" -ErrorAction SilentlyContinue |
+
+# Top-level .html files
+$files = Get-ChildItem -Path $htmlsFolder -Filter "*.html" -File -ErrorAction SilentlyContinue |
          Sort-Object Name
 
+# Subfolders that contain an index.html become a single card pointing to that folder
+$folders = Get-ChildItem -Path $htmlsFolder -Directory -ErrorAction SilentlyContinue |
+           Where-Object { Test-Path (Join-Path $_.FullName "index.html") } |
+           Sort-Object Name
+
 $cards = ""
+foreach ($folder in $folders) {
+    $name = $folder.Name
+    $indexPath = Join-Path $folder.FullName "index.html"
+    $modified = (Get-Item $indexPath).LastWriteTime.ToString("yyyy-MM-dd HH:mm")
+    $cards += "    <a class=`"card`" href=`"./Htmls/$name/index.html`">`n"
+    $cards += "      <div class=`"card-icon`">&#128193;</div>`n"
+    $cards += "      <div class=`"card-info`">`n"
+    $cards += "        <div class=`"card-title`">$name</div>`n"
+    $cards += "        <div class=`"card-date`">$modified</div>`n"
+    $cards += "      </div>`n"
+    $cards += "    </a>`n"
+}
 foreach ($file in $files) {
     $name = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
     $modified = $file.LastWriteTime.ToString("yyyy-MM-dd HH:mm")
@@ -19,7 +38,7 @@ if ($cards -eq "") {
     $cards = "    <p class=`"empty`">&#30446;&#21069;&#27809;&#26377;&#20219;&#20309;&#32178;&#38913;&#12290;</p>`n"
 }
 
-$count = $files.Count
+$count = $files.Count + $folders.Count
 $generated = Get-Date -Format "yyyy-MM-dd HH:mm"
 
 $html = "<!DOCTYPE html>`n"

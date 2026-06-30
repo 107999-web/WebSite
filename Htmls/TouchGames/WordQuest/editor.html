@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔤 題庫編輯器 — 字母尋寶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family:'M PLUS Rounded 1c','Nunito','Microsoft JhengHei',sans-serif;
+  background: linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 50%,#F0F9FF 100%);
+  color:#1e3a5f;
+  font-size:15px;
+  line-height:1.6;
+}
+button { font-family:inherit; cursor:pointer; }
+input, textarea, select { font-family:inherit; }
+
+/* ── 圓點背景 ── */
+body::before {
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:radial-gradient(rgba(56,189,248,.10) 5px, transparent 6px);
+  background-size:64px 64px;
+}
+
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+.header {
+  position:relative; z-index:10;
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:10px 18px;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(10px);
+  border-bottom:2px solid #BFDBFE;
+  box-shadow:0 4px 16px rgba(56,189,248,.2);
+}
+.header-title {
+  font-size:1.2rem; font-weight:800; letter-spacing:.04em;
+  background:linear-gradient(135deg,#38bdf8,#6366f1);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  white-space:nowrap; flex-shrink:0;
+}
+.header-file {
+  flex:1; min-width:0;
+  font-size:.8rem; color:#64748b; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.header-btns { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; }
+
+.hbtn {
+  display:flex; align-items:center; gap:5px;
+  padding:7px 16px; border-radius:50px; border:2px solid;
+  font-size:.82rem; font-weight:800;
+  transition:transform .15s, box-shadow .15s; white-space:nowrap;
+}
+.hbtn:active { transform:scale(.94); }
+.hbtn-open   { background:#FFF; border-color:#BFDBFE; color:#2563EB;
+                box-shadow:0 3px 8px rgba(37,99,235,.15); }
+.hbtn-open:hover  { box-shadow:0 5px 14px rgba(37,99,235,.28); }
+.hbtn-save   { background:#38bdf8; border-color:#FFF; color:#FFF;
+                box-shadow:0 3px 8px rgba(56,189,248,.4); }
+.hbtn-save:hover  { box-shadow:0 5px 14px rgba(56,189,248,.6); }
+.hbtn-save:disabled { background:#CBD5E1; border-color:#FFF; color:#94A3B8; box-shadow:none; cursor:default; }
+.hbtn-saveas { background:#FFF; border-color:#A5F3FC; color:#0891b2;
+                box-shadow:0 3px 8px rgba(8,145,178,.18); }
+.hbtn-saveas:hover { box-shadow:0 5px 14px rgba(8,145,178,.32); }
+.hbtn-saveas:disabled { background:#F8FAFC; border-color:#E2E8F0; color:#CBD5E1; box-shadow:none; cursor:default; }
+.hbtn-tpl    { background:#FFF; border-color:#C4B5FD; color:#7C3AED;
+                box-shadow:0 3px 8px rgba(124,58,237,.15); }
+.hbtn-tpl:hover { box-shadow:0 5px 14px rgba(124,58,237,.28); }
+.hbtn-game   { background:#FFF; border-color:#BBF7D0; color:#16a34a;
+                box-shadow:0 3px 8px rgba(22,163,74,.12); }
+.hbtn-game:hover { box-shadow:0 5px 14px rgba(22,163,74,.28); }
+.dirty-dot { width:7px; height:7px; border-radius:50%; background:#f59e0b; display:none; }
+.dirty-dot.show { display:inline-block; }
+
+/* ══════════════════════════════
+   MAIN LAYOUT
+══════════════════════════════ */
+.app {
+  position:relative; z-index:1;
+  display:flex; height:calc(100vh - 54px);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width:220px; flex-shrink:0;
+  display:flex; flex-direction:column;
+  background:rgba(255,255,255,.6);
+  backdrop-filter:blur(6px);
+  border-right:2px solid #BFDBFE;
+  overflow:hidden;
+}
+.sidebar-head {
+  padding:12px 14px 8px;
+  font-size:.75rem; font-weight:800; color:#64748b; letter-spacing:.08em;
+  border-bottom:1.5px dashed #BFDBFE;
+}
+.cat-list {
+  flex:1; overflow-y:auto; padding:8px 8px 4px;
+  display:flex; flex-direction:column; gap:5px;
+}
+.cat-list::-webkit-scrollbar { width:5px; }
+.cat-list::-webkit-scrollbar-thumb { background:#BFDBFE; border-radius:8px; }
+
+.sbtn {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 11px; border-radius:14px; border:2px solid transparent;
+  background:transparent; color:#1e3a5f; text-align:left;
+  transition:background .15s, border-color .15s; cursor:pointer;
+}
+.sbtn:hover  { background:#EFF6FF; border-color:#BFDBFE; }
+.sbtn.active { background:#DBEAFE; border-color:#60A5FA; }
+.sbtn-icon { font-size:1.25rem; flex-shrink:0; }
+.sbtn-name { flex:1; font-size:.85rem; font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sbtn-cnt  { font-size:.7rem; background:#BFDBFE; color:#1D4ED8; border-radius:50px; padding:1px 8px; font-weight:800; flex-shrink:0; }
+.sbtn.active .sbtn-cnt { background:#60A5FA; color:#FFF; }
+
+.sidebar-foot {
+  padding:8px;
+  border-top:1.5px dashed #BFDBFE;
+}
+.add-cat-btn {
+  width:100%; padding:8px; border-radius:14px; border:2px dashed #93C5FD;
+  background:transparent; color:#2563EB; font-size:.83rem; font-weight:800;
+  transition:background .15s;
+}
+.add-cat-btn:hover { background:#EFF6FF; }
+.add-cat-btn:disabled { color:#CBD5E1; border-color:#E2E8F0; cursor:default; }
+
+/* ── Content ── */
+.content {
+  flex:1; min-width:0;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+/* No-file state */
+.no-file {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px; padding:40px;
+  text-align:center;
+}
+.no-file .nf-icon { font-size:5rem; }
+.no-file h2 { font-size:1.45rem; font-weight:800; color:#1D4ED8; }
+.no-file p  { font-size:.9rem; color:#64748b; max-width:380px; line-height:1.75; }
+.nf-hint {
+  background:#FFF; border:2px solid #BFDBFE; border-radius:16px;
+  padding:14px 20px; font-size:.8rem; color:#64748b; text-align:left; max-width:480px; line-height:1.8;
+}
+.nf-hint code {
+  font-family:monospace; background:#EFF6FF; color:#2563EB;
+  padding:1px 5px; border-radius:4px; font-size:.78rem;
+}
+.nf-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+
+/* Category header */
+.cat-header {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 18px;
+  border-bottom:2px solid #BFDBFE;
+  background:rgba(255,255,255,.5);
+  flex-shrink:0;
+}
+.cat-icon  { font-size:1.7rem; }
+.cat-name  { font-size:1.05rem; font-weight:800; }
+.cat-count {
+  font-size:.78rem; color:#64748b; font-weight:700;
+  background:#EFF6FF; border:1.5px solid #BFDBFE; border-radius:50px; padding:2px 10px;
+}
+.cat-color-dot {
+  width:14px; height:14px; border-radius:50%;
+  border:2px solid rgba(0,0,0,.1); flex-shrink:0;
+}
+.cat-del-btn {
+  margin-left:auto; padding:5px 13px; border-radius:50px; border:2px solid #FCA5A5;
+  background:#FFF; color:#DC2626; font-size:.78rem; font-weight:800;
+  transition:background .15s;
+}
+.cat-del-btn:hover { background:#FEE2E2; }
+
+/* Word list */
+.w-area {
+  flex:1; min-height:0; overflow-y:auto;
+  padding:10px 14px;
+  display:flex; flex-direction:column; gap:6px;
+}
+.w-area::-webkit-scrollbar { width:9px; }
+.w-area::-webkit-scrollbar-track { background:#EFF6FF; border-radius:8px; }
+.w-area::-webkit-scrollbar-thumb { background:#93C5FD; border-radius:8px; border:2px solid #EFF6FF; }
+.w-area::-webkit-scrollbar-thumb:hover { background:#60A5FA; }
+
+.w-empty {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  padding:40px 20px; color:#94A3B8; font-size:.9rem; text-align:center;
+}
+.w-empty .we-icon { font-size:3rem; }
+
+/* Word card */
+.w-card {
+  flex-shrink:0;
+  background:#FFF; border:2px solid #E2E8F0; border-radius:14px;
+  box-shadow:0 2px 8px rgba(56,189,248,.12);
+  overflow:hidden; transition:border-color .15s;
+}
+.w-card:hover { border-color:#93C5FD; }
+.w-card-row {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 13px;
+}
+.w-num {
+  flex-shrink:0; width:26px; height:26px; border-radius:50%;
+  background:#DBEAFE; color:#1D4ED8; font-size:.72rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.w-emoji { font-size:1.4rem; flex-shrink:0; }
+.w-word  { font-size:1rem; font-weight:800; color:#1e3a5f; letter-spacing:.06em; min-width:80px; }
+.w-sep   { color:#CBD5E1; font-weight:300; flex-shrink:0; }
+.w-hint  { flex:1; font-size:.85rem; color:#475569; font-weight:600; }
+.w-actions { display:flex; gap:5px; flex-shrink:0; }
+
+.w-edit-btn, .w-del-btn {
+  width:26px; height:26px; border-radius:50%; border:2px solid;
+  font-size:.78rem; display:flex; align-items:center; justify-content:center;
+  transition:transform .15s;
+}
+.w-edit-btn { background:#EFF6FF; border-color:#93C5FD; color:#2563EB; }
+.w-del-btn  { background:#FFF; border-color:#FCA5A5; color:#DC2626; }
+.w-edit-btn:hover, .w-del-btn:hover { transform:scale(1.12); }
+
+/* Inline edit row */
+.w-edit-row {
+  display:none; padding:0 13px 10px 49px;
+  gap:6px; flex-wrap:wrap; align-items:flex-end;
+}
+.w-edit-row.open { display:flex; }
+.we-input {
+  padding:5px 10px; border:2px solid #BFDBFE; border-radius:10px;
+  font-size:.82rem; color:#1e3a5f; background:#FAFAFA; outline:none;
+  transition:border-color .15s;
+}
+.we-input:focus { border-color:#38bdf8; background:#FFF; }
+.we-input.word  { width:110px; text-transform:uppercase; font-weight:800; letter-spacing:.06em; }
+.we-input.hint  { flex:1; min-width:100px; }
+.we-input.emoji { width:58px; text-align:center; font-size:1.1rem; }
+.we-save-btn {
+  padding:5px 14px; border-radius:50px; border:2px solid #FFF;
+  background:#38bdf8; color:#FFF; font-size:.78rem; font-weight:800;
+  box-shadow:0 2px 6px rgba(56,189,248,.4);
+}
+
+/* ── Add section ── */
+.add-section {
+  flex-shrink:0;
+  background:rgba(255,255,255,.78);
+  border-top:2px solid #BFDBFE;
+  padding:12px 16px;
+  max-height:38%;
+  overflow-y:auto;
+}
+.add-section::-webkit-scrollbar { width:6px; }
+.add-section::-webkit-scrollbar-thumb { background:#BFDBFE; border-radius:8px; }
+
+.add-tabs { display:flex; gap:8px; margin-bottom:10px; }
+.add-tab {
+  padding:6px 16px; border-radius:50px; border:2px solid #BFDBFE;
+  background:#FFF; color:#64748b; font-size:.8rem; font-weight:800;
+  transition:background .15s, border-color .15s;
+}
+.add-tab.active { background:#38bdf8; border-color:#FFF; color:#FFF; }
+
+/* Manual tab */
+.manual-form { display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; }
+.form-field { display:flex; flex-direction:column; gap:3px; }
+.form-label { font-size:.72rem; font-weight:800; color:#64748b; }
+.form-input {
+  padding:7px 11px; border:2px solid #BFDBFE; border-radius:11px;
+  font-size:.85rem; color:#1e3a5f; background:#FFF; outline:none;
+  transition:border-color .15s;
+}
+.form-input:focus { border-color:#38bdf8; }
+.form-input.word-input { width:120px; text-transform:uppercase; font-weight:800; letter-spacing:.06em; }
+.form-input.hint-input { width:160px; }
+.form-input.emoji-input { width:64px; text-align:center; font-size:1.2rem; }
+
+/* Paste tab */
+.paste-hint {
+  background:#F0F9FF; border:1.5px solid #BAE6FD; border-radius:11px;
+  padding:7px 12px; margin-bottom:7px;
+  font-size:.75rem; color:#0369a1; line-height:1.75;
+}
+.paste-hint code {
+  font-family:monospace; background:#E0F2FE; color:#0284c7;
+  padding:1px 4px; border-radius:4px;
+}
+.paste-area {
+  width:100%; min-height:70px; max-height:160px;
+  border:2px solid #BFDBFE; border-radius:12px;
+  padding:8px 12px; font-size:.82rem; color:#1e3a5f;
+  background:#FAFAFA; resize:vertical; outline:none;
+  transition:border-color .15s;
+}
+.paste-area:focus { border-color:#38bdf8; background:#FFF; }
+.paste-row { display:flex; gap:8px; margin-top:7px; align-items:center; }
+.parse-count { font-size:.8rem; color:#64748b; font-weight:700; flex:1; }
+
+.preview-list { display:none; margin-top:8px; flex-direction:column; gap:3px; }
+.preview-list.open { display:flex; }
+.preview-item {
+  background:#E0F2FE; border:1.5px solid #7DD3FC; border-radius:9px;
+  padding:5px 11px; font-size:.8rem; color:#0369a1; font-weight:700;
+  display:flex; gap:8px; align-items:center;
+}
+.preview-err {
+  background:#FEE2E2; border:1.5px solid #FCA5A5; border-radius:9px;
+  padding:7px 12px; font-size:.8rem; color:#DC2626; font-weight:700;
+  margin-top:7px;
+}
+
+/* Shared action buttons */
+.act-btn {
+  padding:7px 18px; border-radius:50px; border:2px solid;
+  font-size:.8rem; font-weight:800;
+  transition:transform .15s, box-shadow .15s;
+}
+.act-btn:active { transform:scale(.93); }
+.act-btn:disabled { opacity:.4; cursor:default; }
+.btn-parse   { background:#EFF6FF; border-color:#93C5FD; color:#1D4ED8; }
+.btn-confirm { background:#22c55e; border-color:#FFF; color:#FFF; box-shadow:0 3px 8px rgba(34,197,94,.4); }
+.btn-add-m   { background:#38bdf8; border-color:#FFF; color:#FFF; box-shadow:0 3px 8px rgba(56,189,248,.4); }
+
+/* ══════════════════════════════
+   MODAL — New Category
+══════════════════════════════ */
+.modal-mask {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(15,23,42,.25); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center;
+}
+.modal-mask.open { display:flex; }
+.modal-box {
+  background:#FFF; border:3px solid #BFDBFE; border-radius:26px;
+  padding:26px 28px; width:min(94vw, 440px);
+  box-shadow:0 16px 40px rgba(56,189,248,.35);
+  animation:popIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-title { font-size:1.05rem; font-weight:800; margin-bottom:16px; color:#1e3a5f; }
+.modal-field { margin-bottom:11px; }
+.m-label { font-size:.74rem; font-weight:800; color:#64748b; display:block; margin-bottom:4px; }
+.m-input {
+  width:100%; padding:8px 12px; border:2px solid #BFDBFE; border-radius:11px;
+  font-size:.88rem; color:#1e3a5f; outline:none; transition:border-color .15s;
+}
+.m-input:focus { border-color:#38bdf8; }
+
+.emoji-grid { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+.emoji-opt {
+  width:34px; height:34px; border-radius:9px; border:2px solid #E2E8F0;
+  font-size:1.25rem; background:#F8FAFC;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background .12s, border-color .12s;
+}
+.emoji-opt.sel { background:#DBEAFE; border-color:#60A5FA; }
+
+.color-grid { display:flex; flex-wrap:wrap; gap:6px; margin-top:5px; }
+.color-opt {
+  width:30px; height:30px; border-radius:50%; border:3px solid transparent;
+  cursor:pointer; transition:transform .12s;
+}
+.color-opt.sel { border-color:#1e3a5f; transform:scale(1.2); }
+
+.modal-btns { display:flex; gap:8px; justify-content:flex-end; margin-top:18px; }
+.modal-cancel {
+  background:#FFF; border:2px solid #E2E8F0; color:#64748b;
+  border-radius:50px; padding:7px 18px; font-size:.83rem; font-weight:800;
+}
+.modal-ok {
+  background:#38bdf8; border:2px solid #FFF; color:#FFF;
+  border-radius:50px; padding:7px 18px; font-size:.83rem; font-weight:800;
+  box-shadow:0 3px 10px rgba(56,189,248,.4);
+}
+
+/* Toast */
+.toast {
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(18px);
+  background:#1e3a5f; color:#FFF; border-radius:50px; padding:9px 22px;
+  font-size:.85rem; font-weight:700; z-index:300; opacity:0;
+  transition:opacity .28s, transform .28s; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <span class="header-title">🔤 題庫編輯器</span>
+  <span class="header-file" id="hdr-file">尚未開啟檔案</span>
+  <div class="header-btns">
+    <button class="hbtn hbtn-tpl" id="btn-tpl">⬇️ 下載範本</button>
+    <button class="hbtn hbtn-game" onclick="window.open('index.html','_blank')">▶ 開啟遊戲</button>
+    <button class="hbtn hbtn-open" id="btn-open">📂 開啟題庫</button>
+    <button class="hbtn hbtn-save" id="btn-save" disabled>
+      <span class="dirty-dot" id="dirty-dot"></span>💾 儲存
+    </button>
+    <button class="hbtn hbtn-saveas" id="btn-saveas" disabled>📄 另存新檔</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">📂 類別列表</div>
+    <div class="cat-list" id="cat-list"></div>
+    <div class="sidebar-foot">
+      <button class="add-cat-btn" id="btn-add-cat" disabled>＋ 新增類別</button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="content">
+
+    <!-- No-file splash -->
+    <div class="no-file" id="no-file">
+      <div class="nf-icon">🔡</div>
+      <h2>開啟題庫檔案開始編輯</h2>
+      <p>點擊「📂 開啟題庫」選擇 .json 格式的題庫檔案，<br>或先下載範本再填入單字。</p>
+      <div class="nf-hint">
+        ✨ <strong>題庫格式說明</strong><br>
+        每個單字需要三個欄位：<br>
+        · <code>word</code>：英文單字（大寫），如 <code>APPLE</code><br>
+        · <code>hint</code>：中文提示，如 <code>蘋果</code><br>
+        · <code>emoji</code>：對應 Emoji，如 <code>🍎</code>（可留空）<br><br>
+        批次貼上格式（每行一個單字）：<br>
+        <code>APPLE 蘋果 🍎</code>&nbsp;&nbsp;或&nbsp;&nbsp;<code>APPLE,蘋果,🍎</code>
+      </div>
+      <div class="nf-actions">
+        <button class="hbtn hbtn-tpl" id="btn-tpl2">⬇️ 下載範本</button>
+        <button class="hbtn hbtn-open" id="btn-open2">📂 開啟題庫</button>
+      </div>
+    </div>
+
+    <!-- Cat view (hidden until file loaded) -->
+    <div id="cat-view" style="display:none; flex:1; min-height:0; flex-direction:column; overflow:hidden;">
+
+      <div class="cat-header" id="cat-header">
+        <span class="cat-icon" id="ch-icon">📂</span>
+        <span class="cat-name" id="ch-name">類別名稱</span>
+        <div class="cat-color-dot" id="ch-color-dot"></div>
+        <span class="cat-count" id="ch-count">0 個單字</span>
+        <button class="cat-del-btn" id="btn-del-cat">🗑 刪除此類別</button>
+      </div>
+
+      <div class="w-area" id="w-area"></div>
+
+      <!-- Add section -->
+      <div class="add-section">
+        <div class="add-tabs">
+          <button class="add-tab active" data-tab="manual">✏️ 手動輸入</button>
+          <button class="add-tab"        data-tab="paste">📋 批次貼上</button>
+        </div>
+
+        <!-- Manual tab -->
+        <div id="tab-manual">
+          <div class="manual-form">
+            <div class="form-field">
+              <label class="form-label">🔤 英文單字</label>
+              <input class="form-input word-input" id="man-word" placeholder="APPLE" type="text" maxlength="30">
+            </div>
+            <div class="form-field">
+              <label class="form-label">💬 中文提示</label>
+              <input class="form-input hint-input" id="man-hint" placeholder="蘋果" type="text">
+            </div>
+            <div class="form-field">
+              <label class="form-label">😊 Emoji</label>
+              <input class="form-input emoji-input" id="man-emoji" placeholder="🍎" type="text" maxlength="4">
+            </div>
+            <div class="form-field" style="padding-bottom:1px">
+              <label class="form-label">&nbsp;</label>
+              <button class="act-btn btn-add-m" id="btn-add-manual">➕ 新增</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paste tab -->
+        <div id="tab-paste" style="display:none">
+          <div class="paste-hint">
+            每行一個單字，欄位用「空格」或「逗號」分隔：<br>
+            <code>APPLE 蘋果 🍎</code>&nbsp;&nbsp;或&nbsp;&nbsp;<code>APPLE,蘋果,🍎</code><br>
+            Emoji 欄位可省略。單字會自動轉為大寫。
+          </div>
+          <textarea class="paste-area" id="paste-area" placeholder="APPLE 蘋果 🍎&#10;BANANA 香蕉 🍌&#10;CHERRY 櫻桃 🍒"></textarea>
+          <div class="paste-row">
+            <span class="parse-count" id="parse-count"></span>
+            <button class="act-btn btn-parse" id="btn-parse">🔍 解析</button>
+            <button class="act-btn btn-confirm" id="btn-confirm" disabled>✅ 加入題庫</button>
+          </div>
+          <div class="preview-list" id="preview-list"></div>
+          <div class="preview-err" id="preview-err" style="display:none"></div>
+        </div>
+      </div>
+
+    </div><!-- /cat-view -->
+
+  </main>
+</div>
+
+<!-- NEW CATEGORY MODAL -->
+<div class="modal-mask" id="modal-new-cat">
+  <div class="modal-box">
+    <div class="modal-title">✨ 新增類別</div>
+    <div class="modal-field">
+      <label class="m-label">類別名稱</label>
+      <input class="m-input" id="nc-name" placeholder="例：動物、食物、Unit 01…" type="text">
+    </div>
+    <div class="modal-field">
+      <label class="m-label">圖示 Emoji</label>
+      <div class="emoji-grid" id="nc-emoji-grid"></div>
+    </div>
+    <div class="modal-field">
+      <label class="m-label">主題顏色</label>
+      <div class="color-grid" id="nc-color-grid"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="nc-cancel">取消</button>
+      <button class="modal-ok" id="nc-ok">✅ 建立類別</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+var fileHandle  = null;
+var wordBank    = {};       // { "CatName": { icon, color, words: [{word,hint,emoji}] } }
+var currentCat  = null;
+var isDirty     = false;
+var parsedBuf   = [];
+var ncEmoji     = '📖';
+var ncColor     = '#38bdf8';
+
+var TEMPLATE = {
+  "範例類別": {
+    "icon": "🌟",
+    "color": "#38bdf8",
+    "words": [
+      { "word": "APPLE",  "hint": "蘋果",   "emoji": "🍎" },
+      { "word": "BANANA", "hint": "香蕉",   "emoji": "🍌" },
+      { "word": "CHERRY", "hint": "櫻桃",   "emoji": "🍒" }
+    ]
+  }
+};
+
+var CAT_EMOJIS = [
+  '🌟','📖','🐾','🍎','🎨','🌸','⚽','🔢','🌍','🎵',
+  '🏠','🚗','🦋','🌊','🎭','💻','🦁','🍕','🎪','🏆',
+  '🌙','🎯','🧩','🔬','🎀','🦄','🌈','💡','🎲','🚀'
+];
+var CAT_COLORS = [
+  '#38bdf8','#6366f1','#ec4899','#f97316','#10b981',
+  '#f59e0b','#8b5cf6','#dc2626','#0891b2','#16a34a',
+  '#7c3aed','#be185d','#ca8a04','#15803d','#0369a1'
+];
+
+/* ═══════════════════════════════════════════════════
+   FILE I/O
+═══════════════════════════════════════════════════ */
+async function openFile() {
+  if (!window.showOpenFilePicker) {
+    // Fallback: file input
+    document.getElementById('file-input-fallback').click(); return;
+  }
+  try {
+    var picks = await window.showOpenFilePicker({
+      types: [{ description: 'JSON 題庫', accept: { 'application/json': ['.json'] } }],
+      excludeAcceptAllOption: false
+    });
+    fileHandle = picks[0];
+    var file = await fileHandle.getFile();
+    var text = await file.text();
+    loadFromText(text, file.name, file.size);
+  } catch(e) {
+    if (e.name !== 'AbortError') toast('⚠️ 開啟失敗：' + e.message);
+  }
+}
+
+function loadFromText(text, name, size) {
+  try {
+    var data = JSON.parse(text);
+    if (typeof data !== 'object' || Array.isArray(data)) throw new Error('格式錯誤：需要物件格式');
+    // Validate / normalise
+    Object.entries(data).forEach(function([k, v]) {
+      if (!v.words) v.words = [];
+      if (!v.icon)  v.icon  = '📖';
+      if (!v.color) v.color = '#38bdf8';
+    });
+    wordBank = data;
+    document.getElementById('no-file').style.display   = 'none';
+    document.getElementById('cat-view').style.display  = 'flex';
+    document.getElementById('btn-add-cat').disabled    = false;
+    document.getElementById('btn-saveas').disabled     = false;
+    document.getElementById('hdr-file').textContent    = name + '  ·  ' + (size ? size + ' bytes' : '');
+    setDirty(false);
+    renderSidebar();
+    var keys = Object.keys(wordBank);
+    if (keys.length) selectCat(keys[0]);
+    toast('📂 載入成功，共 ' + keys.length + ' 個類別');
+  } catch(e) {
+    toast('⚠️ 解析失敗：' + e.message);
+  }
+}
+
+async function saveFile() {
+  if (!fileHandle) { toast('請先開啟檔案'); return; }
+  try {
+    var writable = await fileHandle.createWritable();
+    await writable.write(serializeJSON());
+    await writable.close();
+    setDirty(false);
+    toast('✅ 儲存完成！');
+  } catch(e) {
+    downloadJSON();
+  }
+}
+
+async function saveAsFile() {
+  if (!Object.keys(wordBank).length) { toast('題庫是空的，無法另存'); return; }
+  if (!window.showSaveFilePicker) { downloadJSON(); return; }
+  try {
+    var h = await window.showSaveFilePicker({
+      suggestedName: (fileHandle ? await fileHandle.getFile().then(f=>f.name) : 'wordbank.json'),
+      types: [{ description: 'JSON 題庫', accept: { 'application/json': ['.json'] } }]
+    });
+    var writable = await h.createWritable();
+    await writable.write(serializeJSON());
+    await writable.close();
+    fileHandle = h;
+    var f = await h.getFile();
+    document.getElementById('hdr-file').textContent = f.name;
+    setDirty(false);
+    toast('✅ 另存完成：' + f.name);
+  } catch(e) {
+    if (e.name === 'AbortError') return;
+    downloadJSON();
+  }
+}
+
+function downloadJSON(fname) {
+  var blob = new Blob([serializeJSON()], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname || (fileHandle ? 'wordbank.json' : 'wordbank.json');
+  a.click();
+  toast('⬇️ 已下載，請手動放到遊戲目錄');
+}
+
+function downloadTemplate() {
+  var blob = new Blob([JSON.stringify(TEMPLATE, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wordbank-template.json';
+  a.click();
+  toast('⬇️ 範本已下載！請用記事本或 VS Code 編輯後，再開啟此編輯器');
+}
+
+function serializeJSON() {
+  return JSON.stringify(wordBank, null, 2);
+}
+
+/* Fallback file input for browsers without File System Access API */
+(function() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json'; inp.style.display = 'none';
+  inp.id = 'file-input-fallback';
+  inp.addEventListener('change', function() {
+    var file = inp.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) { loadFromText(e.target.result, file.name, file.size); };
+    reader.readAsText(file);
+    inp.value = '';
+  });
+  document.body.appendChild(inp);
+})();
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════ */
+function renderSidebar() {
+  var list = document.getElementById('cat-list');
+  list.innerHTML = '';
+  Object.entries(wordBank).forEach(function([key, data]) {
+    var btn = document.createElement('button');
+    btn.className = 'sbtn' + (key === currentCat ? ' active' : '');
+    btn.innerHTML =
+      '<span class="sbtn-icon">' + esc(data.icon) + '</span>' +
+      '<span class="sbtn-name">' + esc(key) + '</span>' +
+      '<span class="sbtn-cnt">' + data.words.length + '</span>';
+    btn.addEventListener('click', function() { selectCat(key); });
+    list.appendChild(btn);
+  });
+}
+
+function selectCat(key) {
+  currentCat = key;
+  renderSidebar();
+  renderWords(key);
+  resetPaste();
+}
+
+/* ═══════════════════════════════════════════════════
+   WORD LIST
+═══════════════════════════════════════════════════ */
+function renderWords(key) {
+  var data = wordBank[key];
+  document.getElementById('ch-icon').textContent    = data.icon;
+  document.getElementById('ch-name').textContent    = key;
+  document.getElementById('ch-count').textContent   = data.words.length + ' 個單字';
+  var dot = document.getElementById('ch-color-dot');
+  dot.style.background = data.color;
+
+  var area = document.getElementById('w-area');
+  area.innerHTML = '';
+
+  if (!data.words.length) {
+    area.innerHTML = '<div class="w-empty"><div class="we-icon">📭</div><div>此類別尚無單字，請在下方新增！</div></div>';
+    return;
+  }
+
+  data.words.forEach(function(w, i) {
+    var card = document.createElement('div');
+    card.className = 'w-card';
+    card.innerHTML =
+      '<div class="w-card-row">' +
+        '<span class="w-num">' + (i+1) + '</span>' +
+        '<span class="w-emoji">' + esc(w.emoji || '❓') + '</span>' +
+        '<span class="w-word">' + esc(w.word) + '</span>' +
+        '<span class="w-sep">·</span>' +
+        '<span class="w-hint">' + esc(w.hint) + '</span>' +
+        '<div class="w-actions">' +
+          '<button class="w-edit-btn" data-i="' + i + '" title="編輯">✏</button>' +
+          '<button class="w-del-btn"  data-i="' + i + '" title="刪除">✕</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="w-edit-row" id="wedit-' + i + '">' +
+        '<input class="we-input word"  id="wew-' + i + '" value="' + esc(w.word)  + '" placeholder="WORD" maxlength="30">' +
+        '<input class="we-input hint"  id="weh-' + i + '" value="' + esc(w.hint)  + '" placeholder="中文提示">' +
+        '<input class="we-input emoji" id="wee-' + i + '" value="' + esc(w.emoji||'') + '" placeholder="😊" maxlength="4">' +
+        '<button class="we-save-btn" data-i="' + i + '">✓ 儲存</button>' +
+      '</div>';
+
+    card.querySelector('.w-edit-btn').addEventListener('click', function() {
+      var row = document.getElementById('wedit-' + i);
+      row.classList.toggle('open');
+    });
+    card.querySelector('.w-del-btn').addEventListener('click', function() {
+      deleteWord(key, i);
+    });
+    card.querySelector('.we-save-btn').addEventListener('click', function() {
+      saveWordEdit(key, i);
+    });
+    // Auto uppercase word input
+    var wi = card.querySelector('#wew-' + i);
+    wi.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+
+    area.appendChild(card);
+  });
+}
+
+function deleteWord(key, idx) {
+  if (!confirm('確定刪除「' + wordBank[key].words[idx].word + '」？')) return;
+  wordBank[key].words.splice(idx, 1);
+  setDirty(true);
+  renderSidebar();
+  renderWords(key);
+  toast('🗑 已刪除');
+}
+
+function saveWordEdit(key, idx) {
+  var word  = document.getElementById('wew-' + idx).value.trim().toUpperCase();
+  var hint  = document.getElementById('weh-' + idx).value.trim();
+  var emoji = document.getElementById('wee-' + idx).value.trim();
+  if (!word || !hint) { toast('⚠️ 單字和提示不能為空'); return; }
+  wordBank[key].words[idx] = { word: word, hint: hint, emoji: emoji };
+  setDirty(true);
+  renderSidebar();
+  renderWords(key);
+  toast('✅ 已更新「' + word + '」');
+}
+
+/* ═══════════════════════════════════════════════════
+   MANUAL ADD
+═══════════════════════════════════════════════════ */
+function addManual() {
+  if (!currentCat) return;
+  var word  = document.getElementById('man-word').value.trim().toUpperCase();
+  var hint  = document.getElementById('man-hint').value.trim();
+  var emoji = document.getElementById('man-emoji').value.trim();
+  if (!word) { toast('⚠️ 請輸入英文單字'); return; }
+  if (!hint) { toast('⚠️ 請輸入中文提示'); return; }
+  wordBank[currentCat].words.push({ word: word, hint: hint, emoji: emoji });
+  setDirty(true);
+  renderSidebar();
+  renderWords(currentCat);
+  document.getElementById('man-word').value  = '';
+  document.getElementById('man-hint').value  = '';
+  document.getElementById('man-emoji').value = '';
+  document.getElementById('man-word').focus();
+  toast('✅ 已新增「' + word + '」');
+}
+
+/* ═══════════════════════════════════════════════════
+   PASTE & PARSE
+═══════════════════════════════════════════════════ */
+function parsePasted() {
+  var raw = document.getElementById('paste-area').value.trim();
+  var errEl  = document.getElementById('preview-err');
+  var prevEl = document.getElementById('preview-list');
+  var cntEl  = document.getElementById('parse-count');
+  var confBtn = document.getElementById('btn-confirm');
+
+  errEl.style.display = 'none';
+  prevEl.classList.remove('open');
+  prevEl.innerHTML = '';
+  parsedBuf = [];
+  confBtn.disabled = true;
+  cntEl.textContent = '';
+
+  if (!raw) { toast('請先貼入單字'); return; }
+
+  var lines = raw.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+  var results = [];
+  var errors  = [];
+
+  lines.forEach(function(line, i) {
+    // Split by comma or whitespace (keeping emoji together)
+    var parts;
+    if (line.includes(',')) {
+      parts = line.split(',').map(function(p) { return p.trim(); });
+    } else {
+      // Split on first whitespace sequence, keep remainder as hint+emoji
+      var m = line.match(/^(\S+)\s+(.+)$/);
+      if (!m) { errors.push('第 '+(i+1)+' 行格式有誤：' + line); return; }
+      var rest = m[2].trim();
+      // Try to split hint from emoji (last token if it looks like emoji)
+      var emojiMatch = rest.match(/^(.*?)\s*(\p{Emoji_Presentation}|\p{Extended_Pictographic})$/u);
+      if (emojiMatch) {
+        parts = [m[1], emojiMatch[1].trim(), emojiMatch[2]];
+      } else {
+        parts = [m[1], rest, ''];
+      }
+    }
+    var word  = (parts[0] || '').trim().toUpperCase();
+    var hint  = (parts[1] || '').trim();
+    var emoji = (parts[2] || '').trim();
+    if (!word || !hint) { errors.push('第 '+(i+1)+' 行缺少欄位：' + line); return; }
+    results.push({ word: word, hint: hint, emoji: emoji });
+  });
+
+  if (errors.length) {
+    errEl.style.display = 'block';
+    errEl.textContent = '⚠️ ' + errors.join('；');
+  }
+  if (!results.length) {
+    cntEl.textContent = '無有效單字';
+    return;
+  }
+
+  parsedBuf = results;
+  cntEl.textContent = '✅ 解析到 ' + results.length + ' 個單字';
+  prevEl.classList.add('open');
+  results.forEach(function(w) {
+    var item = document.createElement('div');
+    item.className = 'preview-item';
+    item.innerHTML =
+      '<span style="font-size:1.1rem">' + esc(w.emoji||'·') + '</span>' +
+      '<strong>' + esc(w.word) + '</strong>' +
+      '<span style="color:#0369a1">' + esc(w.hint) + '</span>';
+    prevEl.appendChild(item);
+  });
+  confBtn.disabled = false;
+}
+
+function confirmAdd() {
+  if (!parsedBuf.length || !currentCat) return;
+  parsedBuf.forEach(function(w) { wordBank[currentCat].words.push(w); });
+  setDirty(true);
+  renderSidebar();
+  renderWords(currentCat);
+  toast('✅ 已新增 ' + parsedBuf.length + ' 個單字到「' + currentCat + '」！');
+  resetPaste();
+}
+
+function resetPaste() {
+  document.getElementById('paste-area').value = '';
+  document.getElementById('parse-count').textContent = '';
+  document.getElementById('preview-list').classList.remove('open');
+  document.getElementById('preview-list').innerHTML = '';
+  document.getElementById('preview-err').style.display = 'none';
+  document.getElementById('btn-confirm').disabled = true;
+  parsedBuf = [];
+}
+
+/* ═══════════════════════════════════════════════════
+   DELETE CATEGORY
+═══════════════════════════════════════════════════ */
+function deleteCat() {
+  if (!currentCat) return;
+  var cnt = wordBank[currentCat].words.length;
+  if (!confirm('確定刪除類別「' + currentCat + '」及其 ' + cnt + ' 個單字？\n此動作無法復原。')) return;
+  delete wordBank[currentCat];
+  setDirty(true);
+  currentCat = null;
+  renderSidebar();
+  var keys = Object.keys(wordBank);
+  if (keys.length) {
+    selectCat(keys[0]);
+  } else {
+    document.getElementById('w-area').innerHTML =
+      '<div class="w-empty"><div class="we-icon">📭</div><div>題庫空了，請新增類別</div></div>';
+    document.getElementById('ch-name').textContent  = '—';
+    document.getElementById('ch-icon').textContent  = '📂';
+    document.getElementById('ch-count').textContent = '0 個單字';
+  }
+  toast('🗑 已刪除類別');
+}
+
+/* ═══════════════════════════════════════════════════
+   NEW CATEGORY MODAL
+═══════════════════════════════════════════════════ */
+function openNewCatModal() {
+  ncEmoji = CAT_EMOJIS[0];
+  ncColor = CAT_COLORS[0];
+  document.getElementById('nc-name').value = '';
+
+  var eg = document.getElementById('nc-emoji-grid');
+  eg.innerHTML = '';
+  CAT_EMOJIS.forEach(function(e) {
+    var btn = document.createElement('button');
+    btn.className = 'emoji-opt' + (e === ncEmoji ? ' sel' : '');
+    btn.textContent = e;
+    btn.addEventListener('click', function() {
+      ncEmoji = e;
+      eg.querySelectorAll('.emoji-opt').forEach(function(x) { x.classList.remove('sel'); });
+      btn.classList.add('sel');
+    });
+    eg.appendChild(btn);
+  });
+
+  var cg = document.getElementById('nc-color-grid');
+  cg.innerHTML = '';
+  CAT_COLORS.forEach(function(c) {
+    var btn = document.createElement('button');
+    btn.className = 'color-opt' + (c === ncColor ? ' sel' : '');
+    btn.style.background = c;
+    btn.addEventListener('click', function() {
+      ncColor = c;
+      cg.querySelectorAll('.color-opt').forEach(function(x) { x.classList.remove('sel'); });
+      btn.classList.add('sel');
+    });
+    cg.appendChild(btn);
+  });
+
+  document.getElementById('modal-new-cat').classList.add('open');
+  setTimeout(function() { document.getElementById('nc-name').focus(); }, 80);
+}
+
+function confirmNewCat() {
+  var name = document.getElementById('nc-name').value.trim();
+  if (!name) { toast('⚠️ 請輸入類別名稱'); return; }
+  if (wordBank[name]) { toast('⚠️「' + name + '」已存在'); return; }
+  wordBank[name] = { icon: ncEmoji, color: ncColor, words: [] };
+  setDirty(true);
+  renderSidebar();
+  selectCat(name);
+  document.getElementById('modal-new-cat').classList.remove('open');
+  toast('✨ 已建立類別「' + name + '」！');
+}
+
+/* ═══════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════ */
+document.querySelectorAll('.add-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.add-tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    var which = tab.dataset.tab;
+    document.getElementById('tab-manual').style.display = which === 'manual' ? '' : 'none';
+    document.getElementById('tab-paste').style.display  = which === 'paste'  ? '' : 'none';
+  });
+});
+
+/* ═══════════════════════════════════════════════════
+   UTIL
+═══════════════════════════════════════════════════ */
+function setDirty(val) {
+  isDirty = val;
+  document.getElementById('btn-save').disabled = !val || !fileHandle;
+  document.getElementById('dirty-dot').classList.toggle('show', val);
+}
+
+var toastTimer;
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2800);
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════════════════
+   WIRE UP
+═══════════════════════════════════════════════════ */
+document.getElementById('btn-open').addEventListener('click', openFile);
+document.getElementById('btn-open2').addEventListener('click', openFile);
+document.getElementById('btn-save').addEventListener('click', saveFile);
+document.getElementById('btn-saveas').addEventListener('click', saveAsFile);
+document.getElementById('btn-tpl').addEventListener('click', downloadTemplate);
+document.getElementById('btn-tpl2').addEventListener('click', downloadTemplate);
+document.getElementById('btn-parse').addEventListener('click', parsePasted);
+document.getElementById('btn-confirm').addEventListener('click', confirmAdd);
+document.getElementById('btn-add-manual').addEventListener('click', addManual);
+document.getElementById('btn-add-cat').addEventListener('click', openNewCatModal);
+document.getElementById('btn-del-cat').addEventListener('click', deleteCat);
+document.getElementById('nc-cancel').addEventListener('click', function() {
+  document.getElementById('modal-new-cat').classList.remove('open');
+});
+document.getElementById('nc-ok').addEventListener('click', confirmNewCat);
+document.getElementById('nc-name').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') confirmNewCat();
+});
+
+// Auto uppercase for word inputs
+document.getElementById('man-word').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
+
+// Enter to add manual word
+document.getElementById('man-emoji').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addManual();
+});
+document.getElementById('man-hint').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('man-emoji').focus();
+});
+document.getElementById('man-word').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('man-hint').focus();
+});
+
+// Ctrl+S
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+});
+
+// Click outside modal to close
+document.getElementById('modal-new-cat').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+// Warn on close if dirty
+window.addEventListener('beforeunload', function(e) {
+  if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>
