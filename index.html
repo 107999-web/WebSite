@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>&#32178;&#38913;&#32034;&#24341;</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 40px 20px; }
+    header { text-align: center; margin-bottom: 48px; }
+    header h1 { font-size: 2.2rem; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    header p { color: #94a3b8; font-size: 0.95rem; }
+    .stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 40px; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 2rem; font-weight: 700; color: #38bdf8; }
+    .stat-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; max-width: 1000px; margin: 0 auto; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; text-decoration: none; color: inherit; transition: all 0.2s ease; }
+    .card:hover { border-color: #38bdf8; background: #1e3a5f; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(56,189,248,0.15); }
+    .card-icon { font-size: 2rem; flex-shrink: 0; }
+    .card-title { font-size: 1.05rem; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+    .card-date { font-size: 0.78rem; color: #64748b; }
+    .empty { text-align: center; color: #475569; grid-column: 1/-1; padding: 40px; }
+    footer { text-align: center; margin-top: 60px; color: #334155; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>&#127760; JyunHan &#32178;&#38913;&#32034;&#24341;</h1>
+    <p>&#40670;&#36984;&#21345;&#29255;&#21363;&#21487;&#38283;&#21855;&#35442;&#32178;&#38913;</p>
+  </header>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">&#32178;&#38913;&#25976;&#37327;</div></div>
+    <div class="stat"><div class="stat-num">&#10003;</div><div class="stat-label">&#24050;&#21516;&#27493;</div></div>
+  </div>
+  <div class="grid">
+    <a class="card" href="./Htmls/考試資訊紀錄.html">
+      <div class="card-icon">&#128196;</div>
+      <div class="card-info">
+        <div class="card-title">考試資訊紀錄</div>
+        <div class="card-date">2026-06-30 09:45</div>
+      </div>
+    </a>
+    <a class="card" href="./Htmls/班級分組與座位管理.html">
+      <div class="card-icon">&#128196;</div>
+      <div class="card-info">
+        <div class="card-title">班級分組與座位管理</div>
+        <div class="card-date">2026-06-30 09:45</div>
+      </div>
+    </a>
+    <a class="card" href="./Htmls/範例頁面.html">
+      <div class="card-icon">&#128196;</div>
+      <div class="card-info">
+        <div class="card-title">範例頁面</div>
+        <div class="card-date">2026-06-30 09:55</div>
+      </div>
+    </a>
+    <a class="card" href="./Htmls/學習任務檢核區.html">
+      <div class="card-icon">&#128196;</div>
+      <div class="card-info">
+        <div class="card-title">學習任務檢核區</div>
+        <div class="card-date">2026-06-30 09:45</div>
+      </div>
+    </a>
+  </div>
+  <footer>&#26368;&#24460;&#26356;&#26032;&#65306;2026-06-30 10:13</footer>
+</body>
+</html>

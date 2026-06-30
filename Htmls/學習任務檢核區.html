@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學習任務檢核區</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #0f172a; /* Dark background outside the app */
+        }
+        .app-container {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        .status-btn {
+            transition: all 0.2s ease;
+        }
+        .status-btn.active {
+            transform: scale(1.15);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .status-btn.inactive {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .toast {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-start md:items-center bg-[#0f172a] min-h-screen md:p-6">
+
+    <div class="app-container w-full md:max-w-6xl md:rounded-2xl relative flex flex-col shadow-2xl overflow-hidden h-screen md:h-[95vh]">
+        
+        <!-- Header Image / Icons Area -->
+        <div class="pt-8 pb-4 px-6 flex justify-between items-end bg-gradient-to-b from-blue-50 to-transparent">
+            <div class="flex flex-col items-center">
+                <div class="text-3xl mb-1">🦸</div>
+                <span class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full mt-1">尋找任務中</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="text-3xl mb-1">🧙</div>
+                <span class="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full mt-1">訂正簽名中</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="text-3xl mb-1">🥷</div>
+                <span class="text-[10px] font-bold text-green-500 bg-green-50 px-2 py-0.5 rounded-full mt-1">挑戰大成功</span>
+            </div>
+        </div>
+
+        <div class="text-center font-bold text-lg text-slate-700 tracking-widest mb-4">
+            學習任務檢核區
+        </div>
+
+        <!-- Task Card -->
+        <div class="mx-4 md:mx-auto md:w-full md:max-w-3xl bg-white rounded-2xl shadow-sm border border-slate-100 p-5 text-center mb-5">
+            <div class="text-xs text-indigo-400 font-semibold tracking-wider mb-2">LEARNING MISSION 任務項目</div>
+            <input type="text" id="task-name-input" placeholder="請在此輸入學習項目.." class="w-full text-center text-2xl font-black text-indigo-300 tracking-wide outline-none placeholder-indigo-200 border-b-2 border-transparent focus:border-indigo-100 transition-colors pb-1 bg-transparent italic focus:not-italic focus:text-indigo-700">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center gap-3 px-4 mb-6">
+            <button id="btn-clear" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-full font-bold shadow-sm text-sm active:bg-slate-50 transition">
+                清空狀態
+            </button>
+            <button id="btn-share" class="px-5 py-2.5 bg-indigo-600 text-white rounded-full font-bold shadow-md shadow-indigo-200 text-sm active:bg-indigo-700 transition">
+                分享戰果摘要
+            </button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-4 md:px-8 mb-6">
+            <div class="bg-blue-50 rounded-xl p-3 flex items-center shadow-sm">
+                <div class="text-3xl font-black text-blue-600 w-12 text-center" id="stat-total">30</div>
+                <div class="ml-2">
+                    <div class="text-[10px] text-slate-400 font-bold">挑戰總數</div>
+                    <div class="text-xs font-bold text-slate-700"><span id="stat-total-label">30</span> 位挑戰者</div>
+                </div>
+            </div>
+            <div class="bg-red-50 rounded-xl p-3 flex items-center shadow-sm">
+                <div class="text-3xl font-black text-red-500 w-12 text-center" id="stat-red">0</div>
+                <div class="ml-2">
+                    <div class="text-[10px] text-red-400 font-bold">缺交中</div>
+                    <div class="text-xs font-bold text-red-700"><span id="stat-red-label">0</span> 位挑戰者</div>
+                </div>
+            </div>
+            <div class="bg-amber-50 rounded-xl p-3 flex items-center shadow-sm">
+                <div class="text-3xl font-black text-amber-500 w-12 text-center" id="stat-yellow">0</div>
+                <div class="ml-2">
+                    <div class="text-[10px] text-amber-500 font-bold">訂正簽名未通過</div>
+                    <div class="text-xs font-bold text-amber-700"><span id="stat-yellow-label">0</span> 位挑戰者</div>
+                </div>
+            </div>
+            <div class="bg-green-50 rounded-xl p-3 flex items-center shadow-sm">
+                <div class="text-3xl font-black text-green-500 w-12 text-center" id="stat-green">0</div>
+                <div class="ml-2">
+                    <div class="text-[10px] text-green-500 font-bold">已達成</div>
+                    <div class="text-xs font-bold text-green-700"><span id="stat-green-label">0</span> 位挑戰者</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Grid -->
+        <div class="px-4 md:px-8 pb-24 overflow-y-auto flex-1">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4" id="student-grid">
+                <!-- JavaScript will populate this -->
+            </div>
+        </div>
+
+        <!-- Bottom Status Bar -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 py-2 px-6 flex flex-col justify-center items-center shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+            <div class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                <span id="bottom-rate">0% 達成率</span>
+                <span class="text-green-500">✔️</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-1">© 2026 JyunHan．版權所有</div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast absolute top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg font-bold text-sm z-50 flex items-center gap-2">
+            <span>📋</span> 戰報摘要已複製到剪貼簿
+        </div>
+
+    </div>
+
+    <script>
+        // Initial Data based on the mockups
+        // Using IDs 1-15, 21-35 to make 30 total students as per the sample screenshot
+        const studentIds = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+            21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
+        ];
+
+        let students = studentIds.map(id => {
+            return {
+                id: id,
+                status: 'red',
+                avatar: id % 2 === 0 ? '👦' : '👧' // Alternate simple avatars
+            };
+        });
+
+        const gridEl = document.getElementById('student-grid');
+        const statTotalEl = document.getElementById('stat-total');
+        const statRedEl = document.getElementById('stat-red');
+        const statYellowEl = document.getElementById('stat-yellow');
+        const statGreenEl = document.getElementById('stat-green');
+        const statTotalLabelEl = document.getElementById('stat-total-label');
+        const statRedLabelEl = document.getElementById('stat-red-label');
+        const statYellowLabelEl = document.getElementById('stat-yellow-label');
+        const statGreenLabelEl = document.getElementById('stat-green-label');
+        const bottomRateEl = document.getElementById('bottom-rate');
+        const btnShare = document.getElementById('btn-share');
+        const btnClear = document.getElementById('btn-clear');
+        const taskNameInput = document.getElementById('task-name-input');
+        const toast = document.getElementById('toast');
+
+        function getBorderColor(status) {
+            if (status === 'red') return 'border-red-500';
+            if (status === 'yellow') return 'border-amber-400';
+            if (status === 'green') return 'border-green-500';
+            if (status === 'skipped') return 'border-slate-400';
+            return 'border-slate-200';
+        }
+
+        function renderStudents() {
+            gridEl.innerHTML = '';
+            students.forEach((student, index) => {
+                const card = document.createElement('div');
+                
+                if (student.status === 'skipped') {
+                    card.className = `bg-slate-50 rounded-xl p-3 border-t-4 shadow-sm flex flex-col items-center relative ${getBorderColor(student.status)}`;
+                    card.innerHTML = `
+                        <div class="absolute top-1 right-2 w-4 h-4 rounded-full bg-slate-400 text-white text-[10px] flex items-center justify-center cursor-pointer hover:bg-slate-500 transition-colors" onclick="toggleSkip(${index})">↺</div>
+                        <div class="flex items-center gap-2 mb-3 w-full justify-center opacity-40">
+                            <span class="text-xs font-bold text-slate-500 font-mono">NO.${String(student.id).padStart(2, '0')}</span>
+                            <span class="text-lg grayscale">${student.avatar}</span>
+                        </div>
+                        <div class="flex gap-2 justify-center w-full opacity-40">
+                            <div class="w-6 h-6 rounded-full bg-slate-200"></div>
+                            <div class="w-6 h-6 rounded-full bg-slate-200"></div>
+                            <div class="w-6 h-6 rounded-full bg-slate-200"></div>
+                        </div>
+                    `;
+                } else {
+                    card.className = `bg-amber-50/30 rounded-xl p-3 border-t-4 shadow-sm flex flex-col items-center relative ${getBorderColor(student.status)}`;
+                    card.innerHTML = `
+                        <div class="absolute top-1 right-2 w-4 h-4 rounded-full bg-white border border-slate-200 text-slate-400 text-[10px] flex items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors" onclick="toggleSkip(${index})">✕</div>
+                        <div class="flex items-center gap-2 mb-3 w-full justify-center">
+                            <span class="text-xs font-bold text-slate-500 font-mono">NO.${String(student.id).padStart(2, '0')}</span>
+                            <span class="text-lg">${student.avatar}</span>
+                        </div>
+                        <div class="flex gap-2 justify-center w-full">
+                            <button onclick="setStatus(${index}, 'red')" class="status-btn w-6 h-6 rounded-full ${student.status === 'red' ? 'bg-red-500 active' : 'bg-red-200 inactive'}"></button>
+                            <button onclick="setStatus(${index}, 'yellow')" class="status-btn w-6 h-6 rounded-full ${student.status === 'yellow' ? 'bg-amber-400 active' : 'bg-amber-200 inactive'}"></button>
+                            <button onclick="setStatus(${index}, 'green')" class="status-btn w-6 h-6 rounded-full ${student.status === 'green' ? 'bg-green-500 active' : 'bg-green-200 inactive'}"></button>
+                        </div>
+                    `;
+                }
+                gridEl.appendChild(card);
+            });
+            updateStats();
+        }
+
+        window.setStatus = function(index, color) {
+            students[index].status = color;
+            renderStudents();
+        }
+
+        window.toggleSkip = function(index) {
+            if (students[index].status === 'skipped') {
+                students[index].status = 'red';
+            } else {
+                students[index].status = 'skipped';
+            }
+            renderStudents();
+        }
+
+        function updateStats() {
+            const activeStudents = students.filter(s => s.status !== 'skipped');
+            const redCount = activeStudents.filter(s => s.status === 'red').length;
+            const yellowCount = activeStudents.filter(s => s.status === 'yellow').length;
+            const greenCount = activeStudents.filter(s => s.status === 'green').length;
+            const total = activeStudents.length;
+
+            statTotalEl.innerText = total;
+            statRedEl.innerText = redCount;
+            statYellowEl.innerText = yellowCount;
+            statGreenEl.innerText = greenCount;
+            
+            if(statTotalLabelEl) statTotalLabelEl.innerText = total;
+            if(statRedLabelEl) statRedLabelEl.innerText = redCount;
+            if(statYellowLabelEl) statYellowLabelEl.innerText = yellowCount;
+            if(statGreenLabelEl) statGreenLabelEl.innerText = greenCount;
+
+            const rate = total === 0 ? 0 : Math.round((greenCount / total) * 100);
+            bottomRateEl.innerText = `${rate}% 達成率`;
+        }
+
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function generateReportText() {
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+
+            const activeStudents = students.filter(s => s.status !== 'skipped');
+            const redStudents = activeStudents.filter(s => s.status === 'red').map(s => s.id);
+            const yellowStudents = activeStudents.filter(s => s.status === 'yellow').map(s => s.id);
+            const greenStudents = activeStudents.filter(s => s.status === 'green').map(s => s.id);
+            
+            const rate = activeStudents.length === 0 ? 0 : Math.round((greenStudents.length / activeStudents.length) * 100);
+            
+            const currentTaskName = taskNameInput.value.trim() || '未命名任務';
+
+            return `🚀 【學習任務檢核區 - 戰果摘要】
+📚 學習項目：${currentTaskName}
+📅 紀錄日期：${dateStr}
+-------------------------
+🔴 缺交中 (${redStudents.length}人)：${redStudents.join(', ')}
+🟡 訂正簽名未通過 (${yellowStudents.length}人)：${yellowStudents.join(', ')}
+🟢 已達成 (${greenStudents.length}人)：${greenStudents.join(', ')}
+-------------------------
+✨ 當前達成率：${rate}%`;
+        }
+
+        btnShare.addEventListener('click', () => {
+            const text = generateReportText();
+            
+            // Fallback for clipboard API in iframe
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Failed to copy text', err);
+            }
+            
+            textArea.remove();
+        });
+
+        if (btnClear) {
+            btnClear.addEventListener('click', () => {
+                students.forEach(s => {
+                    if (s.status !== 'skipped') s.status = 'red';
+                });
+                renderStudents();
+            });
+        }
+
+        // Initial render
+        renderStudents();
+    </script>
+</body>
+</html>
