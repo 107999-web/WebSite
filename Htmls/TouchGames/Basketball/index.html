@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🏀 投籃挑戰 Basketball Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0a0a1a; font-family:'Nunito',sans-serif; touch-action:none; }
+
+/* ======= CANVAS ======= */
+#gameCanvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
+
+/* ======= MENU ======= */
+#menuScreen {
+  position:absolute; top:0; left:0; width:100%; height:100%; z-index:100;
+  background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:20px;
+}
+.menu-bg-balls {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  overflow:hidden; pointer-events:none;
+}
+.bg-ball {
+  position:absolute; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(255,160,50,0.3), rgba(200,100,0,0.1));
+  border:2px solid rgba(255,140,0,0.15);
+  animation:floatBall linear infinite;
+}
+@keyframes floatBall {
+  0%   { transform:translateY(110vh) rotate(0deg); opacity:0; }
+  10%  { opacity:0.6; }
+  90%  { opacity:0.4; }
+  100% { transform:translateY(-20vh) rotate(360deg); opacity:0; }
+}
+.menu-logo {
+  position:relative; z-index:1;
+  font-size:clamp(56px,9vw,140px); font-weight:900; color:#fff; letter-spacing:4px;
+  text-shadow:0 0 60px rgba(255,140,0,0.9), 0 6px 30px rgba(0,0,0,0.6);
+  margin-bottom:4px;
+}
+.menu-sub {
+  position:relative; z-index:1;
+  font-size:clamp(16px,2.2vw,34px); color:rgba(255,200,80,0.9); font-weight:800;
+  letter-spacing:2px; margin-bottom:clamp(20px,3vh,50px);
+}
+.settings-panel {
+  position:relative; z-index:1;
+  background:rgba(255,255,255,0.07); backdrop-filter:blur(20px);
+  border:2px solid rgba(255,255,255,0.15); border-radius:32px;
+  padding:clamp(20px,3vw,48px); width:min(95vw,720px);
+  display:flex; flex-direction:column; gap:clamp(14px,2vh,26px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+.setting-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.setting-label {
+  font-size:clamp(15px,1.8vw,26px); color:#fff; font-weight:800;
+  min-width:clamp(90px,9vw,130px); white-space:nowrap;
+}
+.option-btn {
+  background:rgba(255,255,255,0.12); border:2.5px solid rgba(255,255,255,0.25);
+  border-radius:50px; padding:clamp(7px,0.9vw,13px) clamp(14px,1.8vw,26px);
+  color:#fff; font-family:'Nunito',sans-serif; font-size:clamp(13px,1.6vw,22px);
+  font-weight:800; cursor:pointer; transition:all 0.18s;
+}
+.option-btn.active, .option-btn:hover {
+  transform:scale(1.06); box-shadow:0 4px 20px rgba(255,140,0,0.5);
+}
+.time-btn.active  { background:#FF8C00; border-color:#FF8C00; }
+.time-btn:not(.active):hover { background:rgba(255,140,0,0.25); border-color:rgba(255,140,0,0.5); }
+.size-btn.active  { background:#7C3AED; border-color:#7C3AED; }
+.size-btn:not(.active):hover { background:rgba(124,58,237,0.3); border-color:rgba(124,58,237,0.5); }
+
+.divider { border:none; border-top:1px solid rgba(255,255,255,0.1); }
+.start-btn {
+  background:linear-gradient(135deg,#FF8C00,#FF4500);
+  border:none; border-radius:50px;
+  padding:clamp(14px,2vh,26px) clamp(36px,5vw,80px);
+  color:#fff; font-family:'Nunito',sans-serif;
+  font-size:clamp(20px,2.8vw,40px); font-weight:900;
+  cursor:pointer; letter-spacing:2px;
+  box-shadow:0 8px 32px rgba(255,100,0,0.6);
+  transition:all 0.18s; align-self:center;
+}
+.start-btn:hover, .start-btn:active {
+  transform:scale(1.06) translateY(-3px);
+  box-shadow:0 14px 40px rgba(255,100,0,0.7);
+}
+
+/* ======= HUD ======= */
+#hud { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:50; display:none; }
+#hud.show { display:block; }
+.hud-score {
+  position:absolute; top:clamp(14px,2vh,28px); left:clamp(18px,2vw,36px);
+  background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
+  border:2.5px solid rgba(255,165,0,0.5); border-radius:22px;
+  padding:clamp(10px,1.2vh,18px) clamp(18px,2vw,32px);
+  color:#FFD700; font-size:clamp(22px,3vw,50px); font-weight:900;
+  display:flex; align-items:center; gap:10px;
+  box-shadow:0 4px 20px rgba(255,165,0,0.25);
+}
+.hud-timer {
+  position:absolute; top:clamp(14px,2vh,28px); left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
+  border:2.5px solid rgba(255,255,255,0.25); border-radius:22px;
+  padding:clamp(10px,1.2vh,18px) clamp(22px,2.5vw,38px);
+  color:#fff; font-size:clamp(26px,3.8vw,64px); font-weight:900;
+  min-width:clamp(90px,9vw,160px); text-align:center;
+}
+.hud-timer.warn {
+  border-color:#FF4444; color:#FF5555;
+  animation:timerPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes timerPulse {
+  from { transform:translateX(-50%) scale(1); box-shadow:0 0 0 rgba(255,68,68,0); }
+  to   { transform:translateX(-50%) scale(1.08); box-shadow:0 0 20px rgba(255,68,68,0.5); }
+}
+.hud-streak {
+  position:absolute; top:clamp(14px,2vh,28px); right:clamp(18px,2vw,36px);
+  background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
+  border:2.5px solid rgba(255,100,180,0.4); border-radius:22px;
+  padding:clamp(10px,1.2vh,18px) clamp(18px,2vw,30px);
+  color:#FF80C8; font-size:clamp(14px,1.8vw,28px); font-weight:900;
+  text-align:center; line-height:1.3;
+}
+.hud-hint {
+  position:absolute; bottom:clamp(18px,3vh,40px); left:50%; transform:translateX(-50%);
+  color:rgba(255,255,255,0.55); font-size:clamp(14px,1.6vw,24px); font-weight:800;
+  text-shadow:0 2px 8px rgba(0,0,0,0.8); white-space:nowrap; text-align:center;
+  animation:hintFade 2.5s ease-in-out infinite;
+}
+@keyframes hintFade {
+  0%,100%{ opacity:0.4; } 50%{ opacity:0.9; }
+}
+
+/* ======= MOVING HOOP WARNING ======= */
+.hud-moving-warn {
+  position:absolute; top:clamp(90px,13vh,170px); left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(220,30,0,0.92),rgba(255,80,0,0.92));
+  border:2.5px solid rgba(255,140,0,0.8); border-radius:50px;
+  color:#fff; font-size:clamp(13px,1.6vw,24px); font-weight:900;
+  padding:clamp(5px,0.7vh,10px) clamp(16px,2vw,30px);
+  white-space:nowrap; display:none;
+  box-shadow:0 4px 20px rgba(255,50,0,0.5);
+  animation:movingPulse 0.7s ease-in-out infinite alternate;
+  z-index:55;
+}
+.hud-moving-warn.show { display:block; }
+@keyframes movingPulse {
+  from { opacity:0.8; transform:translateX(-50%) scale(0.97); box-shadow:0 4px 16px rgba(255,50,0,0.4); }
+  to   { opacity:1;   transform:translateX(-50%) scale(1.04); box-shadow:0 6px 28px rgba(255,80,0,0.75); }
+}
+
+/* ======= COUNTDOWN ======= */
+#countdown {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(0.5);
+  font-size:clamp(100px,18vw,240px); font-weight:900; color:#fff;
+  text-shadow:0 0 80px rgba(255,165,0,1), 0 0 30px rgba(255,165,0,0.6);
+  z-index:80; pointer-events:none; display:none;
+  animation:countPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+#countdown.show { display:block; }
+@keyframes countPop {
+  from { transform:translate(-50%,-50%) scale(0.3); opacity:0; }
+  to   { transform:translate(-50%,-50%) scale(1); opacity:1; }
+}
+
+/* ======= GAME OVER ======= */
+#gameOverScreen {
+  position:absolute; top:0; left:0; width:100%; height:100%; z-index:100;
+  background:rgba(0,0,0,0.82); backdrop-filter:blur(12px);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+}
+#gameOverScreen.show { display:flex; }
+.go-card {
+  background:linear-gradient(135deg,#1a1a3e,#2a2a5e);
+  border:3px solid rgba(255,165,0,0.6); border-radius:40px;
+  padding:clamp(28px,4vw,64px); text-align:center;
+  box-shadow:0 24px 64px rgba(255,140,0,0.3);
+  min-width:min(85vw,520px);
+  animation:cardIn 0.4s cubic-bezier(0.34,1.4,0.64,1);
+}
+@keyframes cardIn {
+  from { transform:scale(0.6); opacity:0; }
+  to   { transform:scale(1); opacity:1; }
+}
+.go-emoji { font-size:clamp(48px,7vw,90px); margin-bottom:8px; }
+.go-title {
+  font-size:clamp(28px,4.5vw,68px); font-weight:900; color:#FFD700;
+  text-shadow:0 0 30px rgba(255,215,0,0.7); margin-bottom:8px;
+}
+.go-score {
+  font-size:clamp(64px,10vw,140px); font-weight:900; color:#fff;
+  text-shadow:0 4px 24px rgba(255,255,255,0.25); line-height:1;
+  margin:10px 0;
+}
+.go-score-label { font-size:clamp(16px,1.8vw,26px); color:rgba(255,220,80,0.8); font-weight:800; }
+.go-stats {
+  font-size:clamp(14px,1.6vw,24px); color:rgba(255,255,255,0.65); margin:16px 0 24px;
+  font-weight:700;
+}
+.go-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.go-btn {
+  border:none; border-radius:50px; cursor:pointer; font-family:'Nunito',sans-serif;
+  font-size:clamp(16px,2vw,30px); font-weight:900;
+  padding:clamp(12px,1.4vh,20px) clamp(26px,3vw,48px);
+  transition:all 0.18s;
+}
+.go-btn:hover { transform:scale(1.06) translateY(-2px); }
+.btn-again { background:linear-gradient(135deg,#FF8C00,#FF4500); color:#fff; box-shadow:0 6px 24px rgba(255,100,0,0.5); }
+.btn-menu  { background:rgba(255,255,255,0.12); color:#fff; border:2px solid rgba(255,255,255,0.3); }
+
+/* ======= SCORE POPUP ======= */
+.score-popup {
+  position:absolute; pointer-events:none; z-index:60;
+  font-family:'Nunito',sans-serif; font-weight:900;
+  text-shadow:0 3px 12px rgba(0,0,0,0.6);
+  animation:popFloat 1.3s ease-out forwards;
+  transform-origin:center bottom;
+}
+@keyframes popFloat {
+  0%   { opacity:0; transform:scale(0.4) translateY(0); }
+  20%  { opacity:1; transform:scale(1.3) translateY(-10px); }
+  80%  { opacity:1; transform:scale(1) translateY(-70px); }
+  100% { opacity:0; transform:scale(0.9) translateY(-110px); }
+}
+
+/* ======= HOOP CHANGE FLASH ======= */
+.hoop-move-toast {
+  position:absolute; left:50%; transform:translateX(-50%);
+  background:rgba(255,100,0,0.9); border-radius:50px; color:#fff;
+  font-size:clamp(16px,2vw,28px); font-weight:900;
+  padding:10px 28px; white-space:nowrap;
+  animation:toastSlide 1.8s ease forwards;
+  pointer-events:none; z-index:65;
+}
+@keyframes toastSlide {
+  0%   { opacity:0; top:18%; transform:translateX(-50%) scale(0.8); }
+  15%  { opacity:1; top:20%; transform:translateX(-50%) scale(1); }
+  75%  { opacity:1; top:20%; }
+  100% { opacity:0; top:18%; }
+}
+
+/* ======= HUD LEADERBOARD ======= */
+.hud-leaderboard {
+  position:absolute; top:clamp(82px,11.5vh,148px); left:clamp(18px,2vw,36px);
+  background:rgba(0,0,0,0.70); backdrop-filter:blur(12px);
+  border:2px solid rgba(255,215,0,0.28); border-radius:18px;
+  padding:clamp(8px,1vh,14px) clamp(12px,1.4vw,20px);
+  color:#fff; font-family:'Nunito',sans-serif;
+  min-width:clamp(150px,17vw,240px);
+  box-shadow:0 4px 18px rgba(0,0,0,0.35);
+}
+.hud-lb-title {
+  color:#FFD700; font-size:clamp(11px,1.2vw,17px); font-weight:900;
+  margin-bottom:5px; display:flex; align-items:center; gap:5px; white-space:nowrap;
+}
+.hud-lb-cat { color:rgba(255,200,80,0.82); font-size:0.88em; }
+.hud-lb-row {
+  display:flex; align-items:center; gap:6px;
+  padding:clamp(2px,0.28vh,5px) 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:clamp(12px,1.35vw,20px); font-weight:800;
+}
+.hud-lb-row:last-child { border-bottom:none; }
+.hud-lb-medal { width:1.5em; text-align:center; font-size:0.90em; }
+.hud-lb-pts { flex:1; }
+.hud-lb-pts em { font-style:normal; font-size:0.72em; color:rgba(255,200,80,0.80); }
+.hud-lb-date { color:rgba(255,255,255,0.35); font-size:0.68em; white-space:nowrap; }
+.hud-lb-empty { color:rgba(255,255,255,0.30); font-size:clamp(11px,1.1vw,15px);
+  text-align:center; padding:4px 0; }
+@keyframes lbGlow {
+  0%,100%{ border-color:rgba(255,215,0,0.28); box-shadow:0 4px 18px rgba(0,0,0,0.35); }
+  50%{ border-color:rgba(255,215,0,0.95); box-shadow:0 0 26px rgba(255,215,0,0.50); }
+}
+.hud-leaderboard.lb-flash { animation:lbGlow 0.9s ease-in-out 3; }
+
+/* ======= GAME OVER LEADERBOARD ======= */
+.go-lb {
+  margin:14px 0; text-align:left;
+  background:rgba(255,255,255,0.04); border-radius:14px;
+  padding:clamp(10px,1.4vh,16px) clamp(14px,1.8vw,22px);
+  border:1px solid rgba(255,215,0,0.20);
+}
+.go-lb-title {
+  color:#FFD700; font-size:clamp(13px,1.4vw,20px); font-weight:900;
+  margin-bottom:8px; display:flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.go-lb-cat { color:rgba(255,200,80,0.80); font-size:0.86em; }
+.go-lb-row {
+  display:flex; align-items:center; gap:8px;
+  font-size:clamp(13px,1.4vw,20px); font-weight:800;
+  padding:clamp(3px,0.4vh,6px) 0;
+  border-bottom:1px solid rgba(255,255,255,0.06); color:#fff;
+}
+.go-lb-row:last-child { border-bottom:none; }
+.go-lb-row.is-new { color:#FFD700; }
+.go-lb-medal { width:1.6em; text-align:center; font-size:0.95em; }
+.go-lb-pts { flex:1; }
+.go-lb-pts em { font-style:normal; font-size:0.70em; color:rgba(255,200,80,0.80); }
+.go-lb-date { color:rgba(255,255,255,0.38); font-size:0.70em; white-space:nowrap; }
+.go-lb-new-badge {
+  background:linear-gradient(135deg,#FFD700,#FF8C00); color:#1a0800;
+  border-radius:8px; padding:1px 8px; font-size:0.68em; font-weight:900;
+  vertical-align:middle; margin-left:5px;
+}
+
+/* ======= MENU SECONDARY BUTTONS ======= */
+.menu-btns-row {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:-4px;
+}
+.menu-sec-btn {
+  background:rgba(255,255,255,0.09); border:2px solid rgba(255,255,255,0.22);
+  border-radius:50px; padding:clamp(9px,1vh,15px) clamp(22px,2.6vw,40px);
+  color:#fff; font-family:'Nunito',sans-serif;
+  font-size:clamp(14px,1.6vw,22px); font-weight:800;
+  cursor:pointer; transition:all 0.18s; letter-spacing:1px;
+}
+.menu-sec-btn:hover {
+  background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.50);
+  transform:scale(1.06) translateY(-2px);
+  box-shadow:0 6px 20px rgba(255,255,255,0.10);
+}
+
+/* ======= MODAL OVERLAY ======= */
+.modal-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%; z-index:300;
+  background:rgba(0,0,0,0.78); backdrop-filter:blur(10px);
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.show { display:flex; }
+.modal-card {
+  background:linear-gradient(145deg,#1a1a3e,#252550);
+  border:2.5px solid rgba(255,165,0,0.45); border-radius:32px;
+  padding:clamp(22px,3vw,48px); width:min(94vw,660px);
+  max-height:85vh; overflow-y:auto; position:relative;
+  box-shadow:0 24px 72px rgba(0,0,0,0.55);
+  animation:cardIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+  scrollbar-width:thin; scrollbar-color:rgba(255,165,0,0.3) transparent;
+}
+.modal-card::-webkit-scrollbar { width:5px; }
+.modal-card::-webkit-scrollbar-thumb { background:rgba(255,165,0,0.30); border-radius:4px; }
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:clamp(16px,2vh,28px);
+}
+.modal-title {
+  font-size:clamp(20px,2.6vw,36px); font-weight:900; color:#FFD700;
+  text-shadow:0 0 20px rgba(255,215,0,0.4);
+}
+.modal-close {
+  background:rgba(255,255,255,0.10); border:1.5px solid rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.80); font-size:clamp(18px,1.8vw,24px);
+  cursor:pointer; min-width:clamp(34px,3.5vw,46px); height:clamp(34px,3.5vw,46px);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  transition:all 0.18s; font-weight:900; flex-shrink:0;
+}
+.modal-close:hover { background:rgba(255,100,0,0.30); border-color:rgba(255,100,0,0.60); color:#fff; transform:scale(1.1); }
+
+/* ======= SCORING TABLE ======= */
+.score-section-title {
+  color:#FF8C00; font-size:clamp(13px,1.4vw,18px); font-weight:900;
+  margin:clamp(14px,1.8vh,22px) 0 8px; display:flex; align-items:center; gap:6px;
+}
+.score-tbl {
+  width:100%; border-collapse:collapse; margin-bottom:4px;
+  font-size:clamp(13px,1.35vw,18px);
+}
+.score-tbl th {
+  background:rgba(255,140,0,0.20); color:#FFD700; font-weight:900; text-align:left;
+  padding:clamp(7px,0.9vh,12px) clamp(10px,1.2vw,16px);
+  border-bottom:2px solid rgba(255,140,0,0.30); border-top:2px solid rgba(255,140,0,0.30);
+}
+.score-tbl td {
+  padding:clamp(7px,0.9vh,12px) clamp(10px,1.2vw,16px);
+  color:#fff; font-weight:800; border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.score-tbl tr:last-child td { border-bottom:none; }
+.score-tbl tr:nth-child(even) td { background:rgba(255,255,255,0.03); }
+.score-tbl .tag {
+  background:rgba(255,140,0,0.22); border-radius:8px;
+  padding:2px 10px; font-size:0.84em; font-weight:900; white-space:nowrap;
+}
+.score-combo-box {
+  background:rgba(255,215,0,0.08); border:1.5px solid rgba(255,215,0,0.22);
+  border-radius:16px; padding:clamp(12px,1.4vh,18px) clamp(14px,1.6vw,20px);
+  margin-top:clamp(14px,1.8vh,22px);
+}
+.score-combo-title {
+  color:#FFD700; font-size:clamp(13px,1.4vw,18px); font-weight:900;
+  margin-bottom:10px; display:flex; align-items:center; gap:6px;
+}
+.combo-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;
+  font-size:clamp(12px,1.25vw,17px); font-weight:800;
+}
+.combo-item {
+  display:flex; justify-content:space-between; align-items:center;
+  background:rgba(255,255,255,0.04); border-radius:10px;
+  padding:clamp(6px,0.7vh,10px) clamp(8px,1vw,13px);
+  border:1px solid rgba(255,255,255,0.07);
+}
+.combo-item .cond { color:rgba(255,255,255,0.75); }
+.combo-item .pts { color:#FFD700; font-size:1.2em; }
+.combo-item.max { border-color:rgba(255,215,0,0.35); background:rgba(255,215,0,0.08); }
+.combo-item.max .cond { color:rgba(255,220,100,0.90); }
+.score-note-box {
+  margin-top:clamp(14px,1.8vh,22px); background:rgba(255,255,255,0.04);
+  border-radius:12px; padding:clamp(10px,1.2vh,16px) clamp(12px,1.4vw,18px);
+  border:1px solid rgba(255,255,255,0.09);
+}
+.score-note-row {
+  display:flex; gap:8px; align-items:flex-start;
+  font-size:clamp(12px,1.25vw,17px); font-weight:800; color:rgba(255,255,255,0.72);
+  padding:4px 0;
+}
+.score-note-row+.score-note-row { border-top:1px solid rgba(255,255,255,0.06); margin-top:4px; padding-top:8px; }
+
+/* ======= ALL LEADERBOARD MODAL ======= */
+.alb-filter-row {
+  display:flex; gap:8px; flex-wrap:wrap; margin-bottom:clamp(12px,1.5vh,20px);
+}
+.alb-filter-btn {
+  background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.18);
+  border-radius:50px; padding:5px 16px;
+  color:rgba(255,255,255,0.75); font-family:'Nunito',sans-serif;
+  font-size:clamp(12px,1.2vw,16px); font-weight:800; cursor:pointer; transition:all 0.15s;
+}
+.alb-filter-btn.active { background:#FF8C00; border-color:#FF8C00; color:#fff; }
+.alb-section { margin-bottom:clamp(12px,1.6vh,20px); }
+.alb-section-title {
+  font-size:clamp(13px,1.4vw,18px); font-weight:900; color:#FFD700;
+  padding:clamp(6px,0.7vh,10px) 0; margin-bottom:6px;
+  display:flex; align-items:center; gap:7px;
+  border-bottom:1.5px solid rgba(255,215,0,0.18);
+}
+.alb-row {
+  display:flex; align-items:center; gap:8px;
+  padding:clamp(5px,0.6vh,9px) clamp(6px,0.8vw,10px);
+  font-size:clamp(13px,1.35vw,18px); font-weight:800; color:#fff;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.alb-row:last-child { border-bottom:none; }
+.alb-medal { width:1.6em; text-align:center; font-size:0.92em; }
+.alb-score { flex:1; }
+.alb-score em { font-style:normal; font-size:0.70em; color:rgba(255,200,80,0.78); }
+.alb-date { color:rgba(255,255,255,0.35); font-size:0.68em; white-space:nowrap; }
+.alb-empty-msg {
+  text-align:center; color:rgba(255,255,255,0.28);
+  font-size:clamp(14px,1.5vw,20px); font-weight:800;
+  padding:clamp(28px,4vh,48px) 0;
+  line-height:2;
+}
+</style>
+</head>
+<body>
+
+<!-- ======= CANVAS ======= -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- ======= MAIN MENU ======= -->
+<div id="menuScreen">
+  <div class="menu-bg-balls" id="bgBalls"></div>
+  <div class="menu-logo">🏀 投籃挑戰</div>
+  <div class="menu-sub">Basketball Shooting Challenge</div>
+
+  <div class="settings-panel">
+
+    <!-- Game Time -->
+    <div class="setting-row" style="flex-wrap:nowrap;">
+      <span class="setting-label" style="white-space:nowrap;">⏱ 遊戲時間</span>
+      <div style="display:flex;gap:8px;flex-wrap:nowrap;">
+        <button class="option-btn time-btn" data-time="30">30 秒</button>
+        <button class="option-btn time-btn active" data-time="60">60 秒</button>
+        <button class="option-btn time-btn" data-time="90">90 秒</button>
+        <button class="option-btn time-btn" data-time="120">120 秒</button>
+      </div>
+    </div>
+
+
+    <!-- Ball Size -->
+    <div class="setting-row">
+      <span class="setting-label">📐 球的大小</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="option-btn size-btn" data-size="small">🔸 小</button>
+        <button class="option-btn size-btn active" data-size="medium">🟠 中</button>
+        <button class="option-btn size-btn" data-size="large">🔶 大</button>
+      </div>
+    </div>
+
+    <button class="start-btn" id="startBtn">🏀 開始遊戲！</button>
+    <div class="menu-btns-row">
+      <button class="menu-sec-btn" id="scoringBtn">📋 計分方式</button>
+      <button class="menu-sec-btn" id="allLbBtn">🏆 排行榜</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======= SCORING RULES MODAL ======= -->
+<div class="modal-overlay" id="scoringModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">📋 計分方式</div>
+      <button class="modal-close" id="scoringClose">✕</button>
+    </div>
+
+    <div class="score-section-title">🎯 基礎得分（依籃框距離）</div>
+    <table class="score-tbl">
+      <thead><tr><th>距離</th><th>基礎分</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>近距離投籃</td>
+          <td><span class="tag">2 分</span></td>
+          <td>投球起點至籃框距離較近</td>
+        </tr>
+        <tr>
+          <td>遠距離投籃 🎯</td>
+          <td><span class="tag">3 分</span></td>
+          <td>籃框超過螢幕寬度 36% 以上，出現 🎯 標示</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="score-section-title">🔥 連續加成倍率</div>
+    <table class="score-tbl">
+      <thead><tr><th>連續進球數</th><th>加成倍率</th><th>提示</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1 ～ 2 球</td>
+          <td><span class="tag">× 1</span></td>
+          <td>無加成</td>
+        </tr>
+        <tr>
+          <td>3 ～ 4 球</td>
+          <td><span class="tag">🔥 × 2</span></td>
+          <td>畫面顯示 🔥 x2</td>
+        </tr>
+        <tr>
+          <td>5 球以上</td>
+          <td><span class="tag">🔥 × 3</span></td>
+          <td>畫面顯示 🔥 x3</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="score-combo-box">
+      <div class="score-combo-title">📊 所有得分組合（基礎分 × 倍率）</div>
+      <div class="combo-grid">
+        <div class="combo-item"><span class="cond">近距離 × 1</span><span class="pts">2 分</span></div>
+        <div class="combo-item"><span class="cond">遠距離 × 1</span><span class="pts">3 分</span></div>
+        <div class="combo-item"><span class="cond">近距離 🔥×2</span><span class="pts">4 分</span></div>
+        <div class="combo-item"><span class="cond">遠距離 🔥×2</span><span class="pts">6 分</span></div>
+        <div class="combo-item"><span class="cond">近距離 🔥×3</span><span class="pts">6 分</span></div>
+        <div class="combo-item max"><span class="cond">🎯 遠距離 🔥×3</span><span class="pts">9 分 👑</span></div>
+      </div>
+    </div>
+
+    <div class="score-note-box">
+      <div class="score-note-row"><span>❌</span><span>投失球後連續數<strong>歸零</strong>，倍率重新從 ×1 計算</span></div>
+      <div class="score-note-row"><span>🔄</span><span>每連續投進 4 球，籃框自動移位到新位置</span></div>
+      <div class="score-note-row"><span>⚡</span><span>最後 1/3 時間（依設定），籃框開始左右移動，速度漸增</span></div>
+      <div class="score-note-row"><span>👑</span><span>單球最高 <strong>9 分</strong>：遠距離三分 + 連續 5 球以上 × 3 倍率</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= ALL LEADERBOARD MODAL ======= -->
+<div class="modal-overlay" id="allLbModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">🏆 全部排行榜</div>
+      <button class="modal-close" id="allLbClose">✕</button>
+    </div>
+    <div class="alb-filter-row" id="albFilterRow">
+      <button class="alb-filter-btn active" data-filter="all">全部</button>
+      <button class="alb-filter-btn" data-filter="30">30 秒</button>
+      <button class="alb-filter-btn" data-filter="60">60 秒</button>
+      <button class="alb-filter-btn" data-filter="90">90 秒</button>
+      <button class="alb-filter-btn" data-filter="120">120 秒</button>
+    </div>
+    <div id="allLbContent"></div>
+  </div>
+</div>
+
+<!-- ======= HUD ======= -->
+<div id="hud">
+  <div class="hud-score">🏀 <span id="scoreDisplay">0</span></div>
+  <div class="hud-leaderboard" id="hudLeaderboard">
+    <div class="hud-lb-title">🏆 排行榜 <span class="hud-lb-cat" id="lbCat"></span></div>
+    <div id="lbRows"></div>
+  </div>
+  <div class="hud-timer" id="timerDisplay">60</div>
+  <div class="hud-streak" id="streakDisplay">
+    🔥 連續<br><span id="streakCount" style="font-size:1.8em;line-height:1;">0</span>
+  </div>
+  <div class="hud-hint" id="hintText">觸碰球並向籃框方向滑動投球 ✨</div>
+  <div class="hud-moving-warn" id="movingWarn">⚡ 最後衝刺！籃框移動中！</div>
+</div>
+
+<!-- ======= COUNTDOWN ======= -->
+<div id="countdown"></div>
+
+<!-- ======= GAME OVER ======= -->
+<div id="gameOverScreen">
+  <div class="go-card">
+    <div class="go-emoji" id="goEmoji">🏆</div>
+    <div class="go-title">遊戲結束！</div>
+    <div class="go-score-label">最終得分</div>
+    <div class="go-score" id="finalScore">0</div>
+    <div class="go-stats" id="finalStats">投進 0 球 ／ 出手 0 次 ／ 命中率 0%</div>
+    <div class="go-lb" id="goLb">
+      <div class="go-lb-title">🏆 排行榜 <span class="go-lb-cat" id="goLbCat"></span></div>
+      <div id="goLbRows"></div>
+    </div>
+    <div class="go-btns">
+      <button class="go-btn btn-again" id="playAgainBtn">🔄 再玩一次</button>
+      <button class="go-btn btn-menu" id="menuBtn">🏠 主選單</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG & CONSTANTS
+// ═══════════════════════════════════════════════════════
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const GRAVITY    = 0.48;
+const RESTITUTION= 0.52;
+const MAX_POWER  = 30;
+const TRAIL_LEN  = 22;
+
+const BALL_SIZES = { small: 0.026, medium: 0.036, large: 0.048 };
+
+// Hoop positions as [xRatio, yRatio]
+const HOOP_CONFIGS = [
+  [0.76, 0.46],
+  [0.80, 0.39],
+  [0.74, 0.53],
+  [0.84, 0.42],
+  [0.78, 0.35],
+];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let W, H, DPR;
+
+const cfg = { gameTime:60, ballColor:'#FF6B00', ballSize:'medium' };
+
+let gs = 'menu'; // menu | countdown | playing | gameover
+let score=0, timeLeft=60, streak=0, maxStreak=0, totalMade=0, totalAttempts=0;
+let gameTimerID=null, rafID=null;
+let hoopIdx=0, shotsSinceChange=0;
+
+const ball = { x:0,y:0,vx:0,vy:0,r:30, inFlight:false, scored:false, trail:[], rot:0, idle:0 };
+const hoop = { x:0,y:0, rimR:0, tubeR:8, bbX:0,bbY:0,bbW:0,bbH:0, poleX:0,poleBot:0 };
+const drag = { on:false, x0:0,y0:0, cx:0,cy:0 };
+
+let effects=[]; // {type,x,y,vx,vy,r,color,life,maxLife}
+let hoopFlash=0;
+let prevBallY=0;
+let hoopMoving=false, hoopMovePhase=0, hoopBaseX=0;
+let crowdRows=[];
+let floorY=0;
+
+// ═══════════════════════════════════════════════════════
+//  RESIZE & INIT
+// ═══════════════════════════════════════════════════════
+function resize(){
+  DPR = window.devicePixelRatio||1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width  = W*DPR; canvas.height = H*DPR;
+  canvas.style.width  = W+'px'; canvas.style.height = H+'px';
+  ctx.scale(DPR,DPR);
+  floorY = H*0.80;
+  genCrowd();
+  updatePositions();
+}
+
+function updatePositions(){
+  ball.r = Math.max(18, W * BALL_SIZES[cfg.ballSize]);
+  if(!ball.inFlight){
+    ball.x = W*0.14; ball.y = floorY - ball.r;
+  }
+  const hp = HOOP_CONFIGS[hoopIdx];
+  hoopBaseX = W*hp[0];
+  hoop.x = hoopBaseX; hoop.y = H*hp[1];
+  hoop.rimR   = ball.r * 1.55;
+  hoop.tubeR  = Math.max(5, ball.r * 0.22);
+  hoop.bbW    = ball.r * 0.65;
+  hoop.bbH    = ball.r * 3.8;
+  hoop.bbX    = hoop.x + hoop.rimR + ball.r*0.35;
+  hoop.bbY    = hoop.y - hoop.bbH*0.38;
+  hoop.poleX  = hoop.bbX + hoop.bbW*0.5;
+  hoop.poleBot= floorY;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PRE-GENERATE CROWD
+// ═══════════════════════════════════════════════════════
+function genCrowd(){
+  crowdRows=[];
+  const rows=5;
+  const crowdTop = H*0.02, crowdBot = H*0.56;
+  const rowH = (crowdBot-crowdTop)/rows;
+  for(let r=0;r<rows;r++){
+    const rowArr=[];
+    const baseY = crowdBot - r*rowH;
+    const count = Math.ceil(W/26)+2;
+    const offset = (r%2)*13;
+    for(let i=0;i<count;i++){
+      const seed = Math.sin(i*1.7+r*3.1)*10000;
+      rowArr.push({
+        x: i*26+offset,
+        dy: (seed%1)*12-6,
+        sz: 9+r*1.8+(seed%1)*3,
+        hue: Math.floor((seed%1)*360)
+      });
+    }
+    crowdRows.push({baseY, arr:rowArr, r});
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRAWING
+// ═══════════════════════════════════════════════════════
+function drawArena(){
+  // Sky/arena gradient
+  const g = ctx.createLinearGradient(0,0,0,H*0.82);
+  g.addColorStop(0,'#050510');
+  g.addColorStop(0.35,'#0c1230');
+  g.addColorStop(0.7,'#141830');
+  g.addColorStop(1,'#1a1a28');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H*0.82);
+
+  // Spotlights
+  [[0.18,0],[0.50,0],[0.82,0]].forEach(([rx,ry])=>{
+    const sg=ctx.createConicalGradient ? null : ctx.createRadialGradient(W*rx,H*ry,0,W*rx,H*ry,H*0.65);
+    if(!sg) return;
+    sg.addColorStop(0,'rgba(255,220,140,0.09)');
+    sg.addColorStop(0.55,'rgba(255,180,80,0.03)');
+    sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;
+    ctx.beginPath();
+    ctx.moveTo(W*rx, H*-0.05);
+    ctx.lineTo(W*rx - H*0.45, floorY);
+    ctx.lineTo(W*rx + H*0.45, floorY);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  // Court lights strip
+  for(let i=0;i<6;i++){
+    const lx=W*(0.1+i*0.16);
+    const lg=ctx.createRadialGradient(lx,-10,0,lx,-10,H*0.25);
+    lg.addColorStop(0,'rgba(220,200,100,0.12)');
+    lg.addColorStop(1,'transparent');
+    ctx.fillStyle=lg;
+    ctx.fillRect(0,0,W,H*0.5);
+  }
+}
+
+function drawCrowd(){
+  crowdRows.forEach(({baseY,arr,r})=>{
+    arr.forEach(p=>{
+      const y=baseY+p.dy;
+      // Head
+      ctx.fillStyle=`hsl(${p.hue},25%,${12+r*3}%)`;
+      ctx.beginPath(); ctx.arc(p.x,y,p.sz,0,Math.PI*2); ctx.fill();
+      // Shoulders
+      ctx.beginPath();
+      ctx.ellipse(p.x,y+p.sz*0.9,p.sz*1.3,p.sz*0.55,0,0,Math.PI);
+      ctx.fill();
+      // Tiny color dot (jersey)
+      ctx.fillStyle=`hsla(${(p.hue+120)%360},70%,55%,0.5)`;
+      ctx.beginPath(); ctx.arc(p.x,y+p.sz*0.4,p.sz*0.35,0,Math.PI*2); ctx.fill();
+    });
+  });
+  // Fade overlay
+  const fog=ctx.createLinearGradient(0,H*0.4,0,H*0.58);
+  fog.addColorStop(0,'transparent');
+  fog.addColorStop(1,'rgba(14,14,26,0.9)');
+  ctx.fillStyle=fog; ctx.fillRect(0,H*0.4,W,H*0.18);
+}
+
+function drawFloor(){
+  // Base floor
+  const fg=ctx.createLinearGradient(0,floorY,0,H);
+  fg.addColorStop(0,'#C87830');
+  fg.addColorStop(0.25,'#B56A22');
+  fg.addColorStop(1,'#7A4410');
+  ctx.fillStyle=fg; ctx.fillRect(0,floorY,W,H-floorY);
+
+  // Plank vertical lines
+  ctx.strokeStyle='rgba(0,0,0,0.14)'; ctx.lineWidth=1.2;
+  const plankW=Math.max(32,W/55);
+  for(let x=0;x<=W;x+=plankW){
+    ctx.beginPath(); ctx.moveTo(x,floorY); ctx.lineTo(x,H); ctx.stroke();
+  }
+  // Grain horizontal
+  ctx.strokeStyle='rgba(255,255,255,0.055)'; ctx.lineWidth=0.8;
+  for(let y=floorY+5;y<H;y+=7){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+  // Shine strip
+  const shine=ctx.createLinearGradient(0,floorY,0,floorY+(H-floorY)*0.35);
+  shine.addColorStop(0,'rgba(255,255,255,0.14)');
+  shine.addColorStop(1,'transparent');
+  ctx.fillStyle=shine; ctx.fillRect(0,floorY,W,(H-floorY)*0.35);
+
+  // Floor shadow join
+  const shadow=ctx.createLinearGradient(0,floorY-16,0,floorY+16);
+  shadow.addColorStop(0,'transparent');
+  shadow.addColorStop(0.5,'rgba(0,0,0,0.45)');
+  shadow.addColorStop(1,'transparent');
+  ctx.fillStyle=shadow; ctx.fillRect(0,floorY-16,W,32);
+}
+
+function drawCourtMarkings(){
+  ctx.save();
+  // Sideline
+  ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(0,floorY+1); ctx.lineTo(W,floorY+1); ctx.stroke();
+
+  // Paint area (key)
+  const paintL=W*0.60, paintR=hoop.x+hoop.rimR+20;
+  ctx.fillStyle='rgba(160,70,25,0.35)';
+  ctx.fillRect(paintL,floorY+1,paintR-paintL,H-floorY-1);
+  ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=2.5;
+  ctx.strokeRect(paintL,floorY+1,paintR-paintL,H-floorY-1);
+
+  // 3-point arc (floor mark only — arc at floorY)
+  const threeR=W*0.37;
+  ctx.strokeStyle='rgba(255,255,255,0.55)'; ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.arc(hoop.x, floorY, threeR*0.55, Math.PI*0.92, Math.PI*2.08, false);
+  ctx.stroke();
+
+  // Free throw circle
+  const ftX=W*0.635;
+  ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(ftX, floorY, W*0.075, Math.PI, Math.PI*2, false);
+  ctx.stroke();
+
+  // Center court logo (faint)
+  const cx=W*0.3, cr=Math.min(W*0.07,50);
+  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(cx,floorY,cr,0,Math.PI*2); ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawHoop(){
+  const {x,y,rimR,tubeR,bbX,bbY,bbW,bbH,poleX,poleBot}=hoop;
+
+  // Pole shadow
+  ctx.fillStyle='rgba(0,0,0,0.25)';
+  ctx.fillRect(poleX+2,y+bbH*0.5,bbW*0.42,poleBot-y-bbH*0.5);
+
+  // Pole
+  const pg=ctx.createLinearGradient(poleX-bbW*0.28,0,poleX+bbW*0.28,0);
+  pg.addColorStop(0,'#666'); pg.addColorStop(0.5,'#ccc'); pg.addColorStop(1,'#666');
+  ctx.fillStyle=pg;
+  ctx.fillRect(poleX-bbW*0.28,y+bbH*0.48,bbW*0.56,poleBot-y-bbH*0.48);
+
+  // Backboard shadow
+  ctx.fillStyle='rgba(0,0,0,0.28)';
+  ctx.fillRect(bbX+5,bbY+5,bbW,bbH);
+
+  // Backboard
+  const bbg=ctx.createLinearGradient(bbX,0,bbX+bbW,0);
+  bbg.addColorStop(0,'rgba(195,215,255,0.94)');
+  bbg.addColorStop(0.5,'rgba(230,240,255,0.98)');
+  bbg.addColorStop(1,'rgba(175,200,235,0.94)');
+  ctx.fillStyle=bbg; ctx.fillRect(bbX,bbY,bbW,bbH);
+  ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=3;
+  ctx.strokeRect(bbX,bbY,bbW,bbH);
+
+  // Backboard inner square
+  const sqM=bbW*0.08, sqH=bbW*0.75;
+  ctx.strokeStyle='rgba(255,30,0,0.8)'; ctx.lineWidth=2;
+  ctx.strokeRect(bbX+sqM, y-sqH*0.88, bbW-sqM*2, sqH);
+
+  // Arm/brace
+  ctx.strokeStyle='#888'; ctx.lineWidth=bbW*0.35; ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(bbX, y-bbH*0.08);
+  ctx.lineTo(x+rimR, y);
+  ctx.stroke();
+  ctx.lineCap='butt';
+
+  // Net
+  drawNet();
+
+  // Back rim (drawn behind ball)
+  ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=tubeR*2+2;
+  ctx.beginPath(); ctx.arc(x+rimR,y,tubeR,0,Math.PI*2); ctx.stroke();
+  ctx.strokeStyle=hoopFlash>0?`rgba(255,${Math.floor(200*hoopFlash/20)},0,1)`:'#CC5500';
+  ctx.lineWidth=tubeR*2;
+  ctx.beginPath(); ctx.arc(x+rimR,y,tubeR,0,Math.PI*2); ctx.stroke();
+
+  // Full rim ellipse (shadow)
+  ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=tubeR*2+2;
+  ctx.beginPath(); ctx.ellipse(x,y+3,rimR,rimR*0.22,0,0,Math.PI*2); ctx.stroke();
+
+  // Full rim ellipse (colored)
+  const rimColor = hoopFlash>0
+    ? `rgba(255,${Math.floor(200*hoopFlash/20)},0,1)` : '#FF6600';
+  ctx.strokeStyle=rimColor; ctx.lineWidth=tubeR*2;
+  ctx.beginPath(); ctx.ellipse(x,y,rimR,rimR*0.22,0,0,Math.PI*2); ctx.stroke();
+
+  // Front rim highlight
+  ctx.strokeStyle='rgba(255,160,40,0.6)'; ctx.lineWidth=tubeR*0.6;
+  ctx.beginPath(); ctx.ellipse(x,y-1,rimR*0.9,rimR*0.18,0,Math.PI*1.12,Math.PI*1.88); ctx.stroke();
+
+  if(hoopFlash>0) hoopFlash--;
+}
+
+function drawNet(){
+  const {x,y,rimR}=hoop;
+  const netH=rimR*2.0, lines=14;
+  ctx.strokeStyle='rgba(245,245,245,0.65)'; ctx.lineWidth=1.4;
+  ctx.lineCap='round';
+  for(let i=0;i<lines;i++){
+    const a=(i/lines)*Math.PI*2;
+    const tx=x+Math.cos(a)*rimR, ty=y+Math.sin(a)*rimR*0.22;
+    const bx=x+Math.cos(a)*rimR*0.22, by=y+netH;
+    ctx.beginPath(); ctx.moveTo(tx,ty);
+    ctx.bezierCurveTo(tx+(bx-tx)*0.35,ty+netH*0.3,tx+(bx-tx)*0.65,ty+netH*0.7,bx,by);
+    ctx.stroke();
+  }
+  for(let s=1;s<=6;s++){
+    const t=s/7, ry=y+t*netH, rr=rimR*(1-t*0.78);
+    ctx.strokeStyle=`rgba(245,245,245,${0.65*(1-t*0.5)})`;
+    ctx.beginPath(); ctx.ellipse(x,ry,rr,rr*0.22*(1-t*0.4),0,0,Math.PI*2); ctx.stroke();
+  }
+  ctx.lineCap='butt';
+}
+
+function drawBall(){
+  if(!ball.inFlight && gs==='menu') return;
+  const {x,y,r,rot}=ball;
+
+  // Floor shadow
+  const shadowY=floorY+4, shadowW=r*(1.0+Math.max(0,(shadowY-y)/r)*0.4);
+  ctx.beginPath(); ctx.ellipse(x,shadowY,shadowW*0.85,shadowW*0.18,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.28)'; ctx.fill();
+
+  // Trail
+  if(ball.inFlight){
+    ball.trail.forEach((pt,i)=>{
+      const a=(i/ball.trail.length)*0.35;
+      const tr=r*(i/ball.trail.length)*0.55;
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,tr,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,140,0,${a})`; ctx.fill();
+    });
+  }
+
+  // Ball body -- use 🏀 emoji (identical to score bar & menu title icons)
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  // Reset fill state so trail's semi-transparent fillStyle doesn't bleed into emoji rendering
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#FF6B00';
+
+  // Emoji renders with the same appearance as the HUD/menu basketball icons
+  const fontSize = Math.round(r * 2.22);
+  ctx.font = fontSize + 'px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('\uD83C\uDFC0', 0, r * 0.04);
+
+
+  ctx.restore();
+}
+
+function drawLaunchZone(){
+  if(ball.inFlight) return;
+  const bx=ball.x;
+
+  // Platform glow
+  const pg=ctx.createRadialGradient(bx,floorY,0,bx,floorY,ball.r*2.2);
+  pg.addColorStop(0,'rgba(255,150,30,0.22)');
+  pg.addColorStop(1,'transparent');
+  ctx.fillStyle=pg; ctx.fillRect(bx-ball.r*2.5,floorY-ball.r*0.5,ball.r*5,ball.r);
+
+  // Pulsing ring
+  const pulse=0.8+Math.sin(Date.now()*0.004)*0.2;
+  ctx.strokeStyle=`rgba(255,150,30,${0.5*pulse})`;
+  ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.ellipse(bx,floorY+2,ball.r*1.6*pulse,ball.r*0.3*pulse,0,0,Math.PI*2);
+  ctx.stroke();
+}
+
+function drawTrajectory(){
+  if(!drag.on) return;
+  const dx=drag.cx-drag.x0, dy=drag.cy-drag.y0;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist<12) return;
+
+  const maxDist=Math.min(W*0.16,240);
+  const pow=Math.min(dist,maxDist)/maxDist*MAX_POWER;
+  const ang=Math.atan2(dy,dx);
+  let px=ball.x,py=ball.y,pvx=Math.cos(ang)*pow,pvy=Math.sin(ang)*pow;
+
+  ctx.save();
+  let dotIdx=0;
+  for(let i=0;i<90;i++){
+    pvy+=GRAVITY; px+=pvx; py+=pvy;
+    if(py>floorY||px>W+50||px<-50) break;
+    if(i%3===0){
+      const a=((1-i/90)*0.75);
+      const dr=ball.r*0.28*(1-i/90*0.55);
+      ctx.beginPath(); ctx.arc(px,py,dr,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill();
+      dotIdx++;
+    }
+  }
+  ctx.restore();
+
+  // Power arc around ball
+  const ratio=Math.min(dist,maxDist)/maxDist;
+  ctx.save();
+  ctx.strokeStyle=`hsl(${120-ratio*120},100%,60%)`;
+  ctx.lineWidth=Math.max(4,ball.r*0.15);
+  ctx.lineCap='round'; ctx.globalAlpha=0.85;
+  ctx.beginPath();
+  ctx.arc(ball.x,ball.y,ball.r+ball.r*0.45, -Math.PI/2, -Math.PI/2+ratio*Math.PI*2);
+  ctx.stroke();
+  ctx.lineCap='butt'; ctx.restore();
+}
+
+function drawEffects(){
+  effects=effects.filter(e=>e.life>0);
+  effects.forEach(e=>{
+    ctx.save();
+    ctx.globalAlpha=e.life/e.maxLife;
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+    ctx.fillStyle=e.color; ctx.fill();
+    e.x+=e.vx; e.y+=e.vy; e.vy+=0.18; e.r*=0.95; e.life--;
+    ctx.restore();
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  PHYSICS
+// ═══════════════════════════════════════════════════════
+function updateBall(){
+  if(!ball.inFlight) return;
+
+  ball.trail.push({x:ball.x,y:ball.y});
+  if(ball.trail.length>TRAIL_LEN) ball.trail.shift();
+
+  ball.vy+=GRAVITY;
+  ball.x+=ball.vx; ball.y+=ball.vy;
+  ball.rot+=ball.vx*0.04;
+
+  // Floor
+  if(ball.y+ball.r>floorY){
+    ball.y=floorY-ball.r;
+    ball.vy*=-RESTITUTION; ball.vx*=0.82;
+    spawnParticles(ball.x,floorY,'#BB7722',5);
+    if(Math.abs(ball.vy)<2 && Math.abs(ball.vx)<0.8){ endShot(false); return; }
+    if(ball.x<W*0.05||ball.x>W*0.96){ endShot(false); return; }
+  }
+
+  // Out of bounds
+  if(ball.y<-ball.r*8||ball.x<-ball.r*3||ball.x>W+ball.r*3){ endShot(false); return; }
+
+  // Collisions
+  checkBackboard();
+  checkRim();
+  checkBasket();
+}
+
+function checkBackboard(){
+  const {bbX,bbY,bbW,bbH}=hoop;
+  if(ball.x+ball.r>bbX && ball.x-ball.r<bbX+bbW && ball.y>bbY && ball.y<bbY+bbH){
+    if(ball.vx>0){
+      ball.x=bbX-ball.r; ball.vx*=-RESTITUTION*0.9; ball.vy*=0.88;
+      spawnParticles(bbX,ball.y,'#aaaaee',4); hoopFlash=10;
+    }
+  }
+}
+
+function checkRim(){
+  const {x:hx,y:hy,rimR,tubeR}=hoop;
+  // Front rim post
+  checkRimPost(hx-rimR, hy);
+  // Back rim post
+  checkRimPost(hx+rimR, hy);
+}
+
+function checkRimPost(rx,ry){
+  const dx=ball.x-rx, dy=ball.y-ry;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const minD=ball.r+hoop.tubeR;
+  if(dist<minD && dist>0.1){
+    const nx=dx/dist, ny=dy/dist;
+    const dot=ball.vx*nx+ball.vy*ny;
+    ball.vx=(ball.vx-2*dot*nx)*RESTITUTION;
+    ball.vy=(ball.vy-2*dot*ny)*RESTITUTION;
+    ball.x=rx+nx*(minD+1); ball.y=ry+ny*(minD+1);
+    spawnParticles(rx,ry,'#FF6600',5); hoopFlash=8;
+  }
+}
+
+function checkBasket(){
+  if(ball.scored) return;
+  const {x:hx,y:hy,rimR}=hoop;
+  if(prevBallY<=hy && ball.y>hy && ball.vy>0){
+    const tol=ball.r*0.32;
+    if(ball.x>hx-rimR+ball.r-tol && ball.x<hx+rimR-ball.r+tol){
+      scoreBasket();
+    }
+  }
+  prevBallY=ball.y;
+}
+
+function scoreBasket(){
+  ball.scored=true;
+  const distShot=hoop.x - W*0.14;
+  const isThree=distShot > W*0.36;
+  const pts=isThree?3:2;
+  streak++; if(streak>maxStreak) maxStreak=streak;
+  totalMade++;
+  const mult=streak>=5?3:streak>=3?2:1;
+  const earned=pts*mult;
+  score+=earned;
+  updateHUD();
+
+  hoopFlash=22;
+  spawnParticles(hoop.x,hoop.y,'#FFD700',22);
+  spawnParticles(hoop.x,hoop.y,'#FF6600',14);
+  showScorePopup(hoop.x, hoop.y-60, `+${earned}${isThree?'🎯':''}${mult>1?' 🔥x'+mult:''}`);
+
+  shotsSinceChange++;
+  if(shotsSinceChange>=4){
+    shotsSinceChange=0;
+    const next=(hoopIdx+1)%HOOP_CONFIGS.length;
+    hoopIdx=next;
+    updatePositions();
+    showToast('🏀 籃框移動了！');
+  }
+  setTimeout(()=>endShot(true),550);
+}
+
+function endShot(made){
+  if(gs!=='playing') return;
+  ball.inFlight=false; ball.trail=[];
+  if(!made && !ball.scored){ streak=0; updateHUD(); }
+  setTimeout(()=>{
+    if(gs==='playing'){
+      ball.x=W*0.14; ball.y=floorY-ball.r;
+      ball.vx=0; ball.vy=0; ball.rot=0;
+      ball.scored=false; ball.trail=[];
+      prevBallY=ball.y;
+    }
+  },220);
+}
+
+// ═══════════════════════════════════════════════════════
+//  HOOP OSCILLATION (last 1/3 of time)
+// ═══════════════════════════════════════════════════════
+function updateHoopOscillation(){
+  if(!hoopMoving || gs!=='playing') return;
+  // t: 1 at phase start, 0 at game end; speed accelerates as time runs out
+  const t = Math.max(0, timeLeft) / (cfg.gameTime / 3);
+  const speed = 0.018 + (1 - t) * 0.040; // 0.018~0.058 rad/frame
+  hoopMovePhase += speed;
+  const range = W * 0.09; // ~9% of screen width
+  const offsetX = Math.sin(hoopMovePhase) * range;
+  hoop.x = hoopBaseX + offsetX;
+  // Sync dependent positions
+  hoop.bbX  = hoop.x + hoop.rimR + ball.r * 0.35;
+  hoop.poleX = hoop.bbX + hoop.bbW * 0.5;
+}
+
+function drawHoopTrack(){
+  if(!hoopMoving || gs!=='playing') return;
+  const range = W * 0.09;
+  const ty = hoop.y;
+  const left  = hoopBaseX - range - hoop.rimR;
+  const right = hoopBaseX + range + hoop.rimR + hoop.bbW + 10;
+
+  ctx.save();
+  // Track line
+  ctx.strokeStyle = 'rgba(255,100,0,0.22)';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([10, 8]);
+  ctx.beginPath(); ctx.moveTo(left, ty); ctx.lineTo(right, ty); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Left & right extent markers (arrow chevrons)
+  const t = Math.max(0, timeLeft) / (cfg.gameTime / 3);
+  const alpha = 0.25 + (1 - t) * 0.45; // brighter as game speeds up
+  ctx.strokeStyle = `rgba(255,80,0,${alpha})`;
+  ctx.lineWidth = Math.max(2, hoop.tubeR * 0.7);
+  ctx.lineCap = 'round';
+  // Left chevron (<|)
+  const lx = left + 6;
+  ctx.beginPath(); ctx.moveTo(lx+14, ty-14); ctx.lineTo(lx, ty); ctx.lineTo(lx+14, ty+14); ctx.stroke();
+  // Right chevron (|>)
+  const rx = right - 6;
+  ctx.beginPath(); ctx.moveTo(rx-14, ty-14); ctx.lineTo(rx, ty); ctx.lineTo(rx-14, ty+14); ctx.stroke();
+  ctx.lineCap = 'butt';
+
+  // Ghost hoop position dot at base X
+  ctx.globalAlpha = 0.15;
+  ctx.strokeStyle = '#FF6600';
+  ctx.lineWidth = hoop.tubeR * 2;
+  ctx.beginPath();
+  ctx.ellipse(hoopBaseX, ty, hoop.rimR, hoop.rimR * 0.22, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function spawnParticles(x,y,color,n){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, s=2+Math.random()*6;
+    effects.push({
+      x,y, vx:Math.cos(a)*s, vy:Math.sin(a)*s-3.5,
+      r:3+Math.random()*4, color,
+      life:25+Math.random()*20, maxLife:45
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════
+function getPos(e){
+  if(e.touches&&e.touches.length) return {x:e.touches[0].clientX,y:e.touches[0].clientY};
+  return {x:e.clientX,y:e.clientY};
+}
+function onDown(e){
+  if(gs!=='playing'||ball.inFlight) return;
+  e.preventDefault();
+  const p=getPos(e);
+  const dx=p.x-ball.x, dy=p.y-ball.y;
+  if(Math.sqrt(dx*dx+dy*dy)<ball.r*3.5){
+    drag.on=true; drag.x0=p.x; drag.y0=p.y; drag.cx=p.x; drag.cy=p.y;
+  }
+}
+function onMove(e){ if(!drag.on) return; e.preventDefault(); const p=getPos(e); drag.cx=p.x; drag.cy=p.y; }
+function onUp(e){
+  if(!drag.on) return; e.preventDefault();
+  drag.on=false;
+  const dx=drag.cx-drag.x0, dy=drag.cy-drag.y0;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist>18){ launchBall(); totalAttempts++; }
+}
+function launchBall(){
+  const dx=drag.cx-drag.x0, dy=drag.cy-drag.y0;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const maxDist=Math.min(W*0.16,240);
+  const pow=Math.min(dist,maxDist)/maxDist*MAX_POWER;
+  const ang=Math.atan2(dy,dx);
+  ball.vx=Math.cos(ang)*pow; ball.vy=Math.sin(ang)*pow;
+  ball.inFlight=true; ball.scored=false; ball.trail=[];
+  prevBallY=ball.y;
+  document.getElementById('hintText').style.display='none';
+}
+
+canvas.addEventListener('mousedown',onDown);
+canvas.addEventListener('mousemove',onMove);
+canvas.addEventListener('mouseup',onUp);
+canvas.addEventListener('touchstart',onDown,{passive:false});
+canvas.addEventListener('touchmove',onMove,{passive:false});
+canvas.addEventListener('touchend',onUp,{passive:false});
+
+// ═══════════════════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════════════════
+function gameLoop(){
+  ctx.clearRect(0,0,W,H);
+  if(gs==='playing'||gs==='countdown'){
+    drawArena(); drawCrowd(); drawFloor(); drawCourtMarkings();
+    drawHoopTrack(); drawHoop(); drawLaunchZone(); drawTrajectory(); drawBall(); drawEffects();
+    if(gs==='playing'){ updateHoopOscillation(); updateBall(); }
+  }
+  rafID=requestAnimationFrame(gameLoop);
+}
+
+// ═══════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════
+function updateHUD(){
+  document.getElementById('scoreDisplay').textContent=score;
+  document.getElementById('streakCount').textContent=streak;
+  const t=document.getElementById('timerDisplay');
+  t.textContent=timeLeft;
+  t.classList.toggle('warn',timeLeft<=10);
+}
+
+function showScorePopup(x,y,text){
+  const el=document.createElement('div');
+  el.className='score-popup';
+  el.style.cssText=`left:${x}px;top:${y}px;font-size:${Math.max(28,W*0.038)}px;
+    color:#FFD700;text-shadow:0 3px 14px rgba(255,130,0,0.9),0 0 40px rgba(255,215,0,0.5);`;
+  el.textContent=text;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+function showToast(msg){
+  const el=document.createElement('div');
+  el.className='hoop-move-toast'; el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1800);
+}
+
+// =========================================================
+//  LEADERBOARD  (LocalStorage, per time+size category)
+// =========================================================
+const _SZ = { small:'小球', medium:'中球', large:'大球' };
+const _MD = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+
+function lbKey(){ return 'bb_lb_'+cfg.gameTime+'_'+cfg.ballSize; }
+
+function getLB(){
+  try{ return JSON.parse(localStorage.getItem(lbKey())||'[]'); }
+  catch(e){ return []; }
+}
+
+function saveLB(pts){
+  const data = getLB();
+  const prevBest = data.length>0 ? data[0].score : -1;
+  const isNewBest = pts > prevBest && pts > 0;
+  const d = new Date();
+  const ds = String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  data.push({score:pts, date:ds});
+  data.sort((a,b)=>b.score-a.score);
+  const top5 = data.slice(0,5);
+  try{ localStorage.setItem(lbKey(), JSON.stringify(top5)); } catch(e){}
+  return { top5, isNewBest };
+}
+
+function renderHudLB(){
+  const catEl  = document.getElementById('lbCat');
+  const rowsEl = document.getElementById('lbRows');
+  if(!catEl || !rowsEl) return;
+  catEl.textContent = cfg.gameTime+'秒・'+_SZ[cfg.ballSize];
+  const data = getLB();
+  if(!data.length){
+    rowsEl.innerHTML = '<div class="hud-lb-empty">尚無紀錄</div>';
+    return;
+  }
+  rowsEl.innerHTML = data.map((e,i)=>
+    '<div class="hud-lb-row">'+
+    '<span class="hud-lb-medal">'+_MD[i]+'</span>'+
+    '<span class="hud-lb-pts">'+e.score+'<em>分</em></span>'+
+    '<span class="hud-lb-date">'+e.date+'</span>'+
+    '</div>'
+  ).join('');
+}
+
+function renderGoLB(pts, isNewBest){
+  const catEl  = document.getElementById('goLbCat');
+  const rowsEl = document.getElementById('goLbRows');
+  if(!catEl || !rowsEl) return;
+  catEl.textContent = cfg.gameTime+'秒・'+_SZ[cfg.ballSize];
+  const data = getLB();
+  if(!data.length){
+    rowsEl.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:6px">尚無紀錄</div>';
+    return;
+  }
+  rowsEl.innerHTML = data.map((e,i)=>{
+    const isThis = isNewBest && i===0;
+    return '<div class="go-lb-row'+(isThis?' is-new':'')+'">'+
+      '<span class="go-lb-medal">'+_MD[i]+'</span>'+
+      '<span class="go-lb-pts">'+e.score+'<em>分</em></span>'+
+      '<span class="go-lb-date">'+e.date+(isThis?'<span class="go-lb-new-badge">NEW!</span>':'')+'</span>'+
+      '</div>';
+  }).join('');
+}
+
+function startCountdown(cb){
+  const el=document.getElementById('countdown');
+  let n=3;
+  el.classList.add('show'); el.textContent=n;
+  const tick=()=>{
+    n--;
+    if(n>0){
+      el.style.animation='none'; void el.offsetWidth;
+      el.style.animation='countPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards';
+      el.textContent=n;
+      setTimeout(tick,850);
+    } else if(n===0){
+      el.textContent='🏀';
+      setTimeout(()=>{ el.classList.remove('show'); cb(); },700);
+    }
+  };
+  setTimeout(tick,850);
+}
+
+// ═══════════════════════════════════════════════════════
+//  GAME MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function startGame(){
+  gs='countdown';
+  score=0; streak=0; maxStreak=0; totalMade=0; totalAttempts=0;
+  timeLeft=cfg.gameTime; hoopIdx=0; shotsSinceChange=0; effects=[];
+  hoopMoving=false; hoopMovePhase=0;
+  document.getElementById('movingWarn').classList.remove('show');
+  clearInterval(gameTimerID);
+  updatePositions(); updateHUD(); renderHudLB();
+
+  document.getElementById('menuScreen').style.display='none';
+  document.getElementById('gameOverScreen').classList.remove('show');
+  document.getElementById('hud').classList.add('show');
+  document.getElementById('hintText').style.display='block';
+
+  startCountdown(()=>{
+    gs='playing';
+    ball.x=W*0.14; ball.y=floorY-ball.r;
+    ball.vx=0; ball.vy=0; ball.inFlight=false; ball.scored=false; ball.trail=[];
+    prevBallY=ball.y;
+    gameTimerID=setInterval(()=>{
+      timeLeft--; updateHUD();
+      // Trigger hoop moving at last 1/3 of game time
+      if(!hoopMoving && timeLeft>0 && timeLeft<=Math.ceil(cfg.gameTime/3)){
+        hoopMoving=true; hoopMovePhase=0;
+        document.getElementById('movingWarn').classList.add('show');
+        showToast('⚡ 最後衝刺！籃框開始移動！');
+      }
+      if(timeLeft<=0){ clearInterval(gameTimerID); endGame(); }
+    },1000);
+  });
+}
+
+function endGame(){
+  gs='gameover';
+  ball.inFlight=false; hoopMoving=false;
+  clearInterval(gameTimerID);
+  document.getElementById('hud').classList.remove('show');
+  document.getElementById('movingWarn').classList.remove('show');
+
+  const lbRes = saveLB(score); renderGoLB(score, lbRes.isNewBest);
+  const rate=totalAttempts>0?Math.round(totalMade/totalAttempts*100):0;
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('finalStats').textContent=
+    `投進 ${totalMade} 球 ／ 出手 ${totalAttempts} 次 ／ 命中率 ${rate}% ／ 最高連續 ${maxStreak} 球`;
+
+  const emoji = score>=200?'🏆':score>=100?'🌟':score>=50?'👍':'🏀';
+  document.getElementById('goEmoji').textContent=emoji;
+  document.getElementById('gameOverScreen').classList.add('show');
+}
+
+function showMenu(){
+  gs='menu'; clearInterval(gameTimerID);
+  ball.inFlight=false; hoopMoving=false;
+  document.getElementById('hud').classList.remove('show');
+  document.getElementById('movingWarn').classList.remove('show');
+  document.getElementById('gameOverScreen').classList.remove('show');
+  document.getElementById('menuScreen').style.display='flex';
+}
+
+// ═══════════════════════════════════════════════════════
+//  MENU EVENTS
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.time-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.time-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); cfg.gameTime=parseInt(b.dataset.time);
+  });
+});
+document.querySelectorAll('.size-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.size-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); cfg.ballSize=b.dataset.size;
+  });
+});
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('playAgainBtn').addEventListener('click',startGame);
+document.getElementById('menuBtn').addEventListener('click',showMenu);
+
+// =========================================================
+//  SCORING & LEADERBOARD MODALS
+// =========================================================
+document.getElementById('scoringBtn').addEventListener('click',()=>{
+  document.getElementById('scoringModal').classList.add('show');
+});
+document.getElementById('scoringClose').addEventListener('click',()=>{
+  document.getElementById('scoringModal').classList.remove('show');
+});
+document.getElementById('scoringModal').addEventListener('click',e=>{
+  if(e.target===e.currentTarget) e.currentTarget.classList.remove('show');
+});
+
+document.getElementById('allLbBtn').addEventListener('click',()=>{
+  currentAlbFilter='all';
+  document.querySelectorAll('.alb-filter-btn').forEach(b=>b.classList.toggle('active', b.dataset.filter==='all'));
+  renderAllLB('all');
+  document.getElementById('allLbModal').classList.add('show');
+});
+document.getElementById('allLbClose').addEventListener('click',()=>{
+  document.getElementById('allLbModal').classList.remove('show');
+});
+document.getElementById('allLbModal').addEventListener('click',e=>{
+  if(e.target===e.currentTarget) e.currentTarget.classList.remove('show');
+});
+
+// Filter buttons
+let currentAlbFilter = 'all';
+document.querySelectorAll('.alb-filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    currentAlbFilter = btn.dataset.filter;
+    document.querySelectorAll('.alb-filter-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    renderAllLB(currentAlbFilter);
+  });
+});
+
+const _ALB_MD = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+const _ALB_SZ = { small:'🔻 小球', medium:'🟠 中球', large:'🔶 大球' };
+
+function renderAllLB(filter){
+  const TIMES = [30,60,90,120];
+  const SIZES = ['small','medium','large'];
+  const el = document.getElementById('allLbContent');
+  let html = '';
+  let hasData = false;
+  const filterTimes = filter==='all' ? TIMES : [parseInt(filter)];
+
+  filterTimes.forEach(t=>{
+    SIZES.forEach(sz=>{
+      const key = 'bb_lb_'+t+'_'+sz;
+      let data = [];
+      try{ data = JSON.parse(localStorage.getItem(key)||'[]'); } catch(e){}
+      if(!data.length) return;
+      hasData = true;
+      html += '<div class="alb-section">';
+      html += '<div class="alb-section-title">⏱ '+t+'秒 ・ '+_ALB_SZ[sz]+'</div>';
+      html += data.map((e,i)=>
+        '<div class="alb-row">'+
+        '<span class="alb-medal">'+_ALB_MD[i]+'</span>'+
+        '<span class="alb-score">'+e.score+'<em>分</em></span>'+
+        '<span class="alb-date">'+e.date+'</span>'+
+        '</div>'
+      ).join('');
+      html += '</div>';
+    });
+  });
+
+  if(!hasData){
+    const timeStr = filter==='all' ? '' : filter+'秒類別的';
+    html = '<div class="alb-empty-msg">🏀<br>尚無'+timeStr+'紀錄<br><span style="font-size:0.75em;opacity:0.6">玩遊戲後即可看到組別排行榜</span></div>';
+  }
+
+  el.innerHTML = html;
+}
+
+// BACKGROUND FLOATING BALLS (MENU)
+function spawnMenuBall(){
+  const el=document.createElement('div');
+  el.className='bg-ball';
+  const sz=40+Math.random()*100;
+  const left=Math.random()*100;
+  const duration=8+Math.random()*14;
+  el.style.cssText=`width:${sz}px;height:${sz}px;left:${left}%;
+    animation-duration:${duration}s;animation-delay:${Math.random()*-20}s;`;
+  document.getElementById('bgBalls').appendChild(el);
+}
+for(let i=0;i<14;i++) spawnMenuBall();
+
+// INIT
+window.addEventListener('resize',()=>{
+  resize();
+  if(gs==='playing'&&!ball.inFlight){
+    ball.x=W*0.14; ball.y=floorY-ball.r; prevBallY=ball.y;
+  }
+});
+
+resize();
+gameLoop();
+</script>
+    <!-- 回首頁按鈕 -->
+    <a href="../index.html" id="home-btn" title="回首頁" style="
+        position:fixed; bottom:14px; left:16px; z-index:99999;
+        width:44px; height:44px; border-radius:50%;
+        background:rgba(255,255,255,0.82);
+        border:2px solid #f9a8d4;
+        box-shadow:0 4px 12px rgba(236,72,153,0.22);
+        display:flex; align-items:center; justify-content:center;
+        text-decoration:none; transition:background 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+       onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+    </a>
+</body>
+</html>

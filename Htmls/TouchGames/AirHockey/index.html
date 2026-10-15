@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🏒 萌萌桌上曲棍球</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
+    html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans-serif; touch-action:none; background:#0d1b2a; }
+
+    /* ── MENU ─────────────────────────────────────────────── */
+    #screen-menu {
+      position:fixed; inset:0; z-index:200;
+      background:linear-gradient(135deg,#FF8FB1 0%,#FFC8DD 45%,#BDE0FE 100%);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(16px,3vh,28px);
+    }
+    .menu-title {
+      font-size:clamp(2rem,6vw,4.2rem); font-weight:900; color:#fff;
+      text-shadow:0 6px 20px rgba(200,50,100,.35);
+      animation:float 3s ease-in-out infinite;
+    }
+    .menu-sub { font-size:clamp(.9rem,2.5vw,1.4rem); color:rgba(255,255,255,.85); margin-top:-10px; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    .mode-cards { display:flex; gap:clamp(14px,3vw,36px); flex-wrap:wrap; justify-content:center; padding:0 20px; }
+    .mode-card {
+      background:#fff; border-radius:24px; border:4px solid #FADADD;
+      box-shadow:0 12px 32px rgba(255,143,171,.35);
+      padding:clamp(18px,3vw,36px) clamp(22px,4vw,44px);
+      cursor:pointer; text-align:center; min-width:190px; max-width:280px;
+      transition:transform .2s, box-shadow .2s;
+    }
+    .mode-card:hover,.mode-card:active { transform:scale(1.06) translateY(-4px); box-shadow:0 20px 44px rgba(255,143,171,.5); }
+    .mode-card .mc-icon { font-size:clamp(2.4rem,6vw,3.8rem); }
+    .mode-card .mc-name { font-size:clamp(1.1rem,2.5vw,1.7rem); font-weight:900; color:#FF6B9D; margin:6px 0 4px; }
+    .mode-card .mc-desc { font-size:clamp(.72rem,1.4vw,.95rem); color:#999; line-height:1.55; }
+    .mode-card.adv { border-color:#D4B8E0; box-shadow:0 12px 32px rgba(123,94,167,.22); }
+    .mode-card.adv:hover { box-shadow:0 20px 44px rgba(123,94,167,.38); }
+    .mode-card.adv .mc-name { color:#8B5CF6; }
+    .menu-hint { font-size:clamp(.78rem,1.6vw,1rem); color:rgba(255,255,255,.72); }
+
+    /* ── GAME SCREEN ──────────────────────────────────────── */
+    #screen-game { position:fixed; inset:0; z-index:100; display:none; }
+    #game-canvas { display:block; width:100%; height:100%; touch-action:none; }
+
+    /* HUD */
+    #hud {
+      position:absolute; top:0; left:0; right:0;
+      display:flex; justify-content:space-between; align-items:flex-start;
+      padding:10px 14px; pointer-events:none; z-index:10;
+    }
+    .score-box {
+      background:rgba(255,255,255,.92); border-radius:16px; border:3px solid #FADADD;
+      box-shadow:0 4px 14px rgba(255,182,193,.3); padding:6px 20px; text-align:center;
+    }
+    .score-box.p1 { border-color:#FF8FAB; }
+    .score-box.p2 { border-color:#81C8F6; }
+    .score-label { font-size:.7rem; font-weight:700; color:#bbb; letter-spacing:1px; }
+    .score-val { font-size:clamp(1.6rem,4vw,2.4rem); font-weight:900; line-height:1.1; }
+    .score-box.p1 .score-val { color:#FF6B9D; }
+    .score-box.p2 .score-val { color:#4AABE8; }
+    #timer-box {
+      background:rgba(255,255,255,.92); border-radius:16px; border:3px solid #FADADD;
+      box-shadow:0 4px 14px rgba(255,182,193,.3); padding:5px 18px; text-align:center;
+    }
+    #timer-val { font-size:clamp(1.5rem,4vw,2.2rem); font-weight:900; color:#5D4037; line-height:1.1; }
+    #mode-badge { font-size:.68rem; color:#bbb; font-weight:700; }
+
+    /* back btn */
+    #back-btn {
+      position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+      background:rgba(255,255,255,.82); border:2px solid #FADADD; border-radius:20px;
+      padding:5px 18px; font-family:'Nunito',sans-serif; font-size:.82rem; color:#FF6B9D;
+      cursor:pointer; z-index:20; pointer-events:all; display:none;
+    }
+
+    /* chaos overlay */
+    #chaos-overlay { position:absolute; inset:0; pointer-events:none; z-index:5; display:none; }
+    #chaos-overlay.on { display:block; animation:cflash .35s ease-in-out infinite alternate; }
+    @keyframes cflash { 0%{background:rgba(255,50,150,.04)} 100%{background:rgba(120,50,255,.07)} }
+
+    /* announcement */
+    #announce {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      z-index:50; pointer-events:none; display:none; text-align:center;
+    }
+    #announce.show { display:block; animation:ainIn .45s cubic-bezier(.34,1.56,.64,1) forwards; }
+    @keyframes ainIn { 0%{transform:translate(-50%,-50%) scale(.2);opacity:0} 100%{transform:translate(-50%,-50%) scale(1);opacity:1} }
+    #announce-text { font-size:clamp(2rem,8vw,5rem); font-weight:900; color:#fff; text-shadow:0 0 30px rgba(255,200,0,.8),0 4px 12px rgba(0,0,0,.5); white-space:nowrap; }
+
+    /* goal flash */
+    #goal-flash { position:absolute; inset:0; pointer-events:none; z-index:60; opacity:0; transition:opacity .1s; }
+
+    /* ── WIN SCREEN ───────────────────────────────────────── */
+    #screen-win {
+      position:fixed; inset:0; z-index:300; display:none;
+      flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    }
+    #screen-win.show { display:flex; }
+    #screen-win.p1-win { background:linear-gradient(135deg,#FF8FB1,#FFC8DD,#FADADD); }
+    #screen-win.p2-win { background:linear-gradient(135deg,#81C8F6,#BDE0FE,#E0F0FF); }
+    #screen-win.draw-win { background:linear-gradient(135deg,#A8EDEA,#FED6E3); }
+    #win-icon { font-size:clamp(4rem,12vw,7rem); animation:winPop .7s cubic-bezier(.34,1.56,.64,1) forwards; }
+    @keyframes winPop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+    #win-title { font-size:clamp(1.8rem,5.5vw,3.8rem); font-weight:900; color:#fff; text-shadow:0 4px 12px rgba(0,0,0,.15); }
+    #win-score { font-size:clamp(1.1rem,3vw,2rem); color:rgba(255,255,255,.9); font-weight:700; }
+    .win-btns { display:flex; gap:14px; margin-top:8px; flex-wrap:wrap; justify-content:center; }
+    .win-btn {
+      background:#fff; border:3px solid rgba(255,255,255,.5); border-radius:50px;
+      padding:12px 30px; font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:700;
+      cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.1); transition:transform .2s, box-shadow .2s;
+    }
+    .win-btn:hover,.win-btn:active { transform:scale(1.06); box-shadow:0 10px 28px rgba(0,0,0,.15); }
+    .win-btn.c1 { color:#FF6B9D; } .win-btn.c2 { color:#4AABE8; } .win-btn.cn { color:#8B5CF6; }
+
+    /* confetti */
+    .conf { position:absolute; border-radius:50%; pointer-events:none; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ MENU ═══════════════════════════════════════════════ -->
+<div id="screen-menu">
+  <div class="menu-title">🏒 萌萌曲棍球 🏒</div>
+  <div class="menu-sub">Air Hockey Touch ✨</div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="startGame('basic')">
+      <div class="mc-icon">🎯</div>
+      <div class="mc-name">基本模式</div>
+      <div class="mc-desc">經典一對一<br>先攻 <b>7</b> 分獲勝<br>⏱ 2 分鐘計時</div>
+    </div>
+    <div class="mode-card adv" onclick="startGame('advanced')">
+      <div class="mc-icon">🌪️</div>
+      <div class="mc-name">進階大亂鬥</div>
+      <div class="mc-desc">倒數 30 秒觸發<br>🔥 狂灑 15 顆圓盤<br>💥 超混亂刺激模式！</div>
+    </div>
+  </div>
+  <div class="menu-hint">👈 左半邊控制 P1　　P2 控制右半邊 👉</div>
+</div>
+
+<!-- ═══ GAME ════════════════════════════════════════════════ -->
+<div id="screen-game">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="hud">
+    <div class="score-box p1">
+      <div class="score-label">🍓 P1</div>
+      <div class="score-val" id="sv1">0</div>
+    </div>
+    <div id="timer-box">
+      <div id="timer-val">2:00</div>
+      <div id="mode-badge">基本模式</div>
+    </div>
+    <div class="score-box p2">
+      <div class="score-label">🫐 P2</div>
+      <div class="score-val" id="sv2">0</div>
+    </div>
+  </div>
+
+  <div id="chaos-overlay"></div>
+  <div id="announce"><div id="announce-text"></div></div>
+  <div id="goal-flash"></div>
+  <button id="back-btn" onclick="toMenu()">⬅ 返回選單</button>
+</div>
+
+<!-- ═══ WIN ═════════════════════════════════════════════════ -->
+<div id="screen-win">
+  <div id="win-icon">🏆</div>
+  <div id="win-title">P1 獲勝！</div>
+  <div id="win-score">7 : 3</div>
+  <div class="win-btns">
+    <button class="win-btn c1" id="replay-btn" onclick="replay()">再玩一次 🔄</button>
+    <button class="win-btn cn" onclick="toMenu()">主選單 🏠</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const WIN_SCORE    = 7;
+const GAME_TIME    = 120;   // seconds
+const CHAOS_AT     = 30;    // seconds remaining
+const CHAOS_PUCKS  = 15;
+const MAX_SPEED    = 1200;  // px/s
+const RESTITUTION  = 0.88;
+const FRICTION     = 0.9992; // per physics step
+
+// canvas & ctx
+const cvs = document.getElementById('game-canvas');
+const ctx = cvs.getContext('2d');
+
+// ═══════════════════════════════════════════════════════════════
+//  AUDIO (Web Audio API)
+// ═══════════════════════════════════════════════════════════════
+let AC = null;
+function initAC() { if (!AC) try { AC = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
+
+function beep(type) {
+  if (!AC) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.connect(g); g.connect(AC.destination);
+  const t = AC.currentTime;
+  switch(type) {
+    case 'hit':
+      o.type='square'; o.frequency.setValueAtTime(380,t); o.frequency.exponentialRampToValueAtTime(180,t+.1);
+      g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.12);
+      o.start(t); o.stop(t+.13); break;
+    case 'wall':
+      o.type='square'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(100,t+.07);
+      g.gain.setValueAtTime(.07,t); g.gain.exponentialRampToValueAtTime(.001,t+.08);
+      o.start(t); o.stop(t+.09); break;
+    case 'goal':
+      o.type='sine'; ['C5','E5','G5'].forEach((_,i)=>{
+        o.frequency.setValueAtTime([523,659,784][i], t+i*.15);
+      });
+      g.gain.setValueAtTime(.3,t); g.gain.exponentialRampToValueAtTime(.001,t+.6);
+      o.start(t); o.stop(t+.65); break;
+    case 'chaos':
+      o.type='sawtooth'; o.frequency.setValueAtTime(80,t); o.frequency.exponentialRampToValueAtTime(1200,t+.6);
+      g.gain.setValueAtTime(.22,t); g.gain.exponentialRampToValueAtTime(.001,t+.7);
+      o.start(t); o.stop(t+.75); break;
+    case 'warn':
+      o.type='square'; o.frequency.setValueAtTime(900,t);
+      g.gain.setValueAtTime(.08,t); g.gain.exponentialRampToValueAtTime(.001,t+.07);
+      o.start(t); o.stop(t+.08); break;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════════════
+let GS = null;          // game state object
+let RAF = null;         // requestAnimationFrame id
+let lastTs = null;      // last timestamp
+let curMode = 'basic';  // current mode
+
+const PUCK_COLORS = ['#FFFFFF','#FF6B9D','#FFB74D','#4AABE8','#7FE89B','#D4A5FF','#FF8C42','#00D9FF','#FFEC40'];
+
+function mkPuck(W, H, variant) {
+  const r = Math.round(Math.min(W,H) * .045);
+  let x = W/2, y = H/2, vx, vy;
+
+  if (variant === 'chaos') {
+    x = W * .15 + Math.random() * W * .7;
+    y = H * .1  + Math.random() * H * .8;
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 350 + Math.random() * 450;
+    vx = Math.cos(ang)*spd; vy = Math.sin(ang)*spd;
+  } else {
+    // serve toward random player
+    const side = Math.random() > .5 ? 1 : -1;
+    vx = side * (380 + Math.random()*80);
+    vy = (Math.random()-.5) * 260;
+  }
+  return { x, y, vx, vy, r, color: PUCK_COLORS[Math.floor(Math.random()*PUCK_COLORS.length)], active:true };
+}
+
+function mkMallet(x, y, W, color) {
+  const r = Math.round(Math.min(W, cvs.height) * .068);
+  return { x, y, px:x, py:y, r, color, tid:null };
+}
+
+function initGS(mode) {
+  const W = cvs.width, H = cvs.height;
+  const p = mkPuck(W, H, 'serve');
+  p.color = '#FFFFFF';
+  return {
+    W, H, mode,
+    score: [0, 0],
+    timeLeft: GAME_TIME,
+    pucks: [p],
+    mallets: [
+      mkMallet(W*.18, H/2, W, '#FF6B9D'),
+      mkMallet(W*.82, H/2, W, '#4AABE8')
+    ],
+    running: false,
+    chaos: false,
+    goalCD: 0,
+    warnCD: 0,
+    puckCooldown: 0,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CANVAS RESIZE
+// ═══════════════════════════════════════════════════════════════
+function onResize() {
+  cvs.width  = window.innerWidth;
+  cvs.height = window.innerHeight;
+  if (GS) {
+    GS.W = cvs.width; GS.H = cvs.height;
+    // rescale mallet radii
+    GS.mallets.forEach(m => m.r = Math.round(Math.min(GS.W, GS.H) * .068));
+    GS.pucks.forEach(p => p.r = Math.round(Math.min(GS.W, GS.H) * .045));
+    clampAll();
+  }
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+function clampMallet(m, idx) {
+  const {W,H} = GS;
+  const gD = goalDepth(W), gY1 = goalY1(H), gY2 = goalY2(H);
+  m.y = Math.max(m.r, Math.min(H - m.r, m.y));
+  if (idx === 0) {
+    m.x = Math.max(gD + m.r, Math.min(W/2 - m.r, m.x));
+  } else {
+    m.x = Math.max(W/2 + m.r, Math.min(W - gD - m.r, m.x));
+  }
+}
+function clampAll() { if(GS) GS.mallets.forEach((m,i) => clampMallet(m,i)); }
+
+// ═══════════════════════════════════════════════════════════════
+//  GEOMETRY HELPERS
+// ═══════════════════════════════════════════════════════════════
+function goalDepth(W)  { return Math.max(28, Math.round(W * .042)); }
+function goalH(H)      { return Math.round(H * .38); }
+function goalY1(H)     { return (H - goalH(H)) / 2; }
+function goalY2(H)     { return (H + goalH(H)) / 2; }
+
+// ═══════════════════════════════════════════════════════════════
+//  TOUCH INPUT
+// ═══════════════════════════════════════════════════════════════
+let mouseBtn = false, mouseZone = -1;
+
+function setupInput() {
+  cvs.addEventListener('touchstart',  onTS, {passive:false});
+  cvs.addEventListener('touchmove',   onTM, {passive:false});
+  cvs.addEventListener('touchend',    onTE, {passive:false});
+  cvs.addEventListener('touchcancel', onTE, {passive:false});
+  cvs.addEventListener('mousedown',  onMD);
+  cvs.addEventListener('mousemove',  onMM);
+  cvs.addEventListener('mouseup',    ()=>{ mouseBtn=false; mouseZone=-1; });
+}
+
+function zone(x) { return x < cvs.width/2 ? 0 : 1; }
+
+function moveMallet(idx, nx, ny) {
+  if (!GS || !GS.running) return;
+  const m = GS.mallets[idx];
+  m.x = nx; m.y = ny;
+  clampMallet(m, idx);
+}
+
+function onTS(e) {
+  e.preventDefault(); initAC();
+  if (!GS || !GS.running) return;
+  for (const t of e.changedTouches) {
+    const z = zone(t.clientX);
+    const m = GS.mallets[z];
+    if (m.tid === null) { m.tid = t.identifier; moveMallet(z, t.clientX, t.clientY); }
+  }
+}
+function onTM(e) {
+  e.preventDefault();
+  if (!GS || !GS.running) return;
+  for (const t of e.changedTouches) {
+    GS.mallets.forEach((m,i) => { if (m.tid === t.identifier) moveMallet(i, t.clientX, t.clientY); });
+  }
+}
+function onTE(e) {
+  e.preventDefault();
+  if (!GS) return;
+  for (const t of e.changedTouches) {
+    GS.mallets.forEach(m => { if (m.tid === t.identifier) m.tid = null; });
+  }
+}
+function onMD(e) { initAC(); mouseBtn=true; mouseZone=zone(e.clientX); moveMallet(mouseZone,e.clientX,e.clientY); }
+function onMM(e) { if (mouseBtn && mouseZone>=0) moveMallet(mouseZone,e.clientX,e.clientY); }
+
+// ═══════════════════════════════════════════════════════════════
+//  PHYSICS
+// ═══════════════════════════════════════════════════════════════
+function stepPuck(puck, dt) {
+  if (!puck.active) return null;
+  const {W, H} = GS;
+  const gD = goalDepth(W), gy1 = goalY1(H), gy2 = goalY2(H);
+
+  // friction
+  const friction = Math.pow(FRICTION, dt * 60);
+  puck.vx *= friction;
+  puck.vy *= friction;
+
+  puck.x += puck.vx * dt;
+  puck.y += puck.vy * dt;
+
+  // top / bottom walls
+  if (puck.y - puck.r < 0)   { puck.y = puck.r;    puck.vy =  Math.abs(puck.vy)*.94; beep('wall'); }
+  if (puck.y + puck.r > H)   { puck.y = H - puck.r; puck.vy = -Math.abs(puck.vy)*.94; beep('wall'); }
+
+  // left side
+  if (puck.x - puck.r < gD) {
+    if (puck.y >= gy1 && puck.y <= gy2) {
+      puck.active = false; return 'p2-scores'; // P2 scored into P1's goal
+    } else {
+      puck.x = gD + puck.r;
+      puck.vx = Math.abs(puck.vx) * .94;
+      beep('wall');
+    }
+  }
+
+  // right side
+  if (puck.x + puck.r > W - gD) {
+    if (puck.y >= gy1 && puck.y <= gy2) {
+      puck.active = false; return 'p1-scores'; // P1 scored into P2's goal
+    } else {
+      puck.x = W - gD - puck.r;
+      puck.vx = -Math.abs(puck.vx) * .94;
+      beep('wall');
+    }
+  }
+
+  return null;
+}
+
+function hitMallet(puck, mallet, dt) {
+  if (!puck.active) return;
+  const dx = puck.x - mallet.x, dy = puck.y - mallet.y;
+  const dist = Math.hypot(dx, dy);
+  const minD  = puck.r + mallet.r;
+  if (dist >= minD || dist < .001) return;
+
+  const nx = dx/dist, ny = dy/dist;
+  // separate
+  puck.x += nx * (minD - dist + 1);
+  puck.y += ny * (minD - dist + 1);
+
+  // mallet velocity this frame
+  const mvx = (mallet.x - mallet.px) / (dt || .016);
+  const mvy = (mallet.y - mallet.py) / (dt || .016);
+  const MVX = Math.max(-900, Math.min(900, mvx));
+  const MVY = Math.max(-900, Math.min(900, mvy));
+
+  // relative velocity along normal
+  const rvn = (puck.vx - MVX)*nx + (puck.vy - MVY)*ny;
+  if (rvn >= 0) return;  // already separating
+
+  const j = -(1 + RESTITUTION) * rvn;
+  puck.vx += j * nx + MVX * .55;
+  puck.vy += j * ny + MVY * .55;
+
+  // cap speed
+  const spd = Math.hypot(puck.vx, puck.vy);
+  if (spd > MAX_SPEED) { puck.vx = puck.vx/spd*MAX_SPEED; puck.vy = puck.vy/spd*MAX_SPEED; }
+
+  beep('hit');
+}
+
+function hitPucks(a, b) {
+  if (!a.active || !b.active) return;
+  const dx = b.x-a.x, dy = b.y-a.y, dist = Math.hypot(dx,dy);
+  const minD = a.r + b.r;
+  if (dist >= minD || dist < .001) return;
+  const nx=dx/dist, ny=dy/dist, ov=(minD-dist)/2;
+  a.x -= nx*ov; a.y -= ny*ov;
+  b.x += nx*ov; b.y += ny*ov;
+  const dv = (a.vx-b.vx)*nx + (a.vy-b.vy)*ny;
+  if (dv > 0) {
+    a.vx -= dv*nx; a.vy -= dv*ny;
+    b.vx += dv*nx; b.vy += dv*ny;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GOAL & SCORING
+// ═══════════════════════════════════════════════════════════════
+function onGoal(scorer) {   // scorer: 0=P1, 1=P2
+  if (GS.goalCD > 0) return;
+  // 大亂鬥：短暫冷卻，圓盤繼續飛；一般模式：長冷卻等補球
+  GS.goalCD = GS.chaos ? 0.3 : 1.8;
+  GS.score[scorer]++;
+  document.getElementById(scorer===0?'sv1':'sv2').textContent = GS.score[scorer];
+  beep('goal');
+
+  // flash
+  const fl = document.getElementById('goal-flash');
+  fl.style.background = scorer===0
+    ? 'radial-gradient(ellipse,rgba(255,107,157,.55) 0%,transparent 70%)'
+    : 'radial-gradient(ellipse,rgba(74,171,232,.55) 0%,transparent 70%)';
+  fl.style.opacity = '1';
+  setTimeout(()=>fl.style.opacity='0', 380);
+
+  announce(scorer===0 ? '🍓 P1 得分！' : '🫐 P2 得分！', 900);
+
+  // 大亂鬥觸發後，勝負只靠計時器，不受 WIN_SCORE 限制
+  if (!GS.chaos && GS.score[scorer] >= WIN_SCORE) { endGame(scorer); return; }
+
+  // 一般模式補球；大亂鬥場上已有多顆，不補
+  if (!GS.chaos) {
+    setTimeout(() => {
+      if (!GS || !GS.running) return;
+      const {W,H} = GS;
+      const p = mkPuck(W, H, 'serve');
+      p.color = '#FFFFFF';
+      GS.pucks = [p];
+    }, 1000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CHAOS MODE
+// ═══════════════════════════════════════════════════════════════
+function triggerChaos() {
+  GS.chaos = true;
+  beep('chaos');
+  announce('🌪️ 大亂鬥！ 🌪️', 2800);
+  document.getElementById('chaos-overlay').classList.add('on');
+  document.getElementById('mode-badge').textContent = '🔥 大亂鬥模式';
+
+  const {W,H} = GS;
+  for (let i = 0; i < CHAOS_PUCKS; i++) {
+    setTimeout(() => {
+      if (!GS || !GS.running) return;
+      GS.pucks.push(mkPuck(W, H, 'chaos'));
+    }, i * 130);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANNOUNCE HELPER
+// ═══════════════════════════════════════════════════════════════
+let announceTimer = null;
+function announce(txt, dur) {
+  const el = document.getElementById('announce');
+  document.getElementById('announce-text').textContent = txt;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(announceTimer);
+  announceTimer = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TIMER DISPLAY
+// ═══════════════════════════════════════════════════════════════
+function updateTimer() {
+  const t = Math.max(0, Math.ceil(GS.timeLeft));
+  const m = Math.floor(t/60), s = t%60;
+  const el = document.getElementById('timer-val');
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.style.color = GS.timeLeft <= 10 ? '#FF3333' : GS.timeLeft <= 30 ? '#FF8844' : '#5D4037';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN GAME LOOP
+// ═══════════════════════════════════════════════════════════════
+function loop(ts) {
+  if (!GS || !GS.running) return;
+  if (lastTs === null) lastTs = ts;
+  const dt = Math.min((ts - lastTs) / 1000, .05);
+  lastTs = ts;
+
+  // ── countdown ──
+  GS.timeLeft -= dt;
+  if (GS.goalCD > 0) GS.goalCD -= dt;
+
+  // warn beeps in last 10s
+  if (GS.timeLeft > 0 && GS.timeLeft <= 10) {
+    GS.warnCD -= dt;
+    if (GS.warnCD <= 0) { beep('warn'); GS.warnCD = 1; }
+  }
+
+  // chaos trigger
+  if (GS.mode === 'advanced' && !GS.chaos && GS.timeLeft <= CHAOS_AT) triggerChaos();
+
+  // time's up
+  if (GS.timeLeft <= 0) {
+    GS.timeLeft = 0;
+    updateTimer();
+    const w = GS.score[0] > GS.score[1] ? 0 : GS.score[1] > GS.score[0] ? 1 : -1;
+    endGame(w);
+    return;
+  }
+
+  updateTimer();
+
+  // ── physics ──
+  const goals = [];
+  for (const puck of GS.pucks) {
+    const res = stepPuck(puck, dt);
+    if (res && GS.goalCD <= 0) goals.push(res);
+  }
+
+  // mallet vs puck
+  GS.pucks.forEach(p => GS.mallets.forEach(m => hitMallet(p, m, dt)));
+
+  // puck vs puck
+  const active = GS.pucks.filter(p => p.active);
+  for (let i=0; i<active.length; i++) for (let j=i+1; j<active.length; j++) hitPucks(active[i], active[j]);
+
+  // process goals (max 1 per frame)
+  if (goals.length > 0) {
+    if (goals[0] === 'p1-scores') onGoal(0);
+    else                           onGoal(1);
+  }
+
+  // prune inactive pucks (keep at least 1 during normal play)
+  GS.pucks = GS.pucks.filter(p => p.active);
+  if (GS.pucks.length === 0 && !GS.chaos && GS.goalCD <= 0) {
+    const p = mkPuck(GS.W, GS.H, 'serve'); p.color='#FFFFFF'; GS.pucks = [p];
+  }
+
+  // update mallet prev positions
+  GS.mallets.forEach(m => { m.px = m.x; m.py = m.y; });
+
+  // ── render ──
+  render();
+  RAF = requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════════════════════
+const PUCK_GLOW_COLORS = {
+  '#FFFFFF': 'rgba(220,240,255,.8)',
+  '#FF6B9D': 'rgba(255,107,157,.8)',
+  '#FFB74D': 'rgba(255,183,77,.8)',
+  '#4AABE8': 'rgba(74,171,232,.8)',
+  '#7FE89B': 'rgba(127,232,155,.8)',
+  '#D4A5FF': 'rgba(212,165,255,.8)',
+  '#FF8C42': 'rgba(255,140,66,.8)',
+  '#00D9FF': 'rgba(0,217,255,.8)',
+  '#FFEC40': 'rgba(255,236,64,.8)',
+};
+
+function render() {
+  const {W, H, pucks, mallets} = GS;
+  ctx.clearRect(0,0,W,H);
+
+  drawTable(W, H);
+  pucks.forEach(p => { if(p.active) drawPuck(p, W, H); });
+  drawMallet(mallets[0], '🍓');
+  drawMallet(mallets[1], '🫐');
+}
+
+function drawTable(W, H) {
+  const gD = goalDepth(W), gy1 = goalY1(H), gy2 = goalY2(H), gH = goalH(H);
+
+  // ── background ──
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0a1628'); bg.addColorStop(.5,'#142238'); bg.addColorStop(1,'#0a1628');
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+  // ── playing surface ──
+  const surf = ctx.createLinearGradient(gD, 0, W-gD, 0);
+  surf.addColorStop(0,'#0d2b50'); surf.addColorStop(.5,'#113569'); surf.addColorStop(1,'#0d2b50');
+  ctx.fillStyle = surf;
+  ctx.beginPath(); ctx.rect(gD, 0, W-gD*2, H); ctx.fill();
+
+  // subtle grid
+  ctx.strokeStyle = 'rgba(255,255,255,.028)'; ctx.lineWidth = 1;
+  for (let x=gD; x<W-gD; x+=70) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y=0; y<H; y+=70)     { ctx.beginPath(); ctx.moveTo(gD,y); ctx.lineTo(W-gD,y); ctx.stroke(); }
+
+  // ── center line ──
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 3;
+  ctx.setLineDash([14,9]);
+  ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+
+  // ── center circle ──
+  const cR = Math.min(W,H) * .13;
+  ctx.strokeStyle='rgba(200,180,255,.22)'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(W/2,H/2,cR,0,Math.PI*2); ctx.stroke();
+  // center dot
+  const cdg = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,7);
+  cdg.addColorStop(0,'rgba(200,180,255,.8)'); cdg.addColorStop(1,'rgba(200,180,255,0)');
+  ctx.fillStyle = cdg; ctx.beginPath(); ctx.arc(W/2,H/2,7,0,Math.PI*2); ctx.fill();
+
+  // ── corner walls (non-goal left/right) ──
+  ctx.fillStyle='#0d1b2a';
+  ctx.fillRect(0,0,gD,gy1);              // top-left
+  ctx.fillRect(0,gy2,gD,H-gy2);          // bot-left
+  ctx.fillRect(W-gD,0,gD,gy1);           // top-right
+  ctx.fillRect(W-gD,gy2,gD,H-gy2);       // bot-right
+
+  // ── P1 goal (left, pink) ──
+  // glow fill
+  const pg1 = ctx.createLinearGradient(0,gy1,gD,gy1);
+  pg1.addColorStop(0,'rgba(255,107,157,.25)'); pg1.addColorStop(1,'rgba(255,107,157,.04)');
+  ctx.fillStyle = pg1; ctx.fillRect(0,gy1,gD,gH);
+  // border
+  ctx.save();
+  ctx.shadowColor='#FF6B9D'; ctx.shadowBlur=18;
+  ctx.strokeStyle='#FF6B9D'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(gD,gy1); ctx.lineTo(0,gy1); ctx.lineTo(0,gy2); ctx.lineTo(gD,gy2); ctx.stroke();
+  // posts
+  ctx.fillStyle='#FF6B9D';
+  [gy1,gy2].forEach(gy => { ctx.beginPath(); ctx.arc(gD,gy,9,0,Math.PI*2); ctx.fill(); });
+  ctx.restore();
+
+  // ── P2 goal (right, blue) ──
+  const pg2 = ctx.createLinearGradient(W-gD,gy1,W,gy1);
+  pg2.addColorStop(0,'rgba(74,171,232,.04)'); pg2.addColorStop(1,'rgba(74,171,232,.25)');
+  ctx.fillStyle = pg2; ctx.fillRect(W-gD,gy1,gD,gH);
+  ctx.save();
+  ctx.shadowColor='#4AABE8'; ctx.shadowBlur=18;
+  ctx.strokeStyle='#4AABE8'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(W-gD,gy1); ctx.lineTo(W,gy1); ctx.lineTo(W,gy2); ctx.lineTo(W-gD,gy2); ctx.stroke();
+  ctx.fillStyle='#4AABE8';
+  [gy1,gy2].forEach(gy => { ctx.beginPath(); ctx.arc(W-gD,gy,9,0,Math.PI*2); ctx.fill(); });
+  ctx.restore();
+
+  // ── side wall top/bottom lines ──
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(gD,0); ctx.lineTo(W-gD,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(gD,H); ctx.lineTo(W-gD,H); ctx.stroke();
+
+  // ── P labels inside goal ──
+  const labelSize = Math.max(12, Math.round(gD * .45));
+  ctx.fillStyle='rgba(255,107,157,.45)'; ctx.font=`900 ${labelSize}px Nunito`;
+  ctx.textAlign='center'; ctx.save();
+  ctx.translate(gD/2, H/2); ctx.rotate(-Math.PI/2); ctx.fillText('P1',0,0); ctx.restore();
+  ctx.fillStyle='rgba(74,171,232,.45)'; ctx.save();
+  ctx.translate(W-gD/2, H/2); ctx.rotate(Math.PI/2); ctx.fillText('P2',0,0); ctx.restore();
+}
+
+function drawPuck(puck) {
+  const {x,y,r,color} = puck;
+  const glowC = PUCK_GLOW_COLORS[color] || 'rgba(200,220,255,.7)';
+
+  ctx.save();
+  ctx.shadowColor = glowC;
+  ctx.shadowBlur  = 18;
+
+  // main body gradient
+  const g = ctx.createRadialGradient(x - r*.3, y - r*.3, r*.08, x, y, r);
+  g.addColorStop(0, '#FFFFFF');
+  g.addColorStop(.35, color);
+  g.addColorStop(1, darken(color, 45));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // rim
+  ctx.strokeStyle='rgba(255,255,255,.4)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+
+  // highlight
+  ctx.fillStyle='rgba(255,255,255,.3)';
+  ctx.beginPath();
+  ctx.ellipse(x - r*.25, y - r*.3, r*.32, r*.18, -Math.PI/4, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawMallet(m, emoji) {
+  const {x,y,r,color} = m;
+  ctx.save();
+  ctx.shadowColor = color; ctx.shadowBlur = 24;
+
+  // outer glow ring
+  ctx.fillStyle = 'rgba(255,255,255,.1)';
+  ctx.beginPath(); ctx.arc(x,y,r+7,0,Math.PI*2); ctx.fill();
+
+  // body
+  const g = ctx.createRadialGradient(x-r*.3, y-r*.3, r*.1, x, y, r);
+  g.addColorStop(0, lighten(color,45));
+  g.addColorStop(.6, color);
+  g.addColorStop(1, darken(color,35));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // border
+  ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+
+  // inner circle
+  ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(x,y,r*.55,0,Math.PI*2); ctx.stroke();
+
+  // emoji
+  ctx.font = `${Math.round(r*.85)}px serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(emoji, x, y + r*.05);
+  ctx.textBaseline='alphabetic';
+}
+
+// ── color helpers ──
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+  return [ parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16) ];
+}
+function darken(hex,  amt) {
+  if (!hex.startsWith('#')) return hex;
+  const [r,g,b] = hexToRgb(hex);
+  return `rgb(${Math.max(0,r-amt)},${Math.max(0,g-amt)},${Math.max(0,b-amt)})`;
+}
+function lighten(hex, amt) {
+  if (!hex.startsWith('#')) return hex;
+  const [r,g,b] = hexToRgb(hex);
+  return `rgb(${Math.min(255,r+amt)},${Math.min(255,g+amt)},${Math.min(255,b+amt)})`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GAME CONTROL
+// ═══════════════════════════════════════════════════════════════
+function startGame(mode) {
+  initAC(); curMode = mode;
+  GS = initGS(mode);
+
+  document.getElementById('screen-menu').style.display  = 'none';
+  document.getElementById('screen-win').classList.remove('show');
+  document.getElementById('screen-game').style.display  = 'block';
+  document.getElementById('chaos-overlay').classList.remove('on');
+  document.getElementById('back-btn').style.display     = 'block';
+  document.getElementById('mode-badge').textContent     = mode==='advanced' ? '進階大亂鬥' : '基本模式';
+  document.getElementById('sv1').textContent            = '0';
+  document.getElementById('sv2').textContent            = '0';
+  document.getElementById('goal-flash').style.opacity   = '0';
+  document.getElementById('announce').classList.remove('show');
+
+  setupInput();
+  GS.running = true;
+  lastTs = null;
+
+  announce('準備…開始！🎉', 1800);
+  RAF = requestAnimationFrame(loop);
+}
+
+function endGame(winner) {
+  if (!GS) return;
+  GS.running = false;
+  cancelAnimationFrame(RAF); RAF = null;
+  setTimeout(()=>showWin(winner), 600);
+}
+
+function showWin(winner) {
+  document.getElementById('screen-game').style.display = 'none';
+  const ws = document.getElementById('screen-win');
+  ws.className = '';
+
+  if (winner === -1) {
+    ws.classList.add('show','draw-win');
+    document.getElementById('win-icon').textContent  = '🤝';
+    document.getElementById('win-title').textContent = '平手！超厲害！';
+    document.getElementById('replay-btn').className  = 'win-btn cn';
+  } else if (winner === 0) {
+    ws.classList.add('show','p1-win');
+    document.getElementById('win-icon').textContent  = '🍓';
+    document.getElementById('win-title').textContent = '🍓 P1 獲勝！';
+    document.getElementById('replay-btn').className  = 'win-btn c1';
+  } else {
+    ws.classList.add('show','p2-win');
+    document.getElementById('win-icon').textContent  = '🫐';
+    document.getElementById('win-title').textContent = '🫐 P2 獲勝！';
+    document.getElementById('replay-btn').className  = 'win-btn c2';
+  }
+
+  if (GS) document.getElementById('win-score').textContent = `${GS.score[0]} : ${GS.score[1]}`;
+  spawnConfetti(winner);
+}
+
+function spawnConfetti(winner) {
+  const ws = document.getElementById('screen-win');
+  document.querySelectorAll('.conf').forEach(c=>c.remove());
+  const cols = winner===0 ? ['#FF6B9D','#FF8FAB','#FFD6E0','#FFB3C6']
+             : winner===1 ? ['#4AABE8','#81C8F6','#BDE0FE','#99D8FF']
+             :               ['#FF6B9D','#4AABE8','#FFD700','#7FE89B','#D4A5FF'];
+  for (let i=0; i<36; i++) {
+    const c = document.createElement('div');
+    const sz = 8 + Math.random()*12;
+    c.className = 'conf';
+    c.style.cssText = `left:${Math.random()*100}%;top:-20px;width:${sz}px;height:${sz}px;
+      background:${cols[i%cols.length]};border-radius:${Math.random()>.45?'50%':'4px'};
+      animation:cfall ${1.4+Math.random()*2.2}s linear ${Math.random()*.6}s forwards;`;
+    ws.appendChild(c);
+  }
+}
+
+function replay() {
+  document.querySelectorAll('.conf').forEach(c=>c.remove());
+  startGame(curMode);
+}
+
+function toMenu() {
+  if (RAF) { cancelAnimationFrame(RAF); RAF=null; }
+  GS = null; mouseBtn=false; mouseZone=-1;
+  document.querySelectorAll('.conf').forEach(c=>c.remove());
+  document.getElementById('chaos-overlay').classList.remove('on');
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-win').classList.remove('show');
+  document.getElementById('screen-menu').style.display = 'flex';
+  document.getElementById('announce').classList.remove('show');
+}
+
+// inject confetti animation
+const _s = document.createElement('style');
+_s.textContent = '@keyframes cfall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}';
+document.head.appendChild(_s);
+
+// init canvas
+onResize();
+</script>
+    <!-- 回首頁按鈕 -->
+    <a href="../index.html" id="home-btn" title="回首頁" style="
+        position:fixed; bottom:14px; left:16px; z-index:99999;
+        width:44px; height:44px; border-radius:50%;
+        background:rgba(255,255,255,0.82);
+        border:2px solid #f9a8d4;
+        box-shadow:0 4px 12px rgba(236,72,153,0.22);
+        display:flex; align-items:center; justify-content:center;
+        text-decoration:none; transition:background 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+       onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+    </a>
+</body>
+</html>

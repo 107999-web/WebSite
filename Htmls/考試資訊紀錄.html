@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考試資訊紀錄</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #221c3d;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .input-box {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-box:focus:not(:disabled) {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-box:disabled {
+            background-color: transparent;
+            border-color: transparent;
+            color: #cbd5e1;
+            font-weight: bold;
+        }
+
+        .input-box::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .slashed-zero {
+            font-variant-numeric: slashed-zero;
+        }
+        
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 正常時間樣式 */
+        .time-normal {
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
+            -webkit-text-stroke: 0px transparent;
+        }
+
+        /* 最後五分鐘警告樣式 */
+        .time-warning {
+            color: transparent;
+            -webkit-text-stroke: 3px #ef4444;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.4);
+            animation: pulse-warning 1s infinite alternate;
+        }
+
+        @keyframes pulse-warning {
+            from { text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+            to { text-shadow: 0 0 30px rgba(239, 68, 68, 1), 0 0 50px rgba(239, 68, 68, 0.6); }
+        }
+
+        /* 隱藏原生時間選擇器的 icon */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.5;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-7xl w-full flex flex-col lg:flex-row gap-12 lg:gap-24 items-start">
+        
+        <!-- 左側：表單區域 -->
+        <div class="flex-1 w-full">
+            <!-- 標題與按鈕 -->
+            <div class="mb-10 flex justify-between items-end relative">
+                <div class="relative">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500 rounded-full h-8 mt-1"></div>
+                    <div class="pl-4">
+                        <h1 class="text-2xl font-bold tracking-widest text-white mb-1">考試資訊紀錄</h1>
+                        <p class="text-xs tracking-[0.2em] text-gray-500 uppercase">Examination Details Log</p>
+                    </div>
+                </div>
+                <button onclick="openSettings()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded border border-white/20 text-sm tracking-wider transition-colors">
+                    編輯考試設定
+                </button>
+            </div>
+
+            <!-- 表單內容 -->
+            <div class="space-y-6 text-sm tracking-wider">
+                
+                <!-- 動態考試科目列表容器 -->
+                <div id="mainScheduleContainer" class="space-y-4">
+                    <!-- 由 JS 渲染 -->
+                </div>
+
+                <!-- 分隔線 -->
+                <div class="border-b border-white/5 my-6"></div>
+
+                <!-- 監考老師填寫區 -->
+                <div class="text-gray-400 text-xs mb-4 tracking-widest">當節監考紀錄區</div>
+                
+                <div class="flex flex-wrap items-center gap-4">
+                    <span>應到</span>
+                    <input type="text" class="input-box w-16 text-center" placeholder="()">
+                    <span>人</span>
+                    <span class="ml-4">實到</span>
+                    <input type="text" class="input-box w-16 text-center" placeholder="()">
+                    <span>人</span>
+                    <span class="ml-4 text-red-400 font-bold">缺考</span>
+                    <input type="text" class="input-box w-16 text-center" placeholder="()">
+                    <span>人</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-4 pt-2">
+                    <span>隔離考試</span>
+                    <input type="text" class="input-box w-16 text-center" placeholder="()">
+                    <span>人，座號：</span>
+                    <input type="text" class="input-box w-48 text-center" placeholder="()">
+                </div>
+
+                <div class="pt-4 flex flex-col gap-2">
+                    <span>個別化教室考試座號：</span>
+                    <input type="text" class="input-box w-full text-left px-4 py-2" placeholder="()">
+                </div>
+
+            </div>
+
+            <!-- 底部資訊 -->
+            <div class="mt-16 text-[10px] tracking-[0.3em] text-gray-500 uppercase">
+                © 2026 JyunHan．版權所有
+            </div>
+        </div>
+
+        <!-- 右側：時鐘區域 -->
+        <div class="flex-shrink-0 w-full lg:w-[480px]">
+            <div class="glass-panel rounded-[2.5rem] p-10 flex flex-col items-center justify-between min-h-[450px] relative">
+                
+                <!-- 裝飾用小圓點 -->
+                <div class="absolute top-8 left-8 w-1 h-1 bg-white/20 rounded-full"></div>
+                <div class="absolute top-8 right-8 w-1 h-1 bg-white/20 rounded-full"></div>
+                <div class="absolute bottom-8 left-8 w-1 h-1 bg-white/20 rounded-full"></div>
+                <div class="absolute bottom-8 right-8 w-1 h-1 bg-white/20 rounded-full"></div>
+
+                <!-- 日期 -->
+                <div class="text-center mt-2">
+                    <div id="dateDisplay" class="text-2xl tracking-[0.3em] font-medium text-gray-200">YYYY / MM / DD</div>
+                    <div id="dayDisplay" class="text-xs tracking-[0.4em] text-gray-500 mt-2">DAY</div>
+                </div>
+
+                <!-- 考試科目與時間 -->
+                <div class="text-center flex flex-col items-center w-full mt-4">
+                    <!-- 目前考試科目 -->
+                    <div id="currentSubjectDisplay" class="text-3xl font-bold text-white tracking-widest h-10 mb-4 flex items-center justify-center text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+                        <!-- 由 JS 渲染 -->
+                    </div>
+
+                    <!-- 時間 -->
+                    <div class="text-[6.5rem] font-bold tracking-wider slashed-zero font-mono tabular-nums leading-none time-normal transition-all duration-300" id="timeDisplay">
+                        00:00
+                    </div>
+                    
+                    <!-- 秒數 -->
+                    <div class="flex items-center gap-4 mt-6">
+                        <div class="h-px w-12 bg-white/10"></div>
+                        <div id="secondsDisplay" class="text-xl tracking-[0.2em] text-gray-500 font-mono tabular-nums">00</div>
+                        <div class="h-px w-12 bg-white/10"></div>
+                    </div>
+                </div>
+
+                <!-- 底部標籤 -->
+                <div class="mt-8 mb-2 bg-black/40 rounded-full px-5 py-2 flex items-center gap-3 border border-white/5 shadow-inner">
+                    <span class="text-[10px] tracking-[0.2em] text-gray-400">© 2026 JyunHan．版權所有</span>
+                    <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center relative overflow-hidden border border-white/20">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-green-400/20 to-transparent"></div>
+                        <div class="w-3 h-3 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 設定 Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-3xl rounded-2xl p-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white tracking-widest">編輯考試設定</h2>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            
+            <div id="modalScheduleContainer" class="space-y-4 mb-6">
+                <!-- 由 JS 渲染 -->
+            </div>
+
+            <div class="flex justify-between items-center mt-8 pt-6 border-t border-white/10">
+                <button onclick="addSession()" class="bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 px-4 py-2 rounded border border-blue-500/30 text-sm tracking-wider transition-colors">
+                    + 新增節次
+                </button>
+                <div class="flex gap-4">
+                    <button onclick="closeSettings()" class="bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 px-6 py-2 rounded border border-gray-500/30 text-sm tracking-wider transition-colors">取消</button>
+                    <button onclick="saveSettings()" class="bg-green-600/30 hover:bg-green-600/50 text-green-200 px-6 py-2 rounded border border-green-500/30 text-sm tracking-wider transition-colors">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 考試資料狀態
+        let examSessions = [
+            { id: 1, subject: '國語', start: '08:00', end: '09:00', proctor: '陳老師' },
+            { id: 2, subject: '社會', start: '09:20', end: '10:20', proctor: '林老師' },
+            { id: 3, subject: '英文', start: '10:40', end: '11:40', proctor: '張老師' }
+        ];
+
+        // 渲染主畫面的考試列表
+        function renderMainSchedule() {
+            const container = document.getElementById('mainScheduleContainer');
+            container.innerHTML = '';
+            
+            examSessions.forEach((session, index) => {
+                const numStr = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][index] || (index + 1);
+                const html = `
+                    <div class="flex flex-wrap items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
+                        <span class="w-32 text-gray-300">第${numStr}節 (${session.start} - ${session.end})</span>
+                        <span class="text-gray-400 ml-2">科目：</span>
+                        <input type="text" class="input-box w-28 text-center" value="${session.subject}" disabled>
+                        <span class="mx-2 text-gray-500">/</span>
+                        <span class="text-gray-400">監考老師：</span>
+                        <input type="text" class="input-box w-28 text-center" value="${session.proctor}" disabled>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // 渲染 Modal 內的編輯列表
+        function renderModalSchedule() {
+            const container = document.getElementById('modalScheduleContainer');
+            container.innerHTML = '';
+            
+            examSessions.forEach((session, index) => {
+                const html = `
+                    <div class="flex flex-wrap items-center gap-3 bg-black/40 p-4 rounded-lg border border-white/10 relative session-row" data-index="${index}">
+                        <div class="w-8 text-gray-400 font-bold">${index + 1}.</div>
+                        
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs text-gray-500">科目</label>
+                            <input type="text" class="input-box w-24 edit-subject" value="${session.subject}">
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs text-gray-500">開始時間</label>
+                            <input type="time" class="input-box w-32 edit-start" value="${session.start}">
+                        </div>
+                        
+                        <span class="mt-5 text-gray-500">-</span>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs text-gray-500">結束時間</label>
+                            <input type="time" class="input-box w-32 edit-end" value="${session.end}">
+                        </div>
+
+                        <div class="flex flex-col gap-1 ml-4">
+                            <label class="text-xs text-gray-500">監考老師</label>
+                            <input type="text" class="input-box w-28 edit-proctor" value="${session.proctor}">
+                        </div>
+
+                        <button onclick="removeSession(${index})" class="ml-auto text-red-400 hover:text-red-300 px-3 py-2 mt-4 text-xl" title="刪除">&times;</button>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // 新增節次
+        function addSession() {
+            examSessions.push({ id: Date.now(), subject: '', start: '00:00', end: '00:00', proctor: '' });
+            renderModalSchedule();
+        }
+
+        // 刪除節次
+        function removeSession(index) {
+            examSessions.splice(index, 1);
+            renderModalSchedule();
+        }
+
+        // 儲存設定
+        function saveSettings() {
+            const rows = document.querySelectorAll('.session-row');
+            const newSessions = [];
+            
+            rows.forEach(row => {
+                newSessions.push({
+                    id: Date.now() + Math.random(),
+                    subject: row.querySelector('.edit-subject').value,
+                    start: row.querySelector('.edit-start').value,
+                    end: row.querySelector('.edit-end').value,
+                    proctor: row.querySelector('.edit-proctor').value
+                });
+            });
+
+            // 根據開始時間排序
+            newSessions.sort((a, b) => a.start.localeCompare(b.start));
+            
+            examSessions = newSessions;
+            renderMainSchedule();
+            closeSettings();
+            checkExamStatus(new Date()); // 立即更新狀態
+        }
+
+        // 開關 Modal
+        function openSettings() {
+            renderModalSchedule();
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        // 將 HH:MM 轉換為分鐘數，方便計算
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // 檢查目前考試狀態並更新 UI
+        function checkExamStatus(now) {
+            const currentHours = String(now.getHours()).padStart(2, '0');
+            const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+            const currentTimeStr = `${currentHours}:${currentMinutes}`;
+            const currentMins = timeToMinutes(currentTimeStr);
+
+            let activeSession = null;
+            let timeRemainingMins = -1;
+
+            // 尋找進行中的考試
+            for (const session of examSessions) {
+                if (!session.start || !session.end) continue;
+                
+                const startMins = timeToMinutes(session.start);
+                const endMins = timeToMinutes(session.end);
+
+                if (currentMins >= startMins && currentMins < endMins) {
+                    activeSession = session;
+                    timeRemainingMins = endMins - currentMins;
+                    break;
+                }
+            }
+
+            const subjectDisplay = document.getElementById('currentSubjectDisplay');
+            const timeDisplay = document.getElementById('timeDisplay');
+
+            if (activeSession) {
+                subjectDisplay.textContent = `考試中：${activeSession.subject}`;
+                
+                // 檢查是否為最後五分鐘
+                if (timeRemainingMins > 0 && timeRemainingMins <= 5) {
+                    timeDisplay.classList.remove('time-normal');
+                    timeDisplay.classList.add('time-warning');
+                } else {
+                    timeDisplay.classList.add('time-normal');
+                    timeDisplay.classList.remove('time-warning');
+                }
+            } else {
+                subjectDisplay.textContent = '';
+                timeDisplay.classList.add('time-normal');
+                timeDisplay.classList.remove('time-warning');
+            }
+        }
+
+        // 時鐘更新邏輯
+        function updateClock() {
+            const now = new Date();
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            document.getElementById('dateDisplay').textContent = `${year} / ${month} / ${date}`;
+
+            const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+            document.getElementById('dayDisplay').textContent = days[now.getDay()];
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}`;
+
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('secondsDisplay').textContent = seconds;
+
+            // 檢查考試狀態 (變更文字與警告顏色)
+            checkExamStatus(now);
+        }
+
+        // 初始化
+        renderMainSchedule();
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

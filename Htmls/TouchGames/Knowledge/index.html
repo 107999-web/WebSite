@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>校園知識王 🏆 觸控搶答大挑戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* ============ 基礎設定 ============ */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+html,body { width:100%; height:100%; overflow:hidden; touch-action:manipulation; }
+body {
+  font-family:'M PLUS Rounded 1c','Nunito','Microsoft JhengHei',sans-serif;
+  color:#5D4037;
+  background:linear-gradient(135deg,#FFF0F5 0%,#E3F2FD 50%,#F0FFF4 100%);
+  position:relative;
+}
+/* 圓點裝飾背景 */
+body::before {
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:radial-gradient(rgba(255,143,171,.14) 8px, transparent 9px);
+  background-size:90px 90px;
+}
+button { font-family:inherit; cursor:pointer; }
+
+/* ============ 漂浮裝飾 ============ */
+.float-deco { position:fixed; font-size:3.2vmin; opacity:.5; z-index:0; pointer-events:none; animation:floaty 6s ease-in-out infinite; }
+@keyframes floaty { 0%,100%{transform:translateY(0) rotate(-6deg)} 50%{transform:translateY(-2.6vmin) rotate(6deg)} }
+
+/* ============ 畫面切換 ============ */
+.screen { position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:1; padding:3vmin; }
+.screen.active { display:flex; animation:screenIn .45s cubic-bezier(.34,1.56,.64,1); }
+@keyframes screenIn { from{opacity:0; transform:scale(.94) translateY(2vmin)} to{opacity:1; transform:none} }
+
+/* ============ 首頁 ============ */
+.logo-badge { font-size:2.6vmin; background:#FFF; border:.4vmin solid #FADADD; border-radius:50px; padding:.8vmin 3vmin; box-shadow:0 .8vmin 1.6vmin rgba(255,182,193,.4); margin-bottom:1.5vmin; }
+h1.game-title {
+  font-size:9vmin; font-weight:800; letter-spacing:.6vmin; line-height:1.25;
+  background:linear-gradient(180deg,#FF8FAB,#FFB74D);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 .5vmin 0 rgba(255,255,255,.9)) drop-shadow(0 1vmin 1.4vmin rgba(255,143,171,.35));
+  animation:titleBounce 2.6s ease-in-out infinite;
+}
+@keyframes titleBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-1vmin)} }
+.subtitle { font-size:3vmin; margin:1vmin 0 4vmin; color:#8D6E63; }
+.mode-row { display:flex; gap:3.5vmin; flex-wrap:wrap; justify-content:center; }
+.mode-card {
+  width:30vmin; padding:3.4vmin 2vmin; border:none; border-radius:3.4vmin;
+  background:#FFFFFF; border:.5vmin solid #FADADD;
+  box-shadow:0 1.4vmin 2.6vmin rgba(255,182,193,.45);
+  transition:transform .18s ease, box-shadow .18s ease;
+  display:flex; flex-direction:column; align-items:center; gap:1.2vmin; color:#5D4037;
+}
+.mode-card:hover, .mode-card:active { transform:scale(1.07) rotate(-1deg); box-shadow:0 2vmin 3.4vmin rgba(255,143,171,.55); }
+.mode-card .mc-icon { font-size:8vmin; }
+.mode-card .mc-title { font-size:3.4vmin; font-weight:800; }
+.mode-card .mc-desc { font-size:2vmin; color:#A1887F; line-height:1.5; }
+.mode-card.duel { border-color:#BBDEFB; box-shadow:0 1.4vmin 2.6vmin rgba(100,181,246,.4); }
+.mode-card.board { border-color:#FFE0B2; box-shadow:0 1.4vmin 2.6vmin rgba(255,183,77,.4); }
+
+.corner-btns { position:fixed; top:2.4vmin; right:2.4vmin; display:flex; gap:1.6vmin; z-index:50; }
+.icon-btn {
+  width:7vmin; height:7vmin; border-radius:50%; border:.4vmin solid #FFF; font-size:3.2vmin;
+  background:#FFD7E2; color:#5D4037; box-shadow:0 .6vmin 1.4vmin rgba(255,143,171,.45);
+  transition:transform .15s;
+}
+.icon-btn:active { transform:scale(.9); }
+
+/* ============ 科目選擇 ============ */
+h2.screen-title { font-size:5.4vmin; font-weight:800; margin-bottom:3.4vmin; }
+h2.screen-title .deco { font-size:4vmin; }
+.subject-grid { display:flex; flex-wrap:wrap; gap:2.6vmin; justify-content:center; max-width:120vmin; }
+.subject-btn {
+  min-width:24vmin; padding:2.6vmin 3vmin; border-radius:3vmin; border:.5vmin solid #FFF;
+  font-size:3.6vmin; font-weight:800; color:#FFF; display:flex; align-items:center; gap:1.4vmin; justify-content:center;
+  box-shadow:0 1vmin 2vmin rgba(141,110,99,.28); transition:transform .18s;
+}
+.subject-btn:hover, .subject-btn:active { transform:scale(1.08); }
+.subject-btn .s-icon { font-size:4.6vmin; }
+.back-btn {
+  margin-top:4.4vmin; background:#FFF; border:.4vmin solid #E0D7D0; color:#8D6E63;
+  border-radius:50px; padding:1.4vmin 4.6vmin; font-size:2.6vmin; font-weight:700;
+  box-shadow:0 .6vmin 1.4vmin rgba(141,110,99,.18); transition:transform .15s;
+}
+.back-btn:active { transform:scale(.94); }
+
+/* ============ 單人遊戲 ============ */
+.hud { width:100%; max-width:170vmin; display:flex; align-items:center; justify-content:space-between; gap:2vmin; margin-bottom:1.6vmin; }
+.hud-chip {
+  background:#FFF; border:.4vmin solid #FADADD; border-radius:50px; padding:1vmin 2.8vmin;
+  font-size:2.8vmin; font-weight:800; box-shadow:0 .5vmin 1.2vmin rgba(255,182,193,.35);
+  display:flex; align-items:center; gap:1vmin;
+}
+.combo-chip { border-color:#FFCC80; color:#EF6C00; transform:scale(0); transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
+.combo-chip.show { transform:scale(1); }
+
+.timer-track { width:100%; max-width:170vmin; height:2.6vmin; background:#FFFFFFCC; border-radius:50px; border:.35vmin solid #FADADD; overflow:hidden; margin-bottom:2.2vmin; }
+.timer-fill { height:100%; width:100%; border-radius:50px; background:linear-gradient(90deg,#81C784,#AED581); transition:width .1s linear, background .3s; }
+.timer-fill.warn { background:linear-gradient(90deg,#FFB74D,#FFD54F); }
+.timer-fill.danger { background:linear-gradient(90deg,#FF8A80,#FF8FAB); }
+
+.question-card {
+  width:100%; max-width:170vmin; background:#FFFFFF; border:.55vmin solid #FADADD; border-radius:3.6vmin;
+  box-shadow:0 1.4vmin 2.8vmin rgba(255,182,193,.4); padding:3.4vmin 4vmin; text-align:center; position:relative;
+  margin-bottom:2.6vmin;
+}
+.q-subject-tag { position:absolute; top:-2.2vmin; left:3.4vmin; background:#FF8FAB; color:#FFF; border:.4vmin solid #FFF; border-radius:50px; padding:.5vmin 2.4vmin; font-size:2.4vmin; font-weight:800; box-shadow:0 .5vmin 1vmin rgba(255,143,171,.4); }
+.q-text { font-size:5vmin; font-weight:800; line-height:1.55; }
+
+.answer-grid { width:100%; max-width:170vmin; display:grid; grid-template-columns:1fr 1fr; gap:2.4vmin; }
+.answer-btn {
+  border:none; border-radius:3vmin; padding:3vmin 2.6vmin; font-size:3.8vmin; font-weight:800; color:#5D4037;
+  background:#FFF; border:.5vmin solid #E3F2FD; box-shadow:0 1vmin 0 #D7E8F8, 0 1.6vmin 2.4vmin rgba(100,181,246,.25);
+  display:flex; align-items:center; gap:2vmin; text-align:left; line-height:1.4;
+  transition:transform .12s, box-shadow .12s, background .2s, border-color .2s;
+}
+.answer-btn .a-label {
+  flex:0 0 auto; width:5.6vmin; height:5.6vmin; border-radius:50%; background:#E3F2FD; color:#1976D2;
+  display:flex; align-items:center; justify-content:center; font-size:3vmin; font-weight:800;
+}
+.answer-btn:active { transform:translateY(.7vmin); box-shadow:0 .3vmin 0 #D7E8F8; }
+.answer-btn.correct { background:#E8F5E9; border-color:#81C784; animation:popCorrect .5s; }
+.answer-btn.correct .a-label { background:#81C784; color:#FFF; }
+.answer-btn.wrong { background:#FFEBEE; border-color:#FF8A80; animation:shakeWrong .45s; }
+.answer-btn.wrong .a-label { background:#FF8A80; color:#FFF; }
+.answer-btn.dim { opacity:.45; }
+.answer-btn:disabled { cursor:default; }
+@keyframes popCorrect { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 100%{transform:scale(1)} }
+@keyframes shakeWrong { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-1.2vmin)} 50%{transform:translateX(1.2vmin)} 75%{transform:translateX(-.8vmin)} }
+
+.score-pop {
+  position:fixed; font-size:5vmin; font-weight:800; color:#FF8FAB; z-index:60; pointer-events:none;
+  text-shadow:0 .4vmin 0 #FFF; animation:scorePop 1s ease-out forwards;
+}
+@keyframes scorePop { 0%{opacity:0; transform:translateY(0) scale(.6)} 20%{opacity:1; transform:translateY(-2vmin) scale(1.15)} 100%{opacity:0; transform:translateY(-12vmin) scale(1)} }
+
+/* ============ 雙人對戰 ============ */
+#screen-duel { justify-content:flex-start; padding-top:2vmin; }
+.duel-qbar {
+  width:100%; max-width:188vmin; background:#FFF; border:.5vmin solid #FADADD; border-radius:3vmin;
+  box-shadow:0 1vmin 2.2vmin rgba(255,182,193,.4); padding:2vmin 3vmin; text-align:center; position:relative; margin-bottom:1.6vmin;
+}
+.duel-qbar .q-text { font-size:4.4vmin; }
+.duel-round { position:absolute; top:-2vmin; left:50%; transform:translateX(-50%); background:#FFB74D; color:#FFF; border:.4vmin solid #FFF; border-radius:50px; padding:.4vmin 2.6vmin; font-size:2.2vmin; font-weight:800; white-space:nowrap; }
+.duel-arena { width:100%; max-width:188vmin; flex:1; display:flex; gap:2.4vmin; position:relative; min-height:0; }
+.duel-side { flex:1; border-radius:3.4vmin; padding:2vmin; display:flex; flex-direction:column; gap:1.6vmin; border:.55vmin solid; min-height:0; }
+.duel-side.p1 { background:rgba(255,240,245,.92); border-color:#FFC2D4; }
+.duel-side.p2 { background:rgba(227,242,253,.92); border-color:#A8CFF5; }
+.duel-side.locked { filter:grayscale(.8); opacity:.6; }
+.duel-head { display:flex; align-items:center; justify-content:space-between; }
+.duel-name { font-size:3vmin; font-weight:800; display:flex; align-items:center; gap:1vmin; }
+.duel-score { font-size:3.6vmin; font-weight:800; background:#FFF; border-radius:50px; padding:.4vmin 2.6vmin; box-shadow:0 .4vmin 1vmin rgba(141,110,99,.18); }
+.duel-grid { flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:1.6vmin; min-height:0; }
+.duel-grid .answer-btn { font-size:3vmin; padding:1.6vmin; border-radius:2.4vmin; }
+.duel-grid .answer-btn .a-label { width:4.4vmin; height:4.4vmin; font-size:2.4vmin; }
+.vs-badge {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5;
+  width:9vmin; height:9vmin; border-radius:50%; background:#FFF; border:.5vmin solid #FFB74D;
+  display:flex; align-items:center; justify-content:center; font-size:3.4vmin; font-weight:800; color:#EF6C00;
+  box-shadow:0 .8vmin 1.8vmin rgba(255,183,77,.5);
+}
+.round-banner {
+  position:fixed; left:50%; top:42%; transform:translate(-50%,-50%) scale(0); z-index:70;
+  background:#FFF; border:.6vmin solid #FFB74D; border-radius:3.4vmin; padding:2.6vmin 6vmin;
+  font-size:4.6vmin; font-weight:800; box-shadow:0 2vmin 4vmin rgba(141,110,99,.3);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1); text-align:center; pointer-events:none;
+}
+.round-banner.show { transform:translate(-50%,-50%) scale(1); }
+
+/* ============ 結算畫面 ============ */
+.result-card {
+  background:#FFF; border:.6vmin solid #FADADD; border-radius:4vmin; padding:4vmin 7vmin; text-align:center;
+  box-shadow:0 2vmin 4vmin rgba(255,182,193,.45); max-width:130vmin;
+}
+.result-stars { font-size:8vmin; letter-spacing:1.4vmin; margin-bottom:1vmin; }
+.result-stars .on { animation:starIn .5s backwards; display:inline-block; }
+.result-stars .on:nth-child(2){animation-delay:.25s} .result-stars .on:nth-child(3){animation-delay:.5s}
+@keyframes starIn { from{transform:scale(0) rotate(-180deg)} to{transform:scale(1) rotate(0)} }
+.result-title { font-size:5.6vmin; font-weight:800; margin-bottom:1.4vmin; }
+.result-score { font-size:8.6vmin; font-weight:800; color:#FF8FAB; text-shadow:0 .5vmin 0 #FFF; }
+.result-sub { font-size:2.8vmin; color:#8D6E63; margin:1.4vmin 0 2.4vmin; line-height:1.7; }
+.avatar-pick { display:flex; flex-wrap:wrap; gap:1.4vmin; justify-content:center; margin-bottom:2.4vmin; }
+.avatar-btn { width:8vmin; height:8vmin; font-size:4.4vmin; border-radius:50%; background:#FFF8FA; border:.4vmin solid #FADADD; transition:transform .15s, border-color .15s; }
+.avatar-btn.sel { border-color:#FF8FAB; background:#FFE3EC; transform:scale(1.15); }
+.result-btns { display:flex; gap:2.4vmin; justify-content:center; flex-wrap:wrap; }
+.kawaii-btn {
+  background:#FF8FAB; color:#FFF; border:.45vmin solid #FFF; border-radius:50px; padding:1.8vmin 5vmin;
+  font-size:3vmin; font-weight:800; box-shadow:0 .8vmin 1.8vmin rgba(255,143,171,.5); transition:transform .15s;
+}
+.kawaii-btn:active { transform:scale(.93); }
+.kawaii-btn.alt { background:#64B5F6; box-shadow:0 .8vmin 1.8vmin rgba(100,181,246,.5); }
+.kawaii-btn.ghost { background:#FFF; color:#8D6E63; border-color:#E0D7D0; box-shadow:0 .6vmin 1.4vmin rgba(141,110,99,.18); }
+
+/* ============ 排行榜 ============ */
+.board-card { background:#FFF; border:.55vmin solid #FFE0B2; border-radius:4vmin; padding:3.4vmin 5vmin; box-shadow:0 1.6vmin 3.2vmin rgba(255,183,77,.4); width:100%; max-width:110vmin; max-height:72vh; overflow-y:auto; }
+.board-row { display:flex; align-items:center; gap:2.4vmin; padding:1.4vmin 1vmin; border-bottom:.3vmin dashed #FFE0B2; font-size:3.2vmin; font-weight:800; }
+.board-row:last-child { border-bottom:none; }
+.board-rank { width:6.5vmin; text-align:center; font-size:3.4vmin; }
+.board-avatar { font-size:4.4vmin; }
+.board-info { flex:1; text-align:left; }
+.board-info .b-sub { font-size:2vmin; color:#A1887F; font-weight:600; }
+.board-score { color:#FF8FAB; font-size:3.6vmin; }
+.board-empty { font-size:3vmin; color:#A1887F; padding:4vmin; text-align:center; line-height:1.8; }
+
+/* ============ 彩帶 ============ */
+.confetti { position:fixed; top:-4vmin; z-index:80; pointer-events:none; border-radius:.6vmin; animation:confFall linear forwards; }
+@keyframes confFall { to { transform:translateY(110vh) rotate(720deg); opacity:.7; } }
+
+/* ============ 字型選擇面板 ============ */
+#font-panel {
+  display:none; position:fixed; top:11.5vmin; right:2.4vmin; z-index:100;
+  background:#FFF; border:.45vmin solid #FADADD; border-radius:2.6vmin;
+  padding:1.8vmin 1.8vmin 1.2vmin; box-shadow:0 2vmin 4vmin rgba(255,182,193,.55);
+  width:46vmin; max-height:72vh; overflow-y:auto;
+}
+#font-panel.open { display:block; animation:screenIn .3s ease; }
+.fp-title { font-size:2.4vmin; font-weight:800; color:#5D4037; margin-bottom:1.4vmin; padding-bottom:.8vmin; border-bottom:.3vmin dashed #FADADD; }
+.fp-section {
+  font-size:1.8vmin; font-weight:800; color:#A1887F; margin:1.2vmin 0 .8vmin;
+  display:flex; align-items:center; gap:.6vmin;
+}
+.fp-section .fp-tag { font-size:1.5vmin; background:#FFF0F5; border:.3vmin solid #FADADD; border-radius:50px; padding:.2vmin 1.2vmin; color:#C2808E; }
+.fp-opt {
+  width:100%; display:flex; align-items:center; gap:1.4vmin;
+  padding:1.2vmin 1.8vmin; border-radius:1.8vmin; border:.4vmin solid #F5E6EA;
+  margin-bottom:.8vmin; cursor:pointer; transition:background .15s, border-color .15s;
+  background:#FFF8FA; text-align:left;
+}
+.fp-opt:hover { background:#FFF0F5; border-color:#FFADC5; }
+.fp-opt.sel { background:#FFE3EC; border-color:#FF8FAB; }
+.fp-opt .fp-left { display:flex; flex-direction:column; gap:.3vmin; flex:1; min-width:0; }
+.fp-opt .fp-name { font-size:1.8vmin; color:#A1887F; font-weight:700; }
+.fp-opt .fp-preview { font-size:3vmin; font-weight:700; color:#5D4037; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fp-opt .fp-badge { flex:0 0 auto; font-size:1.5vmin; background:#E3F2FD; color:#1976D2; border-radius:50px; padding:.3vmin 1.2vmin; font-weight:700; }
+.fp-opt .fp-badge.serif { background:#FFF8E1; color:#F57C00; }
+.fp-opt .fp-badge.pop   { background:#F3E5F5; color:#7B1FA2; }
+.fp-opt .fp-badge.hand  { background:#E8F5E9; color:#2E7D32; }
+.fp-opt .fp-badge.local { background:#F5F5F5; color:#757575; }
+
+/* 倒數提示 */
+.countdown-big {
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90;
+  font-size:24vmin; font-weight:800; color:#FF8FAB; text-shadow:0 1vmin 0 #FFF; pointer-events:none;
+}
+.countdown-big.show { display:flex; animation:cdPop .9s ease-out; }
+@keyframes cdPop { 0%{transform:scale(2.2); opacity:0} 30%{transform:scale(1); opacity:1} 80%{opacity:1} 100%{opacity:0} }
+</style>
+</head>
+<body>
+
+<!-- 漂浮裝飾 -->
+<span class="float-deco" style="top:8%;  left:5%;  animation-delay:0s">🌸</span>
+<span class="float-deco" style="top:15%; right:7%; animation-delay:1.2s">✨</span>
+<span class="float-deco" style="bottom:12%; left:8%; animation-delay:.6s">🎀</span>
+<span class="float-deco" style="bottom:18%; right:5%; animation-delay:1.8s">🍬</span>
+<span class="float-deco" style="top:45%; left:3%;  animation-delay:2.4s">⭐</span>
+<span class="float-deco" style="top:50%; right:3%; animation-delay:.9s">🌙</span>
+
+<div class="corner-btns">
+  <button class="icon-btn" id="btn-bank" title="切換題庫檔案">📂</button>
+  <button class="icon-btn" id="btn-font" title="字型設定">字</button>
+  <button class="icon-btn" id="btn-sound" title="音效開關">🔊</button>
+  <button class="icon-btn" id="btn-full" title="全螢幕">⛶</button>
+</div>
+
+<!-- 題庫名稱提示 -->
+<div id="bank-label" style="
+  position:fixed; top:2.4vmin; left:50%; transform:translateX(-50%);
+  font-size:1.4vmin; font-weight:700; color:#A1887F;
+  background:rgba(255,255,255,.75); backdrop-filter:blur(6px);
+  padding:.4vmin 1.4vmin; border-radius:50px; border:1.5px solid #FADADD;
+  z-index:50; pointer-events:none; display:none;
+  white-space:nowrap; max-width:50vw; overflow:hidden; text-overflow:ellipsis;
+">📂 questions.js</div>
+
+<!-- 字型選擇面板 -->
+<div id="font-panel">
+  <div class="fp-title">🔡 選擇字型</div>
+</div>
+
+<!-- ============ 首頁 ============ -->
+<section class="screen active" id="screen-home">
+  <div class="logo-badge">🏫 寓教於樂 ‧ 觸控搶答</div>
+  <h1 class="game-title">🏆 校園知識王 🏆</h1>
+  <p class="subtitle">點擊螢幕，挑戰你的大腦極限！誰是今天的知識王？</p>
+  <div class="mode-row">
+    <button class="mode-card" onclick="chooseMode('single')">
+      <span class="mc-icon">🚀</span>
+      <span class="mc-title">單人挑戰</span>
+      <span class="mc-desc">10 題限時搶分<br>連擊越多分數越高！</span>
+    </button>
+    <button class="mode-card duel" onclick="chooseMode('duel')">
+      <span class="mc-icon">⚔️</span>
+      <span class="mc-title">雙人對戰</span>
+      <span class="mc-desc">左右分邊同場搶答<br>答錯就鎖定，小心！</span>
+    </button>
+    <button class="mode-card board" onclick="showBoard()">
+      <span class="mc-icon">👑</span>
+      <span class="mc-title">名人堂</span>
+      <span class="mc-desc">歷代知識王排行榜<br>你能擠進前十名嗎？</span>
+    </button>
+  </div>
+</section>
+
+<!-- ============ 科目選擇 ============ -->
+<section class="screen" id="screen-subject">
+  <h2 class="screen-title"><span class="deco">🌸</span> 選擇挑戰科目 <span class="deco">🌸</span></h2>
+  <div class="subject-grid" id="subject-grid"></div>
+  <button class="back-btn" onclick="showScreen('screen-home')">⬅ 回主畫面</button>
+</section>
+
+<!-- ============ 單人挑戰 ============ -->
+<section class="screen" id="screen-single">
+  <div class="hud">
+    <div class="hud-chip" id="s-counter">第 1 / 10 題</div>
+    <div class="hud-chip combo-chip" id="s-combo">🔥 連擊 x2</div>
+    <div class="hud-chip">⭐ <span id="s-score">0</span> 分</div>
+  </div>
+  <div class="timer-track"><div class="timer-fill" id="s-timer"></div></div>
+  <div class="question-card">
+    <div class="q-subject-tag" id="s-subject">📖 國語</div>
+    <div class="q-text" id="s-question">題目載入中…</div>
+  </div>
+  <div class="answer-grid" id="s-answers"></div>
+</section>
+
+<!-- ============ 雙人對戰 ============ -->
+<section class="screen" id="screen-duel">
+  <div class="duel-qbar">
+    <div class="duel-round" id="d-round">第 1 / 8 回合</div>
+    <div class="q-text" id="d-question">題目載入中…</div>
+  </div>
+  <div class="timer-track" style="max-width:188vmin"><div class="timer-fill" id="d-timer"></div></div>
+  <div class="duel-arena">
+    <div class="duel-side p1" id="d-side-0">
+      <div class="duel-head">
+        <span class="duel-name">🐰 粉紅隊</span>
+        <span class="duel-score" id="d-score-0">0</span>
+      </div>
+      <div class="duel-grid" id="d-grid-0"></div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="duel-side p2" id="d-side-1">
+      <div class="duel-head">
+        <span class="duel-name">🐻 藍藍隊</span>
+        <span class="duel-score" id="d-score-1">0</span>
+      </div>
+      <div class="duel-grid" id="d-grid-1"></div>
+    </div>
+  </div>
+  <div class="round-banner" id="d-banner"></div>
+</section>
+
+<!-- ============ 結算 ============ -->
+<section class="screen" id="screen-result">
+  <div class="result-card">
+    <div class="result-stars" id="r-stars"></div>
+    <div class="result-title" id="r-title">挑戰完成！</div>
+    <div class="result-score" id="r-score">0 分</div>
+    <div class="result-sub" id="r-sub"></div>
+    <div id="r-save-zone">
+      <div class="result-sub" style="margin-bottom:1vmin">選一個頭像，登錄名人堂吧！</div>
+      <div class="avatar-pick" id="r-avatars"></div>
+    </div>
+    <div class="result-btns">
+      <button class="kawaii-btn" id="r-save" onclick="saveScore()">👑 登錄名人堂</button>
+      <button class="kawaii-btn alt" onclick="replay()">🔄 再玩一次</button>
+      <button class="kawaii-btn ghost" onclick="showScreen('screen-home')">🏠 回主畫面</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 排行榜 ============ -->
+<section class="screen" id="screen-board">
+  <h2 class="screen-title">👑 知識王名人堂 👑</h2>
+  <div class="board-card" id="board-list"></div>
+  <button class="back-btn" onclick="showScreen('screen-home')">⬅ 回主畫面</button>
+</section>
+
+<div class="countdown-big" id="countdown"></div>
+
+<script src="questions.js"></script>
+<script src="game.js"></script>
+<script>
+/* ============ Google Fonts 字型選擇器 ============ */
+(function () {
+
+  /* ── Google Fonts 清單（繁體中文支援字型）─── */
+  const GFONTS = [
+    { family: 'Noto Sans TC',      weights: '400;500;700;800', name: '思源黑體 TC',  badge: '黑體',  bc: '' },
+    { family: 'Noto Serif TC',     weights: '400;500;700;800', name: '思源宋體 TC',  badge: '宋體',  bc: 'serif' },
+    { family: 'LXGW WenKai TC',    weights: '400;700',         name: '霞鶩文楷 TC',  badge: '楷體',  bc: 'serif' },
+    { family: 'M PLUS Rounded 1c', weights: '500;700;800',     name: 'M+ 圓體',      badge: '圓體',  bc: '' },
+    { family: 'Zen Maru Gothic',   weights: '500;700',         name: 'Zen 丸哥德',   badge: '圓體',  bc: '' },
+    { family: 'Hachi Maru Pop',    weights: '400',             name: '八丸 Pop',     badge: '圓體',  bc: '' },
+    { family: 'Kosugi Maru',       weights: '400',             name: '小杉圓體',     badge: '圓體',  bc: '' },
+    { family: 'BIZ UDPGothic',     weights: '400;700',         name: 'BIZ UD 圓黑',  badge: '黑體',  bc: '' },
+    { family: 'Mochiy Pop One',    weights: '400',             name: 'Mochiy Pop',   badge: 'Pop',   bc: 'pop' },
+    { family: 'RocknRoll One',     weights: '400',             name: "Rock'n Roll",  badge: 'Pop',   bc: 'pop' },
+    { family: 'DotGothic16',       weights: '400',             name: '點陣哥德',     badge: '點陣',  bc: 'pop' },
+    { family: 'Yomogi',            weights: '400',             name: '手寫草體',     badge: '手寫',  bc: 'hand' },
+    { family: 'New Tegomin',       weights: '400',             name: 'New Tegomin',  badge: '明體',  bc: 'serif' },
+    { family: 'Stick',             weights: '400',             name: 'Stick',        badge: '細體',  bc: '' },
+  ];
+
+  /* ── 本機字型（離線可用，canvas 偵測）─── */
+  const LOCAL_FONTS = [
+    { css: "'Microsoft JhengHei',sans-serif", name: '微軟正黑體', test: 'Microsoft JhengHei' },
+    { css: "'PMingLiU',serif",                name: '新細明體',   test: 'PMingLiU' },
+    { css: "'DFKai-SB',serif",                name: '標楷體',     test: 'DFKai-SB' },
+    { css: 'sans-serif',                      name: '系統預設',   test: null },
+  ];
+
+  const STORAGE_KEY = 'quizking_font';
+  const panel = document.getElementById('font-panel');
+  let fontsLoaded = false;
+
+  /* ── 套用字型 ─── */
+  function applyFont(css) {
+    document.body.style.fontFamily = css;
+    localStorage.setItem(STORAGE_KEY, css);
+    panel.querySelectorAll('.fp-opt').forEach(x => x.classList.remove('sel'));
+    panel.querySelector(`[data-css="${CSS.escape(css)}"]`)?.classList.add('sel');
+  }
+
+  /* 讀取上次選擇 */
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) document.body.style.fontFamily = saved;
+
+  /* ── 動態載入 Google Font <link> ─── */
+  function loadGFont(font) {
+    const id = 'gf-' + font.family.replace(/\s+/g, '_');
+    if (document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href =
+      'https://fonts.googleapis.com/css2?family=' +
+      font.family.replace(/ /g, '+') + ':wght@' + font.weights +
+      '&display=swap';
+    document.head.appendChild(link);
+  }
+
+  /* ── 建立 Google Fonts 選項 ─── */
+  function buildGFontBtn(font) {
+    const css = `'${font.family}',sans-serif`;
+    const btn = document.createElement('button');
+    btn.className = 'fp-opt' + (saved === css ? ' sel' : '');
+    btn.dataset.css = css;
+    btn.innerHTML =
+      `<span class="fp-left">` +
+        `<span class="fp-name">${font.name}</span>` +
+        `<span class="fp-preview" style="font-family:${css}">校園知識王 🏆</span>` +
+      `</span>` +
+      `<span class="fp-badge ${font.bc}">${font.badge}</span>`;
+    btn.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      loadGFont(font);
+      applyFont(css);
+    });
+    return btn;
+  }
+
+  /* ── Canvas 偵測本機字型 ─── */
+  function isLocalAvailable(name) {
+    if (!name) return true;
+    try {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext('2d');
+      const s = '校園知識王搶答';
+      ctx.font = '72px monospace';
+      const base = ctx.measureText(s).width;
+      ctx.font = `72px "${name}", monospace`;
+      return ctx.measureText(s).width !== base;
+    } catch (e) { return false; }
+  }
+
+  /* ── 建立本機字型選項 ─── */
+  function buildLocalBtn(font) {
+    if (!isLocalAvailable(font.test)) return null;
+    const btn = document.createElement('button');
+    btn.className = 'fp-opt' + (saved === font.css ? ' sel' : '');
+    btn.dataset.css = font.css;
+    btn.innerHTML =
+      `<span class="fp-left">` +
+        `<span class="fp-name">${font.name}</span>` +
+        `<span class="fp-preview" style="font-family:${font.css}">校園知識王 🏆</span>` +
+      `</span>` +
+      `<span class="fp-badge local">本機</span>`;
+    btn.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      applyFont(font.css);
+    });
+    return btn;
+  }
+
+  /* ── 首次開啟面板時才建立選項（並載入所有 Google Font CSS）─── */
+  function buildPanel() {
+    if (fontsLoaded) return;
+    fontsLoaded = true;
+
+    // Google Fonts 區塊
+    const secG = document.createElement('div');
+    secG.className = 'fp-section';
+    secG.innerHTML = 'Google Fonts <span class="fp-tag">需要網路</span>';
+    panel.appendChild(secG);
+    GFONTS.forEach(f => {
+      loadGFont(f);                     // 預先載入 CSS（字型檔按需載入）
+      panel.appendChild(buildGFontBtn(f));
+    });
+
+    // 本機字型區塊
+    const secL = document.createElement('div');
+    secL.className = 'fp-section';
+    secL.innerHTML = '本機字型 <span class="fp-tag">離線可用</span>';
+    panel.appendChild(secL);
+    LOCAL_FONTS.forEach(f => {
+      const btn = buildLocalBtn(f);
+      if (btn) panel.appendChild(btn);
+    });
+  }
+
+  /* ── 面板切換 ─── */
+  document.getElementById('btn-font').addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    const opening = !panel.classList.contains('open');
+    panel.classList.toggle('open');
+    if (opening) buildPanel();
+  });
+
+  /* 點擊面板外部關閉 */
+  document.addEventListener('pointerdown', e => {
+    if (!panel.contains(e.target) && e.target.id !== 'btn-font') {
+      panel.classList.remove('open');
+    }
+  });
+})();
+</script>
+    <!-- 回首頁按鈕 -->
+    <a href="../index.html" id="home-btn" title="回首頁" style="
+        position:fixed; bottom:14px; left:16px; z-index:99999;
+        width:44px; height:44px; border-radius:50%;
+        background:rgba(255,255,255,0.82);
+        border:2px solid #f9a8d4;
+        box-shadow:0 4px 12px rgba(236,72,153,0.22);
+        display:flex; align-items:center; justify-content:center;
+        text-decoration:none; transition:background 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+       onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+    </a>
+</body>
+</html>

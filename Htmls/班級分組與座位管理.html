@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班級分組與座位管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <style>
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            padding: 0;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <!-- 視圖 0: 系統設定畫面 -->
+    <div id="settings-view" class="max-w-4xl mx-auto min-h-screen flex flex-col relative hidden">
+        <div class="bg-white px-4 md:px-8 py-4 shadow-sm sticky top-0 z-10 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">系統參數設定</h1>
+            <button id="btn-close-settings" class="text-gray-500 hover:text-gray-800 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <div class="flex-1 p-4 md:p-8 space-y-6 overflow-y-auto pb-24">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <label class="block text-sm font-bold text-gray-700 mb-2">班級總人數 (最大座號)</label>
+                <input type="number" id="input-total-seats" class="w-full md:w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" min="1" max="200">
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-4">
+                    <label class="block text-sm font-bold text-gray-700">區塊設定</label>
+                    <button id="btn-add-zone" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg font-medium hover:bg-indigo-100">+ 新增區塊</button>
+                </div>
+                
+                <div id="zones-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 動態產生區塊設定 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 md:px-8 border-t border-gray-200 sticky bottom-0 z-10">
+            <button id="btn-save-settings" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm shadow-md active:bg-indigo-700 hover:bg-indigo-700 transition">
+                儲存設定並返回
+            </button>
+        </div>
+    </div>
+
+    <!-- 視圖 1: 設定畫面 -->
+    <div id="setup-view" class="max-w-6xl mx-auto min-h-screen flex flex-col relative">
+        <div class="bg-white px-4 md:px-8 py-6 shadow-sm z-10 relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <h1 class="text-2xl font-bold text-indigo-800">班級分組與座位管理</h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="btn-open-settings" class="p-3 bg-gray-100 rounded-xl text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+                <button id="btn-start-grouping" class="flex-1 md:flex-none bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md active:bg-indigo-700 hover:bg-indigo-700 transition transform active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    開始隨機分組
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 p-4 md:p-8 flex flex-col lg:flex-row gap-6 overflow-y-auto pb-24">
+            <!-- Step 1 (佔較大寬度) -->
+            <div class="lg:w-2/3 bg-white rounded-2xl p-5 md:p-8 shadow-sm border border-gray-100 flex flex-col">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded flex items-center justify-center border border-indigo-200 text-indigo-600 text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <h2 class="font-bold text-gray-800 text-lg">第一步：點選班級座號</h2>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button id="btn-select-all" class="text-xs bg-gray-100 text-gray-600 py-1.5 px-4 rounded-full hover:bg-gray-200 font-medium transition">全選</button>
+                        <button id="btn-clear-all" class="text-xs bg-red-50 text-red-500 py-1.5 px-4 rounded-full hover:bg-red-100 font-medium transition">清除重選</button>
+                    </div>
+                </div>
+                
+                <div class="bg-indigo-50 text-indigo-700 font-bold py-2 px-4 rounded-xl inline-block mb-6 w-fit">
+                    選擇人數共 ( <span id="selected-count" class="text-xl">0</span> ) 人
+                </div>
+
+                <div id="seat-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3 flex-1 content-start">
+                    <!-- 座位按鈕由 JS 產生 -->
+                </div>
+
+                <div id="setup-legend" class="flex flex-wrap justify-center lg:justify-start gap-4 mt-8 text-xs text-gray-500 pt-4 border-t border-gray-100">
+                    <!-- 圖例由 JS 產生 -->
+                </div>
+            </div>
+
+            <!-- Step 2 (佔較小寬度) -->
+            <div class="lg:w-1/3 flex flex-col gap-6">
+                <div class="bg-white rounded-2xl p-5 md:p-8 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-5 h-5 rounded flex items-center justify-center border border-indigo-200 text-indigo-600 text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <h2 class="font-bold text-gray-800 text-lg">第二步：設定分組規則</h2>
+                    </div>
+
+                    <div class="flex flex-col gap-4 mb-8 pb-6 border-b border-gray-100">
+                        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition">
+                            <input type="radio" name="groupMode" value="groups" checked class="w-5 h-5 text-indigo-600 focus:ring-indigo-500">
+                            <span class="font-bold text-gray-700">以組數為主</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition">
+                            <input type="radio" name="groupMode" value="people" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500">
+                            <span class="font-bold text-gray-700">以每組基本人數為主</span>
+                        </label>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-sm text-gray-600 font-medium mb-3">預計分成的組數</label>
+                        <div class="flex items-center">
+                            <button id="btn-group-minus" class="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-all text-xl">-</button>
+                            <div id="group-count-display" class="flex-1 text-center font-bold text-2xl text-indigo-900 mx-4">5</div>
+                            <button id="btn-group-plus" class="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-all text-xl">+</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-sm text-gray-600 font-medium mb-3">每組基本人數</label>
+                        <div class="flex items-center">
+                            <button id="btn-people-minus" class="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-all text-xl opacity-30" disabled>-</button>
+                            <div id="people-count-display" class="flex-1 text-center font-bold text-2xl text-indigo-900 mx-4">6</div>
+                            <button id="btn-people-plus" class="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-all text-xl opacity-30" disabled>+</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 rounded-xl p-5 flex items-start gap-4 border border-indigo-100">
+                        <div class="bg-indigo-100 p-2 rounded-full shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <div class="font-bold text-indigo-900 text-sm mb-1">分組計算說明</div>
+                            <div id="calc-display" class="text-sm text-indigo-600 leading-relaxed font-medium">
+                                人數計算中...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pb-8 pt-4">
+                    <div class="text-gray-400 text-sm font-medium tracking-wide">
+                        設計由 <span class="text-indigo-600 font-bold">JyunHan</span>
+                    </div>
+                    <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-widest">
+                        &copy; 2026 JyunHan．版權所有
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 視圖 2: 結果畫面 -->
+    <div id="result-view" class="max-w-6xl mx-auto min-h-screen flex flex-col pb-10 hidden">
+        <div class="bg-white px-4 md:px-8 py-4 shadow-sm sticky top-0 z-10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <h1 class="text-xl font-bold text-indigo-800">班級分組結果</h1>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="btn-back-setup" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">返回修改</button>
+                    <button id="btn-regroup" class="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-600 transition shadow-sm">重新分組</button>
+                    <button id="btn-export-docx" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-sm">匯出分組</button>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 bg-indigo-50/50 p-3 rounded-xl border border-indigo-50">
+                <label for="input-class-name" class="text-sm font-bold text-indigo-900 shrink-0">班級名稱</label>
+                <input type="text" id="input-class-name" placeholder="請輸入班級名稱 (選填，將顯示於匯出檔案標題)" class="w-full sm:max-w-md border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+            </div>
+        </div>
+
+        <div class="flex-1 p-4 md:p-8 space-y-6">
+            <div class="bg-slate-700 text-slate-100 text-center py-3 rounded-xl font-bold tracking-widest text-lg shadow-inner">
+                講台方向 (黑板)
+            </div>
+
+            <!-- 網格排列群組 -->
+            <div id="groups-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                <!-- 分組結果由 JS 產生 -->
+            </div>
+
+            <div class="bg-indigo-900 rounded-2xl p-6 md:p-8 text-white mt-8">
+                <div class="flex items-center gap-4">
+                    <div class="bg-yellow-400 p-3 rounded-xl text-indigo-900 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-2">座位顏色與區塊對應說明</h4>
+                        <div id="result-legend" class="flex flex-wrap gap-6 text-sm text-indigo-200">
+                            <!-- 圖例由 JS 產生 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center pb-8 pt-4">
+                <div class="text-gray-400 text-sm font-medium tracking-wide">
+                    設計由 <span class="text-indigo-500 font-bold">JyunHan</span>
+                </div>
+                <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-widest">
+                    &copy; 2026 JyunHan．版權所有
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全域設定資料結構
+        let appData = {
+            totalSeats: 60,
+            zones: [
+                { id: 'z1', name: '男生', range: '1-20', activeBg: '#0ea5e9', activeText: '#ffffff', inactiveBg: '#f0f9ff', inactiveText: '#38bdf8' },
+                { id: 'z2', name: '女生', range: '21-40', activeBg: '#fb7185', activeText: '#ffffff', inactiveBg: '#fff1f2', inactiveText: '#fb7185' },
+                { id: 'z3', name: '其他', range: '41-60', activeBg: '#d946ef', activeText: '#ffffff', inactiveBg: '#fdf4ff', inactiveText: '#e879f9' }
+            ]
+        };
+
+        // 狀態管理
+        let allSeats = [];
+        let selectedSeats = [];
+        let groupingMode = 'groups'; // 'groups' | 'people'
+        let groupCount = 5;
+        let peoplePerGroup = 6;
+        let groups = [];
+
+        // DOM 元素
+        const settingsView = document.getElementById('settings-view');
+        const setupView = document.getElementById('setup-view');
+        const resultView = document.getElementById('result-view');
+        
+        const seatGrid = document.getElementById('seat-grid');
+        const setupLegend = document.getElementById('setup-legend');
+        const resultLegend = document.getElementById('result-legend');
+        
+        const selectedCountDisplay = document.getElementById('selected-count');
+        const groupCountDisplay = document.getElementById('group-count-display');
+        const peopleCountDisplay = document.getElementById('people-count-display');
+        const calcDisplay = document.getElementById('calc-display');
+        const groupsContainer = document.getElementById('groups-container');
+        
+        const btnGroupMinus = document.getElementById('btn-group-minus');
+        const btnGroupPlus = document.getElementById('btn-group-plus');
+        const btnPeopleMinus = document.getElementById('btn-people-minus');
+        const btnPeoplePlus = document.getElementById('btn-people-plus');
+
+        // 初始化
+        function init() {
+            rebuildSeatsList();
+            selectedSeats = [...allSeats];
+            renderSeats();
+            updateLegends();
+            updateStats();
+            bindEvents();
+        }
+
+        function bindEvents() {
+            // 切換視圖
+            document.getElementById('btn-open-settings').addEventListener('click', () => {
+                renderSettingsView();
+                setupView.classList.add('hidden');
+                settingsView.classList.remove('hidden');
+            });
+            document.getElementById('btn-close-settings').addEventListener('click', () => {
+                settingsView.classList.add('hidden');
+                setupView.classList.remove('hidden');
+            });
+            document.getElementById('btn-back-setup').addEventListener('click', () => {
+                resultView.classList.add('hidden');
+                setupView.classList.remove('hidden');
+            });
+
+            // 設定頁事件
+            document.getElementById('btn-add-zone').addEventListener('click', addZoneUI);
+            document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
+
+            // 選擇與分組事件
+            document.getElementById('btn-select-all').addEventListener('click', () => {
+                selectedSeats = [...allSeats];
+                renderSeats();
+                updateStats();
+            });
+            document.getElementById('btn-clear-all').addEventListener('click', () => {
+                selectedSeats = [];
+                renderSeats();
+                updateStats();
+            });
+
+            // 模式切換
+            document.querySelectorAll('input[name="groupMode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    groupingMode = e.target.value;
+                    if (selectedSeats.length > 0) {
+                        if (groupingMode === 'groups') {
+                            groupCount = Math.max(1, Math.floor(selectedSeats.length / peoplePerGroup));
+                        } else {
+                            peoplePerGroup = Math.max(1, Math.floor(selectedSeats.length / groupCount));
+                        }
+                    }
+                    updateStats();
+                });
+            });
+
+            btnGroupMinus.addEventListener('click', () => { if (groupingMode === 'groups') handleGroupCountChange(-1); });
+            btnGroupPlus.addEventListener('click', () => { if (groupingMode === 'groups') handleGroupCountChange(1); });
+            btnPeopleMinus.addEventListener('click', () => { if (groupingMode === 'people') handlePeoplePerGroupChange(-1); });
+            btnPeoplePlus.addEventListener('click', () => { if (groupingMode === 'people') handlePeoplePerGroupChange(1); });
+            
+            document.getElementById('btn-start-grouping').addEventListener('click', generateGroups);
+            document.getElementById('btn-regroup').addEventListener('click', generateGroups);
+            document.getElementById('btn-export-docx').addEventListener('click', exportToDocx);
+        }
+
+        // --- 設定頁邏輯 ---
+        function renderSettingsView() {
+            document.getElementById('input-total-seats').value = appData.totalSeats;
+            const container = document.getElementById('zones-container');
+            container.innerHTML = '';
+            appData.zones.forEach(zone => {
+                container.appendChild(createZoneElement(zone));
+            });
+        }
+
+        function addZoneUI() {
+            const container = document.getElementById('zones-container');
+            const newZone = {
+                id: 'z' + Date.now(),
+                name: '新區塊',
+                range: '',
+                activeBg: '#6366f1',
+                activeText: '#ffffff',
+                inactiveBg: '#e0e7ff',
+                inactiveText: '#6366f1'
+            };
+            container.appendChild(createZoneElement(newZone));
+        }
+
+        function createZoneElement(zone) {
+            const div = document.createElement('div');
+            div.className = "p-5 border border-gray-200 rounded-xl relative zone-item bg-gray-50";
+            div.dataset.id = zone.id;
+            div.innerHTML = `
+                <button type="button" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 btn-delete-zone transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">區塊名稱</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm zone-name focus:ring-2 focus:ring-indigo-500 outline-none" value="${zone.name}">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">範圍 (如: 1-14, 27)</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm zone-range focus:ring-2 focus:ring-indigo-500 outline-none" value="${zone.range}">
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-3 bg-white p-3 rounded-lg border border-gray-200">
+                    <div class="flex flex-col items-center">
+                        <label class="block text-[10px] font-medium text-gray-500 mb-2">啟用背景</label>
+                        <input type="color" class="zone-active-bg" value="${zone.activeBg}">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="block text-[10px] font-medium text-gray-500 mb-2">啟用文字</label>
+                        <input type="color" class="zone-active-text" value="${zone.activeText}">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="block text-[10px] font-medium text-gray-500 mb-2">未啟用背景</label>
+                        <input type="color" class="zone-inactive-bg" value="${zone.inactiveBg}">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="block text-[10px] font-medium text-gray-500 mb-2">未啟用文字</label>
+                        <input type="color" class="zone-inactive-text" value="${zone.inactiveText}">
+                    </div>
+                </div>
+            `;
+            div.querySelector('.btn-delete-zone').addEventListener('click', () => div.remove());
+            return div;
+        }
+
+        function saveSettings() {
+            const total = parseInt(document.getElementById('input-total-seats').value) || 0;
+            if (total < 1) return alert('總人數必須大於0');
+            
+            appData.totalSeats = total;
+            appData.zones = [];
+            
+            document.querySelectorAll('.zone-item').forEach(el => {
+                appData.zones.push({
+                    id: el.dataset.id,
+                    name: el.querySelector('.zone-name').value,
+                    range: el.querySelector('.zone-range').value,
+                    activeBg: el.querySelector('.zone-active-bg').value,
+                    activeText: el.querySelector('.zone-active-text').value,
+                    inactiveBg: el.querySelector('.zone-inactive-bg').value,
+                    inactiveText: el.querySelector('.zone-inactive-text').value
+                });
+            });
+
+            rebuildSeatsList();
+            selectedSeats = [...allSeats]; // 重設選擇
+            renderSeats();
+            updateLegends();
+            updateStats();
+            
+            settingsView.classList.add('hidden');
+            setupView.classList.remove('hidden');
+        }
+
+        // --- 核心邏輯 ---
+        function rebuildSeatsList() {
+            allSeats = Array.from({ length: appData.totalSeats }, (_, i) => i + 1);
+        }
+
+        function parseRangeString(rangeStr) {
+            let seats = new Set();
+            if (!rangeStr) return [];
+            let parts = rangeStr.split(',');
+            parts.forEach(p => {
+                let s = p.trim();
+                let r = s.split('~');
+                if (r.length === 1) r = s.split('-');
+                
+                if (r.length === 2) {
+                    let start = parseInt(r[0]);
+                    let end = parseInt(r[1]);
+                    if (!isNaN(start) && !isNaN(end)) {
+                        for (let i = Math.min(start, end); i <= Math.max(start, end); i++) seats.add(i);
+                    }
+                } else {
+                    let val = parseInt(r[0]);
+                    if (!isNaN(val)) seats.add(val);
+                }
+            });
+            return Array.from(seats);
+        }
+
+        function getZoneForSeat(num) {
+            for (let z of appData.zones) {
+                let inRange = parseRangeString(z.range).includes(num);
+                if (inRange) return z;
+            }
+            return null;
+        }
+
+        function toggleSeat(num) {
+            if (selectedSeats.includes(num)) {
+                selectedSeats = selectedSeats.filter(s => s !== num);
+            } else {
+                selectedSeats.push(num);
+                selectedSeats.sort((a, b) => a - b);
+            }
+            renderSeats();
+            updateStats();
+        }
+
+        function handleGroupCountChange(delta) {
+            let newVal = groupCount + delta;
+            groupCount = Math.max(1, Math.min(selectedSeats.length || 1, newVal));
+            updateStats();
+        }
+
+        function handlePeoplePerGroupChange(delta) {
+            let newVal = peoplePerGroup + delta;
+            peoplePerGroup = Math.max(1, Math.min(selectedSeats.length || 1, newVal));
+            updateStats();
+        }
+
+        function updateStats() {
+            selectedCountDisplay.textContent = selectedSeats.length;
+            
+            let actualGroups = groupCount;
+            let actualPeople = peoplePerGroup;
+
+            // UI 狀態更新
+            if (groupingMode === 'groups') {
+                btnGroupMinus.disabled = false; btnGroupPlus.disabled = false;
+                btnPeopleMinus.disabled = true; btnPeoplePlus.disabled = true;
+                btnGroupMinus.classList.remove('opacity-30'); btnGroupPlus.classList.remove('opacity-30');
+                btnPeopleMinus.classList.add('opacity-30'); btnPeoplePlus.classList.add('opacity-30');
+                
+                if (selectedSeats.length > 0) {
+                    actualPeople = Math.max(1, Math.floor(selectedSeats.length / groupCount));
+                }
+            } else {
+                btnGroupMinus.disabled = true; btnGroupPlus.disabled = true;
+                btnPeopleMinus.disabled = false; btnPeoplePlus.disabled = false;
+                btnGroupMinus.classList.add('opacity-30'); btnGroupPlus.classList.add('opacity-30');
+                btnPeopleMinus.classList.remove('opacity-30'); btnPeoplePlus.classList.remove('opacity-30');
+
+                if (selectedSeats.length > 0) {
+                    actualGroups = Math.max(1, Math.floor(selectedSeats.length / peoplePerGroup));
+                }
+            }
+
+            if (selectedSeats.length === 0) {
+                groupCountDisplay.textContent = '-';
+                peopleCountDisplay.textContent = '-';
+                calcDisplay.textContent = `尚未選擇參與人數`;
+            } else {
+                groupCountDisplay.textContent = groupingMode === 'groups' ? groupCount : actualGroups;
+                peopleCountDisplay.textContent = groupingMode === 'people' ? peoplePerGroup : actualPeople;
+                
+                const total = selectedSeats.length;
+                const base = Math.floor(total / actualGroups);
+                const remainder = total % actualGroups;
+                
+                if (remainder === 0) {
+                    calcDisplay.textContent = `${total} 人平分為 ${actualGroups} 組，每組剛好 ${base} 人。`;
+                } else {
+                    calcDisplay.textContent = `${total} 人分為 ${actualGroups} 組。\n隨機有 ${remainder} 組為 ${base + 1} 人，其餘 ${actualGroups - remainder} 組為 ${base} 人。`;
+                }
+            }
+        }
+
+        // --- 渲染畫面 ---
+        function renderSeats() {
+            seatGrid.innerHTML = '';
+            allSeats.forEach(num => {
+                const isSelected = selectedSeats.includes(num);
+                const zone = getZoneForSeat(num);
+                
+                let inlineStyle = '';
+                if (zone) {
+                    if (isSelected) {
+                        inlineStyle = `background-color: ${zone.activeBg}; color: ${zone.activeText}; border: 1px solid ${zone.activeBg};`;
+                    } else {
+                        inlineStyle = `background-color: ${zone.inactiveBg}; color: ${zone.inactiveText}; border: 1px solid ${zone.inactiveBg};`;
+                    }
+                } else {
+                    inlineStyle = isSelected 
+                        ? `background-color: #6b7280; color: #ffffff; border: 1px solid #6b7280;` 
+                        : `background-color: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb;`;
+                }
+
+                const btn = document.createElement('button');
+                btn.className = `aspect-square rounded-lg font-bold text-base sm:text-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm hover:opacity-90 active:scale-95`;
+                btn.style = inlineStyle;
+                btn.textContent = num;
+                btn.onclick = () => toggleSeat(num);
+                seatGrid.appendChild(btn);
+            });
+        }
+
+        function updateLegends() {
+            let html = '';
+            let resultHtml = '';
+            appData.zones.forEach(z => {
+                html += `<div class="flex items-center gap-2"><div class="w-4 h-4 rounded" style="background-color: ${z.activeBg}"></div> <span class="font-medium text-gray-700">${z.name}</span></div>`;
+                resultHtml += `<div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full" style="background-color: ${z.activeBg}"></div> <span class="font-medium">${z.name}</span></div>`;
+            });
+            setupLegend.innerHTML = html;
+            resultLegend.innerHTML = resultHtml;
+        }
+
+        function generateGroups() {
+            const total = selectedSeats.length;
+            if (total === 0) {
+                alert("請先選擇參與分組的人員");
+                return;
+            }
+            
+            // 計算實際組數與基數
+            const targetGroupCount = groupingMode === 'groups' ? groupCount : Math.max(1, Math.floor(total / peoplePerGroup));
+            const baseCount = Math.floor(total / targetGroupCount);
+            const remainder = total % targetGroupCount;
+
+            // 產生各組容量陣列，並隨機打亂 (決定哪些組別分到餘數)
+            let capacities = Array(targetGroupCount).fill(baseCount);
+            for (let i = 0; i < remainder; i++) {
+                capacities[i]++;
+            }
+            capacities.sort(() => 0.5 - Math.random());
+            
+            // 隨機打亂選中的座位
+            const shuffledSeats = [...selectedSeats].sort(() => 0.5 - Math.random());
+            
+            // 根據容量分配座位
+            groups = [];
+            let currentIndex = 0;
+            for (let i = 0; i < targetGroupCount; i++) {
+                let cap = capacities[i];
+                groups.push(shuffledSeats.slice(currentIndex, currentIndex + cap));
+                currentIndex += cap;
+            }
+            
+            renderResultGroups();
+            setupView.classList.add('hidden');
+            resultView.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function renderResultGroups() {
+            groupsContainer.innerHTML = '';
+            const starIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+
+            groups.forEach((group, gIndex) => {
+                const groupEl = document.createElement('div');
+                groupEl.className = "bg-white rounded-2xl border border-indigo-100 p-5 shadow-sm flex flex-col h-full";
+                
+                let seatsHtml = '';
+                group.forEach(seatNum => {
+                    const zone = getZoneForSeat(seatNum);
+                    const typeLabel = zone ? zone.name : '未分類';
+                    
+                    let styleStr = zone 
+                        ? `background-color: ${zone.inactiveBg}; color: ${zone.activeBg}; border: 2px solid ${zone.activeBg};` 
+                        : `background-color: #f9fafb; color: #4b5563; border: 2px solid #9ca3af;`;
+
+                    seatsHtml += `
+                        <div class="relative flex flex-col items-center justify-center p-4 md:p-6 rounded-xl transition hover:shadow-md" style="${styleStr}">
+                            <div class="absolute top-2 right-2">${starIconSvg}</div>
+                            <span class="text-3xl font-black">${seatNum}</span>
+                            <span class="text-sm font-medium opacity-80 mt-2">${typeLabel}</span>
+                        </div>
+                    `;
+                });
+
+                groupEl.innerHTML = `
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-50">
+                        <h3 class="font-bold text-indigo-900 text-lg">第 ${gIndex + 1} 組</h3>
+                        <span class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold">${group.length} 人</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 flex-1">
+                        ${seatsHtml}
+                    </div>
+                `;
+                groupsContainer.appendChild(groupEl);
+            });
+        }
+
+        async function exportToDocx() {
+            if (!groups || groups.length === 0) return;
+
+            const className = document.getElementById('input-class-name').value.trim();
+            const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = docx;
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+            const children = [];
+
+            const titleText = className ? `${className} 班級分組座位表 (${dateStr})` : `班級分組座位表 (${dateStr})`;
+
+            children.push(new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                    new TextRun({
+                        text: titleText,
+                        bold: true,
+                        size: 48,
+                        color: "3333FF"
+                    })
+                ],
+                spacing: { after: 400 }
+            }));
+
+            groups.forEach((group, index) => {
+                children.push(new Paragraph({
+                    children: [
+                        new TextRun({
+                            text: `第 ${index + 1} 組`,
+                            bold: true,
+                            size: 32
+                        })
+                    ],
+                    border: {
+                        bottom: {
+                            color: "0000FF",
+                            space: 1,
+                            style: BorderStyle.SINGLE,
+                            size: 12
+                        }
+                    },
+                    spacing: { before: 400, after: 200 }
+                }));
+
+                const memberText = group.map(seat => `${seat} 號`).join('、');
+                children.push(new Paragraph({
+                    children: [
+                        new TextRun({
+                            text: memberText,
+                            size: 28
+                        })
+                    ],
+                    spacing: { after: 400 }
+                }));
+            });
+
+            const doc = new Document({
+                sections: [{ properties: {}, children: children }]
+            });
+
+            const blob = await Packer.toBlob(doc);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const fileName = className ? `${className}_班級分組座位表_${dateStr.replace(/\//g, '')}.docx` : `班級分組座位表_${dateStr.replace(/\//g, '')}.docx`;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 啟動應用
+        init();
+    </script>
+</body>
+</html>

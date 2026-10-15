@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>觸控小遊戲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
+
+        body {
+            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#fbcfe8 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .cute-card {
+            border: 4px solid #fff;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .cute-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 35px rgba(255, 182, 193, 0.6);
+            border-color: #fce7f3;
+        }
+
+        .icon-bounce {
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .cute-card:hover .icon-bounce {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .announcement-box {
+            box-shadow: 0 15px 30px -5px rgba(234, 179, 8, 0.3);
+            border-left-width: 12px;
+        }
+
+        /* 鎖定按鈕 */
+        #exit-btn {
+            position: fixed;
+            top: 14px;
+            right: 16px;
+            z-index: 9999;
+            background: rgba(255,255,255,0.75);
+            border: 2px solid #f9a8d4;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(236,72,153,0.2);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        #exit-btn:hover {
+            background: #fce7f3;
+            box-shadow: 0 6px 18px rgba(236,72,153,0.35);
+        }
+
+        /* 密碼 Modal */
+        #pw-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(0,0,0,0.45);
+            align-items: center;
+            justify-content: center;
+        }
+        #pw-modal.show { display: flex; }
+        #pw-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 36px 32px 28px;
+            box-shadow: 0 20px 60px rgba(236,72,153,0.25);
+            text-align: center;
+            width: 300px;
+        }
+        #pw-box h2 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ec4899;
+            margin-bottom: 18px;
+        }
+        #pw-input {
+            width: 100%;
+            border: 2px solid #f9a8d4;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            margin-bottom: 6px;
+        }
+        #pw-input:focus { border-color: #ec4899; }
+        #pw-error {
+            color: #f43f5e;
+            font-size: 0.85rem;
+            min-height: 20px;
+            margin-bottom: 12px;
+        }
+        .pw-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            margin: 4px;
+        }
+        .pw-btn-confirm {
+            background: #ec4899;
+            color: #fff;
+        }
+        .pw-btn-confirm:hover { background: #db2777; }
+        .pw-btn-cancel {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .pw-btn-cancel:hover { background: #e5e7eb; }
+
+        /* 解鎖成功覆蓋層 */
+        #unlock-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            background: rgba(0,0,0,0.88);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 24px;
+        }
+        #unlock-overlay.show { display: flex; }
+        #unlock-overlay h2 {
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+        }
+        #unlock-overlay .hint {
+            background: #ec4899;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 20px 48px;
+            border-radius: 20px;
+            letter-spacing: 2px;
+            border: none;
+            cursor: pointer;
+        }
+        #unlock-overlay .hint:hover {
+            background: #db2777;
+        }
+        #unlock-overlay .sub {
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-16 px-6">
+
+    <!-- 鎖定/離開全螢幕按鈕 -->
+    <button id="exit-btn" title="退出 Kiosk" onclick="showPwModal()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+    </button>
+
+    <!-- 解鎖成功覆蓋層 -->
+    <div id="unlock-overlay">
+        <h2>&#x1F513; 密碼正確</h2>
+        <button class="hint" onclick="closeKiosk()">點此關閉</button>
+        <div class="sub">或按鍵盤 Alt + F4</div>
+    </div>
+
+    <!-- 密碼 Modal -->
+    <div id="pw-modal">
+        <div id="pw-box">
+            <h2>🔐 請輸入密碼</h2>
+            <input id="pw-input" type="password" maxlength="16" placeholder="••••••"
+                   onkeydown="if(event.key==='Enter') confirmPw()">
+            <div id="pw-error"></div>
+            <div>
+                <button class="pw-btn pw-btn-confirm" onclick="confirmPw()">確認</button>
+                <button class="pw-btn pw-btn-cancel" onclick="hidePwModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="mb-10 text-center w-full max-w-7xl">
+        <h1 class="text-4xl md:text-5xl font-black text-pink-500 tracking-wide drop-shadow-sm mb-3">
+            觸控小遊戲
+        </h1>
+        <div class="h-2 w-24 bg-pink-300 rounded-full mx-auto"></div>
+    </header>
+
+    <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl w-full">
+
+        <a href="./Basketball/index.html" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-orange-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%23f97316"/></svg>')"></div>
+                <div class="text-orange-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#f97316" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-orange-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    投籃挑戰
+                </h2>
+            </div>
+        </a>
+
+        <a href="./AirHockey/index.html" target="_blank" rel="noopener noreferrer" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-indigo-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%236366f1"/></svg>')"></div>
+                <div class="text-indigo-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-indigo-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    桌上曲棍球
+                </h2>
+            </div>
+        </a>
+
+
+        <a href="./SweetPop/index.html" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-emerald-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%2310b981"/></svg>')"></div>
+                <div class="text-emerald-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><circle cx="15" cy="13" r="1"></circle><circle cx="18" cy="11" r="1"></circle></svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-emerald-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    甜點慶典
+                </h2>
+            </div>
+        </a>
+		
+        <a href="./ChoiceGame/index.html" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-blue-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%233b82f6"/></svg>')"></div>
+                <div class="text-blue-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#3b82f6" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-blue-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    互動分類大冒險
+                </h2>
+            </div>
+        </a>
+
+		        <a href="./Knowledge/index.html" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-orange-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%23f97316"/></svg>')"></div>
+                <div class="text-orange-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#f97316" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-orange-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    校園知識王
+                </h2>
+            </div>
+        </a>
+
+
+		        <a href="./SudokuGame/index.html" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-teal-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%2314b8a6"/></svg>')"></div>
+                <div class="text-teal-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#14b8a6" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-teal-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    數獨遊戲
+                </h2>
+            </div>
+        </a>
+
+        <a href="./WordQuest/index.html" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 bg-sky-100 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="%230ea5e9"/></svg>')"></div>
+                <div class="text-sky-500">
+                    <svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="#0ea5e9" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="5" width="18" height="14" rx="2"/>
+                        <path d="M7 9h2m0 0h2M9 9v2m0 0v2"/>
+                        <line x1="13" y1="9" x2="17" y2="9"/>
+                        <line x1="13" y1="13" x2="15" y2="13"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold text-sky-500 opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    字母尋寶
+                </h2>
+            </div>
+        </a>
+
+    </main>
+
+    <script>
+        const CORRECT_PW = '343601';
+
+        // 密碼 Modal
+        function showPwModal() {
+            document.getElementById('pw-input').value = '';
+            document.getElementById('pw-error').textContent = '';
+            document.getElementById('pw-modal').classList.add('show');
+            setTimeout(() => document.getElementById('pw-input').focus(), 100);
+        }
+
+        function hidePwModal() {
+            document.getElementById('pw-modal').classList.remove('show');
+        }
+
+        function confirmPw() {
+            const val = document.getElementById('pw-input').value;
+            if (val === CORRECT_PW) {
+                hidePwModal();
+                document.getElementById('unlock-overlay').classList.add('show');
+            } else {
+                document.getElementById('pw-error').textContent = '密碼錯誤，請再試一次';
+                document.getElementById('pw-input').value = '';
+                document.getElementById('pw-input').focus();
+            }
+        }
+
+        function closeKiosk() {
+            // 通知本機伺服器關閉 Chrome
+            fetch('http://127.0.0.1:9999/close').catch(() => {});
+        }
+    </script>
+
+</body>
+</html>
