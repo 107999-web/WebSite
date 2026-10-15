@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>學生專用 Gemini 提示詞產生器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900 font-sans p-4 md:p-6">
+
+  <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 border-b border-gray-200 bg-white gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">學生專用 Gemini 提示詞產生器</h1>
+        <p class="text-sm text-gray-500 mt-1">基於 PTCF (Persona, Task, Context, Format) 框架設計</p>
+      </div>
+      <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm whitespace-nowrap">
+        開啟 Gemini
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+      </a>
+    </div>
+
+    <div class="flex flex-col md:flex-row">
+      <div class="w-full md:w-1/3 border-r border-gray-200 bg-gray-50/50 flex flex-col h-[300px] md:h-auto">
+        <div class="p-4 border-b border-gray-200 shrink-0">
+          <div class="py-2 px-4 rounded-md font-medium text-sm bg-blue-100 text-blue-700 border border-blue-200 text-center">
+            學生情境
+          </div>
+        </div>
+
+        <div id="template-list" class="p-4 space-y-2 overflow-y-auto no-scrollbar flex-grow">
+        </div>
+      </div>
+
+      <div class="w-full md:w-2/3 p-6 flex flex-col bg-white min-h-[500px]">
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="editor-title" class="text-lg font-bold text-gray-800">編輯提示詞</h2>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="require-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+            <label for="require-checkbox" class="text-sm font-medium text-gray-700 cursor-pointer">加入要求(限制)</label>
+          </div>
+        </div>
+        
+        <div class="flex-grow flex flex-col relative">
+          <textarea id="prompt-textarea" class="w-full h-full min-h-[350px] p-4 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-gray-700 text-sm leading-relaxed" placeholder="在此編輯提示詞..."></textarea>
+        </div>
+        
+        <div class="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <p class="text-xs text-gray-500">請將中括號 <span class="font-mono bg-gray-100 px-1 rounded">[ ]</span> 內的文字替換為實際需求內容</p>
+          <button id="btn-copy" class="flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm w-full sm:w-auto justify-center">
+            <svg id="icon-copy" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            <svg id="icon-check" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span id="text-copy">複製提示詞</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const templates = [
+        { id: 's1', title: '複雜概念解釋', content: '角色：你是一位擅長用生動比喻講解複雜知識的權威教授。\n任務：請向我解釋[填入名詞/概念]。\n背景：我目前是[填入年級]學生，完全沒有相關背景知識，請使用生活中常見的事物來舉例說明。\n格式：列點說明，並在最後提供一個簡單的自我測驗題確認我是否理解。', requirement: '[填入特定限制，例如：完全不使用專有名詞/類比必須跟「食物」有關/字數不超過300字]' },
+        { id: 's2', title: '寫作靈感與大綱', content: '角色：你是一位得獎作家與寫作教練。\n任務：請幫我發想作文的切入角度並規劃文章大綱。\n背景：作文題目是[填入題目]，我想表達的核心思想是[填入核心思想]，但我不知道如何開頭與結尾。\n格式：提供3種不同風格的開頭示範，並列出「起、承、轉、合」的段落大綱結構。', requirement: '[填入特定限制，例如：必須包含一個名人名言/開頭必須是問句/段落安排需符合論說文結構]' },
+        { id: 's3', title: '讀書計畫規劃', content: '角色：你是一位高效的時間管理大師與學習輔導員。\n任務：請幫我安排一份針對[填入考試名稱或科目]的讀書計畫。\n背景：距離考試還有[填入週數]週，我每週可念書的時間約為[填入小時數]小時，我最弱的單元是[填入單元]。\n格式：以每週為單位，使用表格呈現學習進度安排與複習節點。', requirement: '[填入特定限制，例如：週末必須安排休息時間/每天需包含30分鐘的運動時間/最弱單元需安排雙倍時間]' },
+        { id: 's4', title: '語言練習對話', content: '角色：你是一位母語為[填入語言]的語言交換夥伴。\n任務：請與我進行一段對話練習。如果我犯了文法或用詞錯誤，請糾正我。\n背景：我們正在討論[填入對話情境，例如：在咖啡廳點餐/討論週末計畫]。\n格式：每次只回覆一句話，用語保持自然口語。請先由你開始第一句話。', requirement: '[填入特定限制，例如：糾正我時必須解釋文法規則/請使用B1級別的單字/嚴格限制每句不超過15個字]' },
+        { id: 's5', title: '面試/推甄模擬', content: '角色：你是一位嚴格但經驗豐富的[填入校系名稱]大學教授。\n任務：請對我進行入學面試模擬。\n背景：我即將參加該科系的面試，我的個人優勢與背景是[填入1-2個優勢或經歷]。\n格式：一次只問一個問題。等我回答後，給予具體點評、改進建議，然後再問下一個問題。請先拋出第一題。', requirement: '[填入特定限制，例如：教授的語氣設定為嚴厲/每次點評需指出一個致命缺點/針對我的背景提出質疑]' },
+        { id: 's6', title: '專題/科展題目發想', content: '角色：你是一位[填入學科領域]的頂尖創新研究員。\n任務：請幫我發想適合學生的專題研究或科展題目。\n背景：我對[填入興趣關鍵字]有興趣，必須在[填入時間限制]內完成，能使用的資源只有[填入可用資源]。\n格式：提供5個具備可行性與創新性的題目，並分別簡述「研究動機」與建議的「研究方法」。', requirement: '[填入特定限制，例如：研究材料總花費不能超過500元/必須能在室內完成/不涉及危險化學物質]' },
+        { id: 's7', title: '長文重點摘要與心智圖', content: '角色：你是一位擅長資訊統整與結構化思考的學霸。\n任務：請將以下長篇文字轉換為重點摘要與心智圖結構。\n背景：這是一篇關於[填入主題]的文本，我需要快速掌握核心概念以利複習。\n格式：先列出3個最核心的重點（Bullet points），接著以層級式條列（Markdown列表形式，方便轉換為心智圖）呈現細節。文本如下：\n[貼上長文]', requirement: '[填入特定限制，例如：心智圖層次不超過三層/每個重點只能用一句話概括/必須標示出專有名詞]' },
+        { id: 's8', title: '錯題盲點分析', content: '角色：你是一位專屬的一對一[填入科目]解題導師。\n任務：請幫我分析這道錯題的思考盲點，而非只是給出解答。\n背景：題目是「[填入題目]」，我原本的答案是[填入錯誤答案]，正確答案是[填入正確答案]。\n格式：指出我可能誤解的核心概念，解釋正確的解題思路，並提供一題類似觀念的題目讓我重新練習。', requirement: '[填入特定限制，例如：不要直接給我解答/請用蘇格拉底提問法引導我/分析步驟不超過三步]' }
+    ];
+
+    let activeTemplate = templates[0];
+
+    const templateList = document.getElementById('template-list');
+    const editorTitle = document.getElementById('editor-title');
+    const promptTextarea = document.getElementById('prompt-textarea');
+    const btnCopy = document.getElementById('btn-copy');
+    const iconCopy = document.getElementById('icon-copy');
+    const iconCheck = document.getElementById('icon-check');
+    const textCopy = document.getElementById('text-copy');
+    const requireCheckbox = document.getElementById('require-checkbox');
+
+    function renderTemplates() {
+      templateList.innerHTML = '';
+      templates.forEach(template => {
+        const btn = document.createElement('button');
+        const isActive = activeTemplate.id === template.id;
+        
+        btn.className = `w-full text-left px-4 py-3 rounded-lg text-sm transition-colors ${
+          isActive 
+            ? 'bg-white shadow-sm border border-blue-200 text-blue-700 font-medium' 
+            : 'hover:bg-gray-200 text-gray-700 border border-transparent'
+        }`;
+        btn.textContent = template.title;
+        btn.onclick = () => {
+          activeTemplate = template;
+          requireCheckbox.checked = false;
+          updateEditor();
+          renderTemplates();
+        };
+        templateList.appendChild(btn);
+      });
+    }
+
+    function updateEditor() {
+      editorTitle.textContent = `編輯提示詞：${activeTemplate.title}`;
+      let text = activeTemplate.content;
+      if (requireCheckbox.checked && activeTemplate.requirement) {
+        text += `\n要求：${activeTemplate.requirement}`;
+      }
+      promptTextarea.value = text;
+    }
+
+    requireCheckbox.addEventListener('change', updateEditor);
+
+    btnCopy.addEventListener('click', () => {
+      const textToCopy = promptTextarea.value;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+
+      iconCopy.classList.add('hidden');
+      iconCheck.classList.remove('hidden');
+      textCopy.textContent = '已複製';
+
+      setTimeout(() => {
+        iconCheck.classList.add('hidden');
+        iconCopy.classList.remove('hidden');
+        textCopy.textContent = '複製提示詞';
+      }, 2000);
+    });
+
+    renderTemplates();
+    updateEditor();
+  </script>
+</body>
+</html>

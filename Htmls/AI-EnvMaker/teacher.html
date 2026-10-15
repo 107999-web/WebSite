@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>教師檢視器｜AI 環保小創客</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .src-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+    .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+    .steps > li { counter-increment: s; position: relative; padding: 0 0 18px 48px; }
+    .steps > li::before {
+      content: counter(s); position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 10px;
+      background: var(--primary); color: #fff; font-weight: 900; display: grid; place-items: center;
+    }
+    .steps > li b.h { display: block; font-size: 1.02rem; margin-bottom: 4px; }
+    #gsCode { font-family: var(--mono); font-size: .8rem; min-height: 220px; background: #16221c; color: #e7f5ec; }
+    .score-grid { display: grid; gap: 10px; }
+    .score-row { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+    .score-row .lv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+    .score-row .lv label { border: 1.5px solid var(--line); border-radius: 8px; padding: 6px; font-size: .8rem; cursor: pointer; }
+    .score-row .lv label b { display: block; }
+    .score-row .lv input { display: none; }
+    .score-row .lv label:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+    .score-row .lv label.self { box-shadow: inset 0 0 0 2px #c7b8f5; }
+    .detail-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .plan-box { background: var(--surface-2); border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: .92rem; }
+    .plan-box dt { font-weight: 700; color: var(--muted); font-size: .82rem; margin-top: 6px; }
+    .plan-box dd { margin: 0; white-space: pre-wrap; }
+    @media (max-width: 700px) { .score-row .lv { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+<header id="topnav" data-no-profile="1"></header>
+
+<main class="page">
+  <div class="page-head">
+    <h1>👩‍🏫 教師檢視器</h1>
+    <p>收集全班的 AI 創作歷程，查看每位學生的提示詞迭代過程，並依評量規準評分。</p>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab" data-tab="overview">📊 全班總覽</button>
+    <button class="tab" data-tab="detail">👤 個別檢視與評分</button>
+    <button class="tab" data-tab="cloud">☁️ 雲端收件設定</button>
+    <button class="tab" data-tab="guide">📖 教學提醒</button>
+  </div>
+
+  <!-- ===== 總覽 ===== -->
+  <section data-panel="overview">
+    <div class="src-bar">
+      <button class="btn" id="loadCloud">☁️ 從雲端載入全班</button>
+      <label class="btn ghost" for="importFiles">📂 匯入學生備份檔（可多選）</label>
+      <input type="file" id="importFiles" accept=".json,application/json" multiple class="hidden">
+      <span style="flex:1"></span>
+      <button class="btn ghost sm" id="exportCsv">⬇️ 匯出成績 CSV</button>
+      <button class="btn danger sm" id="clearTeacher">清除檢視器資料</button>
+    </div>
+    <div class="stat-tiles" id="classStats"></div>
+    <div id="stratUsage" style="margin:14px 0"></div>
+    <div id="overviewTable"></div>
+  </section>
+
+  <!-- ===== 個別 ===== -->
+  <section data-panel="detail" class="hidden">
+    <div class="detail-head">
+      <button class="btn ghost sm" id="prevStu">◀</button>
+      <select id="stuSelect" style="max-width:320px"></select>
+      <button class="btn ghost sm" id="nextStu">▶</button>
+      <span style="flex:1"></span>
+      <button class="btn ghost sm" onclick="window.print()">🖨️ 列印</button>
+    </div>
+    <div id="detail"></div>
+  </section>
+
+  <!-- ===== 雲端設定 ===== -->
+  <section data-panel="cloud" class="hidden">
+    <div class="grid grid-2" style="align-items:start">
+      <div class="card">
+        <h3>☁️ 資料收集的兩種方式</h3>
+        <p class="small"><b>方式一：雲端自動收件（推薦）</b><br>學生在「歷程紀錄本 → 備份與送出」按一下，資料就會寫進你的 Google 試算表。你可以直接在試算表閱讀，也可以在這個檢視器一鍵載入全班資料。</p>
+        <p class="small"><b>方式二：備份檔＋Classroom</b><br>不需要任何設定。學生匯出 <code>.json</code> 備份檔，繳交到 Google Classroom 作業。你下載後，在「全班總覽」選「匯入學生備份檔」（可一次選多個）。</p>
+        <div class="callout warn small"><strong>學校網域限制</strong>如果部署時「誰可以存取」選不到「任何人」（學校管理員有限制），學生的瀏覽器可能無法送出資料。遇到這種情況請改用方式二，或請資訊組協助開放。</div>
+        <h3 style="margin-top:18px">🛠️ 設定步驟</h3>
+        <ol class="steps">
+          <li><b class="h">建立試算表</b>用你的學校帳號建立一個新的 Google 試算表，例如命名為「AI 環保小創客收件匣」。</li>
+          <li><b class="h">貼上程式碼</b>在試算表選單點「擴充功能 → Apps Script」，刪除原本的內容，貼上右邊的程式碼。</li>
+          <li><b class="h">修改密碼</b>把 <code>CLASS_KEY</code>（班級密語）和 <code>TEACHER_KEY</code>（教師密碼）改成你自己的字串，然後按儲存 💾。</li>
+          <li><b class="h">部署</b>點右上角「部署 → 新增部署作業」→ 齒輪選「網頁應用程式」→ 執行身分選「<b>我</b>」、誰可以存取選「<b>任何人</b>」→ 部署，並依畫面授權。</li>
+          <li><b class="h">填入下方設定</b>複製部署完成的「網頁應用程式網址」（結尾是 <code>/exec</code>），貼到下面，按「測試連線」。</li>
+          <li><b class="h">發給學生</b>產生「學生專用連結」，貼到 Classroom。學生用這個連結打開一次，之後就能直接送出。</li>
+        </ol>
+      </div>
+      <div>
+        <div class="card">
+          <h3>🔑 連線設定</h3>
+          <div class="field"><label for="cfgUrl">網頁應用程式網址</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/……/exec"></div>
+          <div class="row-2">
+            <div class="field"><label for="cfgClassKey">班級密語（CLASS_KEY）</label><input type="text" id="cfgClassKey" placeholder="例如 eco601"></div>
+            <div class="field"><label for="cfgTeacherKey">教師密碼（TEACHER_KEY）</label><input type="password" id="cfgTeacherKey" autocomplete="off"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="saveCfg">💾 儲存設定</button>
+            <button class="btn ghost" id="testCfg">🔌 測試連線</button>
+          </div>
+          <p class="small" id="cfgResult" style="margin-top:10px"></p>
+          <p class="small muted">教師密碼只存在這台電腦的瀏覽器，不會放進學生連結。</p>
+          <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
+          <h3>🔗 學生專用連結</h3>
+          <textarea id="stuLink" rows="3" readonly placeholder="儲存設定後自動產生"></textarea>
+          <div class="btn-row" style="margin-top:8px"><button class="btn ghost sm" id="copyLink">📋 複製連結</button></div>
+          <p class="small muted" style="margin-top:8px">也可以把網址和班級密語填進 <code>assets/config.js</code>，這樣學生直接開網站就能送出，不需要專用連結。</p>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h3>📜 Apps Script 程式碼</h3>
+          <textarea id="gsCode" readonly spellcheck="false"></textarea>
+          <div class="btn-row" style="margin-top:8px"><button class="btn ghost sm" id="copyCode">📋 複製程式碼</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 教學提醒 ===== -->
+  <section data-panel="guide" class="hidden">
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>🔐 帳號與平台</h3>
+        <ul class="small" style="padding-left:18px">
+          <li><b>Gemini</b>：學生使用學校的 Google Workspace for Education 帳號。請先確認學校管理員已經為學生帳號開啟 Gemini，並測試學生帳號能不能<strong>生成圖片</strong>、能不能使用 <strong>Canvas</strong>。</li>
+          <li><b>Suno</b>：服務條款有年齡限制，建議由<strong>教師帳號</strong>操作：學生用積木產生器整理 Style 和 Lyrics，老師代為產生，學生負責比較、選擇與記錄。</li>
+          <li><b>Canva</b>：使用 Canva 教育版，可以用 Google 帳號登入，並透過 Classroom 繳交設計。</li>
+          <li>課前先用學生帳號實際跑過一遍流程，確認沒有被學校網路擋住。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🧭 課堂引導重點</h3>
+        <ul class="small" style="padding-left:18px">
+          <li><b>先想再做</b>：每個任務開始時，先離開電腦 5 分鐘畫草圖或寫句子。</li>
+          <li><b>記錄是習慣</b>：每節課最後 5 分鐘是「補紀錄時間」，把待填寫的結果補完。</li>
+          <li><b>迭代要說理由</b>：巡堂時問學生：「這一版你用了哪一招？為什麼？」</li>
+          <li><b>第 1 版 vs 最終版</b>：成果發表時，請學生並排展示，說明怎麼一步步改進。</li>
+          <li><b>查證</b>：歌詞和程式裡的知識，要求至少查證一個事實。</li>
+          <li><b>音樂主題</b>：歌曲可選「環保主題」或「自由主題」，請先說明班上的規定（例如：自由主題需內容正向、適合國小學生）。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📊 評量建議</h3>
+        <p class="small">評量規準共 5 個向度，每個向度 1～4 分，滿分 20 分：</p>
+        <div id="rubricTable" class="small"></div>
+      </div>
+      <div class="card">
+        <h3>💾 資料保存提醒</h3>
+        <ul class="small" style="padding-left:18px">
+          <li>學生資料存在<strong>各自電腦的瀏覽器</strong>。如果電腦教室有還原卡，請在每節課結束前請學生<strong>送出或匯出備份</strong>。</li>
+          <li>下一節課換了電腦，學生可以在「備份與送出」匯入上次的備份檔，繼續做下去。</li>
+          <li>檢視器裡的評分也只存在這台電腦，請定期「匯出成績 CSV」。</li>
+          <li>課程結束後，請學生在共用電腦上「清除所有資料」。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="text/plain" id="gsSource">
+/**
+ * AI 環保小創客｜雲端收件服務（Google Apps Script）
+ *
+ * 安裝方式（詳細步驟請看「教師檢視器 → 雲端收件設定」）：
+ * 1. 建立一個新的 Google 試算表 → 擴充功能 → Apps Script
+ * 2. 把這整份程式碼貼上，修改下面兩個密碼後儲存
+ * 3. 部署 → 新增部署作業 → 類型選「網頁應用程式」
+ *    執行身分：我；誰可以存取：任何人
+ * 4. 複製部署網址（…/exec），貼到教師檢視器
+ */
+
+// 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
+const CLASS_KEY = 'eco601';
+
+// 老師讀取全班資料用的密碼，請改成只有你知道的字串
+const TEACHER_KEY = 'change-this-teacher-password';
+
+const SHEET_STUDENTS = '學生總表';
+const SHEET_PROMPTS = '提示詞明細';
+const SHEET_PLANS = '後製構想';
+const CHUNK = 45000; // 單一儲存格上限約 5 萬字，JSON 分段存放
+
+const TASK_NAMES = { research: '議題探究', poster: '環保海報', lyrics: '歌詞與曲風', suno: 'Suno 音樂', webapp: '網頁小程式', other: '其他' };
+const WORK_NAMES = { poster: '環保海報', mv: '音樂 MV', webapp: '網頁小程式' };
+const STRATEGY_NAMES = { clear: '說清楚', one: '一次改一件事', limit: '加限制', askme: '請AI先問我', options: '請AI給選項', report: '回報問題' };
+
+const HEADERS = {};
+HEADERS[SHEET_STUDENTS] = ['學生代號', '班級', '座號', '姓名', '議題', '最後送出', '紀錄筆數', '使用技巧次數', '資料(JSON)'];
+HEADERS[SHEET_PROMPTS] = ['學生代號', '班級', '座號', '姓名', '任務', '平台', '版本', '提示詞', 'AI回應摘要', '星等', '好的地方', '下一版要改', '使用技巧', '建立時間'];
+HEADERS[SHEET_PLANS] = ['學生代號', '班級', '座號', '姓名', '作品', 'AI素材', '我加入的元素', '主標語', 'AI貢獻%', '我的貢獻', '作品連結', '後製反思', '更新時間'];
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    const body = JSON.parse(e.postData.contents);
+    if (body.action !== 'submit') return json_({ ok: false, error: '未知的動作' });
+    if (CLASS_KEY && body.key !== CLASS_KEY) return json_({ ok: false, error: '班級密語不正確，請向老師確認學生專用連結' });
+
+    const s = body.student || {};
+    const cls = String(s.cls || '').trim();
+    const seat = String(s.seat || '').trim();
+    const name = String(s.name || '').trim();
+    if (!cls || !seat || !name) return json_({ ok: false, error: '缺少班級、座號或姓名' });
+
+    const id = cls + '-' + ('0' + seat).slice(-2);
+    const data = body.data || {};
+    const entries = Array.isArray(data.entries) ? data.entries : [];
+    const plans = data.plans || {};
+    const submittedAt = body.submittedAt || new Date().toISOString();
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // 1. 學生總表（每位學生一列，保留完整 JSON 供教師檢視器讀取）
+    const stratCount = entries.reduce(function (n, x) { return n + ((x.strategies || []).length); }, 0);
+    const record = JSON.stringify({ student: s, data: data, submittedAt: submittedAt });
+    const chunks = [];
+    for (let i = 0; i < record.length; i += CHUNK) chunks.push(record.slice(i, i + CHUNK));
+    const row = [id, cls, seat, name, s.topic || '', new Date(submittedAt), entries.length, stratCount].concat(chunks);
+    upsertRow_(ss, SHEET_STUDENTS, id, row);
+
+    // 2. 提示詞明細（先刪除這位學生的舊資料，再寫入最新的）
+    const promptRows = entries.slice().sort(function (a, b) {
+      return String(a.task).localeCompare(String(b.task)) || (Number(a.version) || 0) - (Number(b.version) || 0);
+    }).map(function (x) {
+      return [id, cls, seat, name, TASK_NAMES[x.task] || x.task, x.platform || '', Number(x.version) || '',
+        x.prompt || '', x.response || '', Number(x.rating) || '', x.good || '', x.improve || '',
+        (x.strategies || []).map(function (k) { return STRATEGY_NAMES[k] || k; }).join('、'),
+        x.createdAt ? new Date(x.createdAt) : ''];
+    });
+    replaceRows_(ss, SHEET_PROMPTS, id, promptRows);
+
+    // 3. 後製構想
+    const planRows = Object.keys(WORK_NAMES).filter(function (w) { return plans[w]; }).map(function (w) {
+      const p = plans[w];
+      return [id, cls, seat, name, WORK_NAMES[w], p.aiAssets || '',
+        (p.myElements || []).concat(p.otherElements ? [p.otherElements] : []).join('、'),
+        p.mainText || '', p.aiPercent != null ? p.aiPercent : '', p.myPart || '', p.link || '', p.reflect || '',
+        p.updatedAt ? new Date(p.updatedAt) : ''];
+    });
+    replaceRows_(ss, SHEET_PLANS, id, planRows);
+
+    return json_({ ok: true, id: id, count: entries.length, at: submittedAt });
+  } catch (err) {
+    return json_({ ok: false, error: String(err && err.message || err) });
+  } finally {
+    try { lock.releaseLock(); } catch (e2) { /* 沒有取得鎖時忽略 */ }
+  }
+}
+
+function doGet(e) {
+  const p = (e && e.parameter) || {};
+  if (p.action === 'list') {
+    if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
+    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_STUDENTS);
+    const values = sh.getDataRange().getValues().slice(1);
+    const jsonCol = HEADERS[SHEET_STUDENTS].length - 1;
+    const students = [];
+    values.forEach(function (r) {
+      const raw = r.slice(jsonCol).join('');
+      if (!raw) return;
+      try { students.push(JSON.parse(raw)); } catch (err) { /* 略過損壞的資料 */ }
+    });
+    return json_({ ok: true, students: students, at: new Date().toISOString() });
+  }
+  return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中' });
+}
+
+// ---------- 工具函式 ----------
+function sheet_(ss, name) {
+  let sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    sh.getRange(1, 1, 1, HEADERS[name].length).setValues([HEADERS[name]]).setFontWeight('bold').setBackground('#e3f5ec');
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+function upsertRow_(ss, name, id, row) {
+  const sh = sheet_(ss, name);
+  const last = sh.getLastRow();
+  let target = last + 1;
+  if (last > 1) {
+    const ids = sh.getRange(2, 1, last - 1, 1).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]) === id) { target = i + 2; break; }
+    }
+  }
+  // 先清除整列，避免舊的 JSON 分段殘留
+  const width = Math.max(sh.getLastColumn(), row.length);
+  sh.getRange(target, 1, 1, width).clearContent();
+  sh.getRange(target, 1, 1, row.length).setValues([row]);
+}
+
+function replaceRows_(ss, name, id, rows) {
+  const sh = sheet_(ss, name);
+  const width = HEADERS[name].length;
+  const last = sh.getLastRow();
+  let keep = [];
+  if (last > 1) {
+    keep = sh.getRange(2, 1, last - 1, width).getValues().filter(function (r) { return String(r[0]) !== id; });
+    sh.getRange(2, 1, last - 1, width).clearContent();
+  }
+  const all = keep.concat(rows);
+  if (all.length) sh.getRange(2, 1, all.length, width).setValues(all);
+}
+
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+</script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  const E = window.Eco;
+  E.renderNav('');
+  E.footer();
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const TKEY = 'ecoai.teacher';
+
+  // ---------- 教師端資料 ----------
+  function tload() {
+    try { return Object.assign({ students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '' }, JSON.parse(localStorage.getItem(TKEY) || '{}')); }
+    catch (e) { return { students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '' }; }
+  }
+  let T = tload();
+  function tsave() {
+    try { localStorage.setItem(TKEY, JSON.stringify(T)); }
+    catch (e) { E.toast('⚠️ 瀏覽器空間不足，無法儲存檢視器資料', 'warn', 5000); }
+  }
+  if (!T.gasUrl) {
+    const c = E.cloud();
+    T.gasUrl = c.gasUrl;
+    T.classKey = c.classKey;
+  }
+
+  const sid = s => `${String(s.cls || '').trim()}-${String(s.seat || '').trim().padStart(2, '0')}`;
+
+  function normalize(obj) {
+    if (obj && obj.student && obj.data) return { student: obj.student, data: obj.data, submittedAt: obj.submittedAt || '' };
+    if (obj && obj.profile && Array.isArray(obj.entries)) {
+      return {
+        student: obj.profile,
+        data: { entries: obj.entries, plans: obj.plans || {}, reflection: obj.reflection || {}, pledge: obj.pledge || {} },
+        submittedAt: obj.exportedAt || obj.lastSubmit || ''
+      };
+    }
+    return null;
+  }
+  function addRecord(rec, source) {
+    if (!rec || !rec.student || !rec.student.cls || !rec.student.seat) return 'skip';
+    const id = sid(rec.student);
+    const cur = T.students[id];
+    if (cur && String(cur.submittedAt) > String(rec.submittedAt)) return 'older';
+    T.students[id] = Object.assign(rec, { source });
+    return cur ? 'updated' : 'added';
+  }
+
+  function sortedIds() {
+    return Object.keys(T.students).sort((a, b) => {
+      const A = T.students[a].student, B = T.students[b].student;
+      return String(A.cls).localeCompare(String(B.cls)) || (Number(A.seat) || 0) - (Number(B.seat) || 0);
+    });
+  }
+  function scoreTotal(id) {
+    const sc = T.scores[id] || {};
+    const vals = E.RUBRIC.map(r => Number(sc[r.id]) || 0);
+    return vals.every(v => v) ? vals.reduce((a, b) => a + b, 0) : (vals.some(v => v) ? vals.reduce((a, b) => a + b, 0) + '*' : '');
+  }
+
+  // ---------- 分頁 ----------
+  let currentId = '';
+  function showTab(name) {
+    $$('#tabs .tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
+    $$('[data-panel]').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== name));
+    if (name === 'overview') renderOverview();
+    if (name === 'detail') renderDetail();
+  }
+  $('#tabs').addEventListener('click', ev => { const t = ev.target.closest('.tab'); if (t) showTab(t.dataset.tab); });
+
+  // ---------- 總覽 ----------
+  const COLS = ['research', 'poster', 'lyrics', 'suno', 'webapp'];
+  function renderOverview() {
+    const ids = sortedIds();
+    if (!ids.length) {
+      $('#classStats').innerHTML = '';
+      $('#stratUsage').innerHTML = '';
+      $('#overviewTable').innerHTML = `<div class="empty-state card"><div class="big">📭</div>
+        <p>還沒有學生資料。<br>請按「從雲端載入全班」，或匯入學生繳交的備份檔。</p>
+        <p class="small">還沒設定雲端收件？到 <a href="#" data-goto="cloud">☁️ 雲端收件設定</a> 看步驟。</p></div>`;
+      return;
+    }
+    const all = ids.map(id => ({ id, rec: T.students[id], st: E.stats(T.students[id].data) }));
+    const avg = f => (all.reduce((a, x) => a + f(x), 0) / all.length).toFixed(1);
+    const strat = {};
+    all.forEach(x => Object.entries(x.st.strat).forEach(([k, v]) => { strat[k] = (strat[k] || 0) + v; }));
+    $('#classStats').innerHTML = [
+      [all.length, '學生人數'], [avg(x => x.st.count), '平均紀錄筆數'], [avg(x => x.st.stratTotal), '平均使用技巧'],
+      [avg(x => x.st.plansDone), '平均構想單（/3）'], [all.filter(x => x.st.pending).length, '有待填寫的學生']
+    ].map(([n, l]) => `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    $('#stratUsage').innerHTML = '<span class="small muted">全班迭代技巧使用次數：</span> ' +
+      E.STRATEGIES.map(s => `<span class="tag ${strat[s.id] ? '' : 'gray'}">${s.icon} ${s.name} ${strat[s.id] || 0}</span>`).join(' ');
+
+    $('#overviewTable').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>班級</th><th class="num">座號</th><th>姓名</th><th>議題</th><th class="num">紀錄</th>
+      ${COLS.map(c => `<th class="num" title="${E.TASKS[c].name}最高版本">${E.TASKS[c].icon}</th>`).join('')}
+      <th class="num">技巧</th><th class="num">待填</th><th class="num">構想單</th><th class="num">反思</th><th class="num">約定</th><th class="num">評分</th><th>最後送出</th></tr></thead>
+      <tbody>${all.map(({ id, rec, st }) => `<tr class="clickable" data-id="${E.esc(id)}">
+        <td>${E.esc(rec.student.cls)}</td><td class="num">${E.esc(rec.student.seat)}</td><td><b>${E.esc(rec.student.name)}</b></td>
+        <td>${E.esc(rec.student.topic || '—')}</td><td class="num">${st.count}</td>
+        ${COLS.map(c => `<td class="num">${st.maxVer[c] || '·'}</td>`).join('')}
+        <td class="num">${st.stratTotal}</td><td class="num">${st.pending ? `<span class="badge warn">${st.pending}</span>` : '0'}</td>
+        <td class="num">${st.plansDone}/3</td><td class="num">${st.reflected}/6</td>
+        <td class="num">${rec.data.pledge && rec.data.pledge.signedAt ? '✅' : '—'}</td>
+        <td class="num">${scoreTotal(id)}</td><td class="small">${E.fmtTime(rec.submittedAt)}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <p class="small muted">表頭圖示是各任務的最高版本數。評分欄的 * 表示還沒評完。點一列可以查看詳細內容並評分。</p>`;
+  }
+  $('#overviewTable').addEventListener('click', ev => {
+    const g = ev.target.closest('[data-goto]');
+    if (g) { ev.preventDefault(); showTab(g.dataset.goto); return; }
+    const tr = ev.target.closest('tr[data-id]');
+    if (tr) { currentId = tr.dataset.id; showTab('detail'); }
+  });
+
+  $('#importFiles').addEventListener('change', async ev => {
+    const files = [...ev.target.files];
+    ev.target.value = '';
+    const count = { added: 0, updated: 0, older: 0, skip: 0 };
+    const errors = [];
+    for (const f of files) {
+      try { count[addRecord(normalize(await E.readJsonFile(f)), 'file')]++; }
+      catch (err) { errors.push(f.name); }
+    }
+    tsave();
+    renderOverview();
+    E.toast(`匯入完成：新增 ${count.added}、更新 ${count.updated}` +
+      (count.older ? `、較舊略過 ${count.older}` : '') + (count.skip || errors.length ? `、無法辨識 ${count.skip + errors.length}` : ''), 'ok', 5000);
+  });
+
+  $('#loadCloud').addEventListener('click', async () => {
+    if (!T.gasUrl || !T.teacherKey) { E.toast('請先到「雲端收件設定」填寫網址和教師密碼', 'warn'); showTab('cloud'); return; }
+    const btn = $('#loadCloud');
+    btn.disabled = true;
+    btn.textContent = '⏳ 載入中…';
+    try {
+      const res = await fetch(`${T.gasUrl}?action=list&key=${encodeURIComponent(T.teacherKey)}`);
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || '載入失敗');
+      let n = 0;
+      j.students.forEach(s => { if (addRecord(normalize(s), 'cloud') !== 'skip') n++; });
+      tsave();
+      renderOverview();
+      E.toast(`☁️ 已載入 ${n} 位學生的資料`, 'ok');
+    } catch (err) {
+      E.toast('❌ ' + (err.message === 'Failed to fetch' ? '無法連線，請檢查網址與部署權限' : err.message), 'warn', 6000);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '☁️ 從雲端載入全班';
+    }
+  });
+
+  $('#exportCsv').addEventListener('click', () => {
+    const ids = sortedIds();
+    if (!ids.length) { E.toast('沒有資料可以匯出', 'warn'); return; }
+    const head = ['班級', '座號', '姓名', '議題', '紀錄筆數', ...COLS.map(c => E.TASKS[c].name + '版本'), '技巧次數', '構想單', '反思題',
+      ...E.RUBRIC.map(r => r.name), '總分', '學生自評總分', '教師評語'];
+    const rows = ids.map(id => {
+      const rec = T.students[id];
+      const st = E.stats(rec.data);
+      const sc = T.scores[id] || {};
+      const self = (rec.data.reflection || {}).self || {};
+      const selfSum = E.RUBRIC.reduce((a, r) => a + (Number(self[r.id]) || 0), 0);
+      return [rec.student.cls, rec.student.seat, rec.student.name, rec.student.topic || '', st.count,
+        ...COLS.map(c => st.maxVer[c] || 0), st.stratTotal, st.plansDone, st.reflected,
+        ...E.RUBRIC.map(r => sc[r.id] || ''), E.RUBRIC.reduce((a, r) => a + (Number(sc[r.id]) || 0), 0),
+        selfSum || '', sc.comment || ''];
+    });
+    const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    E.download(`AI環保小創客-成績-${new Date().toISOString().slice(0, 10)}.csv`, '﻿' + csv, 'text/csv');
+  });
+
+  $('#clearTeacher').addEventListener('click', () => {
+    if (!confirm('確定要清除檢視器裡的學生資料和評分嗎？（雲端試算表的資料不受影響）')) return;
+    T.students = {};
+    T.scores = {};
+    tsave();
+    renderOverview();
+  });
+
+  // ---------- 個別檢視 ----------
+  function renderDetail() {
+    const ids = sortedIds();
+    const sel = $('#stuSelect');
+    sel.innerHTML = ids.map(id => {
+      const s = T.students[id].student;
+      return `<option value="${E.esc(id)}">${E.esc(s.cls)} 班 ${E.esc(s.seat)} 號 ${E.esc(s.name)}</option>`;
+    }).join('');
+    if (!ids.length) { $('#detail').innerHTML = '<div class="empty-state card"><div class="big">📭</div><p>還沒有學生資料</p></div>'; return; }
+    if (!ids.includes(currentId)) currentId = ids[0];
+    sel.value = currentId;
+    const rec = T.students[currentId];
+    const d = rec.data;
+    const st = E.stats(d);
+    const sc = T.scores[currentId] || {};
+    const self = (d.reflection || {}).self || {};
+    const answers = (d.reflection || {}).answers || {};
+    const QN = { best: '進步最多的一次修改', aiGood: 'AI 幫了很大的忙', human: '一定要靠人完成的部分', skill: '最有效的迭代技巧', ethics: '使用 AI 要注意的事', future: '以後想用 AI 做什麼' };
+
+    const plans = d.plans || {};
+    const planHTML = Object.entries(E.WORKS).map(([k, w]) => {
+      const p = plans[k];
+      if (!p) return `<div class="plan-box"><b>${w.icon} ${w.name}</b> <span class="muted small">— 尚未填寫</span></div>`;
+      const els = (p.myElements || []).concat(p.otherElements ? [p.otherElements] : []).join('、');
+      const rows = [
+        ['AI 素材', p.aiAssets], ['親手加入的元素', els], ['主標語', p.mainText && `${p.mainText}${p.subText ? '／' + p.subText : ''}`],
+        ['分鏡', (p.scenes || []).filter(s => s.visual).map(s => `${s.part}：${s.visual}（${s.source || '—'}）`).join('\n')],
+        ['自己的設計決定', p.decisions], ['試玩回饋', p.testing],
+        ['AI 貢獻', p.aiPercent != null ? `${p.aiPercent}%（我 ${100 - p.aiPercent}%）` : ''],
+        ['我的貢獻', p.myPart], ['後製反思', p.reflect]
+      ].filter(r => r[1]);
+      return `<div class="plan-box"><b>${w.icon} ${w.name}</b>
+        ${p.link ? ` · <a href="${E.esc(p.link)}" target="_blank" rel="noopener">開啟作品 ↗</a>` : ''}
+        <dl>${rows.map(([t, v]) => `<dt>${t}</dt><dd>${E.esc(v)}</dd>`).join('')}</dl></div>`;
+    }).join('');
+
+    $('#detail').innerHTML = `
+      <div class="card" style="margin-bottom:16px">
+        <h2 style="margin-bottom:4px">${E.esc(rec.student.cls)} 班 ${E.esc(rec.student.seat)} 號 ${E.esc(rec.student.name)}</h2>
+        <p class="muted small" style="margin:0">議題：${E.esc(rec.student.topic || '—')} ·
+          AI 使用約定：${d.pledge && d.pledge.signedAt ? '✅ 已簽署' : '未簽署'} ·
+          最後送出：${E.fmtTime(rec.submittedAt) || '—'}（${rec.source === 'cloud' ? '雲端' : '備份檔'}）</p>
+        <div class="stat-tiles" style="margin-top:12px">
+          ${[[st.count, '紀錄'], [st.stratTotal, '使用技巧'], [st.avgRating ? st.avgRating.toFixed(1) : '—', '平均自評星等'], [st.pending, '待填寫'], [`${st.plansDone}/3`, '構想單']]
+            .map(([n, l]) => `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="split">
+        <div>
+          <div class="card" style="margin-bottom:16px"><h3>🕒 提示詞歷程</h3>${E.timelineHTML(d.entries || [], { emptyText: '沒有紀錄' })}</div>
+          <div class="card"><h3>✂️ 後製構想單</h3>${planHTML}</div>
+        </div>
+        <div class="sticky">
+          <div class="card" style="margin-bottom:16px">
+            <h3>🎯 教師評分</h3>
+            <p class="small muted">紫色外框是學生的自評。</p>
+            <div class="score-grid">${E.RUBRIC.map(r => `<div class="score-row"><b>${r.name}</b> <span class="small muted">${r.desc}</span>
+              <div class="lv">${r.levels.map((t, i) => `<label class="${Number(self[r.id]) === i + 1 ? 'self' : ''}" title="${E.esc(t)}">
+                <input type="radio" name="sc_${r.id}" value="${i + 1}" ${Number(sc[r.id]) === i + 1 ? 'checked' : ''}>
+                <b>${i + 1} ${E.LEVEL_NAMES[i]}</b>${E.esc(t)}</label>`).join('')}</div></div>`).join('')}</div>
+            <div class="field" style="margin-top:12px"><label for="scComment">評語</label><textarea id="scComment" rows="3">${E.esc(sc.comment || '')}</textarea></div>
+            <p class="small" id="scSaved" style="color:var(--primary);min-height:1.2em"></p>
+          </div>
+          <div class="card"><h3>🌱 學生反思</h3>
+            ${Object.entries(QN).map(([k, q]) => `<p class="small"><b>${q}</b><br>${E.esc(answers[k] || '—')}</p>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function saveScore() {
+    const sc = {};
+    E.RUBRIC.forEach(r => {
+      const c = document.querySelector(`input[name="sc_${r.id}"]:checked`);
+      if (c) sc[r.id] = Number(c.value);
+    });
+    const cm = $('#scComment');
+    sc.comment = cm ? cm.value : '';
+    T.scores[currentId] = sc;
+    tsave();
+    const total = scoreTotal(currentId);
+    $('#scSaved').textContent = `✅ 已儲存${total !== '' ? `（目前 ${total} 分）` : ''}`;
+  }
+  $('#detail').addEventListener('change', ev => { if (ev.target.closest('.score-grid')) saveScore(); });
+  let cmTimer;
+  $('#detail').addEventListener('input', ev => {
+    if (ev.target.id === 'scComment') { clearTimeout(cmTimer); cmTimer = setTimeout(saveScore, 500); }
+  });
+  $('#stuSelect').addEventListener('change', ev => { currentId = ev.target.value; renderDetail(); });
+  function step(n) {
+    const ids = sortedIds();
+    const i = ids.indexOf(currentId);
+    if (i < 0) return;
+    currentId = ids[(i + n + ids.length) % ids.length];
+    renderDetail();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  $('#prevStu').addEventListener('click', () => step(-1));
+  $('#nextStu').addEventListener('click', () => step(1));
+
+  // ---------- 雲端設定 ----------
+  $('#gsCode').value = $('#gsSource').textContent.trim();
+  $('#cfgUrl').value = T.gasUrl || '';
+  $('#cfgClassKey').value = T.classKey || '';
+  $('#cfgTeacherKey').value = T.teacherKey || '';
+
+  function studentLink() {
+    if (!T.gasUrl) return '';
+    const base = location.href.replace(/teacher\.html.*$/, 'index.html');
+    return `${base}?gas=${encodeURIComponent(T.gasUrl)}&key=${encodeURIComponent(T.classKey || '')}`;
+  }
+  function renderLink() { $('#stuLink').value = studentLink(); }
+
+  $('#saveCfg').addEventListener('click', () => {
+    const url = $('#cfgUrl').value.trim();
+    if (url && !/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) {
+      if (!confirm('網址看起來不是 Apps Script 網頁應用程式的網址（應該是 https://script.google.com/…/exec），還是要儲存嗎？')) return;
+    }
+    T.gasUrl = url;
+    T.classKey = $('#cfgClassKey').value.trim();
+    T.teacherKey = $('#cfgTeacherKey').value;
+    tsave();
+    renderLink();
+    E.toast('💾 已儲存設定', 'ok');
+  });
+  $('#testCfg').addEventListener('click', async () => {
+    const url = $('#cfgUrl').value.trim();
+    const out = $('#cfgResult');
+    if (!url) { out.textContent = '請先填寫網址'; return; }
+    out.textContent = '⏳ 測試中…';
+    try {
+      const j = await (await fetch(url)).json();
+      if (!j.ok) throw new Error(j.error);
+      const key = $('#cfgTeacherKey').value;
+      let msg = `✅ 連線成功：${j.service || ''} ${j.message || ''}`;
+      if (key) {
+        const j2 = await (await fetch(`${url}?action=list&key=${encodeURIComponent(key)}`)).json();
+        msg += j2.ok ? `；教師密碼正確，目前收到 ${j2.students.length} 位學生的資料` : `；⚠️ ${j2.error}`;
+      }
+      out.textContent = msg;
+    } catch (err) {
+      out.textContent = '❌ 連線失敗：請確認網址正確、部署時「誰可以存取」選了「任何人」，且修改程式後有重新部署新版本。';
+    }
+  });
+  $('#copyLink').addEventListener('click', async () => {
+    const t = studentLink();
+    if (!t) { E.toast('請先儲存網址設定', 'warn'); return; }
+    E.toast(await E.copyText(t) ? '📋 已複製學生專用連結' : '複製失敗，請手動選取', 'ok');
+  });
+  $('#copyCode').addEventListener('click', async () => {
+    E.toast(await E.copyText($('#gsCode').value) ? '📋 已複製程式碼' : '複製失敗，請手動選取', 'ok');
+  });
+  renderLink();
+
+  // 評量規準表
+  $('#rubricTable').innerHTML = `<div class="table-wrap"><table><thead><tr><th>向度</th>${E.LEVEL_NAMES.map((n, i) => `<th>${i + 1} ${n}</th>`).join('')}</tr></thead>
+    <tbody>${E.RUBRIC.map(r => `<tr><td><b>${r.name}</b><br><span class="muted">${r.desc}</span></td>${r.levels.map(l => `<td>${E.esc(l)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+  showTab('overview');
+})();
+</script>
+</body>
+</html>

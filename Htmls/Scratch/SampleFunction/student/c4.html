@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>4 角色管理｜Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap" style="--mc:#4C97FF">
+<section class="hero"><span class="kind">第 4 類｜7 個函式（A 型 5、B 型 2）</span><h1>角色管理</h1><p>管理舞台上的角色與分身：一鍵重設、一次清掉所有分身、清空舞台、有編號的分身群，以及位置控制。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="on">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="">8 遊戲機制</a></div><div class="btnrow" style="margin-top:12px"><a class="btn" href="sb3/4_角色管理.sb3" download>⬇ 4_角色管理.sb3</a><a class="btn ghost" href="play/4_角色管理/index.html" target="_blank" rel="noopener">🎮 網頁版試玩</a><a class="btn ghost" href="sprite3/小幫手_4_角色管理.sprite3" download>⬇ 小幫手_4_角色管理.sprite3</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">這一類在做什麼</a><a href="#lab">🎛️ 試玩台</a><a class="sub" href="#f4-1">4-1 重設角色</a><a class="sub" href="#f4-2">4-2 清除所有分身</a><a class="sub" href="#f4-3">4-3 清空舞台</a><a class="sub" href="#f4-4">4-4 建立分身群</a><a class="sub" href="#f4-5">4-5 移到隨機位置</a><a class="sub" href="#f4-6">4-6 限制在舞台內</a><a class="sub" href="#f4-7">4-7 平滑跟隨</a><a href="#work">✏️ 動手改・檢核</a><div class="prog">自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#4C97FF;color:#fff">第 4 類</span><h2>這一類在做什麼</h2></div><div class="topic"><h3>🧹 「清空」要大家一起做</h3>
+<p>Scratch 沒有「刪除所有分身」或「隱藏所有角色」的積木。解法是<b>廣播</b>：舞台的「清除所有分身」只做一件事 —— 廣播「清除分身」；
+每個會產生分身的角色，都放一段<b>「當收到訊息 清除分身 → 分身刪除」</b>。本體收到也沒關係，「分身刪除」對本體沒有作用。</p></div>
+<div class="why"><b class="t">分身的「編號」怎麼來的？</b>　「編號」是「僅適用當前角色」的變數。建立分身的那一瞬間，分身會<b>複製一份</b>本體當時的變數。
+所以本體先把編號設成 1 再建立分身，那個分身的編號就是 1；再設成 2、建立……最後把本體的編號設回 0，就分得出誰是本體。</div></section>
+<section class="chap" id="lab"><div class="ch"><span class="cn" style="background:#4C97FF;color:#fff">試玩台</span><h2>🎛️ 先玩玩看</h2></div><p class="lead">這裡的效果都是照 .sb3 裡的積木一句一句翻成網頁程式，數字和順序完全一樣。按下按鈕時，下面會顯示「在 Scratch 裡等於呼叫哪一塊積木」。</p><div class="lab"><div class="lh">🎛️ 試玩台 4 <span class="tag">動手按</span></div><div data-lab="4"></div></div></section>
+<section class="chap" id="funcs"><div class="ch"><span class="cn" style="background:#4C97FF;color:#fff">函式</span><h2>🧩 7 個函式</h2></div><p class="lead">每張卡片的積木圖都是從 <b>4_角色管理.sb3</b> 自動轉出來的，和檔案裡一模一樣。</p>
+<article class="func" id="f4-1" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-1</span><span class="sb myblocks">重設角色</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>（無）</span><b>輸出</b><span>（角色回到乾淨的樣子）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>清除圖像效果、尺寸 100、面朝 90 度、不說話、顯示、移到最上層。動畫被中斷時，角色常常卡在半透明或縮小的狀態，呼叫它就恢復。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="4|圓圓|def:重設角色"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・綠旗</p><div data-sb="4|圓圓|flag" style="margin-bottom:10px"></div><p class="sm" style="margin:0 0 4px">圓圓・按 5 鍵</p><div data-sb="4|圓圓|key:5" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f4-2" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-2</span><span class="sb myblocks">清除所有分身</span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>（無）</span><b>輸出</b><span>廣播「清除分身」</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>清除所有分身</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>Scratch 沒有「刪除所有分身」的積木。做法：廣播「清除分身」，每個會產生分身的角色都放一段「當收到清除分身 → 刪除這個分身」。本體收到也沒關係，「刪除這個分身」對本體沒有作用。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="4|舞台|def:清除所有分身"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">舞台・按 2 鍵</p><div data-sb="4|舞台|key:2" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f4-3" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-3</span><span class="sb myblocks">清空舞台</span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>（無）</span><b>輸出</b><span>廣播「全部隱藏」「清除分身」</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>清空舞台</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>換關卡、換畫面時用：所有角色收到「全部隱藏」就隱藏，分身全部刪掉。標題、按鈕這些「介面」角色不要接這個訊息。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="4|舞台|def:清空舞台"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">舞台・按 4 鍵</p><div data-sb="4|舞台|key:4" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f4-4" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-4</span><span class="sb myblocks">建立分身群 <span class="rp myblocks">個數</span> 個</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>要幾個分身</span><b>輸出</b><span>每個分身的「編號」（1、2、3…，本體是 0）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>「編號」是僅適用當前角色的變數：建立分身的那一瞬間，分身會複製一份當時的值。所以先設好編號再建立分身，每個分身就有自己的號碼。最後把本體的編號設回 0。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（星星・定義）</small></h4><div data-sb="4|星星|def:建立分身群 %s 個"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">星星・按 1 鍵</p><div data-sb="4|星星|key:1" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f4-5" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-5</span><span class="sb myblocks">移到隨機位置 留邊 <span class="rp myblocks">留邊</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>離舞台邊緣至少幾步</span><b>輸出</b><span>（角色跳到隨機位置）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>舞台 x 是 −240～240、y 是 −180～180。兩邊各留一點，角色才不會一半在舞台外。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="4|圓圓|def:移到隨機位置 留邊 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 3 鍵</p><div data-sb="4|圓圓|key:3" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f4-6" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-6</span><span class="sb myblocks">限制在舞台內 留邊 <span class="rp myblocks">留邊</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>離舞台邊緣至少幾步</span><b>輸出</b><span>（角色被拉回舞台內）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>超出右邊就設回右邊界、超出左邊就設回左邊界，上下也一樣。放在「重複無限次」裡，角色就跑不出去。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="4|圓圓|def:限制在舞台內 留邊 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・綠旗</p><div data-sb="4|圓圓|flag" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f4-7" style="--mc:#4C97FF">
+<div class="fcard"><div class="fname"><span class="fid">4-7</span><span class="sb myblocks">平滑跟隨 x <span class="rp myblocks">目標x</span> y <span class="rp myblocks">目標y</span> 比例 <span class="rp myblocks">比例</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>目標的 x、y、每次靠近的比例（0～1）</span><b>輸出</b><span>（角色往目標靠近一點）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>每次只走「剩下距離 × 比例」。離得遠走得快，快到了走得慢，看起來很柔順（這叫做緩動）。放在迴圈裡一直呼叫。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="4|圓圓|def:平滑跟隨 x %s y %s 比例 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・綠旗</p><div data-sb="4|圓圓|flag" style="margin-bottom:10px"></div></div>
+</div></article>
+</section>
+<section class="chap" id="work"><div class="ch"><span class="cn" style="background:#4C97FF;color:#fff">動手</span><h2>✏️ 動手改・小測驗・自我檢核</h2></div><div class="work"><h3>✏️ 動手改</h3><ol><li>打開 <b>4_角色管理.sb3</b>，按 <kbd>1</kbd> 建立分身、<kbd>2</kbd> 清掉、<kbd>4</kbd> 清空舞台、<kbd>5</kbd> 叫回圓圓。</li><li>按 <kbd>M</kbd> 讓圓圓跟著滑鼠，把「比例」改成 0.05 和 0.5，差在哪裡？</li><li>讓每個星星分身用自己的編號決定大小：尺寸設為（編號 × 20）。</li><li>做一個「換關卡」：按空白鍵 → 清空舞台 → 新的角色「彈出放大」出場。</li><li>挑戰：用「平滑跟隨」做一隻跟在圓圓後面的小寵物（目標 x、y 用圓圓的位置）。</li></ol></div><div class="qz"><div class="qq">建立 5 個分身後，本體的「編號」是多少？</div><div class="ops"><button>5</button><button data-r>0</button><button>1</button></div><div class="ex">函式最後把本體的編號設回 0。本體的編號永遠是 0，才分得出誰是本體。</div></div><div class="qz"><div class="qq">「清除所有分身」為什麼需要每個角色都有「當收到訊息 清除分身」？</div><div class="ops"><button data-r>因為一個角色不能刪別人的分身，只能自己刪自己</button><button>因為舞台不能廣播</button><button>其實不需要</button></div><div class="ex">「分身刪除」只能刪「自己」。所以要廣播，讓每個分身自己刪掉自己。</div></div><div class="chklist" style="margin-top:14px"><label><input type="checkbox" id="k4a"> 我能說明分身的編號是怎麼來的</label><label><input type="checkbox" id="k4b"> 我會用廣播讓所有分身一起刪除</label><label><input type="checkbox" id="k4c"> 我知道「平滑跟隨」的比例在控制什麼</label></div></section>
+<p class="sm" style="margin-top:28px">← <a href="c3.html">3 持續特效</a>　<a href="c5.html">5 計時與流程</a> →</p>
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 產生工具：tools/build_library.py ・ 積木圖由 .sb3 自動轉出</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

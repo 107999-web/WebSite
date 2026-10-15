@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>1 文字與對話｜Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap" style="--mc:#9966FF">
+<section class="hero"><span class="kind">第 1 類｜5 個函式（A 型 2、B 型 3）</span><h1>文字與對話</h1><p>讓角色「說話」的各種方法：一個字一個字打出來、做成旁白字幕、兩個角色輪流對話，還有處理文字的兩個小工具。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="on">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="">8 遊戲機制</a></div><div class="btnrow" style="margin-top:12px"><a class="btn" href="sb3/1_文字與對話.sb3" download>⬇ 1_文字與對話.sb3</a><a class="btn ghost" href="play/1_文字與對話/index.html" target="_blank" rel="noopener">🎮 網頁版試玩</a><a class="btn ghost" href="sprite3/小幫手_1_文字與對話.sprite3" download>⬇ 小幫手_1_文字與對話.sprite3</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">這一類在做什麼</a><a href="#lab">🎛️ 試玩台</a><a class="sub" href="#f1-1">1-1 打字機說</a><a class="sub" href="#f1-2">1-2 打字機字幕</a><a class="sub" href="#f1-3">1-3 播放對話</a><a class="sub" href="#f1-4">1-4 取出片段</a><a class="sub" href="#f1-5">1-5 補零</a><a href="#work">✏️ 動手改・檢核</a><div class="prog">自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#9966FF;color:#fff">第 1 類</span><h2>這一類在做什麼</h2></div><div class="topic"><h3>🗨️ 為什麼要把「說話」做成函式？</h3>
+<p>做故事動畫時，同一個效果會用很多很多次。如果每次都拖一整串「重複、字串組合、說出、等待」，程式會又長又難改。
+包成 <b>打字機說 (文字) 每字 (秒數) 秒</b> 之後，每一句台詞都只要<b>一塊積木</b>，想改速度也只要改一個數字。</p></div>
+<div class="why"><b class="t">這一類用到的 Scratch 技巧</b>　「字串的第 n 字」一次拿一個字；「字串組合」把字接起來；
+「廣播並等待」會等所有收到訊息的程式都跑完才往下 —— 這就是輪流對話不會搶話的原因。</div></section>
+<section class="chap" id="lab"><div class="ch"><span class="cn" style="background:#9966FF;color:#fff">試玩台</span><h2>🎛️ 先玩玩看</h2></div><p class="lead">這裡的效果都是照 .sb3 裡的積木一句一句翻成網頁程式，數字和順序完全一樣。按下按鈕時，下面會顯示「在 Scratch 裡等於呼叫哪一塊積木」。</p><div class="lab"><div class="lh">🎛️ 試玩台 1 <span class="tag">動手按</span></div><div data-lab="1"></div></div></section>
+<section class="chap" id="funcs"><div class="ch"><span class="cn" style="background:#9966FF;color:#fff">函式</span><h2>🧩 5 個函式</h2></div><p class="lead">每張卡片的積木圖都是從 <b>1_文字與對話.sb3</b> 自動轉出來的，和檔案裡一模一樣。</p>
+<article class="func" id="f1-1" style="--mc:#9966FF">
+<div class="fcard"><div class="fname"><span class="fid">1-1</span><span class="sb myblocks">打字機說 <span class="rp myblocks">文字</span> 每字 <span class="rp myblocks">每字秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>文字、每個字的間隔秒數</span><b>輸出</b><span>（角色的對話框）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>一個字一個字說出來。做法：用「字串的第 n 字」把字一個一個接到「打字內容」後面，每接一個就說一次。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（方方・定義）</small></h4><div data-sb="1|方方|def:打字機說 %s 每字 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・收到「說台詞」</p><div data-sb="1|圓圓|msg:說台詞" style="margin-bottom:10px"></div><p class="sm" style="margin:0 0 4px">圓圓・按 1 鍵</p><div data-sb="1|圓圓|key:1" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f1-2" style="--mc:#9966FF">
+<div class="fcard"><div class="fname"><span class="fid">1-2</span><span class="sb myblocks">打字機字幕 <span class="rp myblocks">文字</span> 每字 <span class="rp myblocks">每字秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>文字、每個字的間隔秒數</span><b>輸出</b><span>字幕（所有角色適用的變數，用「大型監看」顯示在舞台上）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>和打字機說一樣，但字是寫進變數「字幕」。把「字幕」的監看改成「大型顯示」，就是旁白字幕。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="1|圓圓|def:打字機字幕 %s 每字 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 2 鍵</p><div data-sb="1|圓圓|key:2" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f1-3" style="--mc:#9966FF">
+<div class="fcard"><div class="fname"><span class="fid">1-3</span><span class="sb myblocks">播放對話</span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>清單「對話角色」「對話內容」（同一行是同一句）</span><b>輸出</b><span>目前說話者、目前台詞＋廣播「說台詞」</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>播放對話</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>一行一行讀清單，把說話者和台詞放進變數，再廣播「說台詞」並等待。每個角色收到後，只要檢查「目前說話者 = 我的名字」就知道輪到自己。換劇本只要改清單，不用改程式。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="1|舞台|def:播放對話"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">舞台・按 3 鍵</p><div data-sb="1|舞台|key:3" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f1-4" style="--mc:#9966FF">
+<div class="fcard"><div class="fname"><span class="fid">1-4</span><span class="sb myblocks">取出片段 <span class="rp myblocks">文字</span> 從 <span class="rp myblocks">從</span> 到 <span class="rp myblocks">到</span></span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>文字、從第幾個字、到第幾個字</span><b>輸出</b><span>結果</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>取出片段</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>Scratch 只有「字串的第 n 字」，一次只能拿一個字。用迴圈從第「從」個字拿到第「到」個字，接起來就是一段。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="1|舞台|def:取出片段 %s 從 %s 到 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 4 鍵</p><div data-sb="1|圓圓|key:4" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f1-5" style="--mc:#9966FF">
+<div class="fcard"><div class="fname"><span class="fid">1-5</span><span class="sb myblocks">補零 <span class="rp myblocks">數字</span> 補到 <span class="rp myblocks">位數</span> 位</span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>數字、要幾位數</span><b>輸出</b><span>結果（文字，例如 007）</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>補零</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>字數不夠就在前面接一個「0」，直到夠長為止。計時器、分數、關卡編號顯示成 007、01:05 都要用它。<br>⚠ 結果是「文字」：拿 007 和 7 用「＝」比，Scratch 會當成數字比，結果「成立」。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="1|舞台|def:補零 %s 補到 %s 位"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 5 鍵</p><div data-sb="1|圓圓|key:5" style="margin-bottom:10px"></div></div>
+</div></article>
+</section>
+<section class="chap" id="work"><div class="ch"><span class="cn" style="background:#9966FF;color:#fff">動手</span><h2>✏️ 動手改・小測驗・自我檢核</h2></div><div class="work"><h3>✏️ 動手改</h3><ol><li>打開 <b>1_文字與對話.sb3</b>，按 <kbd>1</kbd>～<kbd>5</kbd> 各試一次，對照右邊「按鍵說明」。</li><li>把 <kbd>1</kbd> 的「每字秒數」改成 0.2 和 0.02，感覺差在哪裡？什麼樣的角色適合慢慢講？</li><li>在清單「對話角色」「對話內容」各加一行，讓方方多說一句話。程式要改嗎？</li><li>挑戰：新增第三個角色「點點」，讓它也能加入對話。（提示：它需要哪一段程式？它的「我的名字」要設成什麼？）</li><li>挑戰：做一個計時器，用「補零」把 5 顯示成 05。</li></ol></div><div class="qz"><div class="qq">「播放對話」讀完一行後，用哪一塊積木等說話的角色打完字？</div><div class="ops"><button>等待 1 秒</button><button data-r>廣播訊息 (說台詞) 並等待</button><button>重複直到 (字幕) = (目前台詞)</button></div><div class="ex">「廣播並等待」會等到所有收到「說台詞」的程式都跑完。說話的角色要打完字才結束，所以剛好等到它說完。</div></div><div class="qz"><div class="qq">「補零 (7) 補到 (3) 位」的結果是 007。在 Scratch 裡 <code>(結果) = 7</code> 會怎樣？</div><div class="ops"><button>不成立，因為 007 和 7 不一樣</button><button data-r>成立，因為兩邊都長得像數字，Scratch 當數字比</button><button>會出錯</button></div><div class="ex">這是 Scratch 的「＝」的特性：兩邊都像數字就比數值。要比「字」就要一個字一個字比。</div></div><div class="chklist" style="margin-top:14px"><label><input type="checkbox" id="k1a"> 我會用「打字機說」讓角色一個字一個字說話</label><label><input type="checkbox" id="k1b"> 我知道「播放對話」怎麼決定輪到誰說</label><label><input type="checkbox" id="k1c"> 我會用「取出片段」拿出一段文字</label><label><input type="checkbox" id="k1d"> 我知道補零的結果是「文字」</label></div></section>
+<p class="sm" style="margin-top:28px">← <a href="index.html">總覽</a>　<a href="c2.html">2 出場與退場</a> →</p>
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 產生工具：tools/build_library.py ・ 積木圖由 .sb3 自動轉出</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>成語泡泡</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#5b3d7a;
+  --ink-soft:#8b6fae;
+  --card:rgba(255,255,255,.78);
+  --pink:#f9a8d4;
+  --purple:#c4b5fd;
+}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; margin:0; padding:0; }
+html,body{ width:100%; height:100%; overflow:hidden; touch-action:none; }
+body{
+  font-family:'Nunito','Microsoft JhengHei','蘋方-繁',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% 8%,  #ffe4f3 0%, transparent 60%),
+    radial-gradient(1000px 700px at 88% 12%, #e0e7ff 0%, transparent 62%),
+    radial-gradient(1000px 800px at 50% 100%,#d9fbf0 0%, transparent 60%),
+    linear-gradient(160deg,#fff5fb 0%, #f4f0ff 45%, #eefbf8 100%);
+}
+/* 背景裝飾雲朵 */
+.deco{ position:fixed; border-radius:50%; filter:blur(28px); opacity:.55; pointer-events:none; z-index:0; animation:floatDeco 14s ease-in-out infinite; }
+
+@keyframes floatDeco{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-26px)} }
+
+/* ── 回首頁 ───────────────────────────── */
+#homeBtn{
+  position:fixed;bottom:16px;left:16px;z-index:99999;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.82);
+  border:2px solid #f9a8d4;
+  box-shadow:0 4px 12px rgba(236,72,153,0.22);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;transition:background .2s,box-shadow .2s;
+}
+
+/* ── 上方 HUD ─────────────────────────── */
+#hud{
+  position:fixed; top:0; left:0; right:0; height:96px; z-index:60;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 18px 10px 74px; gap:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0));
+  pointer-events:none;
+}
+#hud > *{ pointer-events:auto; }
+.hud-side{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+.chip{
+  display:flex; align-items:center; gap:6px;
+  background:var(--card); border:2px solid #fff;
+  border-radius:999px; padding:8px 15px;
+  font-weight:800; font-size:18px; color:var(--ink);
+  box-shadow:0 6px 16px rgba(196,181,253,.32);
+  white-space:nowrap;
+}
+button.chip{ cursor:pointer; transition:transform .15s, box-shadow .15s, background .2s; font-family:inherit; }
+button.chip:active{ transform:scale(.94); }
+button.chip:disabled{ opacity:.42; }
+.lv{ background:linear-gradient(135deg,#f0abfc,#a78bfa); color:#fff; border-color:rgba(255,255,255,.9); font-size:19px; letter-spacing:1px; }
+#hearts{ display:flex; gap:3px; align-items:center; background:var(--card); border:2px solid #fff; border-radius:999px; padding:6px 12px; box-shadow:0 6px 16px rgba(251,113,133,.25); }
+.heart{ font-size:24px; line-height:1; transition:transform .3s, filter .3s, opacity .3s; }
+.heart.lost{ filter:grayscale(1); opacity:.32; transform:scale(.82); }
+.heart.breaking{ animation:heartBreak .6s ease; }
+@keyframes heartBreak{ 0%{transform:scale(1.5) rotate(0)} 35%{transform:scale(1.7) rotate(-14deg)} 100%{transform:scale(.82)} }
+
+/* 中央成語進度 */
+.hud-center{ flex:1 1 auto; display:flex; flex-direction:column; align-items:center; gap:6px; min-width:0; }
+#chain{ display:flex; gap:10px; }
+.slot{
+  width:64px; height:64px; border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:34px; font-weight:900;
+  background:rgba(255,255,255,.55);
+  border:3px dashed rgba(196,181,253,.85);
+  color:rgba(139,111,174,.35);
+  box-shadow:inset 0 2px 8px rgba(196,181,253,.18);
+  transition:all .2s;
+}
+.slot.filled{
+  background:linear-gradient(140deg,#fff,#fde8f6);
+  border:3px solid #f9a8d4; border-style:solid;
+  color:#7c3aed;
+  box-shadow:0 6px 18px rgba(244,114,182,.35);
+  animation:slotPop .32s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slotPop{ 0%{transform:scale(.4) rotate(-12deg); opacity:0} 100%{transform:scale(1) rotate(0); opacity:1} }
+#toast{
+  min-height:30px; font-size:19px; font-weight:800; color:#7c3aed;
+  background:rgba(255,255,255,.9); border-radius:999px; padding:4px 20px;
+  box-shadow:0 6px 18px rgba(167,139,250,.3);
+  opacity:0; transform:translateY(-8px); transition:opacity .3s, transform .3s;
+  max-width:min(80vw,860px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#toast.show{ opacity:1; transform:translateY(0); }
+
+/* ── 泡泡場地 ─────────────────────────── */
+#playfield{
+  position:fixed; left:0; right:0; top:96px; bottom:0; z-index:10; overflow:hidden;
+}
+#playfield.shake{ animation:fieldShake .4s; }
+@keyframes fieldShake{ 0%,100%{transform:translate(0)} 20%{transform:translate(-9px,3px)} 40%{transform:translate(8px,-3px)} 60%{transform:translate(-6px,2px)} 80%{transform:translate(5px,-2px)} }
+
+.bubble{
+  position:absolute; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; color:#5b3d7a;
+  text-shadow:0 1px 0 rgba(255,255,255,.95), 0 2px 8px rgba(255,255,255,.8);
+  border:2px solid rgba(255,255,255,.9);
+  cursor:pointer;
+  animation:bob 3.6s ease-in-out infinite;
+  will-change:transform;
+}
+.bubble::after{
+  content:''; position:absolute; left:22%; top:16%;
+  width:26%; height:19%; border-radius:50%;
+  background:rgba(255,255,255,.92); filter:blur(1px); transform:rotate(-22deg);
+}
+@keyframes bob{ 0%,100%{transform:translateY(calc(var(--bob) * -1))} 50%{transform:translateY(var(--bob))} }
+.bubble.popping{ animation:pop .34s cubic-bezier(.3,1.2,.6,1) forwards; }
+@keyframes pop{ 0%{transform:scale(1)} 45%{transform:scale(1.35); opacity:.85} 100%{transform:scale(.15); opacity:0} }
+.bubble.wrong{ animation:wrongShake .42s; }
+@keyframes wrongShake{ 0%,100%{transform:translate(0) rotate(0)} 25%{transform:translate(-7px,0) rotate(-7deg)} 50%{transform:translate(7px,0) rotate(7deg)} 75%{transform:translate(-5px,0) rotate(-5deg)} }
+.bubble.hintGlow{ animation:hintGlow 1s ease-in-out 3; z-index:5; }
+@keyframes hintGlow{
+  0%,100%{ box-shadow:0 8px 20px rgba(167,139,250,.3); }
+  50%{ box-shadow:0 0 0 10px rgba(253,224,71,.55), 0 0 34px 12px rgba(250,204,21,.9); }
+}
+.spark{ position:absolute; width:9px; height:9px; border-radius:50%; pointer-events:none; z-index:20; animation:sparkFly .62s ease-out forwards; }
+@keyframes sparkFly{ 0%{transform:translate(0,0) scale(1); opacity:1} 100%{transform:translate(var(--dx),var(--dy)) scale(0); opacity:0} }
+
+/* ── 已完成清單抽屜 ───────────────────── */
+#panel{
+  position:fixed; top:104px; right:14px; bottom:14px; width:320px; z-index:70;
+  background:rgba(255,255,255,.94); border:3px solid #fff; border-radius:26px;
+  box-shadow:0 18px 46px rgba(167,139,250,.4);
+  transform:translateX(calc(100% + 24px)); transition:transform .34s cubic-bezier(.4,1.3,.5,1);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+#panel.open{ transform:translateX(0); }
+#panelHead{ padding:14px 18px; font-size:20px; font-weight:900; color:#7c3aed; border-bottom:2px dashed #ede9fe; display:flex; justify-content:space-between; align-items:center; }
+#panelClose{ border:none; background:#f5f3ff; color:#7c3aed; font-size:19px; font-weight:900; width:34px; height:34px; border-radius:50%; cursor:pointer; font-family:inherit; }
+#doneList{ flex:1; overflow-y:auto; padding:10px 14px 16px; }
+.done-item{ display:flex; gap:10px; align-items:flex-start; padding:9px 10px; border-radius:14px; margin-bottom:7px; background:linear-gradient(120deg,#fdf4ff,#f5f3ff); animation:slideIn .3s ease; }
+@keyframes slideIn{ from{opacity:0; transform:translateX(18px)} to{opacity:1; transform:translateX(0)} }
+.done-no{ flex:0 0 auto; background:#a78bfa; color:#fff; font-weight:900; font-size:13px; border-radius:8px; padding:3px 7px; margin-top:2px; }
+.done-txt{ font-size:19px; font-weight:900; color:#5b3d7a; letter-spacing:2px; }
+.done-mean{ font-size:13px; color:#8b6fae; font-weight:700; margin-top:2px; line-height:1.35; }
+
+/* ── 覆蓋畫面 ─────────────────────────── */
+#overlay{
+  position:fixed; inset:0; z-index:200; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(91,61,122,.34); backdrop-filter:blur(7px);
+}
+#overlay.show{ display:flex; }
+#card{
+  background:linear-gradient(160deg,#ffffff,#fdf4ff);
+  border:5px solid #fff; border-radius:38px;
+  box-shadow:0 26px 70px rgba(124,58,237,.34);
+  padding:38px 46px; text-align:center; max-width:min(90vw,720px);
+  animation:cardIn .42s cubic-bezier(.34,1.5,.6,1);
+}
+@keyframes cardIn{ from{transform:scale(.7) translateY(24px); opacity:0} to{transform:scale(1) translateY(0); opacity:1} }
+#card .emoji{ font-size:66px; line-height:1; }
+#card h1{ font-size:44px; font-weight:900; color:#7c3aed; margin:8px 0 6px; letter-spacing:3px; }
+#card h2{ font-size:30px; font-weight:900; color:#db2777; margin:6px 0 10px; letter-spacing:2px; }
+#card p{ font-size:19px; color:#7a5ea0; font-weight:700; line-height:1.8; }
+.rulebox{ text-align:left; background:#faf5ff; border-radius:20px; padding:16px 22px; margin:16px 0; font-size:18px; color:#6d4f96; font-weight:700; line-height:1.9; }
+.rulebox b{ color:#db2777; }
+.statrow{ display:flex; gap:14px; justify-content:center; margin:16px 0 6px; flex-wrap:wrap; }
+.stat{ background:#f5f3ff; border-radius:18px; padding:12px 22px; min-width:118px; }
+.stat .k{ font-size:14px; color:#a78bfa; font-weight:800; }
+.stat .v{ font-size:29px; font-weight:900; color:#7c3aed; }
+.bigbtn{
+  margin-top:20px; border:none; cursor:pointer; font-family:inherit;
+  background:linear-gradient(135deg,#f472b6,#a78bfa);
+  color:#fff; font-size:26px; font-weight:900; letter-spacing:3px;
+  padding:16px 52px; border-radius:999px;
+  box-shadow:0 12px 28px rgba(167,139,250,.5);
+  transition:transform .16s, box-shadow .16s;
+}
+.bigbtn:active{ transform:scale(.95); }
+.subbtn{
+  margin:14px 8px 0; border:none; cursor:pointer; font-family:inherit;
+  background:#f5f3ff; color:#7c3aed; font-size:18px; font-weight:900;
+  padding:11px 28px; border-radius:999px;
+}
+
+@media (max-width:900px){
+  #hud{ height:84px; padding-left:66px; }
+  #playfield{ top:84px; }
+  .slot{ width:48px; height:48px; font-size:26px; border-radius:16px; }
+  .chip{ font-size:15px; padding:6px 11px; }
+  #panel{ width:260px; }
+}
+</style>
+</head>
+<body>
+
+<a id="homeBtn" href="../index.html" title="回首頁"
+  onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+  onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+       stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+</a>
+
+<header id="hud">
+  <div class="hud-side">
+    <div class="chip lv">第 <span id="levelNum">1</span> 關</div>
+    <div id="hearts"></div>
+  </div>
+
+  <div class="hud-center">
+    <div id="chain"></div>
+    <div id="toast"></div>
+  </div>
+
+  <div class="hud-side">
+    <div class="chip">⏱ <span id="timer">00:00</span></div>
+    <div class="chip">⭐ <span id="score">0</span></div>
+    <button class="chip" id="hintBtn">💡 提示 <span id="hintCount">3</span></button>
+    <button class="chip" id="listBtn">📜 已完成 <span id="doneCount">00</span>/<span id="totalCount">10</span></button>
+  </div>
+</header>
+
+<div id="playfield"></div>
+
+<aside id="panel">
+  <div id="panelHead">
+    <span>📜 已完成成語 <span id="panelCount">00 / 10</span></span>
+    <button id="panelClose">✕</button>
+  </div>
+  <div id="doneList"></div>
+</aside>
+
+<div id="overlay"><div id="card"></div></div>
+
+<script src="idioms.js"></script>
+<script>
+/* ============================================================
+   成語泡泡 － 遊戲主程式
+   ============================================================ */
+(function(){
+"use strict";
+
+const MAX_LEVEL   = 10;   // 第 N 關 = N×10 組成語
+const HEARTS_MAX  = 5;
+const HINTS_MAX   = 3;
+const PER_LEVEL   = 10;
+
+const PALETTE = [
+  ['#ffd3e9','#ffa8d4'], ['#ded6ff','#bcaaff'], ['#c8f3e5','#98e6ce'],
+  ['#ffeabe','#ffd489'], ['#cce5ff','#a2d1ff'], ['#ffdccd','#ffb9a0'],
+  ['#eed3ff','#d5aaff'], ['#d3f7d9','#a9ecb6']
+];
+
+const $ = id => document.getElementById(id);
+const pf = $('playfield');
+
+let S = null;          // 遊戲狀態
+let timerId = null;
+let toastId = null;
+
+/* ── 音效（Web Audio 合成，無需外部音檔）─────── */
+let AC = null;
+function ac(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
+function tone(freq, dur, type, vol, slideTo){
+  const c = ac(); if(!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, c.currentTime);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, c.currentTime + dur);
+  g.gain.setValueAtTime(0.0001, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(vol||0.16, c.currentTime + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime + dur + 0.03);
+}
+const SFX = {
+  pop  : () => tone(520, 0.13, 'sine', 0.2, 1180),
+  wrong: () => { tone(220, 0.26, 'sawtooth', 0.1, 110); },
+  heart: () => { tone(400,0.16,'triangle',0.12,180); },
+  done : () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.24,'sine',0.16),i*85)),
+  level: () => [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.34,'triangle',0.16),i*110)),
+  fail : () => [440,370,294,233].forEach((f,i)=>setTimeout(()=>tone(f,0.3,'sine',0.14),i*140)),
+  hint : () => tone(880,0.18,'sine',0.13,1320)
+};
+
+/* ── 工具 ───────────────────────────────── */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const pad2 = n => String(n).padStart(2,'0');
+
+/* ── 背景裝飾 ───────────────────────────── */
+(function deco(){
+  const c = ['#ffd6ec','#dcd4ff','#c9f3e6','#ffe9c2','#d7e9ff'];
+  for(let i=0;i<7;i++){
+    const d = document.createElement('div');
+    d.className='deco';
+    const s = 130+Math.random()*230;
+    d.style.cssText += `width:${s}px;height:${s}px;background:${c[i%c.length]};
+      left:${Math.random()*88}vw;top:${Math.random()*82}vh;
+      animation-delay:${(Math.random()*8).toFixed(1)}s;`;
+    document.body.appendChild(d);
+  }
+})();
+
+/* ── 建立關卡 ───────────────────────────── */
+function buildLevel(level, keepIdioms, resetScore){
+  const pool = (window.IDIOM_DATA||[]).filter(x => Array.from(x[0]).length === 4);
+  const need = level * PER_LEVEL;
+  let picked;
+  if(keepIdioms && keepIdioms.length === need){
+    picked = keepIdioms;
+  }else{
+    picked = shuffle(pool.slice()).slice(0, Math.min(need, pool.length));
+  }
+
+  const carry = (S && !resetScore) ? S.score : 0;
+
+  S = {
+    level, hearts: HEARTS_MAX, hints: HINTS_MAX,
+    score: carry,
+    idioms: picked.map((x,i) => ({ text:x[0], meaning:x[1], done:false, i })),
+    bubbles: [], chain: [], completed: [],
+    elapsed: 0, locked:false
+  };
+
+  // 建立泡泡（每個字一顆）
+  let id = 0;
+  S.idioms.forEach(idi => {
+    Array.from(idi.text).forEach(ch => {
+      S.bubbles.push({ id:id++, ch, popped:false, el:null });
+    });
+  });
+  shuffle(S.bubbles);
+
+  pf.innerHTML = '';
+  S.bubbles.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'bubble';
+    el.dataset.id = b.id;
+    el.textContent = b.ch;
+    const p = PALETTE[(Math.random()*PALETTE.length)|0];
+    el.style.background =
+      `radial-gradient(circle at 30% 25%, rgba(255,255,255,.92), rgba(255,255,255,.22) 29%, rgba(255,255,255,0) 50%),`+
+      `linear-gradient(150deg, ${p[0]}, ${p[1]})`;
+    el.style.animationDelay = (Math.random()*3.6).toFixed(2)+'s';
+    b.el = el;
+    pf.appendChild(el);
+  });
+
+  layout();
+  renderHearts(); renderChain(); renderDoneList();
+  $('levelNum').textContent = level;
+  $('totalCount').textContent = pad2(S.idioms.length);
+  $('hintCount').textContent = S.hints;
+  $('hintBtn').disabled = false;
+  $('score').textContent = S.score;
+  updateCounters();
+  startTimer();
+}
+
+/* ── 排版：保證泡泡不重疊 ───────────────── */
+function layout(){
+  if(!S) return;
+  const live = S.bubbles.filter(b => !b.popped);
+  const N = live.length;
+  if(!N) return;
+
+  const pad = 10;
+  const W = pf.clientWidth  - pad*2;
+  const H = pf.clientHeight - pad*2;
+
+  // 找出讓格子最大的 欄×列 組合
+  let best = {cols:1, rows:N, d:0};
+  for(let cols=1; cols<=N; cols++){
+    const rows = Math.ceil(N/cols);
+    const d = Math.min(W/cols, H/rows);
+    if(d > best.d) best = {cols, rows, d};
+  }
+  const cols = best.cols, rows = best.rows;
+  const cw = W/cols, chh = H/rows;
+
+  // 泡泡直徑：格子短邊的 88%，最大 128px
+  const d = Math.max(30, Math.min(128, Math.min(cw, chh) * 0.855));
+  const bob  = Math.max(2, Math.min(6, (chh - d)/4));
+  const jx   = Math.max(0, ((cw  - d)/2 - 2) * 0.75);
+  const jy   = Math.max(0, ((chh - d)/2 - bob - 2) * 0.75);
+
+  // 隨機挑選格子，讓泡泡布滿整個畫面
+  const cells = [];
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) cells.push([c,r]);
+  shuffle(cells);
+
+  live.forEach((b, i) => {
+    const [c, r] = cells[i];
+    const x = pad + c*cw  + (cw  - d)/2 + (Math.random()*2-1)*jx;
+    const y = pad + r*chh + (chh - d)/2 + (Math.random()*2-1)*jy;
+    const el = b.el;
+    el.style.width = el.style.height = d + 'px';
+    el.style.left = x.toFixed(1) + 'px';
+    el.style.top  = y.toFixed(1) + 'px';
+    el.style.fontSize = (d*0.46).toFixed(1) + 'px';
+    el.style.setProperty('--bob', bob.toFixed(1)+'px');
+    el.style.boxShadow = `0 ${(d*0.09).toFixed(1)}px ${(d*0.22).toFixed(1)}px rgba(167,139,250,.3),`+
+                         `inset 0 -${(d*0.09).toFixed(1)}px ${(d*0.16).toFixed(1)}px rgba(255,255,255,.6),`+
+                         `inset 0 ${(d*0.06).toFixed(1)}px ${(d*0.12).toFixed(1)}px rgba(255,255,255,.85)`;
+  });
+}
+
+let rzTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(rzTimer);
+  rzTimer = setTimeout(() => { if(S && !S.locked) layout(); }, 220);
+});
+
+/* ── 判定：目前可以點的下一個字 ─────────── */
+function validNext(){
+  const prefix = S.chain.join('');
+  const set = new Set();
+  S.idioms.forEach(idi => {
+    if(idi.done) return;
+    if(idi.text.startsWith(prefix)) set.add(Array.from(idi.text)[S.chain.length]);
+  });
+  return set;
+}
+
+/* ── 點擊泡泡 ───────────────────────────── */
+pf.addEventListener('pointerdown', e => {
+  const el = e.target.closest('.bubble');
+  if(!el || !S || S.locked) return;
+  const b = S.bubbles[ S.bubbles.findIndex(x => x.id === +el.dataset.id) ];
+  if(!b || b.popped) return;
+  tapBubble(b);
+}, {passive:true});
+
+function tapBubble(b){
+  if(validNext().has(b.ch)){
+    // 正確
+    b.popped = true;
+    sparkle(b.el);
+    b.el.classList.add('popping');
+    const el = b.el;
+    setTimeout(() => { if(el && el.parentNode) el.parentNode.removeChild(el); }, 340);
+    S.chain.push(b.ch);
+    SFX.pop();
+    renderChain();
+
+    if(S.chain.length === 4){
+      const text = S.chain.join('');
+      const idi = S.idioms.find(x => !x.done && x.text === text);
+      if(idi){
+        idi.done = true;
+        S.completed.push(idi);
+        S.score += 100;
+        $('score').textContent = S.score;
+        SFX.done();
+        showToast('🎉 ' + idi.text + ' — ' + idi.meaning, 2600);
+        addDoneItem(idi, S.completed.length);
+        updateCounters();
+      }
+      S.chain = [];
+      setTimeout(renderChain, 420);
+      if(S.idioms.every(x => x.done)) setTimeout(levelClear, 780);
+    }
+  }else{
+    // 錯誤
+    b.el.classList.remove('wrong'); void b.el.offsetWidth; b.el.classList.add('wrong');
+    pf.classList.remove('shake');  void pf.offsetWidth;    pf.classList.add('shake');
+    SFX.wrong();
+    S.score = Math.max(0, S.score - 20);
+    $('score').textContent = S.score;
+    loseHeart();
+  }
+}
+
+function loseHeart(){
+  S.hearts--;
+  renderHearts(true);
+  SFX.heart();
+  const need = S.chain.length ? '接下來要點「' + [...validNext()].join('或') + '」喔！' : '再想想看，從成語的第一個字開始～';
+  showToast('💔 點錯了！' + need, 2200);
+  if(S.hearts <= 0) setTimeout(gameOver, 700);
+}
+
+/* ── 特效 ───────────────────────────────── */
+function sparkle(el){
+  const r = el.getBoundingClientRect(), pr = pf.getBoundingClientRect();
+  const cx = r.left - pr.left + r.width/2, cy = r.top - pr.top + r.height/2;
+  const cols = ['#f9a8d4','#c4b5fd','#fcd34d','#6ee7b7','#93c5fd','#fda4af'];
+  for(let i=0;i<7;i++){
+    const s = document.createElement('div');
+    s.className = 'spark';
+    const a = Math.random()*Math.PI*2, dist = 34 + Math.random()*44;
+    s.style.left = (cx-4)+'px'; s.style.top = (cy-4)+'px';
+    s.style.background = cols[(Math.random()*cols.length)|0];
+    s.style.setProperty('--dx', (Math.cos(a)*dist).toFixed(1)+'px');
+    s.style.setProperty('--dy', (Math.sin(a)*dist).toFixed(1)+'px');
+    pf.appendChild(s);
+    setTimeout(() => s.remove(), 680);
+  }
+}
+
+function showToast(msg, ms){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastId);
+  toastId = setTimeout(() => t.classList.remove('show'), ms || 2000);
+}
+
+/* ── HUD 繪製 ───────────────────────────── */
+function renderHearts(justLost){
+  const box = $('hearts');
+  box.innerHTML = '';
+  for(let i=0;i<HEARTS_MAX;i++){
+    const h = document.createElement('span');
+    h.className = 'heart' + (i < S.hearts ? '' : ' lost');
+    h.textContent = i < S.hearts ? '❤️' : '🤍';
+    if(justLost && i === S.hearts) h.classList.add('breaking');
+    box.appendChild(h);
+  }
+}
+
+function renderChain(){
+  const box = $('chain');
+  box.innerHTML = '';
+  for(let i=0;i<4;i++){
+    const d = document.createElement('div');
+    if(S.chain[i]){ d.className = 'slot filled'; d.textContent = S.chain[i]; }
+    else{ d.className = 'slot'; d.textContent = '？'; }
+    box.appendChild(d);
+  }
+}
+
+function updateCounters(){
+  const done = S.completed.length, tot = S.idioms.length;
+  $('doneCount').textContent = pad2(done);
+  $('totalCount').textContent = pad2(tot);
+  $('panelCount').textContent = pad2(done) + ' / ' + pad2(tot);
+}
+
+function renderDoneList(){
+  $('doneList').innerHTML = '';
+  S.completed.forEach((idi,i) => addDoneItem(idi, i+1));
+  updateCounters();
+}
+
+function addDoneItem(idi, no){
+  const list = $('doneList');
+  const d = document.createElement('div');
+  d.className = 'done-item';
+  d.innerHTML = '<span class="done-no">' + pad2(no) + '</span>' +
+                '<span><span class="done-txt">' + idi.text + '</span>' +
+                '<div class="done-mean">' + idi.meaning + '</div></span>';
+  list.appendChild(d);
+  list.scrollTop = list.scrollHeight;
+}
+
+/* ── 計時 ───────────────────────────────── */
+function startTimer(){
+  clearInterval(timerId);
+  S.elapsed = 0; $('timer').textContent = '00:00';
+  timerId = setInterval(() => {
+    if(!S || S.locked) return;
+    S.elapsed++;
+    $('timer').textContent = pad2((S.elapsed/60)|0) + ':' + pad2(S.elapsed%60);
+  }, 1000);
+}
+
+/* ── 提示 ───────────────────────────────── */
+$('hintBtn').addEventListener('click', () => {
+  if(!S || S.locked || S.hints <= 0) return;
+  const need = validNext();
+  const target = S.bubbles.find(b => !b.popped && need.has(b.ch));
+  if(!target) return;
+  S.hints--;
+  S.score = Math.max(0, S.score - 30);
+  $('score').textContent = S.score;
+  $('hintCount').textContent = S.hints;
+  if(S.hints === 0) $('hintBtn').disabled = true;
+  SFX.hint();
+  target.el.classList.remove('hintGlow'); void target.el.offsetWidth;
+  target.el.classList.add('hintGlow');
+  setTimeout(() => target.el && target.el.classList.remove('hintGlow'), 3100);
+  showToast('💡 發光的泡泡就是下一個字！', 2000);
+});
+
+/* ── 完成清單抽屜 ───────────────────────── */
+$('listBtn').addEventListener('click', () => $('panel').classList.toggle('open'));
+$('panelClose').addEventListener('click', () => $('panel').classList.remove('open'));
+
+/* ── 畫面切換 ───────────────────────────── */
+function showCard(html){ $('card').innerHTML = html; $('overlay').classList.add('show'); }
+function hideCard(){ $('overlay').classList.remove('show'); }
+
+function startScreen(){
+  showCard(
+    '<div class="emoji">🫧</div>' +
+    '<h1>成語泡泡</h1>' +
+    '<p style="font-size:21px;color:#db2777;font-weight:900;">依照順序戳破泡泡，拼出四字成語！</p>' +
+    '<div class="rulebox">' +
+      '① 每個泡泡是成語裡的<b>一個字</b>，要<b>照順序</b>點才算對。<br>' +
+      '② 點到<b>不能接下去的字</b>就會<b>扣一顆愛心</b>，每關有 <b>5 顆愛心</b>。<br>' +
+      '③ 第 1 關 <b>10 組</b>成語，之後每過一關<b>再多 10 組</b>（最多第 10 關）。<br>' +
+      '④ 上方會顯示目前拼到的字，右上角可展開<b>已完成成語清單</b>。<br>' +
+      '⑤ 卡關時可以按 <b>💡 提示</b>，每關 3 次。' +
+    '</div>' +
+    '<button class="bigbtn" id="btnStart">開始遊戲</button>'
+  );
+  $('btnStart').onclick = () => { ac(); hideCard(); buildLevel(1, null, true); };
+}
+
+function levelClear(){
+  S.locked = true;
+  clearInterval(timerId);
+  SFX.level();
+  const bonus = S.hearts * 50 + S.hints * 20;
+  S.score += bonus;
+  $('score').textContent = S.score;
+  const last = S.level >= MAX_LEVEL;
+  showCard(
+    '<div class="emoji">' + (last ? '👑' : '🎊') + '</div>' +
+    '<h1>' + (last ? '全部通關！' : '第 ' + S.level + ' 關完成！') + '</h1>' +
+    '<h2>' + S.idioms.length + ' 組成語全部完成 🎉</h2>' +
+    '<div class="statrow">' +
+      stat('用時', pad2((S.elapsed/60)|0)+':'+pad2(S.elapsed%60)) +
+      stat('剩餘愛心', S.hearts + ' ❤️') +
+      stat('關卡加分', '+' + bonus) +
+      stat('總分', S.score) +
+    '</div>' +
+    (last
+      ? '<p style="margin-top:12px">太厲害了！你已經完成全部 10 關的挑戰！</p><button class="bigbtn" id="btnNext">從第 1 關再玩一次</button>'
+      : '<button class="bigbtn" id="btnNext">下一關（' + (S.level+1)*PER_LEVEL + ' 組成語）</button>')
+  );
+  $('btnNext').onclick = () => { hideCard(); buildLevel(last ? 1 : S.level + 1, null, last); };
+}
+
+function gameOver(){
+  S.locked = true;
+  clearInterval(timerId);
+  SFX.fail();
+  const lvl = S.level, keep = S.idioms.map(x => [x.text, x.meaning]);
+  showCard(
+    '<div class="emoji">💔</div>' +
+    '<h1>愛心用完了</h1>' +
+    '<h2>別灰心，再挑戰一次吧！</h2>' +
+    '<div class="statrow">' +
+      stat('關卡', '第 ' + lvl + ' 關') +
+      stat('已完成', S.completed.length + ' / ' + S.idioms.length) +
+      stat('總分', S.score) +
+    '</div>' +
+    '<button class="bigbtn" id="btnRetry">重玩第 ' + lvl + ' 關</button><br>' +
+    '<button class="subbtn" id="btnHome">回到第 1 關</button>'
+  );
+  $('btnRetry').onclick = () => { hideCard(); buildLevel(lvl, keep); };
+  $('btnHome').onclick  = () => { hideCard(); buildLevel(1, null, true); };
+}
+
+function stat(k,v){ return '<div class="stat"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+
+/* ── 除錯／教學用途：可在開發者主控台呼叫 ──
+   __game.state()   讀取目前遊戲狀態
+   __game.jump(5)   直接跳到第 5 關（教學示範用）      */
+window.__game = { state: () => S, jump: lv => { hideCard(); buildLevel(lv, null, true); } };
+
+/* ── 啟動 ───────────────────────────────── */
+startScreen();
+
+})();
+</script>
+</body>
+</html>

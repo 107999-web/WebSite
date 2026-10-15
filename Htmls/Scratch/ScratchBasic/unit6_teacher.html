@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 6 教師手冊：一次記住很多件事</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📓 單元 6 教師手冊 <em>一次記住很多件事</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit6_student.html">學生版</a>
+      <a href="unit5_teacher.html">單元5</a>
+      <a href="unit7_teacher.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>單元 6 教師手冊</h1>
+    <p>對象：國小高年級（建議六年級）　·　時間：2 節（40 分鐘）　·　範圍：清單 12 塊　·　搭配：<a href="unit6_student.html">學生版實作單</a>、<a href="guide.html">積木圖鑑</a>、<a href="mistakes.html">易錯點總表</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、教學目標</h3>
+    <ul style="font-size:.94rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>認知</b>：說明清單是「一組有順序、有編號的資料」，並與變數的單一儲存做對比。</li>
+      <li><b>技能</b>：用添加、插入、替換、刪除維護一張清單，並用編號取出指定項目。</li>
+      <li><b>思維</b>：能用「重複 清單長度 次」搭配計數變數走訪整張清單，這是迴圈與資料結構的第一次結合。</li>
+    </ul>
+    <div class="note" style="margin-top:12px">清單的積木不算難，難的是<b>「編號」這個概念</b>。整堂課的成敗幾乎都在學生有沒有把「第幾項」和「裡面裝什麼」分開來想。建議全程用實體教具輔助。</div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、節次流程（兩節課）</h3>
+    <div class="tline"><div class="t">第1節<br>0–10′</div><div><b>不插電導入</b>：請五位學生排成一列，每人手上拿一張名字卡。先問：「第 3 位是誰？」再問：「小明排第幾？」——這正好對應「第 N 項」和「項目編號」兩塊積木。接著請第 1 位坐下，問全班：「現在第 1 位是誰？」<b>編號會往前移</b>的概念就出來了。</div></div>
+    <div class="tline"><div class="t">10–25′</div><div><b>清單實驗室</b>：學生版第 1 段。讓學生自己打字、按按鈕，同時看網頁下方的編號表與舞台右上角的監看器。重點是<b>編號和內容是兩回事</b>。</div></div>
+    <div class="tline"><div class="t">25–40′</div><div><b>添加 vs 插入 vs 替換</b>：學生版第 3 段。先請學生預測兩段程式跑完的順序再執行。特別強調<b>替換不會讓清單變長</b>。</div></div>
+    <div class="tline"><div class="t">第2節<br>0–15′</div><div><b>走訪整張清單（本課核心）</b>：學生版第 4 段。逐塊拆解那三層嵌套：說出的欄位裡放「第幾項」，「第幾項」的欄位裡放「編號」。建議用「慢」速執行，一圈一圈看編號往上加。</div></div>
+    <div class="tline"><div class="t">15–35′</div><div><b>完成三個作品</b>：點名冊、查名次、把每一項唸一遍。作品 2 要刻意查一個不存在的名字，讓學生看到回傳 <b>0</b>。</div></div>
+    <div class="tline"><div class="t">35–40′</div><div><b>分享與預告</b>：請學生說出生活中還有哪些東西是「一整排有編號的」（點名簿、播放清單、購物車）。預告下一課的函式積木。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、關鍵概念與學生迷思</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">概念</th><th style="width:38%">學生常見迷思</th><th>教學建議</th></tr></thead>
+      <tbody>
+        <tr><td><b>第一項是 1</b></td><td>以為第一項是第 0 項（受其他程式語言或直覺影響）。</td><td>Scratch 是從 <b>1</b> 開始的，和日常說「第一個」一致。這點反而比多數程式語言好教。</td></tr>
+        <tr><td><b>編號 vs 內容</b></td><td>把「第 3 項」和「數字 3」搞混。</td><td>用排隊比喻：<b>位置</b>是第三個，<b>他是誰</b>是另一回事。實體排隊教具最有效。</td></tr>
+        <tr><td><b>刪除會位移</b></td><td>用迴圈從第 1 項往後刪，結果每次都跳過一項。</td><td>示範一次錯的，再改成<b>從最後一項往前刪</b>，或直接用「刪除所有項目」。</td></tr>
+        <tr><td><b>插入 vs 替換</b></td><td>想換掉某一項卻用了插入，清單越來越長。</td><td>插入＝<b>擠進去</b>（變長）、替換＝<b>換掉</b>（不變長）。看監看器的長度最直觀。</td></tr>
+        <tr><td><b>找不到回傳 0</b></td><td>以為找不到會顯示「沒有」或空白。</td><td>因為<b>沒有第 0 項</b>，所以 0 就代表找不到。可以搭配「如果 編號 ＝ 0 就說：查無此人」。</td></tr>
+        <tr><td><b>取超過範圍</b></td><td>拿第 10 項卻只有 3 項，程式沒報錯所以以為沒問題。</td><td>會得到<b>空白</b>。提醒學生取值前先檢查長度。</td></tr>
+        <tr><td><b>初始化</b></td><td>每按一次綠旗，清單就越來越長。</td><td>和變數一樣：「<b>刪除所有項目</b>」要放在綠旗下面。這是跨單元的共同觀念。</td></tr>
+        <tr><td><b>清單在哪一類</b></td><td>在積木清單裡找不到清單積木。</td><td>清單<b>和變數放在同一個分類</b>，要先按「建立一個清單」才會出現。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、三個作品的教學提示</h3>
+    <div class="tline"><div class="t">作品 1<br>點名冊</div><div><b>教學重點</b>：建立「清空 → 加資料 → 顯示」的標準流程。<b>易錯</b>：忘記先清空，重按綠旗名字就重複出現。<b>差異化</b>：進階者改成用「詢問並等待」讓使用者自己輸入名字。</div></div>
+    <div class="tline"><div class="t">作品 2<br>查名次</div><div><b>教學重點</b>：「項目編號」是<b>反查</b>——給內容問位置，和「第 N 項」方向相反。<b>易錯</b>：兩塊積木填反。<b>延伸</b>：加上「如果 編號 ＝ 0 就說查無此人」，把 0 的意義用起來。</div></div>
+    <div class="tline"><div class="t">作品 3<br>逐項唸出</div><div><b>教學重點</b>：本課最高難度，也是清單真正的價值——<b>不管有幾項，程式都不用改</b>。<b>易錯</b>：忘記把編號設回 1；忘記在迴圈裡讓編號加 1（會一直唸第 1 項）。<b>建議</b>：刻意把「編號改變 1」拿掉跑一次，讓學生自己找出原因。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>五、差異化與延伸</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢</b>：只要能用「添加」建出一張清單並顯示監看器，就算達標，作品 3 可省略。</li>
+      <li><b>提早完成</b>：挑戰「不重複的報名表」（加入前先用「清單包含？」檢查），或做一張猜謎題庫，用隨機取數抽題。</li>
+      <li><b>跨領域</b>：數學的序數與基數、統計的資料整理；國語的詞語蒐集；生活中的播放清單與購物車。</li>
+      <li><b>不插電</b>：全班排隊當清單，老師唸積木指令（「插入 小美 到 第 2 項」「刪除 第 1 項」），學生實際移動位置。這個活動的效果通常比在電腦前講解好。</li>
+      <li><b>下一步</b>：當學生做出「三十個名字的清單」卻要為每一個都寫一段程式時，就是導入<b>函式積木</b>的時機。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>六、評量規準</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>編號概念</b></td><td>能預測刪除或插入後每一項的新編號</td><td>能正確用編號取出指定項目</td><td>把編號與內容混為一談</td></tr>
+        <tr><td><b>清單操作</b></td><td>能依需求選用添加、插入、替換或刪除</td><td>能完成指定的清單操作</td><td>常選錯積木，需逐步協助</td></tr>
+        <tr><td><b>迴圈走訪</b></td><td>能自行寫出走訪整張清單的程式並說明每一層的作用</td><td>能依步驟完成作品 3</td><td>尚無法把迴圈與清單結合</td></tr>
+        <tr><td><b>創作表現</b></td><td>能用清單設計出原創作品（題庫、紀錄器等）</td><td>能完成三個指定作品</td><td>僅能複製示範</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>七、關於小舞台的說明（與真實 Scratch 的差異）</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>清單是預先建好的</b>：小舞台固定提供「排行榜」與「我的清單」；真實 Scratch 要先按「<b>建立一個清單</b>」，並選擇適用於所有角色或僅當前角色。上課時請務必示範這一步。</li>
+      <li><b>清單監看器</b>在舞台<b>右上角</b>，樣式和真實 Scratch 一樣（編號＋內容＋長度），但<b>不能拖動位置、不能直接在上面編輯</b>，也不會有捲軸——超過 6 項只顯示前 6 項，資料仍然完整。</li>
+      <li><b>積木顏色</b>：真實 Scratch 的清單積木是比變數深一階的橘色，小舞台照做了，但兩者同樣放在「變數」分類裡。</li>
+      <li><b>「清單包含？」</b>要<b>整項一模一樣</b>才算（不分大小寫）；運算類的「字串包含」則是找字串裡的一小段，兩者容易混淆。</li>
+      <li><b>刪除是永久的</b>，小舞台沒有復原功能，示範前建議先存一份。</li>
+      <li>清單長度上限設為 200 項，避免學生誤寫無限迴圈把瀏覽器塞爆。</li>
+    </ul>
+  </div>
+
+  <footer>📓 單元 6 教師手冊　·　<a href="unit5_teacher.html">單元 5</a>　·　<a href="unit7_teacher.html">單元 7</a></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 堂｜紅石比較器：讀出容器裝多滿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="11">
+<main class="wrap">
+
+<section class="hero" style="--u:#81C784">
+  <span class="tag">第 11 堂 ／ 單元3　感測與自動化</span>
+  <h1>紅石比較器：讀出容器裝多滿 📊</h1>
+  <p>比較器可以讀出箱子、漏斗裝了多滿，變成 0～15 的訊號；也能讀出講台上的書翻到第幾頁。訊號越強，紅石粉走得越遠——用這個特性就能做「快滿了」警示燈和頁碼選擇器。</p>
+  <div class="chips"><span class="chip">🧱 紅石比較器、箱子、講台＋書與筆、紅石粉、紅石燈</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>知道比較器可以讀容器有多滿（0～15）。</li><li>會利用「訊號走一格少 1」設定門檻，做出半滿警示燈。</li><li>做出講台翻頁選擇器。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：上週的倉庫箱子現在多滿了？怎麼不打開就知道？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：網頁實驗：箱子放 0、64、900、1728 個，比較器的數字是多少？</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：半滿警示燈：用紅石粉長度當門檻</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：講台翻頁選擇器：翻到第幾頁亮幾盞燈</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：翻到第 15 頁，全部的燈都亮了嗎？</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">⚖️</span><b>比較器讀容器</b>後面接箱子，前面輸出 0～15：空的是 0，有 1 個就至少 1，全滿是 15。</div><div class="lc"><span class="ic">📏</span><b>用距離當門檻</b>訊號 8 走過 8 格紅石粉才用完。把燈放在第 8 格，就要訊號 8 以上才會亮。</div><div class="lc"><span class="ic">📖</span><b>講台</b>放一本「書與筆」在講台上。比較器讀講台：翻到越後面的頁，訊號越強。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>比較器的「後面」接要讀的東西，「前面」（單一個小火把那端）輸出。</li><li>一個箱子要 1728 個物品才全滿，所以大多數時候訊號都很小；漏斗只要 320 個就滿，比較好測試。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：倉庫半滿警示燈 📦</h3></header>
+  <div class="items">🎒 準備物品：箱子、紅石比較器、紅石粉、紅石燈</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s11a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>用上週的倉庫箱子，在它旁邊放比較器（背對箱子）。</li><li>從比較器往前鋪 8 格紅石粉。</li><li>在第 8 格旁邊（或下面）放警示燈。</li><li>往箱子裡放東西：超過一半，警示燈就亮！</li></ol>
+  <div class="tip">💡 想讓「快滿了」（例如訊號 13）才亮？把燈放在第 13 格。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：網頁和遊戲都做出半滿警示燈。</div><div class="lv f"><b>🦊 五、六年級</b>：改用漏斗（320 個就滿），做 3 段指示燈：1/3、2/3、全滿。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：講台翻頁選擇器 📖</h3></header>
+  <div class="items">🎒 準備物品：講台、書與筆、紅石比較器、紅石粉、紅石燈 ×15</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s11b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>放講台，把「書與筆」寫好 15 頁（每頁寫一個數字）放上去。</li><li>講台旁邊放比較器，前面鋪 15 格紅石粉，每格下面放一盞燈。</li><li>翻頁！第 1 頁亮 1 盞，第 15 頁全部亮。</li><li>🦊 只要翻到「第 7 頁」才開門？想想看要怎麼做（提示：第 13 堂的知識）。</li></ol>
+  <div class="tip">💡 書與筆在遊戲裡打開後每頁可以寫字，按「下一頁」新增頁數。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出翻頁亮燈。</div><div class="lv f"><b>🦊 五、六年級</b>：用翻頁做一個「選關卡」機關：第 1 頁開 1 號門……</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：這堂要算「訊號強度」和「紅石粉長度」，在網頁模擬器裡改數量、看數字最清楚。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>你想用「讀容器」的功能做什麼？（例如：餵寵物的飼料快沒了就亮燈）</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>比較器公式（教師參考）：訊號 ＝ 1 ＋ 無條件捨去（裝的比例 × 14），只要有 1 個物品就至少是 1。</li><li>網頁中箱子 800 個 → 7，900 個 → 8，可以讓高年級學生驗算。</li><li>講台上的「書與筆」在創造物品欄可以直接拿到。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s11a": {"title": "📦 應用 1：箱子半滿警示燈", "desc": "箱子 → 比較器（朝 →）→ 8 格紅石粉，第 8 格下面有警示燈。用 🖐️ 點箱子改數量，看比較器的數字。", "rows": ["C@0:C ? ? ? ? ? ? ? ? ? .", ". . . . . . . . . O:L ."], "tools": ["comp", "dust"], "names": {"C": "箱子", "L": "警示燈"}, "challenges": [{"name": "箱子超過一半（訊號 8 以上）警示燈才亮", "level": "🐣", "steps": [{"items": ["C", 0], "expect": {"L": false}}, {"items": ["C", 800], "expect": {"L": false}}, {"items": ["C", 900], "expect": {"L": true}}, {"items": ["C", 1728], "expect": {"L": true}}]}]}, "s11b": {"title": "📖 應用 2：講台翻頁選擇器", "desc": "書有 15 頁。用 🖐️ 點講台翻頁：翻到第幾頁，就亮幾盞燈。", "rows": ["E15:E c> - - - - - - - - - - - - - - -", ". . O O O O O:5 O:6 O O O O O O O O O"], "names": {"E": "講台", "5": "第5盞燈", "6": "第6盞燈"}, "challenges": [{"name": "翻到第 5 頁剛好亮 5 盞", "level": "🐣", "demo": true, "steps": [{"page": ["E", 5], "expect": {"5": true, "6": false}}]}]}};
+window.QUIZ = [{"q": "比較器讀一個「空」箱子，輸出是？", "o": ["0", "1", "15"], "a": 0, "why": "空的就是 0。"}, {"q": "比較器輸出 8，紅石燈放在第幾格以內才會亮？", "o": ["第 8 格", "第 15 格", "第 20 格"], "a": 0, "why": "8、7、6……第 8 格是 1，第 9 格就是 0。"}, {"q": "哪一個容器比較容易「裝滿」？", "o": ["箱子（1728 個）", "漏斗（320 個）"], "a": 1, "why": "漏斗只有 5 格，比較快滿。"}, {"q": "講台翻到最後一頁，比較器輸出是？", "o": ["0", "1", "15"], "a": 2, "why": "最後一頁就是最強的 15。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

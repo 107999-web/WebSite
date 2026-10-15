@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>ML2Scratch 教師手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --cream:#EFF8F6; --paper:#FFFFFF; --paper2:#DFF0EC; --ink:#38504C; --ink2:#7A948E; --line:#C4E2DB;
+  --teal:#2E9E96; --teal-d:#1F7C75; --grape:#A77BDB; --pink:#FF8FAB; --butter:#FFC86B; --sky:#6FB7E4;
+  --block:#0FBD8C; --block-d:#0BA277; --block-op:#4C97FF; --block-op-d:#3373CC;
+  --l1:#FF8FAB; --l2:#6FB7E4; --l3:#FFC86B;
+  --shadow:0 10px 24px rgba(46,158,150,.16); --shadow-s:0 4px 12px rgba(46,158,150,.14);
+  --f-round:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --f-num:'Nunito','M PLUS Rounded 1c',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cream:#1B2827; --paper:#243432; --paper2:#2D403D; --ink:#E4F2EF; --ink2:#A5BFBA; --line:#3B5350;
+  --teal:#5FC9BF; --teal-d:#86DED5; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --cream:#1B2827; --paper:#243432; --paper2:#2D403D; --ink:#E4F2EF; --ink2:#A5BFBA; --line:#3B5350;
+  --teal:#5FC9BF; --teal-d:#86DED5; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-round);font-size:16px;line-height:1.82;
+  background-image:radial-gradient(var(--line) 1.3px,transparent 1.3px);background-size:28px 28px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px;padding-block:0 64px}
+h1,h2,h3{text-wrap:balance;line-height:1.4;margin:0}
+a{color:var(--teal-d)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in srgb,var(--cream) 85%,transparent);border-bottom:2px solid var(--line)}
+nav .inner{max-width:1060px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--paper);border:2px solid var(--line);
+  border-radius:50px;padding:5px 15px;font-size:.86rem;font-weight:700;transition:transform .18s,background .18s}
+nav a:hover{transform:translateY(-2px);background:var(--paper2)}
+header.hero{padding-block:40px 24px}
+.badge{display:inline-block;background:var(--teal);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:50px;box-shadow:var(--shadow-s)}
+header.hero h1{font-size:clamp(1.8rem,5vw,2.7rem);font-weight:800;margin:14px 0 8px}
+header.hero p{color:var(--ink2);max-width:46em;margin:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
+.fact{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-s)}
+.fact .k{font-size:.76rem;letter-spacing:.08em;color:var(--ink2);font-weight:700}
+.fact .v{font-weight:800;font-size:1rem}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--grape);color:#fff;text-decoration:none;font-weight:800;
+  border-radius:50px;padding:10px 22px;margin-top:18px;box-shadow:0 5px 14px rgba(167,123,219,.4);transition:transform .18s}
+.cta:hover{transform:scale(1.05);color:#fff}
+section{margin-top:44px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-head .dot{width:14px;height:14px;border-radius:4px;background:var(--teal);flex:0 0 auto;transform:rotate(45deg)}
+.sec-head h2{font-size:clamp(1.25rem,3.2vw,1.6rem);font-weight:800}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tablewrap{overflow-x:auto;border-radius:20px;border:2px solid var(--line);background:var(--paper);box-shadow:var(--shadow-s);margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:620px}
+table caption{text-align:left;font-weight:800;padding:12px 14px 6px;font-size:.95rem}
+table th{text-align:left;background:var(--paper2);font-size:.8rem;color:var(--ink2);padding:10px 12px;font-weight:800;white-space:nowrap}
+table td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.blk{display:inline-flex;align-items:center;gap:6px;background:var(--block);color:#fff;font-weight:700;font-size:.9rem;
+  padding:6px 12px;border-radius:9px;box-shadow:0 3px 0 var(--block-d);margin:2px 0;line-height:1.5}
+.blk.hat{border-radius:14px 14px 9px 9px}
+.blk.rep{border-radius:50px}
+.blk.ctl{background:var(--butter);box-shadow:0 3px 0 #E0A63F;color:#4A3530}
+.blk.mot{background:var(--block-op);box-shadow:0 3px 0 var(--block-op-d)}
+.blk .drop{background:rgba(0,0,0,.18);border-radius:50px;padding:1px 9px}
+.blk .num{background:#fff;color:#4A3530;border-radius:50px;padding:0 9px;font-family:var(--f-num);font-weight:800}
+.code{background:var(--paper2);border:2px dashed var(--line);border-radius:16px;padding:11px 13px;display:grid;gap:2px;margin-top:8px}
+.code .ind1{margin-left:18px}.code .ind2{margin-left:36px}
+.note{background:color-mix(in srgb,var(--butter) 22%,var(--paper));border:2px solid color-mix(in srgb,var(--butter) 50%,var(--line));
+  border-radius:18px;padding:12px 16px;font-size:.93rem}
+.warn{background:color-mix(in srgb,var(--pink) 16%,var(--paper));border:2px solid color-mix(in srgb,var(--pink) 42%,var(--line));
+  border-radius:18px;padding:12px 16px;font-size:.93rem}
+/* knn lab */
+.lab{display:grid;grid-template-columns:minmax(260px,1.05fr) minmax(250px,.95fr);gap:18px;align-items:start}
+@media(max-width:760px){.lab{grid-template-columns:1fr}}
+.labbox{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:12px;box-shadow:var(--shadow)}
+svg.knn{width:100%;height:auto;display:block;background:var(--paper2);border-radius:16px;cursor:crosshair;touch-action:manipulation}
+svg.knn .axis{stroke:var(--line);stroke-width:2}
+svg.knn .axlab{font-family:var(--f-round);font-size:11px;font-weight:700;fill:var(--ink2)}
+svg.knn .link{stroke:var(--ink2);stroke-width:2;stroke-dasharray:4 4;opacity:.75}
+svg.knn .pt{stroke:var(--paper);stroke-width:2.5}
+svg.knn .test{stroke:var(--ink);stroke-width:3}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.tool{border:2px solid var(--line);background:var(--paper);border-radius:50px;padding:6px 15px;font-family:var(--f-round);
+  font-weight:800;font-size:.88rem;cursor:pointer;color:var(--ink);transition:transform .18s}
+.tool:hover{transform:scale(1.05)}
+.tool.on{color:#fff;border-color:transparent}
+.tool.t1.on{background:var(--l1)}.tool.t2.on{background:var(--l2)}.tool.t3.on{background:var(--l3);color:#4A3530}
+.tool.tt.on{background:var(--teal)}
+.kpick{display:flex;gap:6px;align-items:center;font-size:.86rem;font-weight:700;color:var(--ink2);margin-left:auto}
+.kpick button{border:2px solid var(--line);background:var(--paper);border-radius:50px;width:34px;height:34px;
+  font-family:var(--f-num);font-weight:800;cursor:pointer;color:var(--ink)}
+.kpick button.on{background:var(--teal);color:#fff;border-color:transparent}
+.verdict{background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:14px 16px}
+.verdict .big{font-size:1.15rem;font-weight:800}
+.verdict .sub{font-size:.9rem;color:var(--ink2)}
+.tallies{display:grid;gap:6px;margin-top:10px}
+.tally{display:grid;grid-template-columns:64px 1fr 42px;gap:8px;align-items:center;font-size:.85rem;font-weight:700}
+.tally .track{height:11px;border-radius:50px;background:var(--paper);border:2px solid var(--line);overflow:hidden}
+.tally .track i{display:block;height:100%;width:0;transition:width .3s}
+.lesson{display:grid;gap:10px}
+.lesson .row{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;background:var(--paper);
+  border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-s)}
+.lesson .t{font-family:var(--f-num);font-weight:800;background:var(--paper2);border-radius:12px;text-align:center;padding:4px;font-size:.84rem}
+details{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:2px 16px;box-shadow:var(--shadow-s)}
+details+details{margin-top:9px}
+details summary{cursor:pointer;font-weight:800;padding:10px 0;list-style:none;display:flex;gap:8px;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'▸';color:var(--teal-d);font-weight:800}
+details[open] summary::before{content:'▾'}
+details .body{padding:0 0 12px;font-size:.93rem}
+ul.tidy{margin:8px 0 0;padding-left:1.2em}ul.tidy li{margin:3px 0}
+.chk{display:grid;gap:8px}
+.chk label{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:2px solid var(--line);
+  border-radius:16px;padding:10px 14px;cursor:pointer;font-size:.94rem;transition:border-color .2s,background .2s}
+.chk input{margin-top:6px;width:18px;height:18px;accent-color:var(--teal);flex:0 0 auto}
+.chk label:has(input:checked){border-color:var(--teal);background:var(--paper2)}
+footer{margin-top:50px;text-align:center;color:var(--ink2);font-size:.85rem}
+:focus-visible{outline:3px solid var(--teal-d);outline-offset:3px;border-radius:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media print{nav,.cta{display:none}body{background:#fff}.card,.fact,.tablewrap,details{box-shadow:none}}
+</style>
+
+<nav><div class="inner">
+  <a href="#about">教材定位</a>
+  <a href="#spec">積木規格</a>
+  <a href="#knn">KNN 原理</a>
+  <a href="#quality">訓練品質</a>
+  <a href="#flow">教學流程</a>
+  <a href="#demo">範例與易錯點</a>
+  <a href="#ready">課前檢查</a>
+  <a href="#faq">問題排除</a>
+  <a href="#assess">評量與倫理</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">教師手冊</span>
+  <h1>ML2Scratch 教師手冊</h1>
+  <p>ML2Scratch 與 Handpose／Facemesh 有本質差異：後兩者使用<b>已訓練好的模型</b>，學生只是讀取座標；ML2Scratch 則讓學生<b>親手訓練一個分類模型</b>。本手冊整理積木規格、KNN 原理示範、訓練品質指南、兩節課流程與 AI 倫理討論設計。</p>
+  <div class="facts">
+    <div class="fact"><div class="k">模型</div><div class="v">MobileNet + KNN</div></div>
+    <div class="fact"><div class="k">學習方式</div><div class="v">監督式學習（分類）</div></div>
+    <div class="fact"><div class="k">標籤數</div><div class="v">最多 10 類</div></div>
+    <div class="fact"><div class="k">建議時數</div><div class="v">2–3 節（各 40 分鐘）</div></div>
+  </div>
+  <a class="cta" href="https://claude.ai/artifact/JpLxywb8epejQpzisjgbX6">👉 開啟學生版實作單</a>
+  <span style="font-size:.84rem;color:var(--ink2);margin-left:8px">（本機檔案版：<a href="student.html">student.html</a>）</span>
+</header>
+
+<section id="about">
+  <div class="sec-head"><span class="dot"></span><h2>一、教材定位與技術原理</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>模型怎麼運作</h3>
+      <p style="font-size:.94rem">ML2Scratch 由 Junya Ishihara（champierre）開發，使用 <b>ml5.js / TensorFlow.js</b>：先以 <b>MobileNet</b> 把每張畫面轉成一組特徵數值，再交給 <b>KNN 分類器</b>記住「這組數值＝標籤 N」。判斷時計算新畫面與所有已存範例的距離，取最近的幾筆投票決定答案。</p>
+      <ul class="tidy" style="font-size:.93rem">
+        <li><b>不需要等待訓練</b>：按下「學習」的瞬間就記住了，適合課堂即時操作。</li>
+        <li><b>全程在瀏覽器本機執行</b>，影像不上傳伺服器。</li>
+        <li>學習資料可<b>匯出／匯入 JSON</b>，跨堂延續使用。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>與前兩個擴充的教學定位差異</h3>
+      <div class="tablewrap" style="box-shadow:none;border:none;margin-bottom:0">
+        <table style="min-width:0">
+          <thead><tr><th></th><th>Handpose／Facemesh</th><th>ML2Scratch</th></tr></thead>
+          <tbody>
+            <tr><td>模型</td><td>已訓練好</td><td><b>學生自己訓練</b></td></tr>
+            <tr><td>輸出</td><td>座標數值</td><td><b>標籤（分類）</b></td></tr>
+            <tr><td>核心概念</td><td>感測與座標</td><td><b>資料、標籤、泛化</b></td></tr>
+            <tr><td>事件積木</td><td>無</td><td><b>有（當接收到標籤）</b></td></tr>
+            <tr><td>會出錯嗎</td><td>偵測不到</td><td><b>會猜錯（可討論）</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.92rem;margin-top:10px"><b>教學價值：</b>模型會猜錯正是最好的教材 —— 學生會自然追問「為什麼錯？」，這正是資料品質與 AI 偏見的切入點。</p>
+    </div>
+  </div>
+</section>
+
+<section id="spec">
+  <div class="sec-head"><span class="dot"></span><h2>二、積木完整規格</h2></div>
+  <p style="margin:0 0 12px;color:var(--ink2)">積木文字以 stretch3 中文介面為準，不同版本用詞可能略有差異。</p>
+
+  <div class="tablewrap">
+    <table>
+      <caption>① 訓練類</caption>
+      <thead><tr><th>積木</th><th>類型</th><th>說明與教學提醒</th></tr></thead>
+      <tbody>
+        <tr><td><span class="blk">學習標籤1</span><br><span class="blk">學習標籤2</span><span class="blk">學習標籤3</span></td><td>執行</td>
+          <td>將<b>當下畫面</b>存為該標籤的一筆範例。按一次存一張，建議每標籤 <b>20 張以上</b>。前三個標籤有獨立積木，方便低年段操作。</td></tr>
+        <tr><td><span class="blk">學習標籤 <span class="drop">4 ▾</span></span></td><td>執行</td>
+          <td>選單提供標籤 <b>4–10</b>。另有可直接輸入編號的 <span class="blk">學習標籤 <span class="num">11</span></span>，可接變數，適合做「自動連拍 20 張」或多標籤迴圈。</td></tr>
+        <tr><td><span class="blk">學習/分類 <span class="drop">網路攝影機 ▾</span> 影像</span></td><td>執行</td>
+          <td>切換學習與判斷的影像來源：<b>網路攝影機</b>或<b>舞台</b>。選「舞台」可做「手繪圖形辨識」，沒有攝影機的電腦也能上課。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <caption>② 判斷類</caption>
+      <thead><tr><th>積木</th><th>類型</th><th>說明與教學提醒</th></tr></thead>
+      <tbody>
+        <tr><td><span class="blk rep">標籤</span></td><td>數值</td>
+          <td>目前的判斷結果。<b>務必請學生勾選顯示在舞台</b>，這是全課最重要的回饋來源。尚未訓練時為空白。</td></tr>
+        <tr><td><span class="blk hat">接收到類別 <span class="drop">1 ▾</span> 時</span></td><td>事件（帽子）</td>
+          <td>判斷結果變為該類別時觸發。選單含 <b>任何</b> 與 1–10；另有可輸入編號的 <span class="blk hat">接收到類別 <span class="num">11</span> 時</span>。這是本擴充唯一的事件積木，也是作品的主結構。</td></tr>
+        <tr><td><span class="blk"><span class="drop">開啟 ▾</span> 分類</span></td><td>執行</td>
+          <td>開／關即時判斷（英文原文 turn classification on/off，中文介面顯示為「〔關閉▾〕分類」）。<b>建議訓練時先關閉</b>，避免畫面跳動干擾；訓練完再開啟。</td></tr>
+        <tr><td><span class="blk">每隔 <span class="drop">1 ▾</span> 秒標記一次</span></td><td>執行</td>
+          <td>「標記」即判斷。可選 1／0.5／0.2／0.1 秒，<b>預設 1 秒</b>。遊戲類作品建議 0.2 秒；老舊電腦維持 1 秒。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <caption>③ 資料管理類</caption>
+      <thead><tr><th>積木</th><th>類型</th><th>說明與教學提醒</th></tr></thead>
+      <tbody>
+        <tr><td><span class="blk rep">標籤數量1</span> … <span class="blk rep">標籤數量10</span><br><span class="blk rep">標籤數量 <span class="num">11</span></span></td><td>數值</td>
+          <td>該標籤已收集的範例數。標籤 1–10 各有獨立積木（可勾選顯示於舞台），另有可輸入編號的版本。<b>請學生全部勾選顯示</b>，一眼就能看出資料是否平衡，是最好的自我檢核工具。</td></tr>
+        <tr><td><span class="blk">重置 <span class="drop">所有量 ▾</span></span></td><td>執行</td>
+          <td>清除學習資料。選單的 <b>所有量</b> 代表全部清空，也可選單一標籤；另有可輸入編號的 <span class="blk">重置 <span class="num">11</span></span>。教錯了重置比硬修有效。</td></tr>
+        <tr><td><span class="blk">下載學習資料</span><br><span class="blk">上傳學習資料</span></td><td>執行</td>
+          <td>匯出／匯入 JSON。<b class="">.sb3 專案檔不包含學習資料</b>，兩個檔案都要存，這是本單元最常見的災難。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <caption>④ 攝影機設定類</caption>
+      <thead><tr><th>積木</th><th>類型</th><th>說明與教學提醒</th></tr></thead>
+      <tbody>
+        <tr><td><span class="blk">視訊設為 <span class="drop">開啟 ▾</span></span></td><td>執行</td><td>選單為關閉／開啟／鏡像開啟，預設鏡像開啟。介面用詞為「視訊」而非「攝影機」。</td></tr>
+        <tr><td><span class="blk">視訊透明度設為 <span class="num">50</span></span></td><td>執行</td><td>0（清楚）～100（全透明），<b>預設 50</b>。訓練階段建議調低，讓學生看清楚自己入鏡的樣子。</td></tr>
+        <tr><td><span class="blk">網路攝影機切換到 <span class="drop">… ▾</span></span></td><td>執行</td><td>多鏡頭裝置可切換來源（例如外接 USB 視訊鏡頭），下拉會列出系統偵測到的裝置。</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn">💾 <b>務必先教存檔流程再開始訓練。</b>學生花 20 分鐘訓練的成果，只要重新整理頁面就會全部消失。建議課堂規定：<b>每訓練完一個標籤就下載一次學習資料</b>。</div>
+</section>
+
+<section id="knn">
+  <div class="sec-head"><span class="dot"></span><h2>三、KNN 原理互動示範（可直接投影）</h2></div>
+  <p style="margin:0 0 14px;color:var(--ink2)">把高維特徵簡化成平面上的點：<b>點擊白色區域</b>放置已標記的資料點，再放一個測試點，即可看到最近鄰投票的過程。右側可切換 <b>k 值</b>，示範「參考幾個鄰居」如何改變結果。</p>
+  <div class="lab">
+    <div>
+      <div class="labbox">
+        <svg class="knn" id="knnsvg" viewBox="0 0 400 300" role="img" aria-label="KNN 判斷示範圖，可點擊放置資料點">
+          <line class="axis" x1="34" y1="266" x2="384" y2="266"></line>
+          <line class="axis" x1="34" y1="16" x2="34" y2="266"></line>
+          <text class="axlab" x="210" y="284" text-anchor="middle">特徵 1（MobileNet 輸出的其中一維）</text>
+          <text class="axlab" x="16" y="140" text-anchor="middle" transform="rotate(-90 16 140)">特徵 2</text>
+          <g id="links"></g><g id="dots"></g><g id="testg"></g>
+        </svg>
+      </div>
+      <div class="tools">
+        <button class="tool t1 on" data-m="1">標籤1</button>
+        <button class="tool t2" data-m="2">標籤2</button>
+        <button class="tool t3" data-m="3">標籤3</button>
+        <button class="tool tt" data-m="t">測試點</button>
+        <button class="tool" id="clear">清除</button>
+        <span class="kpick">k =
+          <button data-k="1">1</button><button data-k="3" class="on">3</button><button data-k="5">5</button>
+        </span>
+      </div>
+    </div>
+    <div>
+      <div class="verdict">
+        <div class="big" id="v-big">請先放置資料點</div>
+        <div class="sub" id="v-sub">選擇標籤顏色後點擊左側區域，每一點代表一張已標記的訓練影像。</div>
+        <div class="tallies" id="tallies"></div>
+      </div>
+      <div class="note" style="margin-top:12px"><b>三個可以現場示範的教學情境：</b>
+        <ul class="tidy">
+          <li><b>資料太少</b>：只放 2 個點就丟測試點 → 判斷完全被單一樣本左右。</li>
+          <li><b>資料不平衡</b>：標籤1 放 12 個、標籤2 放 2 個 → 測試點幾乎永遠被判成標籤1。</li>
+          <li><b>k 值影響</b>：把測試點放在兩群交界處，切換 k=1 與 k=5，答案會改變 —— 說明「參考越多鄰居越穩定，但也可能被遠處的資料干擾」。</li>
+        </ul>
+      </div>
+      <p style="font-size:.86rem;color:var(--ink2);margin-top:10px">※ 本示範為教學簡化。實際 ML2Scratch 的特徵維度超過一千維，且 k 值由 ml5.js 內部設定，學生無法調整。</p>
+    </div>
+  </div>
+</section>
+
+<section id="quality">
+  <div class="sec-head"><span class="dot"></span><h2>四、訓練品質指南</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>五個影響準確度的關鍵</h3>
+      <ul class="tidy" style="font-size:.93rem">
+        <li><b>數量</b>：每標籤至少 20 張，30–40 張更穩定。</li>
+        <li><b>平衡</b>：各標籤張數應相近。差距過大時模型會傾向樣本多的類別。</li>
+        <li><b>變異</b>：拍攝時刻意改變位置、角度、距離，模型才會學到「手勢」而非「某個固定畫面」。</li>
+        <li><b>負樣本</b>：務必加一個「什麼都沒有」的標籤（空背景），否則模型永遠會從既有類別中硬選一個。</li>
+        <li><b>背景一致</b>：若各標籤在不同背景拍攝，模型可能學到的是「背景」而不是目標物 —— 這是最經典的<b>捷徑學習</b>陷阱。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>現場可做的「打臉實驗」</h3>
+      <p style="font-size:.93rem">刻意製造失敗，比講解十分鐘更有效：</p>
+      <ol style="font-size:.93rem;padding-left:1.2em">
+        <li>請一位學生只在<b>自己座位</b>訓練石頭／剪刀／布。</li>
+        <li>訓練完成後，請他<b>換到教室另一邊</b>再試一次。</li>
+        <li>準確度通常明顯下降 → 提問：「模型到底學到了什麼？」</li>
+        <li>再請他在新位置補 10 張，準確度回升 → 帶出「<b>資料涵蓋範圍</b>」的概念。</li>
+      </ol>
+      <div class="note" style="margin-top:10px">同樣的手法可延伸到 AI 偏見：只用男生的臉訓練，女生就認不出來；只用自己的手訓練，老師的大手就失準。</div>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="sec-head"><span class="dot"></span><h2>五、教學流程（建議 2–3 節）</h2></div>
+  <div class="lesson">
+    <div class="row"><div class="t">第 1 節<br>0–10′</div><div><b>引起動機</b>：對比前兩個擴充「電腦本來就會」與本單元「要你教它」。提問：「你要怎麼教一個從沒看過貓的人認出貓？」</div></div>
+    <div class="row"><div class="t">10–20′</div><div><b>環境設定＋認識回饋</b>：加入擴充、允許攝影機，<b>勾選「標籤」與「標籤數量N」顯示在舞台</b>。此步驟決定後續學生能否自我除錯。</div></div>
+    <div class="row"><div class="t">20–40′</div><div><b>第一次訓練</b>：石頭／剪刀／布各 20 張，觀察「標籤」變化。<b>下課前務必完成一次「下載學習資料」。</b></div></div>
+    <div class="row"><div class="t">第 2 節<br>0–10′</div><div><b>KNN 原理</b>：用本頁的互動示範講解「找最近的鄰居投票」，並現場示範資料太少與不平衡的後果。</div></div>
+    <div class="row"><div class="t">10–30′</div><div><b>做出作品</b>：以「當接收到標籤」串接動作，完成猜拳機或垃圾分類小幫手。提早完成者調整判斷間隔、增加標籤。</div></div>
+    <div class="row"><div class="t">30–40′</div><div><b>打臉實驗與省思</b>：進行第四節的換位置實驗，討論資料品質與 AI 偏見。</div></div>
+    <div class="row"><div class="t">第 3 節<br>（選）</div><div><b>專題延伸</b>：分組設計自己的辨識應用（表情點餐機、教室物品導覽、手勢簡報遙控器），並於課堂發表，說明「我教了什麼資料、它為什麼會錯」。</div></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="sec-head"><span class="dot"></span><h2>六、範例程式與學生易錯點</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>✌️ 範例 1：猜拳辨識機</h3>
+      <div class="code">
+        <div><span class="blk hat">接收到類別 <span class="drop">1 ▾</span> 時</span></div>
+        <div class="ind1"><span class="blk ctl">說出「石頭」</span></div>
+        <div class="ind1"><span class="blk ctl">切換造型到「布」</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>易錯點：</b>三個手勢都在同一位置、同一角度拍攝，導致換個姿勢就失準；訓練時忘記把「分類」關閉，畫面跳動讓學生誤以為壞掉。</p>
+    </div>
+    <div class="card">
+      <h3>🔁 範例 2：自動連拍 20 張</h3>
+      <p style="font-size:.92rem;color:var(--ink2)">避免學生狂按滑鼠，也能確保張數一致。</p>
+      <div class="code">
+        <div><span class="blk ctl">當按下 <span class="drop">空白 ▾</span> 鍵</span></div>
+        <div class="ind1"><span class="blk ctl">重複 <span class="num">20</span> 次</span></div>
+        <div class="ind2"><span class="blk">學習標籤1</span></div>
+        <div class="ind2"><span class="blk ctl">等待 <span class="num">0.2</span> 秒</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>教學重點：</b>中間的「等待」很關鍵 —— 讓學生在 4 秒內緩慢移動手部，自然產生變異，比連按 20 下同一畫面好得多。</p>
+    </div>
+    <div class="card">
+      <h3>🗑️ 範例 3：垃圾分類小幫手</h3>
+      <div class="code">
+        <div><span class="blk hat">接收到類別 <span class="drop">4 ▾</span> 時</span></div>
+        <div class="ind1"><span class="blk ctl">說出「請把物品放到鏡頭前」</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>設計重點：</b>標籤4 設為「空背景」負樣本。<b>易錯點：</b>沒有負樣本時，鏡頭空著也會一直觸發某個分類，學生會以為程式壞了。</p>
+    </div>
+    <div class="card">
+      <h3>🎨 範例 4：不用攝影機的玩法</h3>
+      <p style="font-size:.92rem;color:var(--ink2)">用 <span class="blk">學習/分類 <span class="drop">舞台 ▾</span> 影像</span> 改成辨識學生在舞台上用畫筆畫的圖形。</p>
+      <ul class="tidy" style="font-size:.92rem">
+        <li>適合攝影機不足或不便入鏡的班級。</li>
+        <li>可教「圓形／三角形／正方形」辨識，與數學課圖形單元結合。</li>
+        <li>畫完記得清除舞台再畫下一個。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="ready">
+  <div class="sec-head"><span class="dot"></span><h2>七、課前檢查清單</h2></div>
+  <div class="chk">
+    <label><input type="checkbox"><span>所有電腦安裝 <b>Chrome</b> 並可連外；已在教師機完整跑過一次訓練與存檔流程。</span></label>
+    <label><input type="checkbox"><span>已確認學生<b>有可寫入的資料夾</b>可存放學習資料 JSON 與 .sb3（雲端硬碟或個人資料夾）。</span></label>
+    <label><input type="checkbox"><span>攝影機權限正常；若攝影機不足，已準備「舞台影像」版本的替代教案。</span></label>
+    <label><input type="checkbox"><span>已準備實體教具（猜拳手勢卡、回收物品、色卡），讓訓練目標明確一致。</span></label>
+    <label><input type="checkbox"><span>教室光線穩定；已提醒學生訓練與測試要在<b>相同環境</b>進行。</span></label>
+    <label><input type="checkbox"><span>已依校內規定取得攝影機使用同意，並準備 AI 偏見的討論提問。</span></label>
+    <label><input type="checkbox"><span>已備妥一份訓練好的學習資料 JSON，供進度落後的學生直接上傳試玩。</span></label>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="sec-head"><span class="dot"></span><h2>八、常見問題排除</h2></div>
+  <details open><summary>「標籤」一直空白</summary><div class="body">① 尚未有任何學習資料；② 「分類」開關被關閉；③ 模型載入未完成。請先用「標籤數量N」確認資料存在，再開啟判斷。</div></details>
+  <details><summary>不論輸入什麼，永遠回答同一個標籤</summary><div class="body">最常見原因是<b>資料不平衡</b>。請學生比對各標籤張數並補齊。其次是兩類畫面差異太小，或缺少負樣本。</div></details>
+  <details><summary>剛才很準，換位置或換人就失準</summary><div class="body">模型學到了背景或個人特徵（捷徑學習）。在新條件下補充樣本即可改善，並藉此帶出「訓練資料涵蓋範圍」的概念。</div></details>
+  <details><summary>重新整理後學習資料全部消失</summary><div class="body">這是設計如此，資料僅存在於瀏覽器記憶體。務必使用「下載學習資料／上傳學習資料」。<b>提醒：.sb3 不含學習資料。</b></div></details>
+  <details><summary>上傳學習資料後沒有反應</summary><div class="body">請確認上傳的是本擴充下載的 JSON 檔（非 .sb3），且標籤編號與程式中使用的一致。上傳後可用「標籤數量N」確認是否載入成功。</div></details>
+  <details><summary>電腦效能不足、畫面延遲</summary><div class="body">將「每隔幾秒標記一次」改為 1 秒、訓練期間關閉判斷、關閉其他分頁。ML2Scratch 的負擔低於 Facemesh，若連此也吃力，建議改用舞台影像模式。</div></details>
+  <details><summary>擴充功能載入失敗</summary><div class="body">其他 Chrome 擴充（廣告攔截、隱私保護）可能衝突，可用<b>無痕／訪客模式</b>測試。首次載入需連網下載模型。</div></details>
+</section>
+
+<section id="assess">
+  <div class="sec-head"><span class="dot"></span><h2>九、評量指標、AI 倫理與延伸</h2></div>
+  <div class="grid3">
+    <div class="card"><h3>📝 評量指標</h3><ul class="tidy" style="font-size:.92rem">
+      <li><b>知識</b>：能說出機器學習的四步驟（蒐集、標籤、學習、判斷）。</li>
+      <li><b>理解</b>：能解釋 KNN「看最近的鄰居投票」的概念。</li>
+      <li><b>技能</b>：能訓練出準確率穩定的三類模型，並完成存檔與載入。</li>
+      <li><b>分析</b>：模型出錯時能提出至少一個合理原因與改善方法。</li>
+    </ul></div>
+    <div class="card"><h3>⚖️ AI 倫理討論</h3><ul class="tidy" style="font-size:.92rem">
+      <li>「模型只認得它看過的東西」——若訓練資料只涵蓋某一群人會如何？</li>
+      <li>真實案例延伸：人臉辨識對不同膚色的準確度差異。</li>
+      <li>誰該為 AI 的錯誤負責？寫程式的人、提供資料的人，還是使用的人？</li>
+      <li>影像在本機運算的意義：什麼情況下資料上傳雲端會有風險？</li>
+    </ul></div>
+    <div class="card"><h3>🚀 延伸主題</h3><ul class="tidy" style="font-size:.92rem">
+      <li>與 Handpose 結合：用手部座標＋分類做更精準的手勢辨識。</li>
+      <li>比較 Google Teachable Machine（TM2Scratch）的差異。</li>
+      <li>圖形辨識（舞台影像模式）結合數學圖形單元。</li>
+      <li>班級專題：設計一個「幫助某人」的辨識應用並發表。</li>
+    </ul></div>
+  </div>
+</section>
+
+<footer>
+  <p>教材整理　·　ML2Scratch by Junya Ishihara（champierre）　·　模型：ml5.js／TensorFlow.js（MobileNet 特徵擷取 + KNN 分類器）</p>
+  <p><a href="https://github.com/champierre/ml2scratch">GitHub 原始碼</a>　·　<a href="https://stretch3.github.io/">stretch3 線上編輯器</a></p>
+</footer>
+</div>
+
+<script>
+var LC={1:'var(--l1)',2:'var(--l2)',3:'var(--l3)'};
+var LN={1:'標籤1',2:'標籤2',3:'標籤3'};
+var NS='http://www.w3.org/2000/svg';
+function at(el,o){for(var k in o){el.setAttribute(k,o[k]);}return el;}
+var svg=document.getElementById('knnsvg'),dotsG=document.getElementById('dots'),
+    linksG=document.getElementById('links'),testG=document.getElementById('testg');
+var pts=[],test=null,mode='1',K=3;
+function svgXY(evt){
+  var r=svg.getBoundingClientRect();
+  var x=(evt.clientX-r.left)/r.width*400, y=(evt.clientY-r.top)/r.height*300;
+  return {x:Math.max(42,Math.min(376,x)),y:Math.max(14,Math.min(258,y))};
+}
+svg.addEventListener('click',function(e){
+  var p=svgXY(e);
+  if(mode==='t'){test={x:p.x,y:p.y};}else{pts.push({x:p.x,y:p.y,l:parseInt(mode,10)});}
+  draw();
+});
+document.getElementById('clear').addEventListener('click',function(){pts=[];test=null;draw();});
+[].slice.call(document.querySelectorAll('.tool[data-m]')).forEach(function(b){
+  b.addEventListener('click',function(){
+    mode=b.dataset.m;
+    [].slice.call(document.querySelectorAll('.tool[data-m]')).forEach(function(o){o.classList.toggle('on',o===b);});
+  });
+});
+[].slice.call(document.querySelectorAll('.kpick button')).forEach(function(b){
+  b.addEventListener('click',function(){
+    K=parseInt(b.dataset.k,10);
+    [].slice.call(document.querySelectorAll('.kpick button')).forEach(function(o){o.classList.toggle('on',o===b);});
+    draw();
+  });
+});
+function draw(){
+  dotsG.textContent='';linksG.textContent='';testG.textContent='';
+  pts.forEach(function(p){
+    dotsG.appendChild(at(document.createElementNS(NS,'circle'),{cx:p.x,cy:p.y,r:7,fill:LC[p.l],'class':'pt'}));
+  });
+  var big=document.getElementById('v-big'),sub=document.getElementById('v-sub'),tal=document.getElementById('tallies');
+  tal.textContent='';
+  if(!test){
+    big.textContent=pts.length?('目前資料筆數：'+pts.length):'請先放置資料點';
+    sub.textContent=pts.length?'接著選「測試點」放置一個待判斷樣本。':'選擇標籤顏色後點擊左側區域，每一點代表一張已標記的訓練影像。';
+    return;
+  }
+  var star='M '+test.x+' '+(test.y-13)+' l 3.8 8.6 l 9.4 1 l -7 6.3 l 2 9.2 l -8.2 -4.7 l -8.2 4.7 l 2 -9.2 l -7 -6.3 l 9.4 -1 z';
+  testG.appendChild(at(document.createElementNS(NS,'path'),{d:star,fill:'var(--teal)','class':'test'}));
+  if(pts.length===0){
+    big.textContent='無法判斷';
+    sub.textContent='沒有任何訓練資料時，模型無從比較 —— 對應課堂上「標籤」空白的情形。';
+    return;
+  }
+  var arr=pts.map(function(p){
+    var dx=p.x-test.x,dy=p.y-test.y;return {p:p,d:Math.sqrt(dx*dx+dy*dy)};
+  }).sort(function(a,b){return a.d-b.d;});
+  var k=Math.min(K,arr.length),vote={1:0,2:0,3:0};
+  for(var i=0;i<k;i++){
+    vote[arr[i].p.l]++;
+    linksG.appendChild(at(document.createElementNS(NS,'line'),
+      {x1:test.x,y1:test.y,x2:arr[i].p.x,y2:arr[i].p.y,'class':'link'}));
+    dotsG.appendChild(at(document.createElementNS(NS,'circle'),
+      {cx:arr[i].p.x,cy:arr[i].p.y,r:12,fill:'none',stroke:LC[arr[i].p.l],'stroke-width':3,opacity:.85}));
+  }
+  var best=1;
+  for(var l=2;l<=3;l++){if(vote[l]>vote[best])best=l;}
+  var tie=[1,2,3].filter(function(l){return vote[l]===vote[best];}).length>1;
+  big.innerHTML='判斷結果：<span style="color:'+LC[best]+'">'+LN[best]+'</span>'+(tie?'（同票，結果不穩定）':'');
+  sub.textContent='最近的 '+k+' 筆資料中有 '+vote[best]+' 筆屬於'+LN[best]+'　（k = '+K+'）';
+  [1,2,3].forEach(function(l){
+    if(vote[l]===0 && !pts.some(function(p){return p.l===l;}))return;
+    var row=document.createElement('div');row.className='tally';
+    row.innerHTML='<span style="color:'+LC[l]+'">'+LN[l]+'</span>'+
+      '<span class="track"><i style="width:'+(vote[l]/k*100)+'%;background:'+LC[l]+'"></i></span>'+
+      '<span style="font-family:var(--f-num)">'+vote[l]+'/'+k+'</span>';
+    tal.appendChild(row);
+  });
+}
+draw();
+</script>
+
+</body>
+</html>

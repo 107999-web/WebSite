@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>8 遊戲機制｜Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap" style="--mc:#E8544B">
+<section class="hero"><span class="kind">第 8 類｜6 個函式（A 型 5、B 型 1）</span><h1>遊戲機制</h1><p>做遊戲一定會用到的機制：順暢的左右移動、有重力的跳躍、受傷與無敵時間、無敵閃爍、最高分、無限捲動的背景。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="on">8 遊戲機制</a></div><div class="btnrow" style="margin-top:12px"><a class="btn" href="sb3/8_遊戲機制.sb3" download>⬇ 8_遊戲機制.sb3</a><a class="btn ghost" href="play/8_遊戲機制/index.html" target="_blank" rel="noopener">🎮 網頁版試玩</a><a class="btn ghost" href="sprite3/小幫手_8_遊戲機制.sprite3" download>⬇ 小幫手_8_遊戲機制.sprite3</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">這一類在做什麼</a><a href="#lab">🎛️ 試玩台</a><a class="sub" href="#f8-1">8-1 左右鍵移動</a><a class="sub" href="#f8-2">8-2 重力跳躍</a><a class="sub" href="#f8-3">8-3 受傷</a><a class="sub" href="#f8-4">8-4 無敵閃爍</a><a class="sub" href="#f8-5">8-5 更新最高分</a><a class="sub" href="#f8-6">8-6 無限捲動</a><a href="#work">✏️ 動手改・檢核</a><div class="prog">自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#E8544B;color:#fff">第 8 類</span><h2>這一類在做什麼</h2></div><div class="topic"><h3>🎮 主迴圈只剩「呼叫函式」</h3>
+<p>把每個機制包成函式以後，玩家的主迴圈變得像一張清單：<b>左右鍵移動 → 重力跳躍 → 限制在舞台內 → 無敵閃爍 → 碰到刺球就受傷</b>。
+一眼就看得出每一格在做什麼；想調整跳躍手感，只要改「重力」「跳躍力」兩個數字。</p></div>
+<div class="why"><b class="t">「一格一格」的物理</b>　重力跳躍每一格都做：上下速度 − 重力、y ＋ 上下速度。速度一直變小（變成負的），角色就會先往上、慢下來、再往下掉，畫出一條拋物線。</div>
+<div class="warn"><b class="t">（踩過的坑）先設變數，再廣播</b>　「開始遊戲」如果寫成「收到廣播才把生命值設成 3」，玩家的程式可能比舞台先跑，讀到上一局的生命值 0，一開始就「遊戲結束」。所以範例是先把分數、生命值設好，<b>再</b>廣播「開始遊戲」。</div></section>
+<section class="chap" id="lab"><div class="ch"><span class="cn" style="background:#E8544B;color:#fff">試玩台</span><h2>🎛️ 先玩玩看</h2></div><p class="lead">這裡的效果都是照 .sb3 裡的積木一句一句翻成網頁程式，數字和順序完全一樣。按下按鈕時，下面會顯示「在 Scratch 裡等於呼叫哪一塊積木」。</p><div class="lab"><div class="lh">🎛️ 試玩台 8 <span class="tag">動手按</span></div><div data-lab="8"></div></div></section>
+<section class="chap" id="funcs"><div class="ch"><span class="cn" style="background:#E8544B;color:#fff">函式</span><h2>🧩 6 個函式</h2></div><p class="lead">每張卡片的積木圖都是從 <b>8_遊戲機制.sb3</b> 自動轉出來的，和檔案裡一模一樣。</p>
+<article class="func" id="f8-1" style="--mc:#E8544B">
+<div class="fcard"><div class="fname"><span class="fid">8-1</span><span class="sb myblocks">左右鍵移動 速度 <span class="rp myblocks">速度</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>每一格走幾步</span><b>輸出</b><span>（角色往左右走）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>按 → 或 D 往右、按 ← 或 A 往左。放在「重複無限次」裡呼叫，所以按住就會一直走，比「當 → 鍵被按下」順很多。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（玩家・定義）</small></h4><div data-sb="8|玩家|def:左右鍵移動 速度 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">玩家・收到「開始遊戲」</p><div data-sb="8|玩家|msg:開始遊戲" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f8-2" style="--mc:#E8544B">
+<div class="fcard"><div class="fname"><span class="fid">8-2</span><span class="sb myblocks">重力跳躍 重力 <span class="rp myblocks">重力</span> 跳躍力 <span class="rp myblocks">跳躍力</span> 地面 <span class="rp myblocks">地面y</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>重力（每格速度減多少）、跳躍力（起跳速度）、地面的 y</span><b>輸出</b><span>（角色的 y 與「上下速度」）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>每一格：上下速度減掉重力、y 加上上下速度。掉到地面以下就站回地面、速度歸零。站在地上又按 ↑ 才能起跳（不能在空中連跳）。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（玩家・定義）</small></h4><div data-sb="8|玩家|def:重力跳躍 重力 %s 跳躍力 %s 地面 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">玩家・收到「開始遊戲」</p><div data-sb="8|玩家|msg:開始遊戲" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f8-3" style="--mc:#E8544B">
+<div class="fcard"><div class="fname"><span class="fid">8-3</span><span class="sb myblocks">受傷 <span class="rp myblocks">傷害</span> 無敵 <span class="rp myblocks">無敵秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>扣幾點生命、受傷後無敵幾秒</span><b>輸出</b><span>生命值（所有角色適用）、無敵到</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>如果現在不是無敵：生命值扣掉傷害，並設定「無敵到 ＝ 計時器 ＋ 無敵秒數」。碰到敵人的那幾格都會呼叫，但只有第一次會扣血。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（玩家・定義）</small></h4><div data-sb="8|玩家|def:受傷 %s 無敵 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">玩家・收到「開始遊戲」</p><div data-sb="8|玩家|msg:開始遊戲" style="margin-bottom:10px"></div><p class="sm" style="margin:0 0 4px">玩家・按 H 鍵</p><div data-sb="8|玩家|key:h" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f8-4" style="--mc:#E8544B">
+<div class="fcard"><div class="fname"><span class="fid">8-4</span><span class="sb myblocks">無敵閃爍</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>（無，放在迴圈裡）</span><b>輸出</b><span>（無敵時角色一閃一閃）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>無敵中：幻影 ＝（四捨五入(計時器 × 10) 除以 2 的餘數）× 70，每 0.1 秒切換一次；不是無敵就設回 0。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（玩家・定義）</small></h4><div data-sb="8|玩家|def:無敵閃爍"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">玩家・收到「開始遊戲」</p><div data-sb="8|玩家|msg:開始遊戲" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f8-5" style="--mc:#E8544B">
+<div class="fcard"><div class="fname"><span class="fid">8-5</span><span class="sb myblocks">更新最高分</span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>分數、最高分</span><b>輸出</b><span>最高分、破紀錄（1／0）</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>更新最高分</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>分數比最高分高，就更新最高分並把「破紀錄」設成 1。（最高分會跟著專案存檔，但重新開網頁就沒了。）</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="8|舞台|def:更新最高分"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">舞台・收到「遊戲結束」</p><div data-sb="8|舞台|msg:遊戲結束" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f8-6" style="--mc:#E8544B">
+<div class="fcard"><div class="fname"><span class="fid">8-6</span><span class="sb myblocks">無限捲動 速度 <span class="rp myblocks">速度</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>每一格往左移幾步</span><b>輸出</b><span>（角色往左移，出去後從右邊回來）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>往左移；x 小於 −250 就搬到 x ＝ 250。放幾個分身（雲、樹、障礙物）一起捲，就像背景一直往後跑。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（刺球・定義）</small></h4><div data-sb="8|刺球|def:無限捲動 速度 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">雲・分身產生時</p><div data-sb="8|雲|clone" style="margin-bottom:10px"></div><p class="sm" style="margin:0 0 4px">刺球・收到「開始遊戲」</p><div data-sb="8|刺球|msg:開始遊戲" style="margin-bottom:10px"></div></div>
+</div></article>
+</section>
+<section class="chap" id="work"><div class="ch"><span class="cn" style="background:#E8544B;color:#fff">動手</span><h2>✏️ 動手改・小測驗・自我檢核</h2></div><div class="work"><h3>✏️ 動手改</h3><ol><li>打開 <b>8_遊戲機制.sb3</b>（或網頁版），用 ← → ↑ 玩，按 <kbd>H</kbd> 假裝被撞、<kbd>R</kbd> 重來。</li><li>在試玩台把重力調成 0.4、跳躍力調成 10：像在月球嗎？</li><li>把無敵秒數改成 0，碰到刺球會一次扣幾滴血？為什麼？</li><li>加上「金幣」：用「無限捲動」和「碰到玩家」讓分數 +5。</li><li>挑戰：讓玩家可以「二段跳」（提示：記錄跳了幾次，落地時歸零）。</li></ol></div><div class="qz"><div class="qq">為什麼「受傷」要有無敵時間？</div><div class="ops"><button>讓遊戲比較簡單</button><button data-r>碰到敵人的那幾格都會呼叫「受傷」，沒有無敵的話一碰就扣好幾滴血</button><button>Scratch 規定的</button></div><div class="ex">角色和刺球重疊好幾格，每一格都「碰到」。無敵時間讓只有第一次會扣血。</div></div><div class="qz"><div class="qq">「重力跳躍」怎麼防止在空中一直跳？</div><div class="ops"><button>跳躍力設小一點</button><button data-r>只有「y ＝ 地面」時按 ↑ 才起跳</button><button>跳了之後等待 1 秒</button></div><div class="ex">在空中 y 不等於地面，按 ↑ 也不會改變速度。</div></div><div class="chklist" style="margin-top:14px"><label><input type="checkbox" id="k8a"> 我會用函式讓主迴圈變短</label><label><input type="checkbox" id="k8b"> 我能說出重力跳躍每一格做的兩件事</label><label><input type="checkbox" id="k8c"> 我知道受傷為什麼要無敵時間</label></div></section>
+<p class="sm" style="margin-top:28px">← <a href="c7.html">7 清單工具</a>　<a href="index.html#dl">下載區</a> →</p>
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 產生工具：tools/build_library.py ・ 積木圖由 .sb3 自動轉出</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

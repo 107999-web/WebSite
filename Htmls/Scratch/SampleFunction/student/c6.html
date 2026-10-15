@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>6 數學小工具｜Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap" style="--mc:#59C059">
+<section class="hero"><span class="kind">第 6 類｜5 個函式（B 型 5）</span><h1>數學小工具</h1><p>常用的數學小工具：限制範圍、兩點距離、在不在範圍內、四捨五入到小數第幾位、不重複的隨機數。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="on">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="">8 遊戲機制</a></div><div class="btnrow" style="margin-top:12px"><a class="btn" href="sb3/6_數學小工具.sb3" download>⬇ 6_數學小工具.sb3</a><a class="btn ghost" href="play/6_數學小工具/index.html" target="_blank" rel="noopener">🎮 網頁版試玩</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">這一類在做什麼</a><a href="#lab">🎛️ 試玩台</a><a class="sub" href="#f6-1">6-1 限制範圍</a><a class="sub" href="#f6-2">6-2 兩點距離</a><a class="sub" href="#f6-3">6-3 在範圍內嗎</a><a class="sub" href="#f6-4">6-4 四捨五入</a><a class="sub" href="#f6-5">6-5 不重複隨機</a><a href="#work">✏️ 動手改・檢核</a><div class="prog">自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#59C059;color:#fff">第 6 類</span><h2>這一類在做什麼</h2></div><div class="topic"><h3>🧮 B 型函式：舞台服務台</h3>
+<p>這一類的函式都放在<b>舞台</b>上，只負責計算，不會動任何角色。任何角色要用，就照三個步驟：</p>
+<ol><li>把輸入寫進「參數1」「參數2」……</li><li><b>廣播</b>（函式的名字）<b>並等待</b></li><li>讀「結果」</li></ol>
+<p>舞台上有一段「當收到訊息 限制範圍 → 限制範圍 (參數1) 最小 (參數2) 最大 (參數3)」，這就是「服務台」。</p></div>
+<div class="warn"><b class="t">兩個角色同時用服務台會怎樣？</b>　參數和結果都只有一份。如果兩個角色在同一瞬間寫參數，可能會拿到別人的結果。
+一般情況（按鍵、點角色）不會同時發生；如果要在「重複無限次」裡大量計算，就把那個函式複製一份到角色裡自己用。</div></section>
+<section class="chap" id="lab"><div class="ch"><span class="cn" style="background:#59C059;color:#fff">試玩台</span><h2>🎛️ 先玩玩看</h2></div><p class="lead">這裡的效果都是照 .sb3 裡的積木一句一句翻成網頁程式，數字和順序完全一樣。按下按鈕時，下面會顯示「在 Scratch 裡等於呼叫哪一塊積木」。</p><div class="lab"><div class="lh">🎛️ 試玩台 6 <span class="tag">動手按</span></div><div data-lab="6"></div></div></section>
+<section class="chap" id="funcs"><div class="ch"><span class="cn" style="background:#59C059;color:#fff">函式</span><h2>🧩 5 個函式</h2></div><p class="lead">每張卡片的積木圖都是從 <b>6_數學小工具.sb3</b> 自動轉出來的，和檔案裡一模一樣。</p>
+<article class="func" id="f6-1" style="--mc:#59C059">
+<div class="fcard"><div class="fname"><span class="fid">6-1</span><span class="sb myblocks">限制範圍 <span class="rp myblocks">值</span> 最小 <span class="rp myblocks">最小</span> 最大 <span class="rp myblocks">最大</span></span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>值、最小值、最大值</span><b>輸出</b><span>結果</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>限制範圍</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>比最小還小就用最小，比最大還大就用最大。生命值不能小於 0、音量不能超過 100 都用它。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="6|舞台|def:限制範圍 %s 最小 %s 最大 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 1 鍵</p><div data-sb="6|圓圓|key:1" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f6-2" style="--mc:#59C059">
+<div class="fcard"><div class="fname"><span class="fid">6-2</span><span class="sb myblocks">兩點距離 x1 <span class="rp myblocks">x1</span> y1 <span class="rp myblocks">y1</span> x2 <span class="rp myblocks">x2</span> y2 <span class="rp myblocks">y2</span></span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>兩個點的 x、y</span><b>輸出</b><span>結果</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>兩點距離</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>畢氏定理：橫的差 × 橫的差 ＋ 直的差 × 直的差，再開平方根。（Scratch 有「到 鼠標 的距離」，但只能量「角色到某個東西」；這個可以量任意兩點。）</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="6|舞台|def:兩點距離 x1 %s y1 %s x2 %s y2 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 2 鍵</p><div data-sb="6|圓圓|key:2" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f6-3" style="--mc:#59C059">
+<div class="fcard"><div class="fname"><span class="fid">6-3</span><span class="sb myblocks">在範圍內嗎 <span class="rp myblocks">值</span> 最小 <span class="rp myblocks">最小</span> 最大 <span class="rp myblocks">最大</span></span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>值、最小值、最大值</span><b>輸出</b><span>結果（1 在範圍內，0 不在）</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>在範圍內嗎</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>「不小於最小」而且「不大於最大」。用「不成立 ＜」代替「≧」，因為 Scratch 沒有 ≧ 積木。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="6|舞台|def:在範圍內嗎 %s 最小 %s 最大 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 3 鍵</p><div data-sb="6|圓圓|key:3" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f6-4" style="--mc:#59C059">
+<div class="fcard"><div class="fname"><span class="fid">6-4</span><span class="sb myblocks">四捨五入 <span class="rp myblocks">值</span> 到小數 <span class="rp myblocks">位數</span> 位</span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>值、要留幾位小數</span><b>輸出</b><span>結果</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>四捨五入</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>Scratch 的「四捨五入」只能到整數。先乘 10 的「位數」次方，四捨五入，再除回去。例如 3.14159 到 2 位 → 314.159 → 314 → 3.14。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="6|舞台|def:四捨五入 %s 到小數 %s 位"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 4 鍵</p><div data-sb="6|圓圓|key:4" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f6-5" style="--mc:#59C059">
+<div class="fcard"><div class="fname"><span class="fid">6-5</span><span class="sb myblocks">不重複隨機 <span class="rp myblocks">最小</span> 到 <span class="rp myblocks">最大</span></span><span class="ftype B">B 型｜舞台服務台</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>最小、最大（整數）</span><b>輸出</b><span>結果</span><b>放在哪</b><span>放在舞台。舞台直接呼叫；角色用「參數 → 廣播 <b>不重複隨機</b> 並等待 → 讀結果」。</span><b>怎麼做</b><span>把所有數字放進「抽籤袋」清單，每次隨機抽一個並把它刪掉，所以不會重複。袋子空了（或範圍改了）就重新裝滿。出題、洗牌都用得到。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（舞台・定義）</small></h4><div data-sb="6|舞台|def:不重複隨機 %s 到 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 5 鍵</p><div data-sb="6|圓圓|key:5" style="margin-bottom:10px"></div></div>
+</div></article>
+</section>
+<section class="chap" id="work"><div class="ch"><span class="cn" style="background:#59C059;color:#fff">動手</span><h2>✏️ 動手改・小測驗・自我檢核</h2></div><div class="work"><h3>✏️ 動手改</h3><ol><li>打開 <b>6_數學小工具.sb3</b>，按 <kbd>1</kbd>～<kbd>5</kbd>，看左上角的參數與結果怎麼變。</li><li>按 <kbd>2</kbd> 前先移動滑鼠：距離和你想的一樣嗎？</li><li>用「限制範圍」讓生命值不會小於 0、也不會大於 10。</li><li>用「不重複隨機」做一個 1～10 的題目順序，10 題都不會重複。</li><li>挑戰：寫一個新的 B 型函式「兩數平均 (a)(b)」，也接上服務台（需要加哪兩段程式？）。</li></ol></div><div class="qz"><div class="qq">角色要用「四捨五入 (3.14159) 到小數 (2) 位」，正確的順序是？</div><div class="ops"><button>廣播 → 寫參數 → 讀結果</button><button data-r>寫參數 → 廣播並等待 → 讀結果</button><button>讀結果 → 寫參數 → 廣播</button></div><div class="ex">一定要先把參數寫好再廣播（坑：先改變數，再廣播），而且要「並等待」，不然還沒算完就讀結果了。</div></div><div class="qz"><div class="qq">「在範圍內嗎 (100) 最小 (−100) 最大 (100)」的結果？</div><div class="ops"><button data-r>1</button><button>0</button></div><div class="ex">「不小於最小」而且「不大於最大」，所以邊界上的 100 也算在範圍內。</div></div><div class="chklist" style="margin-top:14px"><label><input type="checkbox" id="k6a"> 我會用「寫參數 → 廣播並等待 → 讀結果」使用 B 型函式</label><label><input type="checkbox" id="k6b"> 我知道為什麼廣播要「並等待」</label><label><input type="checkbox" id="k6c"> 我會做不重複的隨機題目</label></div></section>
+<p class="sm" style="margin-top:28px">← <a href="c5.html">5 計時與流程</a>　<a href="c7.html">7 清單工具</a> →</p>
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 產生工具：tools/build_library.py ・ 積木圖由 .sb3 自動轉出</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

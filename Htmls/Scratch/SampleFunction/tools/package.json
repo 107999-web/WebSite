@@ -1,0 +1,7 @@
+{
+  "name": "scratch-function-library-tools",
+  "private": true,
+  "description": "Scratch 函式庫：用 headless scratch-vm 測試 .sb3（node test_library.js）",
+  "scripts": { "test": "node test_library.js" },
+  "dependencies": { "scratch-vm": "*" }
+}

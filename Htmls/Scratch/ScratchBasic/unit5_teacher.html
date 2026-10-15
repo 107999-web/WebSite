@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 5 教師手冊：讓程式記住事情</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📦 單元 5 教師手冊 <em>讓程式記住事情</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit5_student.html">學生版</a>
+      <a href="unit3_teacher.html">單元3</a>
+      <a href="unit4_teacher.html">單元4</a>
+      <a href="unit6_teacher.html">單元6</a>
+      <a href="unit7_teacher.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>單元 5 教師手冊</h1>
+    <p>對象：國小高年級（建議六年級）　·　時間：2 節（40 分鐘）　·　範圍：變數類 5 塊　·　搭配：<a href="unit5_student.html">學生版實作單</a>、<a href="guide.html">積木圖鑑</a>、<a href="mistakes.html">易錯點總表</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、教學目標</h3>
+    <ul style="font-size:.94rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>認知</b>：說明變數是「有名字、可以重複覆寫」的儲存空間，並分辨賦值（設為）與累加（改變）。</li>
+      <li><b>技能</b>：用變數完成計分板與生命值，並能判斷歸零的積木該放在哪一層。</li>
+      <li><b>思維</b>：能指出程式中哪些數字「應該變成變數」，也就是把魔術數字抽象化。</li>
+    </ul>
+    <div class="note" style="margin-top:12px">變數是<b>整套教材裡最抽象的一課</b>，卻也是學生最有動機學的一課——因為沒有變數就做不出分數。建議用「分數」當唯一主線，其他變數都當配角，不要一次介紹太多。</div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、節次流程（兩節課）</h3>
+    <div class="tline"><div class="t">第1節<br>0–8′</div><div><b>不插電導入</b>：拿一個真的盒子，外面貼上「分數」的標籤。放一張寫 0 的紙進去，問：「要變成 1，我要怎麼做？」引導出「<b>把舊的拿出來、換一張新的</b>」——這正是賦值。</div></div>
+    <div class="tline"><div class="t">8–20′</div><div><b>變數實驗室</b>：投影學生版第 1 段，讓學生輪流按按鈕，觀察舞台左上角的監看器。重點是建立「按一下積木，盒子就變一次」的因果感。</div></div>
+    <div class="tline"><div class="t">20–40′</div><div><b>設為 vs 改變（本課核心）</b>：學生版第 3 段的兩段對照程式。<b>先請學生預測</b>結果再執行，預測錯的學生印象最深。這一段寧可花 20 分鐘。</div></div>
+    <div class="tline"><div class="t">第2節<br>0–20′</div><div><b>完成作品 1 計分板</b>：強調「設為 0」放在綠旗下面、「改變 1」放在迴圈裡。可刻意示範把「設為 0」放進迴圈，讓分數卡在 1，再請學生說出原因。</div></div>
+    <div class="tline"><div class="t">20–35′</div><div><b>完成作品 2 生命值</b>：重點是<b>減分要填負數</b>，以及「重複直到 生命 ＝ 0」把變數當成迴圈的結束條件。</div></div>
+    <div class="tline"><div class="t">35–40′</div><div><b>分享與預告</b>：請學生說出自己作品裡「哪一個數字應該變成變數」。預告清單（一次記很多筆）與函式積木。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、關鍵概念與學生迷思</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">概念</th><th style="width:38%">學生常見迷思</th><th>教學建議</th></tr></thead>
+      <tbody>
+        <tr><td><b>設為 vs 改變</b></td><td>用「設為 1」想要加一分，結果分數永遠是 1。</td><td>盒子比喻：設為＝<b>把裡面的紙換掉</b>，改變＝<b>在紙上的數字再加</b>。這是本課第一名的錯誤。</td></tr>
+        <tr><td><b>歸零的位置</b></td><td>把「設為 0」放進重複無限次裡，分數每圈都被洗掉。</td><td>問一句：「這件事一局要做<b>幾次</b>？」一次的放綠旗下面，每次都要的才放迴圈裡。</td></tr>
+        <tr><td><b>減少要用負數</b></td><td>找不到「減少」的積木，以為 Scratch 沒有這個功能。</td><td>「改變 -1」就是減一。順帶複習運算類的負數概念。</td></tr>
+        <tr><td><b>變數是值不是動作</b></td><td>把圓形的變數積木直接接在腳本上，按執行沒反應。</td><td>回到單元 4 的形狀觀念：圓形要放<b>進欄位</b>。</td></tr>
+        <tr><td><b>顯示 ≠ 存在</b></td><td>以為「隱藏」等於把分數清成 0。</td><td>隱藏之後按「說出 分數」，值還在，學生立刻明白。</td></tr>
+        <tr><td><b>加分會連續觸發</b></td><td>碰到目標後分數瞬間跳好幾十分。</td><td>迴圈每一圈都成立就會一直加。解法是加完分立刻<b>讓條件不再成立</b>（換位置、隱藏、等待）。</td></tr>
+        <tr><td><b>變數是全班共用的</b></td><td>以為每個角色的「分數」是各自獨立的。</td><td>建立變數時選「<b>適用於所有角色</b>」是共用的，選「僅適用當前角色」才各自一份。小舞台只有一個角色，此處用口頭說明。</td></tr>
+        <tr><td><b>名字要看得懂</b></td><td>四個變數都叫 a、b、c。</td><td>要求學生用中文或有意義的英文命名。這是程式素養，不是龜毛。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、三個作品的教學提示</h3>
+    <div class="tline"><div class="t">作品 1<br>計分板</div><div><b>教學重點</b>：完整的「初始化 → 迴圈 → 條件 → 累加」結構，是所有遊戲的骨架。<b>易錯</b>：忘記加分後換位置，分數一次跳很多；「設為 0」放錯層。<b>差異化</b>：進階者加上「分數 ＞ 10 就說過關」。</div></div>
+    <div class="tline"><div class="t">作品 2<br>生命值</div><div><b>教學重點</b>：變數也可以<b>當迴圈的結束條件</b>，把單元 3 的「重複直到」和變數接起來。<b>易錯</b>：減分填成正數，生命越撞越多；條件寫成「生命 ＜ 0」而永遠跳不出來（因為會直接從 1 跳到 0 再變 -1）。<b>建議</b>：用「生命 ＝ 0」或「生命 ＜ 1」都可以，請學生說明差別。</div></div>
+    <div class="tline"><div class="t">作品 3<br>可調速度</div><div><b>教學重點</b>：把寫死的數字換成變數，程式就「可以調參數」了，這是<b>抽象化</b>的第一步。<b>易錯</b>：速度累加太快導致角色瞬間穿牆。<b>延伸</b>：加「速度 ＞ 30 就設回 5」做出循環。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>五、差異化與延伸</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢</b>：只要能完成「設為 0 → 迴圈裡改變 1 → 分數會往上跳」就算達標，作品 2、3 可省略。</li>
+      <li><b>提早完成</b>：挑戰把作品 1 與 2 合併，或做「每 5 分加速一次」（用運算類的餘數）。</li>
+      <li><b>跨領域</b>：數學的等號意義（程式的 ＝ 是「放進去」，不是「兩邊相等」，這點值得特別澄清）；統計的計次；體育的計分規則設計。</li>
+      <li><b>不插電</b>：每人一個紙杯貼上名字當變數，老師唸指令（「分數 改變 3」「分數 設為 0」），學生用籌碼操作，全班一起驗證答案。</li>
+      <li><b>下一步</b>：當學生問「我想記住十個人的分數怎麼辦」，就是導入<b>清單</b>的最佳時機。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>六、評量規準</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>概念理解</b></td><td>能說明設為與改變的差別，並預測程式執行後變數的值</td><td>能正確選用設為或改變</td><td>兩者混用，需提示才能修正</td></tr>
+        <tr><td><b>結構安排</b></td><td>能判斷初始化該放在哪一層，並說明理由</td><td>能依步驟把歸零放在綠旗下面</td><td>常把初始化放進迴圈</td></tr>
+        <tr><td><b>抽象化</b></td><td>能主動指出程式裡哪些數字應該改成變數</td><td>能依提示把數字換成變數</td><td>尚未察覺變數的用處</td></tr>
+        <tr><td><b>創作表現</b></td><td>完成含計分或生命機制的原創作品並說明邏輯</td><td>能完成指定作品</td><td>僅能複製示範</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>七、關於小舞台的說明（與真實 Scratch 的差異）</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>變數是預先建好的</b>：小舞台固定提供 <code>my variable</code>、分數、生命、速度四個；真實 Scratch 要先按「<b>建立一個變數</b>」，並選擇適用於所有角色或僅當前角色。上課時請務必示範這一步。</li>
+      <li><b>回報積木是下拉選單</b>：真實 Scratch 是<b>每個變數各有一塊</b>圓形積木；小舞台為了避免圖鑑出現四張幾乎一樣的卡片，改成一塊加下拉選單。概念相同，但要提醒學生實際畫面不一樣。</li>
+      <li><b>監看器</b>：舞台左上角的橙色方塊和真實 Scratch 一樣，但小舞台<b>不能拖動位置</b>，也沒有滑桿與大字顯示三種樣式。</li>
+      <li><b>勾選框</b>：圖鑑裡變數積木左邊的方框只是<b>示意</b>，要用「顯示／隱藏」積木來控制監看器。</li>
+      <li><b>重設全部</b>會把四個變數一起歸零，方便重跑示範。</li>
+      <li><b>清單與函式積木</b>尚未建置，預計在下一批完成。</li>
+    </ul>
+  </div>
+
+  <footer>📦 單元 5 教師手冊　·　<a href="unit3_teacher.html">單元 3</a>　·　<a href="unit4_teacher.html">單元 4</a></footer>
+</div>
+</body>
+</html>

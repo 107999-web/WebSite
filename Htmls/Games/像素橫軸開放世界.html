@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D 像素橫軸開放世界 - 角色與多層地貌優化版</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            background-color: #111; color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
+        }
+        #ui { text-align: center; margin-bottom: 10px; }
+        .stats { font-size: 18px; color: #5dade2; font-weight: bold; }
+        .layer-info { color: #f1c40f; font-size: 14px; margin-top: 3px; }
+        canvas {
+            border: 4px solid #333;
+            background: linear-gradient(to bottom, #0f172a, #1e293b, #334155); /* 漸層夜空 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <h2>🦊 像素橫軸開放世界 v2.0</h2>
+        <p>移動: <b>A, D</b> | 跳躍: <b>W / K</b> | 攻擊: <b>J / Space</b></p>
+        <div class="stats">⚔️ 擊殺史萊姆: <span id="kill-count" style="color:#e74c3c">0</span></div>
+        <div class="layer-info">目前高度層級: <span id="current-layer">地表</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const killCountSpan = document.getElementById("kill-count");
+        const layerInfoSpan = document.getElementById("current-layer");
+
+        // --- 遊戲物理與設定 ---
+        const GRAVITY = 0.45;
+        const BLOCK_SIZE = 40; 
+        let killCount = 0;
+
+        // 玩家狀態（大幅優化建模）
+        const player = {
+            x: 100, y: 100,
+            vx: 0, vy: 0,
+            width: 24, height: 40, // 更符合人形的比例
+            speed: 4.5, jumpForce: 10.5,
+            grounded: false,
+            facing: "right",
+            isAttacking: false,
+            attackTimer: 0,
+            walkCycle: 0 // 用於計算雙腳與身體踏步的動畫
+        };
+
+        // 史萊姆怪物
+        const enemies = [
+            { x: 400, y: 100, vx: 1, vy: 0, hp: 2, size: 26, jumpTimer: 0 },
+            { x: -200, y: 100, vx: -1, vy: 0, hp: 2, size: 26, jumpTimer: 0 },
+            { x: 800, y: -200, vx: 1, vy: 0, hp: 2, size: 26, jumpTimer: 0 } // 在浮空島附近
+        ];
+
+        // 按鍵狀態
+        const keys = {};
+        window.addEventListener("keydown", e => {
+            const k = e.key.toLowerCase();
+            keys[k] = true;
+            if (k === " " || k === "j") {
+                if (!player.isAttacking) {
+                    player.isAttacking = true;
+                    player.attackTimer = 10;
+                    checkAttack();
+                }
+                e.preventDefault();
+            }
+            if (k === "w" || k === "arrowup" || k === "k") {
+                if (player.grounded) {
+                    player.vy = -player.jumpForce;
+                    player.grounded = false;
+                }
+            }
+        });
+        window.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+        // --- 地形生成核心（多層世界：浮空島、地表、地下礦坑） ---
+        function getBlockType(bx, by) {
+            // by 代表從天頂往下算的格數
+            // 換算成世界高度層（以地表為基準 0）
+            const groundBase = 7; // 地表基礎線
+            
+            // 1. 天空層 (by <= 3) -> 隨機生成浮空島平台
+            if (by < 4) {
+                const islandNoise = Math.sin(bx * 0.4) * Math.cos(bx * 0.2);
+                if (islandNoise > 0.4 && by === 2) return "cloud_grass";
+                if (islandNoise > 0.4 && by === 3) return "cloud_dirt";
+                return "air";
+            }
+
+            // 2. 地表起伏線
+            const hill = Math.floor(Math.sin(bx * 0.1) * 2 + Math.cos(bx * 0.04) * 3);
+            const surfaceY = groundBase - hill;
+
+            if (by < surfaceY) {
+                return "air"; // 空氣
+            } else if (by === surfaceY) {
+                return "surface_grass"; // 地表草地
+            } else if (by > surfaceY && by < surfaceY + 5) {
+                return "surface_dirt"; // 地表泥土
+            } else {
+                // 3. 地下深層礦坑 (by >= surfaceY + 5)
+                // 利用雜湊孔洞模擬地下洞穴
+                const caveNoise = Math.sin(bx * 0.2) * Math.sin(by * 0.3) + Math.cos(bx * 0.1) * Math.cos(by * 0.2);
+                if (caveNoise > 0.6) return "air"; // 挖空的洞穴
+                return "stone"; // 深層岩石
+            }
+        }
+
+        // --- 物理碰撞檢查（改為精確的格子碰撞） ---
+        function handleCollisions(obj, isPlayer = false) {
+            obj.vy += GRAVITY;
+            obj.x += obj.vx;
+            obj.y += obj.vy;
+
+            // 底部碰撞偵測（踩在實體方塊上）
+            const footY = obj.y + obj.height;
+            const leftBlockX = Math.floor(obj.x / BLOCK_SIZE);
+            const rightBlockX = Math.floor((obj.x + obj.width) / BLOCK_SIZE);
+            const footBlockY = Math.floor(footY / BLOCK_SIZE);
+
+            let onSolid = false;
+            for (let bx = leftBlockX; bx <= rightBlockX; bx++) {
+                const type = getBlockType(bx, footBlockY);
+                if (type !== "air") {
+                    const blockTopY = footBlockY * BLOCK_SIZE;
+                    if (obj.vy >= 0 && footY >= blockTopY && footY - obj.vy <= blockTopY + 6) {
+                        obj.y = blockTopY - obj.height;
+                        obj.vy = 0;
+                        onSolid = true;
+                    }
+                }
+            }
+            
+            if (isPlayer) {
+                obj.grounded = onSolid;
+                // 更新 UI 顯示目前層級
+                if (obj.y < 120) layerInfoSpan.innerText = "☁️ 浮空島天空層";
+                else if (obj.y > 360) layerInfoSpan.innerText = "⛏️ 地下深層礦坑";
+                else layerInfoSpan.innerText = "🌳 盎然地表層";
+            }
+            return onSolid;
+        }
+
+        // --- 戰鬥傷害判定 ---
+        function checkAttack() {
+            const range = 50;
+            const attackX = player.facing === "right" ? player.x + player.width : player.x - range;
+            
+            enemies.forEach(enemy => {
+                if (attackX < enemy.x + enemy.size && attackX + range > enemy.x &&
+                    player.y < enemy.y + enemy.size && player.y + player.height > enemy.y) {
+                    enemy.hp -= 1;
+                    enemy.vx = player.facing === "right" ? 6 : -6;
+                    enemy.vy = -3;
+                    if (enemy.hp <= 0) {
+                        killCount++;
+                        killCountSpan.innerText = killCount;
+                        enemy.hp = 2;
+                        enemy.x = player.x + (Math.random() * 400 + 300) * (Math.random() > 0.5 ? 1 : -1);
+                        enemy.y = player.y - 100;
+                    }
+                }
+            });
+        }
+
+        // --- 遊戲邏輯更新 ---
+        function update() {
+            player.vx = 0;
+            if (keys["a"] || keys["arrowleft"]) { player.vx = -player.speed; player.facing = "left"; }
+            if (keys["d"] || keys["arrowright"]) { player.vx = player.speed; player.facing = "right"; }
+
+            if (player.vx !== 0 && player.grounded) {
+                player.walkCycle += 0.2; // 增加踏步動畫計數
+            } else if (!player.grounded) {
+                player.walkCycle = 0.5; // 空中維持特定姿勢
+            } else {
+                player.walkCycle = 0; // 靜止
+            }
+
+            handleCollisions(player, true);
+
+            if (player.isAttacking) {
+                player.attackTimer--;
+                if (player.attackTimer <= 0) player.isAttacking = false;
+            }
+
+            // 史萊姆 AI
+            enemies.forEach(enemy => {
+                if (enemy.vx > 1) enemy.vx -= 0.1;
+                if (enemy.vx < -1) enemy.vx += 0.1;
+                const onGround = handleCollisions(enemy, false);
+                if (onGround) {
+                    enemy.jumpTimer++;
+                    if (enemy.jumpTimer > 50 + Math.random() * 30) {
+                        enemy.vy = -6 - Math.random() * 3;
+                        enemy.vx = player.x > enemy.x ? 1.8 : -1.8;
+                        enemy.jumpTimer = 0;
+                    }
+                }
+            });
+        }
+
+        // --- 繪製像素世界與精緻人物 ---
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cameraX = player.x - canvas.width / 2 + player.width / 2;
+            const cameraY = player.y - canvas.height / 2 + player.height / 2;
+
+            const startBlockX = Math.floor(cameraX / BLOCK_SIZE) - 1;
+            const endBlockX = Math.floor((cameraX + canvas.width) / BLOCK_SIZE) + 1;
+            const startBlockY = Math.floor(cameraY / BLOCK_SIZE) - 1;
+            const endBlockY = Math.floor((cameraY + canvas.height) / BLOCK_SIZE) + 1;
+
+            // 1. 繪製多層地磚
+            for (let bx = startBlockX; bx <= endBlockX; bx++) {
+                for (let by = startBlockY; by <= endBlockY; by++) {
+                    const type = getBlockType(bx, by);
+                    if (type === "air") continue;
+
+                    const sX = bx * BLOCK_SIZE - cameraX;
+                    const sY = by * BLOCK_SIZE - cameraY;
+
+                    if (type === "surface_grass") {
+                        ctx.fillStyle = "#2ecc71"; ctx.fillRect(sX, sY, BLOCK_SIZE, 8);
+                        ctx.fillStyle = "#27ae60"; ctx.fillRect(sX, sY + 8, BLOCK_SIZE, BLOCK_SIZE - 8);
+                    } else if (type === "surface_dirt") {
+                        ctx.fillStyle = "#855e42"; ctx.fillRect(sX, sY, BLOCK_SIZE, BLOCK_SIZE);
+                    } else if (type === "cloud_grass") {
+                        ctx.fillStyle = "#a5d6a7"; ctx.fillRect(sX, sY, BLOCK_SIZE, 8);
+                        ctx.fillStyle = "#eceff1"; ctx.fillRect(sX, sY + 8, BLOCK_SIZE, BLOCK_SIZE - 8);
+                    } else if (type === "cloud_dirt") {
+                        ctx.fillStyle = "#b0bec5"; ctx.fillRect(sX, sY, BLOCK_SIZE, BLOCK_SIZE);
+                    } else if (type === "stone") {
+                        ctx.fillStyle = "#475569"; ctx.fillRect(sX, sY, BLOCK_SIZE, BLOCK_SIZE);
+                        ctx.fillStyle = "#334155"; ctx.fillRect(sX + 6, sY + 6, 8, 8); // 岩石紋路像素
+                    }
+                }
+            }
+
+            // 2. 繪製史萊姆
+            enemies.forEach(enemy => {
+                const eX = enemy.x - cameraX;
+                const eY = enemy.y;
+                if (eX < -50 || eX > canvas.width + 50) return;
+
+                ctx.fillStyle = "rgba(231, 76, 60, 0.9)";
+                ctx.beginPath();
+                ctx.arc(eX + enemy.size/2, eY + enemy.size/2, enemy.size/2, Math.PI, 0);
+                ctx.ellipse(eX + enemy.size/2, eY + enemy.size/2, enemy.size/2, enemy.size/4, 0, 0, Math.PI);
+                ctx.fill();
+                // 眼睛
+                ctx.fillStyle = "#fff"; ctx.fillRect(eX + 6, eY + 8, 3, 3); ctx.fillRect(eX + 15, eY + 8, 3, 3);
+            });
+
+            // 3. 【全新動態優化】繪製精緻像素冒險者角色
+            const pX = player.x - cameraX;
+            const pY = player.y;
+
+            // 計算踏步產生的上下微調波幅 (微幅跳動感)
+            const bobbing = Math.abs(Math.sin(player.walkCycle)) * 4;
+
+            // 繪製雙腳 (左右踏步像素)
+            ctx.fillStyle = "#2c3e50"; // 褲子/鞋子顏色
+            const leftLegOffset = Math.sin(player.walkCycle) * 4;
+            ctx.fillRect(pX + 4, pY + player.height - 6 - (leftLegOffset > 0 ? 2 : 0), 6, 6); // 左腳
+            ctx.fillRect(pX + 14, pY + player.height - 6 - (leftLegOffset < 0 ? 2 : 0), 6, 6); // 右腳
+
+            // 繪製身體 (冒險者紅外套衣)
+            ctx.fillStyle = "#e74c3c";
+            ctx.fillRect(pX + 2, pY + 14 + bobbing, player.width - 4, 20);
+
+            // 繪製頭部與金色頭髮
+            ctx.fillStyle = "#fed330"; // 金髮
+            ctx.fillRect(pX + 2, pY + bobbing, player.width - 4, 8);
+            ctx.fillStyle = "#ffdad6"; // 膚色臉部
+            ctx.fillRect(pX + 4, pY + 8 + bobbing, player.width - 8, 8);
+
+            // 繪製眼睛與面向細節
+            ctx.fillStyle = "#2c3e50";
+            if (player.facing === "right") {
+                ctx.fillRect(pX + 16, pY + 9 + bobbing, 4, 4); // 眼睛
+                ctx.fillStyle = "#d35400"; // 後背包背帶
+                ctx.fillRect(pX + 2, pY + 16 + bobbing, 4, 12);
+            } else {
+                ctx.fillRect(pX + 4, pY + 9 + bobbing, 4, 4); // 眼睛
+                ctx.fillStyle = "#d35400"; 
+                ctx.fillRect(pX + player.width - 6, pY + 16 + bobbing, 4, 12);
+            }
+
+            // 4. 【全新實體化】繪製手上拿著的像素實體長劍與攻擊特效
+            if (player.isAttacking) {
+                ctx.fillStyle = "#eceff1"; // 劍身鐵色
+                ctx.strokeStyle = "#d35400"; // 劍柄咖啡色
+                ctx.lineWidth = 3;
+
+                ctx.save();
+                if (player.facing === "right") {
+                    // 揮劍劃過出的金色弧光
+                    ctx.strokeStyle = "rgba(241, 196, 15, 0.7)";
+                    ctx.beginPath(); ctx.arc(pX + player.width, pY + 20, 28, -Math.PI/3, Math.PI/3); ctx.stroke();
+                    
+                    // 實體像素長劍本體
+                    ctx.fillStyle = "#fff";
+                    ctx.fillRect(pX + player.width + 4, pY + 16, 20, 5); // 劍刃
+                    ctx.fillStyle = "#f39c12";
+                    ctx.fillRect(pX + player.width, pY + 15, 4, 7);     // 護手
+                } else {
+                    // 往左揮劍弧光
+                    ctx.strokeStyle = "rgba(241, 196, 15, 0.7)";
+                    ctx.beginPath(); ctx.arc(pX, pY + 20, 28, Math.PI*2/3, Math.PI*4/3); ctx.stroke();
+
+                    // 往左長劍本體
+                    ctx.fillStyle = "#fff";
+                    ctx.fillRect(pX - 24, pY + 16, 20, 5);
+                    ctx.fillStyle = "#f39c12";
+                    ctx.fillRect(pX - 4, pY + 15, 4, 7);
+                }
+                ctx.restore();
+            }
+        }
+
+        // --- 遊戲主迴圈 ---
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

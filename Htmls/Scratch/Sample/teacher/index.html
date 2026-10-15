@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>爆炸頭節奏大師・教師手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="../student/assets/style.css">
+<link rel="stylesheet" href="../student/assets/anim.css">
+<link rel="stylesheet" href="../student/assets/game.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📗 爆炸頭節奏大師 <em>教師手冊</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="../student/index.html">學生版教學</a>
+      <a href="../student/play.html">試玩</a>
+      <a href="../student/爆炸頭節奏大師_範例.sb3" download>⬇ 範例 .sb3</a>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <section class="hero">
+    <h1>教師手冊：用 Handpose2Scratch 做節奏遊戲</h1>
+    <p>適用：國小高年級（已上過 Handpose2Scratch 入門、會用變數與廣播）　建議時數：4 節（各 40 分鐘）　環境：Chrome＋網路攝影機＋stretch3.github.io</p>
+  </section>
+
+  <div class="topic">
+    <h3>一、教學目標</h3>
+    <ul>
+      <li><b>運算思維</b>：把「手勢」拆解成可計算的規則（距離、比例、方向），理解判斷順序的重要性。</li>
+      <li><b>程式概念</b>：狀態變數（階段）、邊緣觸發（上膛）、自訂積木與參數、清單、分身、用計時器同步。</li>
+      <li><b>數學連結</b>：直角座標、兩點距離公式、絕對值、比例（用手掌當尺消除遠近影響）。</li>
+      <li><b>AI 素養</b>：AI 只給 21 個點的座標，「看懂手勢」的規則是人寫的；辨識有延遲與誤差，需要設計容錯。</li>
+    </ul>
+  </div>
+
+  <div class="topic">
+    <h3>二、建議節次</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>節次</th><th>學生版章節</th><th>重點活動</th><th>檢核點</th></tr>
+      <tr><td>第 1 節</td><td>0～3 章</td><td>試玩 play.html → 規劃角色 → 方向測試 → 手勢判斷實驗室 → 拼「辨識手勢」</td><td>小牌子能顯示 拳／左／上／右</td></tr>
+      <tr><td>第 2 節</td><td>4～5 章</td><td>上膛模擬器 → 出招廣播＋鍵盤出招 → 譜面、讀取譜面、打拍</td><td>按綠旗能聽到 8 拍節拍器；清單內容正確</td></tr>
+      <tr><td>第 3 節</td><td>6～7 章</td><td>師傅示範、節拍列分身 → 節奏判定實驗室 → 判定角色</td><td>用鍵盤能打出 GOOD／BAD／MISS</td></tr>
+      <tr><td>第 4 節</td><td>8～9 章</td><td>主流程、爆炸頭、提示 → 調參數 → 挑戰任務與分享</td><td>完整玩 5 回合；存成 .sb3</td></tr>
+    </table></div>
+    <div class="why"><b class="t">分流建議　</b>進度快的學生可直接挑戰第 9 章任務；進度慢的學生可從範例 .sb3 開始，刪掉某個角色的程式再自己補回來（「挖空練習」）。</div>
+  </div>
+
+  <div class="topic">
+    <h3>三、技術要點（備課必讀）</h3>
+    <ul>
+      <li><b>Handpose2Scratch 只有 6 個積木、沒有事件積木</b>，辨識必須放在「重複無限次」裡；偵測不到手時座標回傳<b>空字串</b>，本教材以「手腕 x &gt; −250」判斷是否看得到手。</li>
+      <li><b>座標公式</b>（依擴充原始碼）：x ＝ 240 −（像素 x × 倍率），y ＝ 180 −（像素 y × 倍率）；攝影機選「開啟（on）」時為鏡像畫面，另一個選項 x 會變號。
+        不同版本的中文選單名稱不一，<b>請以第 2 章的方向測試為準</b>：往右指時 dx 為正。</li>
+      <li><b>手勢規則</b>：手掌＝距離(1,10)；中指長＝距離(10,13) &gt; 手掌×門檻 → 其他；食指長＝距離(6,9) &lt; 手掌×門檻 → 拳；否則比較 |dx|、|dy| 決定左／右／上。門檻預設 0.6。</li>
+      <li><b>上膛</b>是「邊緣觸發」：必須先回到拳才會再次出招，避免同一個手勢被連續計分，對應貓咪盃初賽規則「每個動作之間須能判斷玩家已回到預備姿勢，避免同一動作被重複判定」。</li>
+      <li><b>出題規則</b>：譜面中每個動作後面都要接休息拍「-」，讓玩家有時間握拳（連續動作時，一拍內要完成「指 → 握拳 → 指」，攝影機常來不及偵測中間的握拳）。
+        難度改由速度提升：拍長 ＝ 起始拍長(0.9) －（回合 − 1）× 加速(0.075)，第 1 關 0.9 秒到第 5 關 0.6 秒。</li>
+      <li><b>節拍用計時器</b>：第 n 拍在「開始時間＋(n−1)×拍長」，不會累積誤差；判定也用同一個開始時間，所以兩者一定對得上。</li>
+      <li><b>廣播時序</b>：打拍迴圈中要「先改變目前拍，再廣播」；主流程中要「先設開始時間，再改階段為玩家」。這兩個順序錯了都會出現難以察覺的 bug，是很好的除錯教材。</li>
+      <li><b>延遲補償</b>：攝影機＋模型約有 0.1～0.2 秒延遲，範例預設 0.15 秒；鍵盤測試時設 0。</li>
+    </ul>
+  </div>
+
+  <div class="topic">
+    <h3>四、範例 .sb3 結構</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>角色</th><th>程式</th></tr>
+      <tr><td>舞台</td><td>綠旗主流程（初始化、5 回合迴圈、每關拍長遞減）、定義「讀取譜面」、定義「打拍（拍數）」、收到拍→節拍音效</td></tr>
+      <tr><td>手勢偵測</td><td>定義「辨識手勢」（不重新整理畫面）、綠旗＋上膛迴圈、← ↑ → 鍵盤出招</td></tr>
+      <tr><td>師傅</td><td>收到拍：示範階段照譜面換造型與音效，其他階段點頭；失敗與結束時說話</td></tr>
+      <tr><td>玩家／爆炸頭</td><td>跟隨手勢換造型、出招音效；過關時爆炸頭尺寸＝40＋分數×20</td></tr>
+      <tr><td>節拍列</td><td>本體建立 8 個分身（區域變數「我的拍」），分身顯示譜面並隨拍放大</td></tr>
+      <tr><td>判定</td><td>收到出招→GOOD／BAD；綠旗迴圈→MISS；顯示判定動畫</td></tr>
+      <tr><td>提示</td><td>開場、看師傅、換你、倒數 3·2·1·GO、過關、失敗、結束</td></tr>
+    </table></div>
+    <p>每個重點程式旁都附有中文註解。節拍列的三個手勢造型與學生版第 0 章的手勢圖相同（student/assets/img）。</p>
+    <div class="good"><b class="t">已完成的自動測試　</b>範例檔在 Scratch 3 引擎（scratch-vm）中以模擬手部資料實際執行：
+      六種狀態（看不到手、張開、左、上、右、拳）辨識皆正確；5 關的拍長依序為 0.9、0.825、0.75、0.675、0.6 秒；模擬「全部跟對」得 5 分、「每回合漏 1 拍」仍得 5 分、「方向全錯」得 0 分、「鍵盤操作」得 5 分，流程皆能跑完 5 回合。
+      實體攝影機的辨識穩定度仍需在教室環境試跑一次。</div>
+  </div>
+
+  <div class="topic">
+    <h3>五、課堂常見狀況</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>狀況</th><th>原因</th><th>處理</th></tr>
+      <tr><td>左右顛倒</td><td>攝影機模式選到非鏡像</td><td>換另一個「開啟」選項，重做方向測試</td></tr>
+      <tr><td>握拳被判成出招</td><td>拍攝角度讓食指看起來較長</td><td>門檻調大到 0.65～0.7；手背或側面朝鏡頭</td></tr>
+      <tr><td>比「上」變成「其他」</td><td>中指被判成伸直</td><td>門檻調大；手掌側面朝鏡頭</td></tr>
+      <tr><td>明明有跟上卻一直 MISS</td><td>判定時間與實際動作有落差</td><td>容許調到 0.35、延遲補償調到 0.2，或拍長調到 0.9</td></tr>
+      <tr><td>一開始就判好幾個 MISS</td><td>主流程先改階段才設開始時間</td><td>調換兩個積木的順序（見學生版第 8 章）</td></tr>
+      <tr><td>連續兩個動作的第二個總是 MISS</td><td>譜面動作之間沒有休息拍，來不及握拳</td><td>每個動作後面加「-」（節奏判定實驗室會自動提醒）</td></tr>
+      <tr><td>節拍越來越慢</td><td>用「等待 0.8 秒」數拍子</td><td>改成用計時器的「打拍」</td></tr>
+      <tr><td>電腦很卡</td><td>手部模型吃效能</td><td>關閉其他分頁；辨識手勢勾選不重新整理畫面；兩人一組</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic">
+    <h3>六、評量建議</h3>
+    <table class="rubric">
+      <tr><th>向度</th><th>基礎</th><th>精熟</th><th>進階</th></tr>
+      <tr><td>手勢辨識</td><td>能辨識 拳／左／上／右</td><td>能說明手掌當尺與判斷順序</td><td>新增第四個手勢或自行調校門檻</td></tr>
+      <tr><td>節奏與判定</td><td>師傅能示範、節拍準確</td><td>GOOD／BAD／MISS 判定正確</td><td>能解釋時間窗、延遲補償並調參</td></tr>
+      <tr><td>完整遊戲</td><td>能跑完一回合</td><td>5 回合、過關變大、有提示</td><td>完成挑戰任務（加速、記憶模式、雙人）</td></tr>
+    </table>
+  </div>
+
+  <div class="topic">
+    <h3>七、資料來源與說明</h3>
+    <ul>
+      <li>原作玩法參考：GameFAQs《Bishi Bashi Special 2》FAQ 中對 Perm Mania 的說明（照節奏按鍵、每回合先示範、一整段最多錯一次才得分、成功時頭髮變大）。</li>
+      <li>Handpose2Scratch 原始碼：github.com/champierre/handpose2scratch（積木、選單值與座標公式）。</li>
+      <li>積木中文依 Scratch 官方繁體中文翻譯（scratch-l10n zh-tw）；Handpose2Scratch 的積木沿用本校先前教材的中文說法。</li>
+      <li>本教材角色、背景、音效皆為自製，未使用原作美術；遊戲名稱與角色為教學用原創改編。</li>
+    </ul>
+  </div>
+  <footer>爆炸頭節奏大師・教師手冊 · 請勿發給學生（學生版不會連到本頁）</footer>
+</div>
+</body>
+</html>

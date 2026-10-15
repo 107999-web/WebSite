@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 幸運輪盤 Lucky Wheel 🎉</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        
+        :root {
+            --main-pink: #FFB7C5;
+            --light-pink: #FFDBE2;
+            --main-blue: #A5D8FF;
+            --main-green: #B5E8B5;
+            --main-yellow: #FFEAAE;
+            --main-purple: #E2C6FF;
+            --text-color: #5D5D5D;
+            --button-pink: #FF8FAB;
+            --button-hover: #FF6B8B;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        body {
+            background-color: #FFF6F9;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23FFD6E8' fill-opacity='0.5' fill-rule='evenodd'/%3E%3C/svg%3E");
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(255, 183, 197, 0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, var(--main-pink), var(--main-blue), var(--main-green), var(--main-yellow), var(--main-purple));
+        }
+        
+        h1 {
+            color: #FF6B8B;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            padding-top: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--main-pink), var(--main-blue));
+            border-radius: 3px;
+        }
+        
+        .content {
+            display: flex;
+            width: 100%;
+            margin-top: 30px;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<style>
+    .wheel-container {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    
+    .wheel {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    canvas {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10%;
+        height: 10%;
+        background-color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+    }
+    
+    .spinner::before {
+        content: "";
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 15px solid #FF6B8B;
+    }
+    
+    .controls {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .time-input {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 2px solid var(--light-pink);
+        border-radius: 10px;
+        padding: 5px 10px;
+        margin-right: 10px;
+    }
+    
+    .time-input input {
+        width: 60px;
+        font-size: 1.5rem;
+        border: none;
+        text-align: center;
+        font-weight: bold;
+        color: var(--text-color);
+        outline: none;
+    }
+    
+    .time-input span {
+        font-size: 1rem;
+        font-weight: bold;
+        color: var(--text-color);
+        margin-left: 5px;
+    }
+    
+    button {
+        padding: 10px 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .spin-btn {
+        background-color: var(--button-pink);
+        color: white;
+    }
+    
+    .spin-btn:hover {
+        background-color: var(--button-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .reset-btn {
+        background-color: #f0f0f0;
+        color: var(--text-color);
+    }
+    
+    .reset-btn:hover {
+        background-color: #e0e0e0;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .list-container {
+        flex: 1;
+        min-width: 250px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .list-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--text-color);
+    }
+    
+    .item-list {
+        background-color: white;
+        border: 2px solid var(--light-pink);
+        border-radius: 15px;
+        height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--main-pink) #f0f0f0;
+    }
+    
+    .item-list::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .item-list::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+    
+    .item-list::-webkit-scrollbar-thumb {
+        background-color: var(--main-pink);
+        border-radius: 10px;
+    }
+    
+    textarea {
+        width: 100%;
+        height: 100%;
+        border: none;
+        resize: none;
+        font-size: 1rem;
+        line-height: 1.5;
+        padding: 5px;
+        outline: none;
+    }
+</style>
+
+<style>
+    .list-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .list-btn {
+        flex: 1;
+        background-color: white;
+        border: 2px solid var(--light-pink);
+        color: var(--text-color);
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+    
+    .list-btn:hover {
+        background-color: var(--light-pink);
+        color: var(--text-color);
+    }
+    
+    .keyboard-shortcuts {
+        margin-top: 30px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 15px;
+        width: 100%;
+    }
+    
+    .shortcuts-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: var(--text-color);
+    }
+    
+    .shortcuts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    
+    .shortcut-item {
+        display: flex;
+        align-items: center;
+    }
+    
+    .key {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 3px 8px;
+        margin-right: 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .shortcut-desc {
+        font-size: 0.9rem;
+    }
+    
+    .result-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    
+    .result-container.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    
+    .result-box {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        position: relative;
+        width: 90%;
+        max-width: 400px;
+    }
+    
+    .result-container.active .result-box {
+        transform: scale(1);
+    }
+    
+    .result-title {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+    
+    .result-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FF6B8B;
+        margin: 20px 0;
+        padding: 10px 20px;
+        background-color: #FFF6F9;
+        border-radius: 10px;
+        display: inline-block;
+    }
+    
+    .close-result {
+        background-color: var(--button-pink);
+        color: white;
+        margin: 0 auto;
+    }
+    
+    /* Cute decorations */
+    .decoration {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .deco1 {
+        top: -15px;
+        left: -15px;
+        background-color: var(--main-pink);
+        border-radius: 50%;
+    }
+    
+    .deco2 {
+        top: -15px;
+        right: -15px;
+        background-color: var(--main-blue);
+        border-radius: 50%;
+    }
+    
+    .deco3 {
+        bottom: -15px;
+        left: -15px;
+        background-color: var(--main-green);
+        border-radius: 50%;
+    }
+    
+    .deco4 {
+        bottom: -15px;
+        right: -15px;
+        background-color: var(--main-yellow);
+        border-radius: 50%;
+    }
+    
+    /* Animation */
+    @keyframes float {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+    
+    .title-decoration {
+        display: inline-block;
+        animation: float 3s ease-in-out infinite;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="title-decoration">🎀</span> ✨ 幸運輪盤 Lucky Wheel 🎉 <span class="title-decoration">🎀</span></h1>
+        
+        <div class="content">
+            <div class="wheel-container">
+                <div class="wheel">
+                    <canvas id="wheel"></canvas>
+                    <div class="spinner"></div>
+                </div>
+                
+                <div class="controls">
+                    <div class="time-input">
+                        <input type="number" id="spinTime" value="10" min="1" max="30">
+                        <span>s</span>
+                    </div>
+                    <button class="spin-btn" id="spinBtn">開始</button>
+                    <button class="reset-btn" id="resetBtn">重設</button>
+                </div>
+            </div>
+            
+            <div class="list-container">
+                <div class="list-header">
+                    <div class="list-title">項目列表</div>
+                </div>
+                <div class="item-list">
+                    <textarea id="itemList" placeholder="請輸入項目，每行一個">🍦 冰淇淋
+🍧 刨冰
+🍨 聖代
+🍩 甜甜圈
+🍪 餅乾
+🎂 蛋糕
+🍰 蛋糕片
+🧁 杯子蛋糕
+🥧 派
+🍫 巧克力
+🍬 糖果
+🍭 棒棒糖
+🍮 布丁
+🍯 蜂蜜</textarea>
+                </div>
+                <div class="list-buttons">
+                    <button class="list-btn" id="clearBtn">清空</button>
+                    <button class="list-btn" id="editBtn">編輯</button>
+                    <button class="list-btn" id="hideBtn">隱藏</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="keyboard-shortcuts">
+            <div class="shortcuts-title">鍵盤快捷鍵</div>
+            <div class="shortcuts-grid">
+                <div class="shortcut-item">
+                    <span class="key">SPACE</span>
+                    <span class="shortcut-desc">旋轉</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">X</span>
+                    <span class="shortcut-desc">關閉提示</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">S</span>
+                    <span class="shortcut-desc">隱藏選取的項目</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">R</span>
+                    <span class="shortcut-desc">重設</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">E</span>
+                    <span class="shortcut-desc">編輯</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">F</span>
+                    <span class="shortcut-desc">全螢幕</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="result-container" id="resultContainer">
+        <div class="result-box">
+            <div class="decoration deco1"></div>
+            <div class="decoration deco2"></div>
+            <div class="decoration deco3"></div>
+            <div class="decoration deco4"></div>
+            <div class="result-title">恭喜！抽中了</div>
+            <div class="result-value" id="resultValue">7</div>
+            <button class="close-result" id="closeResult">確認</button>
+        </div>
+    </div>
+	
+	<footer class="footer" align="center">
+        <p>By Han © 2025 - 用心打造教學體驗</p>
+    </footer>
+	
+	<script>
+        // 輪盤功能主程式
+        class WheelOfFortune {
+            constructor() {
+                // 獲取元素
+                this.canvas = document.getElementById('wheel');
+                this.ctx = this.canvas.getContext('2d');
+                this.spinBtn = document.getElementById('spinBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.timeInput = document.getElementById('spinTime');
+                this.itemList = document.getElementById('itemList');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.editBtn = document.getElementById('editBtn');
+                this.hideBtn = document.getElementById('hideBtn');
+                this.resultContainer = document.getElementById('resultContainer');
+                this.resultValue = document.getElementById('resultValue');
+                this.closeResult = document.getElementById('closeResult');
+                
+                // 初始參數
+                this.isSpinning = false;
+                this.spinAngle = 0;
+                this.spinVelocity = 0;
+                this.items = this.itemList.value.split('\n').filter(item => item.trim() !== '');
+                this.colors = [
+                    '#FFB7C5', // 粉紅
+                    '#A5D8FF', // 淺藍
+                    '#B5E8B5', // 淺綠
+                    '#FFEAAE', // 淺黃
+                    '#E2C6FF', // 淺紫
+                    '#FFD6A5', // 淺橙
+                    '#FFABAB', // 淺紅
+                    '#87CEFA', // 淺藍天
+                    '#98FB98', // 淺綠
+                    '#FFC0CB', // 粉紅
+                    '#AFEEEE', // 淺綠藍
+                    '#FFF8DC'  // 玉米色
+                ];
+                this.selectedItem = null;
+                this.isEditing = false;
+                
+                // 初始化畫布大小
+                this.resizeCanvas();
+                
+                // 事件監聽
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.spinBtn.addEventListener('click', () => this.startSpin());
+                this.resetBtn.addEventListener('click', () => this.resetWheel());
+                this.itemList.addEventListener('input', () => this.updateItems());
+                this.clearBtn.addEventListener('click', () => this.clearItems());
+                this.editBtn.addEventListener('click', () => this.toggleEdit());
+                this.hideBtn.addEventListener('click', () => this.hideItem());
+                this.closeResult.addEventListener('click', () => this.hideResult());
+                
+                // 鍵盤快捷鍵
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (!this.isSpinning) this.startSpin();
+                    } else if (e.code === 'KeyR') {
+                        this.resetWheel();
+                    } else if (e.code === 'KeyE') {
+                        this.toggleEdit();
+                    } else if (e.code === 'KeyS') {
+                        this.hideItem();
+                    } else if (e.code === 'KeyX') {
+                        this.hideResult();
+                    } else if (e.code === 'KeyF') {
+                        this.toggleFullscreen();
+                    }
+                });
+                
+                // 初始繪製輪盤
+                this.drawWheel();
+            }
+            
+            // 調整畫布大小
+            resizeCanvas() {
+                const size = Math.min(400, this.canvas.parentElement.offsetWidth);
+                this.canvas.width = size;
+                this.canvas.height = size;
+                this.radius = size / 2;
+                this.drawWheel();
+            }
+            
+            // 繪製輪盤
+            drawWheel() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                
+                // 繪製輪盤主體
+                if (this.items.length > 0) {
+                    const arcLength = (2 * Math.PI) / this.items.length;
+                    
+                    for (let i = 0; i < this.items.length; i++) {
+                        const angle = i * arcLength;
+                        const color = this.colors[i % this.colors.length];
+                        
+                        // 繪製扇形
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(centerX, centerY);
+                        this.ctx.arc(centerX, centerY, this.radius - 5, angle + this.spinAngle, angle + arcLength + this.spinAngle);
+                        this.ctx.lineTo(centerX, centerY);
+                        this.ctx.fillStyle = color;
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = 'white';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.stroke();
+                        
+                        // 繪製文字
+                        this.ctx.save();
+                        this.ctx.translate(centerX, centerY);
+                        this.ctx.rotate(angle + arcLength / 2 + this.spinAngle);
+                        this.ctx.textAlign = 'right';
+                        this.ctx.fillStyle = '#5D5D5D';
+                        this.ctx.font = `bold ${Math.min(16, 180 / this.items.length)}px 'Noto Sans TC'`;
+                        this.ctx.fillText(this.items[i], this.radius - 20, 6);
+                        this.ctx.restore();
+                    }
+                } else {
+                    // 如果沒有項目，顯示提示
+                    this.ctx.beginPath();
+                    this.ctx.arc(centerX, centerY, this.radius - 5, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = '#FFE4E1';
+                    this.ctx.fill();
+                    this.ctx.strokeStyle = 'white';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+                    
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillStyle = '#5D5D5D';
+                    this.ctx.font = "16px 'Noto Sans TC'";
+                    this.ctx.fillText('請添加項目', centerX, centerY);
+                }
+                
+                // 繪製輪盤中心裝飾
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
+                this.ctx.fillStyle = 'white';
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#FF6B8B';
+                this.ctx.lineWidth = 3;
+                this.ctx.stroke();
+                
+                // 繪製輪盤外圈裝飾
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, this.radius - 2, 0, 2 * Math.PI);
+                this.ctx.strokeStyle = 'white';
+                this.ctx.lineWidth = 5;
+                this.ctx.stroke();
+            }
+            
+            // 開始旋轉
+            startSpin() {
+                if (this.isSpinning || this.items.length === 0) return;
+                
+                this.isSpinning = true;
+                this.spinBtn.disabled = true;
+                this.itemList.disabled = true;
+                this.editBtn.disabled = true;
+                this.hideBtn.disabled = true;
+                
+                const spinTime = parseInt(this.timeInput.value) || 10;
+                const maxVelocity = 0.2 + (Math.random() * 0.1);
+                const acceleration = maxVelocity / (spinTime * 30); // 加速度
+                const deceleration = maxVelocity / (spinTime * 60); // 減速度
+                
+                let isAccelerating = true;
+                this.spinVelocity = 0;
+                
+                const spin = () => {
+                    if (isAccelerating) {
+                        this.spinVelocity += acceleration;
+                        if (this.spinVelocity >= maxVelocity) {
+                            isAccelerating = false;
+                        }
+                    } else {
+                        this.spinVelocity -= deceleration;
+                    }
+                    
+                    if (this.spinVelocity <= 0) {
+                        this.spinVelocity = 0;
+                        this.isSpinning = false;
+                        this.spinBtn.disabled = false;
+                        this.itemList.disabled = false;
+                        this.editBtn.disabled = false;
+                        this.hideBtn.disabled = false;
+                        
+                        // 確定選中的項目
+                        const arcLength = (2 * Math.PI) / this.items.length;
+                        const normalizedAngle = (this.spinAngle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                        const topPosition = 1.5 * Math.PI; // 頂部位置（270度）
+                        const relativeAngle = (topPosition - normalizedAngle + 2 * Math.PI) % (2 * Math.PI);
+                        const itemIndex = Math.floor(relativeAngle / arcLength) % this.items.length;
+                        
+                        this.selectedItem = this.items[itemIndex];
+                        this.resultValue.textContent = this.selectedItem;
+                        this.resultContainer.classList.add('active');
+                        
+                        return;
+                    }
+                    
+                    this.spinAngle += this.spinVelocity;
+                    this.drawWheel();
+                    requestAnimationFrame(spin);
+                };
+                
+                spin();
+            }
+            
+            // 重置輪盤
+            resetWheel() {
+                this.itemList.value = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12";
+                this.updateItems();
+                this.spinAngle = 0;
+                this.drawWheel();
+                this.selectedItem = null;
+            }
+            
+            // 更新項目
+            updateItems() {
+                this.items = this.itemList.value.split('\n').filter(item => item.trim() !== '');
+                this.drawWheel();
+            }
+            
+            // 清空項目
+            clearItems() {
+                this.itemList.value = '';
+                this.updateItems();
+            }
+            
+            // 切換編輯模式
+            toggleEdit() {
+                this.isEditing = !this.isEditing;
+                this.itemList.disabled = !this.isEditing;
+                this.editBtn.textContent = this.isEditing ? '完成' : '編輯';
+            }
+            
+            // 隱藏選中的項目
+            hideItem() {
+                if (!this.selectedItem) return;
+                
+                const items = this.itemList.value.split('\n');
+                const newItems = items.filter(item => item !== this.selectedItem);
+                this.itemList.value = newItems.join('\n');
+                this.updateItems();
+                this.selectedItem = null;
+                this.hideResult();
+            }
+            
+            // 隱藏結果
+            hideResult() {
+                this.resultContainer.classList.remove('active');
+            }
+            
+            // 切換全屏
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            }
+        }
+        
+        // 當頁面加載完成後初始化輪盤
+        document.addEventListener('DOMContentLoaded', () => {
+            const wheel = new WheelOfFortune();
+        });
+    </script>
+</body>
+</html>

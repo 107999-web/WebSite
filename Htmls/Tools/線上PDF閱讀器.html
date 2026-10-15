@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>線上PDF閱讀器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', '微軟正黑體', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem;
+            background-color: #34495e;
+            align-items: center;
+        }
+        
+        .controls button {
+            padding: 0.5rem 1rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .controls button:hover {
+            background-color: #2980b9;
+        }
+        
+        .controls button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: white;
+            margin-left: auto;
+        }
+        
+        .file-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-input label {
+            padding: 0.5rem 1rem;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .file-input label:hover {
+            background-color: #c0392b;
+        }
+        
+        .file-input input {
+            display: none;
+        }
+        
+        .file-name {
+            color: white;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            color: white;
+        }
+        
+        .pdf-container {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1rem;
+            background-color: #7f8c8d;
+        }
+        
+        #pdf-viewer {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            background-color: white;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-size: 1.2rem;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .page-info {
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>線上PDF閱讀器</h1>
+    </header>
+    
+    <div class="controls">
+        <div class="file-input">
+            <label for="pdf-file">選擇PDF檔案</label>
+            <input type="file" id="pdf-file" accept=".pdf" />
+            <span class="file-name" id="file-name">未選擇檔案</span>
+        </div>
+        
+        <button id="prev-page" disabled>上一頁</button>
+        <button id="next-page" disabled>下一頁</button>
+        
+        <div class="zoom-controls">
+            <button id="zoom-out">縮小</button>
+            <span id="zoom-level">100%</span>
+            <button id="zoom-in">放大</button>
+        </div>
+        
+        <div class="page-info">
+            第 <span id="current-page">0</span> 頁，共 <span id="total-pages">0</span> 頁
+        </div>
+    </div>
+    
+    <div class="pdf-container">
+        <canvas id="pdf-viewer"></canvas>
+    </div>
+    
+    <audio id="page-turn-sound" src="/api/placeholder/400/320" alt="翻頁音效"></audio>
+
+    <script>
+        // 初始化PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js';
+        
+        // 獲取DOM元素
+        const pdfFile = document.getElementById('pdf-file');
+        const fileName = document.getElementById('file-name');
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+        const currentPageElement = document.getElementById('current-page');
+        const totalPagesElement = document.getElementById('total-pages');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const pdfContainer = document.querySelector('.pdf-container');
+        const zoomInButton = document.getElementById('zoom-in');
+        const zoomOutButton = document.getElementById('zoom-out');
+        const zoomLevelElement = document.getElementById('zoom-level');
+        const pageTurnSound = document.getElementById('page-turn-sound');
+        
+        // 設置翻頁音效
+        pageTurnSound.src = 'data:audio/mp3;base64,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/////d/9+ZkZiYyMCAgM/////sjexsmMjpAbPDw0wSDBIYOJhRAIEBgoJCgoMDH/+5JjpAAFAMa+SXwc4MqY18kvg5wSsxrxJfBzgzBjXSS+DnHbdtu2qYWZiY0//////+7/78zIzExkYEBAZ/////sjexsmMjpAbPDw0wSDBIYNJhRAIEBgoJCgoMDP/7kmOoAAUgxrpJfBzgwJjWyS+DnBJzGtEl8HODKmNaJL4OcW3bbtqmFmYmNP//////dv+/MyOxMZGBAQGf////7I3sbJjI6QGzw8NMEgwSGDSYUQCBAYKCgoKDAz//uSY6wABRDGskl8HOC4GNZJLyicFIMauSXlE4LoY1UkvKJxb222balWZiY0//////91/35mR2JjIwICAz/////sjexsmOjpAaPDw0wSDBIYNJhRAIEBggKCgwMN//7kmOuAAT0xqpJeUTgupjVCS8onBJDGpkl8HODAGNTJLyica23a219qVZkZjT//////dv+/MyOxMZGBAQGf////7I3sbJjo6QGjw8NMEgwSGDSYUQCBAYICgoMDDf/+5JjsgAE+MaiSXwc4MMY1EkvKJwR8xp5JfBzgwxjTyS8onFt22+2taVZkZjb//////dv+/MyOxMZGBAQGf////7I3sbJjo6QGzw8NMEgwSHDSYUQCAwYICgoMDDf/7kmO0AAUIxppJfBzgwZjSyS8onBKTGlkl5ROC8mNJJLyicba22229alOZGY3//////br/vzMjsTGRgQEBn/////sjexsmOjpAbPDw0wSDBIcNJhRAIDAgIEBQUGBn//uSY7gABHzGjkl5RODDmNFJL4OcEjMaKSXwc4MQY0MkvKJx23bbbrTOXYjMbf//////d/9+ZkdiYyMCAgM/////7I3sbJjo6QGzw8NMEgwSGDSgUQCAwICBAUFBgZ//+5JjvgAEnMaGSXwc4LyY0UkvKJwRAxoZJfBzgxJjQSS8onH7bbdtaZy7Ehib//////u3/fmZHYmMDAgIDf////7I3sbJjo6QGjw8NMEgwSGDSgUQCAwQCBAUFBgZ//7kmPAAASkxn5JfBzgwxjPyS+DnBCDGekl8HODEGNBJLyicbbbdtqtM5diQxN///////u3/fmZHYmMjAgIDP////+yN7GyY6OEBs8PDTBIMEhw0oFEAgMEAgQFBQYGP/+5JjxAAEdMZ2SXwc4MAYzskng5wRYxnZJfBzgxBjOyS+DnG3bbdaZ07Ehib//////91/35mR2JjIwICAz/////sjexsmOjhAbPDw0wSDBIcNKBRAIDBAIEBQUGBj//+xJjzAAEQMZuSXwc4MIYzkkng5wAAABpAAAACAAADSAAAAEbbVOi7Ehib//////7r/vzMjsTGRgQEBn/////sjexsmOjhAbPDw0wSDBP/7kmPPAAR8xmpJfBzgwxjNSS+DnAAAAGkAAAAIAAANIAAAAIMNKBRAIDBAIEBQUGCA=';
+        
+        // 變數初始化
+        let pdfDoc = null;
+        let currentPage = 1;
+        let zoomLevel = 1.0;
+        const ctx = pdfViewer.getContext('2d');
+        
+        // 監聽檔案上傳
+        pdfFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                fileName.textContent = file.name;
+                loadPDF(file);
+            }
+        });
+        
+        // 載入PDF檔案
+        function loadPDF(file) {
+            const fileReader = new FileReader();
+            
+            // 顯示載入中訊息
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'loading';
+            loadingElement.textContent = '載入中...';
+            document.body.appendChild(loadingElement);
+            
+            fileReader.onload = function() {
+                const typedArray = new Uint8Array(this.result);
+                
+                pdfjsLib.getDocument(typedArray).promise.then(function(pdf) {
+                    pdfDoc = pdf;
+                    totalPagesElement.textContent = pdf.numPages;
+                    currentPage = 1;
+                    
+                    // 啟用按鈕
+                    prevButton.disabled = currentPage === 1;
+                    nextButton.disabled = currentPage === pdf.numPages;
+                    
+                    // 移除載入中訊息
+                    document.body.removeChild(loadingElement);
+                    
+                    // 渲染第一頁
+                    renderCurrentPage();
+                }).catch(error => {
+                    console.error('PDF載入錯誤:', error);
+                    alert('PDF載入失敗: ' + error.message);
+                    document.body.removeChild(loadingElement);
+                });
+            };
+            
+            fileReader.readAsArrayBuffer(file);
+        }
+        
+        // 渲染當前頁面
+        function renderCurrentPage() {
+            pdfDoc.getPage(currentPage).then(function(page) {
+                // 更新頁碼顯示
+                currentPageElement.textContent = currentPage;
+                
+                // 計算縮放因子，使PDF適應容器寬度
+                const viewport = page.getViewport({ scale: zoomLevel });
+                const containerWidth = pdfContainer.clientWidth - 40; // 減去內邊距
+                const containerHeight = pdfContainer.clientHeight - 40;
+                
+                // 設置canvas大小
+                pdfViewer.width = viewport.width;
+                pdfViewer.height = viewport.height;
+                
+                // 渲染PDF頁面
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                page.render(renderContext);
+            });
+        }
+        
+        // 上一頁
+        prevButton.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                pageTurnSound.play();
+                renderCurrentPage();
+                prevButton.disabled = currentPage === 1;
+                nextButton.disabled = false;
+            }
+        });
+        
+        // 下一頁
+        nextButton.addEventListener('click', function() {
+            if (pdfDoc && currentPage < pdfDoc.numPages) {
+                currentPage++;
+                pageTurnSound.play();
+                renderCurrentPage();
+                prevButton.disabled = false;
+                nextButton.disabled = currentPage === pdfDoc.numPages;
+            }
+        });
+        
+        // 縮小
+        zoomOutButton.addEventListener('click', function() {
+            if (zoomLevel > 0.5) {
+                zoomLevel -= 0.1;
+                zoomLevel = Math.round(zoomLevel * 10) / 10; // 四捨五入到小數點後一位
+                zoomLevelElement.textContent = Math.round(zoomLevel * 100) + '%';
+                renderCurrentPage();
+            }
+        });
+        
+        // 放大
+        zoomInButton.addEventListener('click', function() {
+            if (zoomLevel < 3.0) {
+                zoomLevel += 0.1;
+                zoomLevel = Math.round(zoomLevel * 10) / 10; // 四捨五入到小數點後一位
+                zoomLevelElement.textContent = Math.round(zoomLevel * 100) + '%';
+                renderCurrentPage();
+            }
+        });
+        
+        // 鍵盤控制翻頁
+        document.addEventListener('keydown', function(e) {
+            if (pdfDoc) {
+                if (e.key === 'ArrowLeft' && currentPage > 1) {
+                    currentPage--;
+                    pageTurnSound.play();
+                    renderCurrentPage();
+                    prevButton.disabled = currentPage === 1;
+                    nextButton.disabled = false;
+                } else if (e.key === 'ArrowRight' && currentPage < pdfDoc.numPages) {
+                    currentPage++;
+                    pageTurnSound.play();
+                    renderCurrentPage();
+                    prevButton.disabled = false;
+                    nextButton.disabled = currentPage === pdfDoc.numPages;
+                }
+            }
+        });
+        
+        // 響應式處理 - 視窗大小變化時重新渲染
+        window.addEventListener('resize', function() {
+            if (pdfDoc) {
+                renderCurrentPage();
+            }
+        });
+    </script>
+</body>
+</html>

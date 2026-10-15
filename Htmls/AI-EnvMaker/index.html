@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 環保小創客</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .hero {
+      background: linear-gradient(135deg, #0f9466 0%, #13b07b 45%, #38bdf8 100%);
+      color: #fff; border-radius: 22px; padding: 36px 32px; position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: '🌱'; position: absolute; right: 28px; bottom: -18px; font-size: 9rem; opacity: .18;
+    }
+    .hero h1 { font-size: 2.3rem; font-weight: 900; margin-bottom: 6px; }
+    .hero p { font-size: 1.08rem; opacity: .95; max-width: 640px; }
+    .hero .btn.ghost { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.5); }
+    .hero .btn.ghost:hover { background: rgba(255,255,255,.28); color: #fff; }
+    .hero .btn.white { background: #fff; color: var(--primary); }
+
+    .loop { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .loop-step {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+      padding: 10px 14px; text-align: center; min-width: 104px; flex: 1;
+    }
+    .loop-step .i { font-size: 1.5rem; display: block; }
+    .loop-step b { display: block; }
+    .loop-step span.d { font-size: .8rem; color: var(--muted); }
+    .loop-step.human { border-color: #9fd9bf; background: var(--primary-soft); }
+    .loop-arrow { color: var(--muted); font-weight: 900; }
+
+    .gem { border-top: 5px solid var(--c); }
+    .gem .i { font-size: 1.6rem; }
+    .gem .ex { background: var(--surface-2); border-radius: 8px; padding: 6px 10px; font-size: .9rem; margin-top: 6px; }
+
+    .lesson { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 10px; }
+    .lesson > summary { list-style: none; padding: 14px 18px; display: flex; gap: 14px; align-items: center; }
+    .lesson > summary::-webkit-details-marker { display: none; }
+    .lesson > summary::after { content: '＋'; margin-left: auto; color: var(--muted); font-weight: 900; }
+    .lesson[open] > summary::after { content: '－'; }
+    .lesson .no {
+      flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+      font-weight: 900; color: #fff; background: var(--task, var(--primary));
+    }
+    .lesson .ttl b { display: block; font-size: 1.04rem; }
+    .lesson .ttl span { font-size: .86rem; color: var(--muted); }
+    .lesson .body { padding: 0 18px 18px 74px; }
+    .lesson ol { margin: 6px 0 12px; padding-left: 20px; }
+    .lesson li { margin-bottom: 3px; }
+    @media (max-width: 560px) { .lesson .body { padding-left: 18px; } .hero { padding: 28px 20px; } .hero h1 { font-size: 1.8rem; } }
+
+    .pledge label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px dashed var(--line); cursor: pointer; }
+    .pledge input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--primary); flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<header id="topnav"></header>
+
+<main class="page">
+  <section class="hero">
+    <h1>🌏 AI 環保小創客</h1>
+    <p>AI 是你的創作助手，作品的想法還是要由你決定。這個單元要用 Gemini、Suno 和 Canva 完成三件作品：環保海報、音樂 MV、網頁小程式（音樂可以選環保主題，也可以自由創作），並記錄你和 AI 的每一次對話。</p>
+    <div class="btn-row" style="margin-top:18px">
+      <button class="btn white" id="heroProfile">👤 設定我的資料</button>
+      <a class="btn ghost" href="builder.html">🧩 開始寫提示詞</a>
+      <a class="btn ghost" href="journal.html">📒 打開歷程紀錄本</a>
+    </div>
+  </section>
+
+  <!-- 我的進度 -->
+  <section class="section">
+    <h2>📈 我的進度</h2>
+    <div class="stat-tiles" id="myStats"></div>
+    <div id="pendingNote"></div>
+  </section>
+
+  <!-- 創作循環 -->
+  <section class="section">
+    <h2>🔄 人機共創循環</h2>
+    <p class="muted">每一件作品都照著這個循環做。綠色的步驟要由「你」完成，AI 沒辦法代替。</p>
+    <div class="loop">
+      <div class="loop-step human"><span class="i">💡</span><b>我先想</b><span class="d">草圖、關鍵句</span></div><span class="loop-arrow">→</span>
+      <div class="loop-step"><span class="i">💬</span><b>問 AI</b><span class="d">用提示詞五寶</span></div><span class="loop-arrow">→</span>
+      <div class="loop-step human"><span class="i">👀</span><b>評估</b><span class="d">哪裡好？哪裡不好？</span></div><span class="loop-arrow">→</span>
+      <div class="loop-step human"><span class="i">🔧</span><b>修正</b><span class="d">用迭代六招</span></div><span class="loop-arrow">→</span>
+      <div class="loop-step human"><span class="i">✂️</span><b>後製</b><span class="d">在 Canva 加入我的創意</span></div><span class="loop-arrow">→</span>
+      <div class="loop-step human"><span class="i">📒</span><b>記錄反思</b><span class="d">每一版都記下來</span></div>
+    </div>
+  </section>
+
+  <!-- 提示詞五寶 -->
+  <section class="section">
+    <h2>💎 提示詞五寶</h2>
+    <p class="muted">好的提示詞要讓 AI 清楚知道：它扮演誰、要做什麼、內容是什麼、長什麼樣子、有哪些規定。</p>
+    <div class="grid grid-auto">
+      <div class="card gem" style="--c:#2f80ed"><div class="i">🎭</div><h3>角色</h3><p class="small muted">請 AI 扮演專家</p><div class="ex">你是一位環保海報插畫家</div></div>
+      <div class="card gem" style="--c:#0f9466"><div class="i">🎯</div><h3>任務</h3><p class="small muted">要 AI 完成什麼</p><div class="ex">幫我畫一張宣導海報插圖</div></div>
+      <div class="card gem" style="--c:#8b5cf6"><div class="i">📦</div><h3>內容</h3><p class="small muted">畫面、主題、重點</p><div class="ex">一隻海龜游過滿是塑膠袋的海</div></div>
+      <div class="card gem" style="--c:#f0643c"><div class="i">🎨</div><h3>風格</h3><p class="small muted">外觀、語氣、感覺</p><div class="ex">水彩風、藍綠色調、溫暖有希望</div></div>
+      <div class="card gem" style="--c:#d48a00"><div class="i">🚧</div><h3>限制</h3><p class="small muted">不要什麼、格式規定</p><div class="ex">直式、不要出現文字</div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card tinted">
+        <h3>😕 模糊的提示詞</h3>
+        <pre class="prompt">畫一張環保海報</pre>
+        <p class="small muted">AI 只能用猜的，每次結果都不一樣，也不一定是你想要的。</p>
+      </div>
+      <div class="card tinted">
+        <h3>😃 五寶齊全的提示詞</h3>
+        <pre class="prompt">你是一位環保海報插畫家。請幫我畫一張宣導「減少塑膠」的海報插圖：一隻海龜游過漂著塑膠袋的海，遠方有孩子在撿垃圾。水彩風格、藍綠色調，感覺溫暖有希望。直式構圖，上方留白，圖中不要出現文字。</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 迭代六招 -->
+  <section class="section">
+    <h2>🔧 提示詞迭代六招</h2>
+    <p class="muted">第一次的結果通常不完美，這很正常。看完結果後，用下面的方法修改提示詞，每一版都要記錄「用了哪一招」。</p>
+    <div class="grid grid-3" id="strategyCards"></div>
+  </section>
+
+  <!-- 課程地圖 -->
+  <section class="section">
+    <h2>🗺️ 課程地圖（10 節課）</h2>
+    <p class="muted">點開每一節，看看這節課要做什麼。</p>
+
+    <details class="lesson" style="--task:var(--primary)">
+      <summary><span class="no">1</span><span class="ttl"><b>認識 AI 創作夥伴</b><span>AI 能做什麼、不能做什麼 · 提示詞五寶 · AI 使用約定</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>比較看看：老師用「模糊提示詞」和「五寶提示詞」問 Gemini，結果差在哪裡？</li>
+          <li>討論：AI 會出錯、會編造資料、不知道你的想法，所以需要「人」來判斷。</li>
+          <li>設定「我的資料」，閱讀並簽署下方的 <a href="#pledge">AI 使用約定</a>。</li>
+          <li>打開歷程紀錄本，了解每次和 AI 對話都要記錄。</li>
+        </ol>
+        <p><span class="tag">產出</span> 簽署 AI 使用約定</p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-research)">
+      <summary><span class="no">2</span><span class="ttl"><b>環保議題探究</b><span>用 Gemini 追問 · 查證 AI 的回答 · 決定我的議題</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>從議題清單中挑一個有興趣的，用 Gemini 問：「這個問題為什麼重要？」</li>
+          <li><strong>至少追問 3 次</strong>，例如：「可以舉一個臺灣的例子嗎？」「小學生能做什麼？」</li>
+          <li><strong>查證</strong>：挑一個 AI 給的數字，到環境部或其他可信任的網站查查看對不對。</li>
+          <li>用一句話寫下作品的<strong>核心訊息</strong>（例如：「自備環保杯，海龜不再哭」）。</li>
+        </ol>
+        <p><a class="btn sm ghost" href="journal.html?task=research">📒 記錄議題探究</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-poster)">
+      <summary><span class="no">3</span><span class="ttl"><b>環保海報（一）構想與生圖</b><span>先畫草圖 · Gemini 生圖 · 至少迭代 3 版</span></span></summary>
+      <div class="body">
+        <ol>
+          <li><strong>先不要開電腦</strong>：花 5 分鐘在紙上畫海報草圖，決定主角、場景和想傳達的感覺。</li>
+          <li>用「提示詞積木 → 海報」把草圖變成提示詞，複製到 Gemini 生圖。</li>
+          <li>看結果、打星等、想想哪裡要改，再用迭代六招修改，<strong>至少做 3 版</strong>。</li>
+          <li>小祕訣：請 AI <strong>不要在圖裡放文字</strong>，標語留給自己在 Canva 設計。</li>
+        </ol>
+        <p><a class="btn sm" href="builder.html?mode=poster">🧩 海報提示詞積木</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-poster)">
+      <summary><span class="no">4</span><span class="ttl"><b>環保海報（二）Canva 後製</b><span>後製構想單 · 標語與排版 · 標示 AI</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>進 Canva 前，先填「後製構想單」：要加什麼標語？版面怎麼排？要放哪些自己做的元素？</li>
+          <li>在 Canva 上傳 AI 圖片，加入標語、排版、配色，至少再加一樣<strong>自己畫的或拍的</strong>元素。</li>
+          <li>在海報角落加上「AI 使用標示」。</li>
+          <li>回到構想單，填寫「AI 做了什麼、我做了什麼」。</li>
+        </ol>
+        <p><a class="btn sm" href="postplan.html?work=poster">✂️ 海報後製構想單</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-lyrics)">
+      <summary><span class="no">5</span><span class="ttl"><b>音樂創作（一）歌詞共創</b><span>選主題 · 先寫自己的句子 · Gemini 寫歌詞與建議曲風</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>選擇創作方向：<strong>環保主題</strong>，或依老師規定選一個<strong>自由主題</strong>（夢想、友情、家人、校園回憶……）。</li>
+          <li>先自己寫出 <strong>2～4 句</strong>關鍵歌詞，這是你的創作核心。</li>
+          <li>用「提示詞積木 → 音樂」產生歌詞提示詞，請 Gemini 保留你的句子並完成整首歌。</li>
+          <li>檢查歌詞：通順嗎？內容正確嗎？像六年級學生會說的話嗎？修改至少 2 版。</li>
+          <li>請 Gemini 建議 3 種曲風，選一個最適合的。</li>
+        </ol>
+        <p><a class="btn sm" href="builder.html?mode=music">🧩 音樂提示詞積木</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-suno)">
+      <summary><span class="no">6</span><span class="ttl"><b>音樂創作（二）Suno 生成音樂</b><span>整理 Style 與 Lyrics · 只改一個標籤比較</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>用「提示詞積木 → 音樂 → Suno」整理曲風標籤（Style）和歌詞（Lyrics）。可以先點一個<strong>曲風模板</strong>（流行、搖滾、爵士、兒歌、中國風……），再自己增減標籤。</li>
+          <li>在 Suno 產生歌曲（依學校規定，可能由老師的帳號操作）。</li>
+          <li>練習「一次改一件事」：只換一個曲風標籤再產生一次，比較兩首的差別。</li>
+          <li>選出最喜歡的版本並下載，記錄選擇的原因。</li>
+        </ol>
+        <p><a class="btn sm" href="builder.html?mode=music&step=suno">🧩 Suno 提示詞積木</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-suno)">
+      <summary><span class="no">7</span><span class="ttl"><b>音樂創作（三）Canva 音樂影片</b><span>MV 分鏡 · 歌詞字幕 · 素材來源標示</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>在後製構想單規劃 MV 分鏡：每一段歌詞要搭配什麼畫面？素材從哪裡來？</li>
+          <li>在 Canva 建立影片，放入 Suno 歌曲、海報圖片和自己拍攝或繪製的素材。</li>
+          <li>加上歌詞字幕，讓字幕跟著歌曲節拍出現。</li>
+          <li>片尾加上 AI 使用標示與製作名單。</li>
+        </ol>
+        <p><a class="btn sm" href="postplan.html?work=mv">✂️ MV 後製構想單</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-webapp)">
+      <summary><span class="no">8</span><span class="ttl"><b>環保網頁小程式（一）規劃與第一版</b><span>紙上畫畫面 · Gemini Canvas 產生程式</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>決定要做什麼：垃圾分類遊戲、環保問答、節電挑戰……在紙上畫出畫面和按鈕。</li>
+          <li>用「提示詞積木 → 網頁程式」寫出規格，在 Gemini 開啟 <strong>Canvas</strong> 功能後貼上。</li>
+          <li>實際玩玩看，把發現的問題一條一條記下來。</li>
+        </ol>
+        <p><a class="btn sm" href="builder.html?mode=webapp">🧩 網頁程式提示詞積木</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--t-webapp)">
+      <summary><span class="no">9</span><span class="ttl"><b>環保網頁小程式（二）除錯與改良</b><span>回報問題 · 一次改一件事 · 分享作品</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>用「回報問題」和「一次改一件事」修正程式，<strong>至少迭代 3 版</strong>。</li>
+          <li>請同學試玩，把同學的建議變成下一版的提示詞。</li>
+          <li>取得分享連結，在後製構想單寫下「我自己決定或修改了哪些地方」。</li>
+        </ol>
+        <p><a class="btn sm" href="postplan.html?work=webapp">✂️ 網頁程式構想單</a></p>
+      </div>
+    </details>
+
+    <details class="lesson" style="--task:var(--accent)">
+      <summary><span class="no">10</span><span class="ttl"><b>成果發表與反思</b><span>第 1 版 vs 最終版 · 自評互評 · 送出歷程</span></span></summary>
+      <div class="body">
+        <ol>
+          <li>在歷程紀錄本完成「反思與自評」。</li>
+          <li>發表時展示：<strong>第 1 版提示詞與結果 → 最終版</strong>，說明你用了哪些修改技巧。</li>
+          <li>互相給回饋：哪一個作品的「人工後製」最有創意？</li>
+          <li>把歷程送出給老師（或匯出備份檔上傳 Classroom）。</li>
+        </ol>
+        <p><a class="btn sm" href="journal.html?tab=reflect">🌱 反思與自評</a></p>
+      </div>
+    </details>
+  </section>
+
+  <!-- AI 使用約定 -->
+  <section class="section" id="pledge">
+    <h2>🤝 AI 使用約定</h2>
+    <div class="card pledge">
+      <div id="pledgeList"></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn" id="signBtn">✍️ 我同意並簽署</button>
+        <span id="pledgeStatus" class="muted small"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  const E = window.Eco;
+  E.renderNav('index.html');
+  E.footer();
+
+  document.getElementById('heroProfile').addEventListener('click', () => E.openProfile());
+
+  // 迭代六招卡片
+  document.getElementById('strategyCards').innerHTML = E.STRATEGIES.map(s => `
+    <div class="card">
+      <h3><span style="font-size:1.4rem">${s.icon}</span>${s.name}</h3>
+      <p class="small">${E.esc(s.tip)}</p>
+      <div class="small muted" style="background:var(--surface-2);border-radius:8px;padding:6px 10px">${E.esc(s.example)}</div>
+    </div>`).join('');
+
+  // 我的進度
+  function renderStats() {
+    const st = E.stats(E.state);
+    const tiles = [
+      [st.count, '提示詞紀錄'],
+      [st.maxVer.poster || 0, '海報最新版本'],
+      [(st.maxVer.lyrics || 0) + (st.maxVer.suno || 0), '音樂相關版本'],
+      [st.maxVer.webapp || 0, '網頁程式版本'],
+      [st.stratTotal, '使用迭代技巧'],
+      [`${st.plansDone}/3`, '後製構想單']
+    ];
+    document.getElementById('myStats').innerHTML = tiles.map(([n, l]) =>
+      `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    document.getElementById('pendingNote').innerHTML = st.pending
+      ? `<div class="callout warn"><strong>還有 ${st.pending} 筆紀錄沒有填寫結果</strong>到 <a href="journal.html?tab=timeline">歷程紀錄本</a> 補上 AI 的回應和你的評價吧！</div>`
+      : '';
+  }
+  renderStats();
+
+  // AI 使用約定
+  const PLEDGE = [
+    '我<strong>不會</strong>把自己或別人的個人資料（全名、地址、電話、照片）輸入 AI。',
+    'AI 給的資訊可能出錯，我會<strong>查證</strong>，特別是數字和事實。',
+    '我會<strong>先有自己的想法</strong>，再請 AI 協助，不會直接把 AI 的產出當作自己的作品。',
+    '作品中用到 AI 的部分，我會<strong>清楚標示</strong>。',
+    '我會<strong>記錄</strong>每一次的提示詞，誠實呈現創作過程。',
+    '我不會用 AI 製作傷害、欺騙或冒犯別人的內容。'
+  ];
+  const listEl = document.getElementById('pledgeList');
+  listEl.innerHTML = PLEDGE.map((t, i) => `<label><input type="checkbox" data-i="${i}"><span>${t}</span></label>`).join('');
+  const boxes = [...listEl.querySelectorAll('input')];
+  function renderPledge() {
+    const pl = E.state.pledge;
+    boxes.forEach(b => { b.checked = (pl.items || []).includes(Number(b.dataset.i)); });
+    document.getElementById('pledgeStatus').innerHTML = pl.signedAt
+      ? `✅ 已於 ${E.fmtTime(pl.signedAt)} 簽署`
+      : '請逐條閱讀並勾選';
+  }
+  document.getElementById('signBtn').addEventListener('click', () => {
+    const items = boxes.filter(b => b.checked).map(b => Number(b.dataset.i));
+    if (items.length < PLEDGE.length) { E.toast('請先勾選全部 ' + PLEDGE.length + ' 條約定', 'warn'); return; }
+    if (!E.profileReady()) { E.openProfile(() => document.getElementById('signBtn').click()); return; }
+    E.state.pledge = { items, signedAt: new Date().toISOString() };
+    E.save();
+    renderPledge();
+    E.toast('🤝 簽署完成！', 'ok');
+  });
+  renderPledge();
+
+  if (!E.profileReady()) setTimeout(() => E.openProfile(), 400);
+})();
+</script>
+</body>
+</html>

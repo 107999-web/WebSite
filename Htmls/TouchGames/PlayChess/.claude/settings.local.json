@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"\" \"index.html\")",
+      "Bash(cmd /c start \"\" \"index.html\")",
+      "Bash(cmd /c start \"\" \"中國象棋.html\")"
+    ]
+  }
+}

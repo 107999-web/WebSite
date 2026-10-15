@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 中國象棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a0800;
+  font-family:'Microsoft JhengHei','微軟正黑體','PingFang TC',sans-serif;}
+canvas{display:block;}
+
+/* ─── START DIALOG ─── */
+#dialog-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.78);
+  display:flex;align-items:center;justify-content:center;z-index:1000;}
+.dlg{
+  background:linear-gradient(155deg,#241208 0%,#3e2210 55%,#2a1508 100%);
+  border:2px solid #c8a050;border-radius:18px;padding:42px 52px;
+  text-align:center;min-width:360px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.9),0 0 0 1px rgba(255,200,80,0.08),
+             inset 0 1px 0 rgba(255,210,100,0.12);}
+.dlg h1{color:#f2c860;font-size:34px;letter-spacing:8px;margin-bottom:6px;
+  text-shadow:0 2px 20px rgba(240,180,60,0.4);}
+.dlg .sub{color:#907840;font-size:13px;margin-bottom:30px;line-height:1.6;}
+.mode-row{display:flex;gap:12px;margin-bottom:26px;}
+.m-btn{
+  flex:1;padding:12px 0;background:#2e1608;color:#b09050;
+  border:1.5px solid #6a4820;border-radius:10px;cursor:pointer;
+  font-size:14px;font-family:inherit;line-height:1.4;
+  transition:all 0.2s;letter-spacing:1px;}
+.m-btn:hover{background:#4a2a10;border-color:#b08040;}
+.m-btn.sel{background:#5a3015;border-color:#e0b860;color:#f0d070;
+  box-shadow:0 0 16px rgba(200,160,60,0.25);}
+.go-btn{
+  width:100%;padding:15px;letter-spacing:4px;
+  background:linear-gradient(135deg,#c8a050,#e0c070 50%,#c09040);
+  color:#1e0c00;border:none;border-radius:11px;cursor:pointer;
+  font-size:17px;font-weight:bold;font-family:inherit;
+  box-shadow:0 6px 20px rgba(200,150,50,0.45);
+  transition:all 0.2s;}
+.go-btn:hover{transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(200,150,50,0.6);}
+.go-btn:active{transform:translateY(0);}
+
+/* ─── HUD ─── */
+#hud{
+  position:fixed;top:0;left:0;right:0;
+  padding:14px 20px;display:none;
+  justify-content:space-between;align-items:center;z-index:200;
+  pointer-events:none;}
+.hud-pill{
+  background:rgba(8,4,0,0.88);
+  border:1px solid #5a3810;border-radius:24px;
+  padding:8px 20px;display:flex;align-items:center;gap:12px;
+  pointer-events:all;backdrop-filter:blur(4px);}
+#turn-dot{width:10px;height:10px;border-radius:50%;background:#cc3322;
+  box-shadow:0 0 8px currentColor;flex-shrink:0;}
+#turn-txt{color:#e8c870;font-size:15px;letter-spacing:1px;}
+#check-badge{
+  background:#8b0000;color:#ffaaaa;font-size:12px;
+  padding:2px 10px;border-radius:12px;display:none;border:1px solid #cc2222;}
+.hud-btns{display:flex;gap:8px;}
+.hud-btn{
+  padding:7px 16px;background:rgba(8,4,0,0.88);
+  border:1px solid #5a3810;color:#c8a050;border-radius:20px;
+  cursor:pointer;font-size:12px;font-family:inherit;
+  transition:border-color 0.15s;pointer-events:all;letter-spacing:1px;}
+.hud-btn:hover{border-color:#c8a050;}
+.hud-btn.on{background:#5a3015;border-color:#e0b860;color:#f0d070;}
+
+/* ─── HINT ─── */
+#hint-bar{
+  position:fixed;bottom:16px;left:0;right:0;text-align:center;
+  color:#604820;font-size:12px;z-index:99;pointer-events:none;
+  display:none;letter-spacing:1px;}
+
+/* ─── AI THINKING ─── */
+#ai-thinking{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(8,4,0,0.92);border:1px solid #6a4820;
+  border-radius:12px;padding:16px 32px;color:#c8a050;font-size:14px;
+  display:none;z-index:300;letter-spacing:2px;}
+
+/* ─── WIN OVERLAY ─── */
+#win-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.87);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;z-index:2000;}
+#win-overlay h2{
+  font-size:52px;letter-spacing:6px;margin-bottom:12px;
+  text-shadow:0 0 60px currentColor;}
+.win-sub{color:#907840;font-size:14px;margin-bottom:36px;letter-spacing:2px;}
+#win-overlay .play-again{
+  padding:15px 52px;background:linear-gradient(135deg,#c8a050,#e0c070 50%,#c09040);
+  color:#1e0c00;border:none;border-radius:11px;cursor:pointer;
+  font-size:16px;font-weight:bold;font-family:inherit;letter-spacing:3px;
+  box-shadow:0 6px 20px rgba(200,150,50,0.5);}
+#win-overlay .play-again:hover{transform:translateY(-2px);}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+
+<!-- START DIALOG -->
+<div id="dialog-overlay">
+  <div class="dlg">
+    <h1>中國象棋</h1>
+    <div class="sub">Three.js 3D 立體棋盤<br>拖曳旋轉視角 · 滾輪縮放 · 點擊選棋落子</div>
+    <div class="mode-row">
+      <button class="m-btn sel" id="pvp-btn" onclick="setMode('pvp')">
+        雙人對戰<br><small style="font-size:11px;opacity:0.6">兩人輪流</small>
+      </button>
+      <button class="m-btn" id="ai-btn" onclick="setMode('ai')">
+        電腦對戰<br><small style="font-size:11px;opacity:0.6">紅方為人</small>
+      </button>
+    </div>
+    <button class="go-btn" onclick="startGame()">開 始 對 局</button>
+  </div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div id="win-overlay">
+  <h2 id="win-msg"></h2>
+  <div class="win-sub">對局結束</div>
+  <button class="play-again" onclick="backToMenu()">再來一局</button>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-pill">
+    <div id="turn-dot"></div>
+    <span id="turn-txt">紅方先行</span>
+    <span id="check-badge">⚠ 將軍</span>
+  </div>
+  <div class="hud-btns">
+    <button class="hud-btn" onclick="undoLastMove()">悔棋</button>
+    <button class="hud-btn on" id="flip-btn" onclick="toggleAutoFlip()">🔄 自動轉向：開</button>
+    <button class="hud-btn" onclick="resetView()">重置視角</button>
+    <button class="hud-btn" onclick="backToMenu()">結束</button>
+  </div>
+</div>
+
+<!-- AI THINKING -->
+<div id="ai-thinking">電腦思考中⋯</div>
+
+<!-- HINT -->
+<div id="hint-bar">拖曳旋轉視角 &nbsp;·&nbsp; 滾輪縮放 &nbsp;·&nbsp; 點擊棋子選擇</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════════
+   CHESS LOGIC
+══════════════════════════════════════════════════════════════ */
+function side(p){return p?(p[0]==='紅'?'red':'black'):null;}
+function pname(p){return p?p[1]:null;}
+function opp(s){return s==='red'?'black':'red';}
+function cloneB(b){return b.map(r=>[...r]);}
+function inB(r,c){return r>=0&&r<=9&&c>=0&&c<=8;}
+
+function inPalace(r,c,s){
+  if(c<3||c>5) return false;
+  return s==='red'?(r>=7&&r<=9):(r>=0&&r<=2);
+}
+function crossedRiver(r,s){return s==='red'?r<=4:r>=5;}
+
+function createInitialBoard(){
+  const b=Array(10).fill(0).map(()=>Array(9).fill(null));
+  b[0]=['黑車','黑馬','黑象','黑士','黑將','黑士','黑象','黑馬','黑車'];
+  b[2][1]='黑包';b[2][7]='黑包';
+  [0,2,4,6,8].forEach(c=>b[3][c]='黑卒');
+  b[9]=['紅俥','紅傌','紅相','紅仕','紅帥','紅仕','紅相','紅傌','紅俥'];
+  b[7][1]='紅炮';b[7][7]='紅炮';
+  [0,2,4,6,8].forEach(c=>b[6][c]='紅兵');
+  return b;
+}
+
+function getRawMoves(b,r,c){
+  const p=b[r][c];if(!p)return[];
+  const s=side(p),n=pname(p),mv=[];
+  const add=(nr,nc)=>{
+    if(!inB(nr,nc))return;
+    const t=b[nr][nc];
+    if(t&&side(t)===s)return;
+    mv.push([nr,nc]);
+  };
+
+  if(n==='車'||n==='俥'){
+    for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+      let nr=r+dr,nc=c+dc;
+      while(inB(nr,nc)){
+        if(b[nr][nc]){if(side(b[nr][nc])!==s)mv.push([nr,nc]);break;}
+        mv.push([nr,nc]);nr+=dr;nc+=dc;
+      }
+    }
+  }else if(n==='馬'||n==='傌'){
+    const legs=[{l:[-1,0],d:[[-2,-1],[-2,1]]},{l:[1,0],d:[[2,-1],[2,1]]},
+                {l:[0,-1],d:[[-1,-2],[1,-2]]},{l:[0,1],d:[[-1,2],[1,2]]}];
+    for(const{l,d}of legs){
+      const[lr,lc]=[r+l[0],c+l[1]];
+      if(!inB(lr,lc)||b[lr][lc])continue;
+      d.forEach(([dr,dc])=>add(r+dr,c+dc));
+    }
+  }else if(n==='炮'||n==='包'){
+    for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+      let nr=r+dr,nc=c+dc,jumped=false;
+      while(inB(nr,nc)){
+        if(!jumped){if(b[nr][nc])jumped=true;else mv.push([nr,nc]);}
+        else{if(b[nr][nc]){if(side(b[nr][nc])!==s)mv.push([nr,nc]);break;}}
+        nr+=dr;nc+=dc;
+      }
+    }
+  }else if(n==='相'||n==='象'){
+    for(const[dr,dc]of[[-2,-2],[-2,2],[2,-2],[2,2]]){
+      const nr=r+dr,nc=c+dc,mr=r+dr/2,mc=c+dc/2;
+      if(!inB(nr,nc)||b[mr][mc])continue;
+      if(s==='red'&&nr<5)continue;
+      if(s==='black'&&nr>4)continue;
+      add(nr,nc);
+    }
+  }else if(n==='仕'||n==='士'){
+    for(const[dr,dc]of[[-1,-1],[-1,1],[1,-1],[1,1]]){
+      const nr=r+dr,nc=c+dc;
+      if(inPalace(nr,nc,s))add(nr,nc);
+    }
+  }else if(n==='帥'||n==='將'){
+    for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+      const nr=r+dr,nc=c+dc;
+      if(inPalace(nr,nc,s))add(nr,nc);
+    }
+  }else if(n==='兵'||n==='卒'){
+    const fwd=s==='red'?-1:1;
+    add(r+fwd,c);
+    if(crossedRiver(r,s)){add(r,c-1);add(r,c+1);}
+  }
+  return mv;
+}
+
+function findGeneral(b,s){
+  const piece=s==='red'?'紅帥':'黑將';
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++)if(b[r][c]===piece)return[r,c];
+  return null;
+}
+
+function isInCheck(b,s){
+  const gp=findGeneral(b,s);if(!gp)return false;
+  const[gr,gc]=gp,en=opp(s);
+  // Normal attack check
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++){
+    if(b[r][c]&&side(b[r][c])===en){
+      if(getRawMoves(b,r,c).some(([mr,mc])=>mr===gr&&mc===gc))return true;
+    }
+  }
+  // Flying general
+  const ep=en==='red'?'紅帥':'黑將';
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++){
+    if(b[r][c]===ep&&c===gc){
+      const[minR,maxR]=[Math.min(r,gr)+1,Math.max(r,gr)];
+      let blocked=false;
+      for(let rr=minR;rr<maxR;rr++)if(b[rr][gc]){blocked=true;break;}
+      if(!blocked)return true;
+    }
+  }
+  return false;
+}
+
+function getValidMoves(b,r,c){
+  const p=b[r][c];if(!p)return[];
+  const s=side(p);
+  return getRawMoves(b,r,c).filter(([nr,nc])=>{
+    const nb=cloneB(b);nb[nr][nc]=p;nb[r][c]=null;
+    return!isInCheck(nb,s);
+  });
+}
+
+function getAllMoves(b,s){
+  const caps=[],rest=[];
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++){
+    if(!b[r][c]||side(b[r][c])!==s)continue;
+    getValidMoves(b,r,c).forEach(([nr,nc])=>{
+      if(b[nr][nc])caps.push([r,c,nr,nc]);
+      else rest.push([r,c,nr,nc]);
+    });
+  }
+  return[...caps,...rest];
+}
+
+function hasAnyMove(b,s){
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++)
+    if(b[r][c]&&side(b[r][c])===s&&getValidMoves(b,r,c).length>0)return true;
+  return false;
+}
+
+/* ─── AI (minimax α-β depth 2) ─── */
+const PV={'帥':10000,'將':10000,'車':900,'俥':900,'馬':400,'傌':400,'炮':450,'包':450,
+           '相':200,'象':200,'仕':200,'士':200,'兵':100,'卒':100};
+// Position bonus tables (row 0=black side top, row 9=red side bottom)
+// Slight center preference for generals/horses
+function evalB(b,s){
+  let score=0;
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++){
+    const p=b[r][c];if(!p)continue;
+    const v=(PV[pname(p)]||0);
+    if(side(p)===s)score+=v;else score-=v;
+  }
+  return score;
+}
+
+function minimax(b,depth,alpha,beta,maxing,aiSide){
+  if(depth===0)return{sc:evalB(b,aiSide)};
+  const curS=maxing?aiSide:opp(aiSide);
+  const moves=getAllMoves(b,curS);
+  if(moves.length===0)return{sc:maxing?-99999:99999};
+  let best=maxing?{sc:-Infinity}:{sc:Infinity};
+  for(const[r,c,nr,nc]of moves){
+    const nb=cloneB(b);nb[nr][nc]=nb[r][c];nb[r][c]=null;
+    const res=minimax(nb,depth-1,alpha,beta,!maxing,aiSide);
+    if(maxing){if(res.sc>best.sc){best={sc:res.sc,mv:[r,c,nr,nc]};alpha=Math.max(alpha,res.sc);}
+    }else{if(res.sc<best.sc){best={sc:res.sc,mv:[r,c,nr,nc]};beta=Math.min(beta,res.sc);}}
+    if(beta<=alpha)break;
+  }
+  return best;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════════════════════════ */
+let gBoard,gSide,gSel,gMoves,gHistory,gMode,gOver;
+
+function initState(){
+  gBoard=createInitialBoard();
+  gSide='red';gSel=null;gMoves=[];gHistory=[];gOver=false;
+}
+
+function applyMove(r,c,nr,nc){
+  gHistory.push({b:cloneB(gBoard),s:gSide});
+  gBoard[nr][nc]=gBoard[r][c];gBoard[r][c]=null;
+  gSide=opp(gSide);gSel=null;gMoves=[];
+}
+
+function undoLastMove(){
+  const steps=gMode==='ai'&&gHistory.length>=2?2:1;
+  for(let i=0;i<steps&&gHistory.length;i++){
+    const h=gHistory.pop();gBoard=h.b;gSide=h.s;
+  }
+  gSel=null;gMoves=[];gOver=false;
+  syncScene();updateHUD();updateCameraForTurn();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THREE.JS SCENE
+══════════════════════════════════════════════════════════════ */
+const SP=1.15; // spacing
+let scene,camera,renderer,raycaster;
+let pGroups=[],hiMeshes=[];
+let isDrag=false,prevMX=0,prevMY=0,cSX=0,cSY=0;
+let camTheta=0.22,camPhi=0.78,camR=14;
+let gViewSide='red',camAnimId=null,gAutoFlip=true;
+const camTgt=new THREE.Vector3(0,0,0);
+const txCache={};
+
+function colX(c){return(c-4)*SP;}
+function rowZ(r){return(r-4.5)*SP;}
+function xCol(x){return Math.round(x/SP+4);}
+function zRow(z){return Math.round(z/SP+4.5);}
+
+function initThree(){
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x120800);
+  scene.fog=new THREE.Fog(0x120800,18,42);
+
+  camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,100);
+  applyCamera();
+
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  raycaster=new THREE.Raycaster();
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffe8c0,0.55));
+  const sun=new THREE.DirectionalLight(0xfff0d8,1.3);
+  sun.position.set(6,14,8);sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);
+  sun.shadow.camera.near=1;sun.shadow.camera.far=40;
+  sun.shadow.camera.left=-8;sun.shadow.camera.right=8;
+  sun.shadow.camera.top=8;sun.shadow.camera.bottom=-8;
+  scene.add(sun);
+  const fill=new THREE.DirectionalLight(0x806040,0.35);
+  fill.position.set(-8,5,-6);scene.add(fill);
+  const pt=new THREE.PointLight(0xffb060,0.9,22);
+  pt.position.set(0,7,0);scene.add(pt);
+
+  buildBoard();
+
+  // Events
+  addEventListener('resize',()=>{
+    camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+  });
+  renderer.domElement.addEventListener('mousedown',onMD);
+  renderer.domElement.addEventListener('mousemove',onMM);
+  renderer.domElement.addEventListener('mouseup',onMU);
+  renderer.domElement.addEventListener('wheel',onWh,{passive:true});
+  renderer.domElement.addEventListener('touchstart',onTS,{passive:false});
+  renderer.domElement.addEventListener('touchmove',onTM,{passive:false});
+  renderer.domElement.addEventListener('touchend',onTE);
+
+  (function loop(){requestAnimationFrame(loop);renderer.render(scene,camera);})();
+}
+
+function applyCamera(){
+  const x=camR*Math.sin(camPhi)*Math.sin(camTheta);
+  const y=camR*Math.cos(camPhi);
+  const z=camR*Math.sin(camPhi)*Math.cos(camTheta);
+  camera.position.set(x,y,z);camera.lookAt(camTgt);
+}
+function resetView(){
+  camPhi=0.78;camR=14;
+  const target=(gAutoFlip&&gMode==='pvp')?gSide:'red';
+  camTheta=0.22+(target==='black'?Math.PI:0);
+  gViewSide=target;
+  applyCamera();
+}
+
+/* ─── AUTO-FLIP CAMERA TO ACTIVE PLAYER (PvP) ─── */
+function animateCameraTheta(delta,duration=700){
+  if(camAnimId)cancelAnimationFrame(camAnimId);
+  const startTheta=camTheta,startTime=performance.now();
+  (function step(now){
+    const t=Math.min(1,(now-startTime)/duration);
+    const ease=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    camTheta=startTheta+delta*ease;
+    applyCamera();
+    if(t<1)camAnimId=requestAnimationFrame(step);
+    else camAnimId=null;
+  })(performance.now());
+}
+function updateCameraForTurn(){
+  if(!gAutoFlip)return;
+  const target=gMode==='pvp'?gSide:'red';
+  if(target===gViewSide)return;
+  gViewSide=target;
+  animateCameraTheta(Math.PI);
+}
+
+function toggleAutoFlip(){
+  gAutoFlip=!gAutoFlip;
+  const btn=document.getElementById('flip-btn');
+  btn.textContent=gAutoFlip?'🔄 自動轉向：開':'🔄 自動轉向：關';
+  btn.classList.toggle('on',gAutoFlip);
+  if(gAutoFlip)updateCameraForTurn();
+}
+
+/* ─── BOARD GEOMETRY ─── */
+function buildBoard(){
+  // Pedestal
+  const pedGeo=new THREE.BoxGeometry(12,0.6,12);
+  const pedMat=new THREE.MeshPhongMaterial({color:0x5a2e0a,shininess:15});
+  const ped=new THREE.Mesh(pedGeo,pedMat);
+  ped.position.y=-0.42;ped.receiveShadow=true;scene.add(ped);
+
+  // Board surface
+  const bw=8*SP+1.4,bh=9*SP+1.4;
+  const bGeo=new THREE.BoxGeometry(bw,0.22,bh);
+  const bMat=new THREE.MeshPhongMaterial({color:0xC8823A,shininess:25,
+    specular:new THREE.Color(0.08,0.05,0.02)});
+  const bMesh=new THREE.Mesh(bGeo,bMat);
+  bMesh.position.y=-0.11;bMesh.receiveShadow=true;scene.add(bMesh);
+
+  // Top face (lighter)
+  const sfGeo=new THREE.PlaneGeometry(bw-0.1,bh-0.1);
+  const sfMat=new THREE.MeshPhongMaterial({color:0xDFA040,shininess:8});
+  const sf=new THREE.Mesh(sfGeo,sfMat);
+  sf.rotation.x=-Math.PI/2;sf.position.y=0.001;sf.receiveShadow=true;
+  scene.add(sf);
+
+  // Grid lines
+  const lMat=new THREE.LineBasicMaterial({color:0x2a1400});
+  const lVerts=[];
+  for(let r=0;r<=9;r++){const z=rowZ(r);lVerts.push(colX(0),0.01,z,colX(8),0.01,z);}
+  for(let c=0;c<=8;c++){const x=colX(c);lVerts.push(x,0.01,rowZ(0),x,0.01,rowZ(9));}
+  const lGeo=new THREE.BufferGeometry();
+  lGeo.setAttribute('position',new THREE.Float32BufferAttribute(lVerts,3));
+  scene.add(new THREE.LineSegments(lGeo,lMat));
+
+  // Palace diagonals
+  const dVerts=[
+    colX(3),0.015,rowZ(0), colX(5),0.015,rowZ(2),
+    colX(5),0.015,rowZ(0), colX(3),0.015,rowZ(2),
+    colX(3),0.015,rowZ(7), colX(5),0.015,rowZ(9),
+    colX(5),0.015,rowZ(7), colX(3),0.015,rowZ(9),
+  ];
+  const dGeo=new THREE.BufferGeometry();
+  dGeo.setAttribute('position',new THREE.Float32BufferAttribute(dVerts,3));
+  scene.add(new THREE.LineSegments(dGeo,new THREE.LineBasicMaterial({color:0x2a1400})));
+
+  // River text 楚河 漢界
+  [['楚河',-2.0],['漢界',2.0]].forEach(([txt,xOff])=>{
+    const cv=document.createElement('canvas');cv.width=256;cv.height=128;
+    const ctx=cv.getContext('2d');
+    ctx.fillStyle='rgba(0,0,0,0)';ctx.fillRect(0,0,256,128);
+    ctx.fillStyle='#5a2800';
+    ctx.font='bold 56px Microsoft JhengHei,serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(txt,128,68);
+    const tex=new THREE.CanvasTexture(cv);
+    const m=new THREE.Mesh(
+      new THREE.PlaneGeometry(2.2,1.1),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false})
+    );
+    m.rotation.x=-Math.PI/2;
+    const z=(rowZ(4)+rowZ(5))/2;
+    m.position.set(xOff,0.015,z);scene.add(m);
+  });
+
+  // Position markers (corners for cannon & pawn spots)
+  const markPositions=[
+    [2,1],[2,7],[7,1],[7,7],
+    [3,0],[3,2],[3,4],[3,6],[3,8],
+    [6,0],[6,2],[6,4],[6,6],[6,8]
+  ];
+  markPositions.forEach(([r,c])=>addCrossMarker(rowZ(r),colX(c)));
+
+  // Board frame (raised edges)
+  const fMat=new THREE.MeshPhongMaterial({color:0x8B4A14,shininess:40});
+  const fY=0.04,fT=0.12,fH=0.14;
+  const bW2=bw/2,bH2=bh/2;
+  [
+    {geo:[bw+fT*2,fH,fT],pos:[0,fY,-(bH2+fT/2)]},
+    {geo:[bw+fT*2,fH,fT],pos:[0,fY,bH2+fT/2]},
+    {geo:[fT,fH,bh+fT*2],pos:[-(bW2+fT/2),fY,0]},
+    {geo:[fT,fH,bh+fT*2],pos:[bW2+fT/2,fY,0]},
+  ].forEach(({geo,pos})=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(...geo),fMat);
+    m.position.set(...pos);m.castShadow=true;scene.add(m);
+  });
+}
+
+function addCrossMarker(z,x){
+  const sz=0.08,gap=0.25,y=0.018;
+  const mat=new THREE.LineBasicMaterial({color:0x2a1400});
+  const verts=[];
+  // 4 corner L-marks
+  const corners=[[1,1],[1,-1],[-1,1],[-1,-1]];
+  corners.forEach(([sx,sz2])=>{
+    verts.push(x+sx*gap,y,z+sz2*gap, x+sx*(gap+sz),y,z+sz2*gap);
+    verts.push(x+sx*gap,y,z+sz2*gap, x+sx*gap,y,z+sz2*(gap+sz));
+  });
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+  scene.add(new THREE.LineSegments(g,mat));
+}
+
+/* ─── PIECE TEXTURES & MESHES ─── */
+function makeTex(char,isRed){
+  const k=char+(isRed?'R':'B');
+  if(txCache[k])return txCache[k];
+  const sz=256,cv=document.createElement('canvas');
+  cv.width=sz;cv.height=sz;
+  const ctx=cv.getContext('2d');
+
+  // Outer disc gradient
+  const rOuter=sz/2-4;
+  ctx.beginPath();ctx.arc(sz/2,sz/2,rOuter,0,Math.PI*2);
+  if(isRed){
+    const g=ctx.createRadialGradient(sz/2-25,sz/2-25,8,sz/2,sz/2,rOuter);
+    g.addColorStop(0,'#f5d560');g.addColorStop(0.45,'#c8900a');g.addColorStop(1,'#6a4000');
+    ctx.fillStyle=g;
+  }else{
+    const g=ctx.createRadialGradient(sz/2-22,sz/2-22,8,sz/2,sz/2,rOuter);
+    g.addColorStop(0,'#5a5a5a');g.addColorStop(0.45,'#222222');g.addColorStop(1,'#050505');
+    ctx.fillStyle=g;
+  }
+  ctx.fill();
+
+  // Outer ring
+  ctx.strokeStyle=isRed?'#d08010':'#484848';ctx.lineWidth=6;ctx.stroke();
+  // Inner ring
+  ctx.beginPath();ctx.arc(sz/2,sz/2,rOuter-16,0,Math.PI*2);
+  ctx.strokeStyle=isRed?'#e8c040':'#686868';ctx.lineWidth=2.5;ctx.stroke();
+
+  // Character
+  ctx.save();
+  ctx.shadowColor=isRed?'rgba(80,20,0,0.8)':'rgba(0,0,0,0.8)';
+  ctx.shadowBlur=6;
+  ctx.fillStyle=isRed?'#8a0000':'#d8c888';
+  ctx.font=`bold ${Math.floor(sz*0.46)}px Microsoft JhengHei,PingFang TC,serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(char,sz/2,sz/2+3);
+  ctx.restore();
+
+  const tex=new THREE.CanvasTexture(cv);
+  txCache[k]=tex;return tex;
+}
+
+function makePieceMesh(piece,r,c){
+  const isRed=side(piece)==='red';
+  const tex=makeTex(pname(piece),isRed);
+  const grp=new THREE.Group();
+
+  // Cylinder body
+  const body=new THREE.Mesh(
+    new THREE.CylinderGeometry(0.40,0.43,0.20,36),
+    new THREE.MeshPhongMaterial({
+      color:isRed?0xB07010:0x151515,
+      shininess:isRed?90:60,
+      specular:isRed?new THREE.Color(0.25,0.15,0):new THREE.Color(0.08,0.08,0.08)
+    })
+  );
+  body.castShadow=true;grp.add(body);
+
+  // Top disc with texture
+  const top=new THREE.Mesh(
+    new THREE.CircleGeometry(0.40,36),
+    new THREE.MeshPhongMaterial({map:tex,shininess:15})
+  );
+  top.rotation.x=-Math.PI/2;top.position.y=0.101;grp.add(top);
+
+  // Bottom rim
+  const rim=new THREE.Mesh(
+    new THREE.TorusGeometry(0.41,0.03,8,36),
+    new THREE.MeshPhongMaterial({color:isRed?0xd09020:0x303030,shininess:80})
+  );
+  rim.rotation.x=Math.PI/2;rim.position.y=-0.09;grp.add(rim);
+
+  grp.position.set(colX(c),0.21,rowZ(r));
+  if(!isRed) grp.rotation.y=Math.PI; // 黑棋面向紅方（旋轉180度）
+  const ud={row:r,col:c,piece};
+  grp.userData=ud;
+  grp.children.forEach(ch=>ch.userData=ud);
+  return grp;
+}
+
+/* ─── SCENE SYNC ─── */
+function syncScene(){
+  pGroups.forEach(g=>scene.remove(g));pGroups=[];
+  for(let r=0;r<=9;r++)for(let c=0;c<=8;c++){
+    if(gBoard[r][c]){const g=makePieceMesh(gBoard[r][c],r,c);scene.add(g);pGroups.push(g);}
+  }
+  clearHi();
+  if(gSel)showHi();
+}
+
+function clearHi(){hiMeshes.forEach(m=>scene.remove(m));hiMeshes=[];}
+
+function showHi(){
+  clearHi();
+  if(!gSel)return;
+  const[sr,sc]=gSel;
+  // Selection ring
+  const ring=makeRing(0xffdd00,0.46,0.51);
+  ring.position.set(colX(sc),0.12,rowZ(sr));scene.add(ring);hiMeshes.push(ring);
+  // Move dots
+  gMoves.forEach(([mr,mc])=>{
+    const isCapture=!!gBoard[mr][mc];
+    const dot=makeDot(isCapture?0xff4444:0x44ff88,isCapture?0.28:0.20);
+    dot.position.set(colX(mc),0.12,rowZ(mr));scene.add(dot);hiMeshes.push(dot);
+  });
+}
+
+function makeRing(color,inner,outer){
+  const m=new THREE.Mesh(
+    new THREE.RingGeometry(inner,outer,36),
+    new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide,transparent:true,opacity:0.9,depthWrite:false})
+  );
+  m.rotation.x=-Math.PI/2;return m;
+}
+function makeDot(color,r){
+  const m=new THREE.Mesh(
+    new THREE.CircleGeometry(r,24),
+    new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.65,side:THREE.DoubleSide,depthWrite:false})
+  );
+  m.rotation.x=-Math.PI/2;return m;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOUSE / TOUCH INPUT
+══════════════════════════════════════════════════════════════ */
+function onMD(e){
+  if(e.button!==0)return;
+  isDrag=true;prevMX=e.clientX;prevMY=e.clientY;cSX=e.clientX;cSY=e.clientY;
+}
+function onMM(e){
+  if(!isDrag)return;
+  camTheta-=(e.clientX-prevMX)*0.005;
+  camPhi=Math.max(0.18,Math.min(1.52,camPhi+(e.clientY-prevMY)*0.005));
+  prevMX=e.clientX;prevMY=e.clientY;applyCamera();
+}
+function onMU(e){
+  if(e.button!==0)return;
+  const dx=e.clientX-cSX,dy=e.clientY-cSY;
+  if(Math.sqrt(dx*dx+dy*dy)<6)handleClick(e.clientX,e.clientY);
+  isDrag=false;
+}
+function onWh(e){
+  camR=Math.max(6,Math.min(24,camR+e.deltaY*0.015));applyCamera();
+}
+
+let ptDist=null;
+function onTS(e){
+  e.preventDefault();
+  if(e.touches.length===1){
+    isDrag=true;const t=e.touches[0];
+    prevMX=t.clientX;prevMY=t.clientY;cSX=t.clientX;cSY=t.clientY;
+  }else if(e.touches.length===2){isDrag=false;ptDist=tdist(e);}
+}
+function onTM(e){
+  e.preventDefault();
+  if(e.touches.length===1&&isDrag){
+    const t=e.touches[0];
+    camTheta-=(t.clientX-prevMX)*0.007;
+    camPhi=Math.max(0.18,Math.min(1.52,camPhi+(t.clientY-prevMY)*0.007));
+    prevMX=t.clientX;prevMY=t.clientY;applyCamera();
+  }else if(e.touches.length===2){
+    const d=tdist(e);
+    if(ptDist)camR=Math.max(6,Math.min(24,camR-(d-ptDist)*0.04));
+    ptDist=d;applyCamera();
+  }
+}
+function onTE(e){
+  if(e.changedTouches.length===1&&isDrag){
+    const t=e.changedTouches[0];
+    const dx=t.clientX-cSX,dy=t.clientY-cSY;
+    if(Math.sqrt(dx*dx+dy*dy)<10)handleClick(t.clientX,t.clientY);
+  }
+  isDrag=false;ptDist=null;
+}
+function tdist(e){
+  const[a,b]=[e.touches[0],e.touches[1]];
+  return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+}
+
+/* ─── CLICK → GRID ─── */
+function handleClick(mx,my){
+  if(gOver)return;
+  if(gMode==='ai'&&gSide==='black')return;
+
+  const rect=renderer.domElement.getBoundingClientRect();
+  const nx=((mx-rect.left)/rect.width)*2-1;
+  const ny=-((my-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:nx,y:ny},camera);
+
+  // Raycast against piece top faces
+  const tops=[];
+  pGroups.forEach(g=>g.children.forEach(ch=>tops.push(ch)));
+  const hits=raycaster.intersectObjects(tops);
+  if(hits.length>0){
+    const ud=hits[0].object.userData;
+    if(ud.row!==undefined){onSquare(ud.row,ud.col);return;}
+  }
+
+  // Fallback: board plane at y=0
+  const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+  const pt=new THREE.Vector3();
+  if(raycaster.ray.intersectPlane(plane,pt)){
+    const c=xCol(pt.x),r=zRow(pt.z);
+    if(inB(r,c))onSquare(r,c);
+  }
+}
+
+function onSquare(r,c){
+  if(gOver)return;
+  const p=gBoard[r][c];
+
+  if(gSel){
+    const[sr,sc]=gSel;
+    // Move?
+    if(gMoves.some(([mr,mc])=>mr===r&&mc===c)){
+      applyMove(sr,sc,r,c);
+      syncScene();updateHUD();
+      updateCameraForTurn();
+      if(!checkEnd()&&gMode==='ai'){
+        showAIThink(true);
+        setTimeout(doAI,300);
+      }
+      return;
+    }
+    // Re-select own piece?
+    if(p&&side(p)===gSide){
+      gSel=[r,c];gMoves=getValidMoves(gBoard,r,c);showHi();return;
+    }
+    // Deselect
+    gSel=null;gMoves=[];clearHi();return;
+  }
+
+  // Select own piece
+  if(p&&side(p)===gSide){
+    gSel=[r,c];gMoves=getValidMoves(gBoard,r,c);showHi();
+  }
+}
+
+/* ─── AI ─── */
+function doAI(){
+  const res=minimax(gBoard,2,-Infinity,Infinity,true,'black');
+  showAIThink(false);
+  if(res.mv){
+    const[r,c,nr,nc]=res.mv;
+    applyMove(r,c,nr,nc);
+    syncScene();updateHUD();updateCameraForTurn();checkEnd();
+  }
+}
+function showAIThink(show){
+  document.getElementById('ai-thinking').style.display=show?'block':'none';
+}
+
+/* ─── WIN / HUD ─── */
+function checkEnd(){
+  if(!hasAnyMove(gBoard,gSide)){
+    gOver=true;
+    const winner=gSide==='red'?'黑方勝利':'紅方勝利';
+    const col=gSide==='red'?'#6699ff':'#ff6644';
+    const wm=document.getElementById('win-msg');
+    wm.textContent=winner;wm.style.color=col;
+    document.getElementById('win-overlay').style.display='flex';
+    return true;
+  }
+  return false;
+}
+
+function updateHUD(){
+  const dot=document.getElementById('turn-dot');
+  const txt=document.getElementById('turn-txt');
+  const badge=document.getElementById('check-badge');
+  if(gSide==='red'){
+    dot.style.background='#dd4422';dot.style.boxShadow='0 0 8px #dd4422';
+    txt.textContent='紅方行棋';txt.style.color='#ff9966';
+  }else{
+    dot.style.background='#6688cc';dot.style.boxShadow='0 0 8px #6688cc';
+    txt.textContent='黑方行棋';txt.style.color='#99bbff';
+  }
+  const inCheck=isInCheck(gBoard,gSide);
+  badge.style.display=inCheck?'inline-block':'none';
+}
+
+/* ─── GAME FLOW ─── */
+let threeInit=false;
+
+function setMode(m){
+  gMode=m;
+  document.getElementById('pvp-btn').classList.toggle('sel',m==='pvp');
+  document.getElementById('ai-btn').classList.toggle('sel',m==='ai');
+}
+
+function startGame(){
+  document.getElementById('dialog-overlay').style.display='none';
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('hint-bar').style.display='block';
+  initState();
+  if(!threeInit){initThree();threeInit=true;}
+  resetView();
+  syncScene();updateHUD();
+}
+
+function backToMenu(){
+  document.getElementById('win-overlay').style.display='none';
+  document.getElementById('dialog-overlay').style.display='flex';
+  document.getElementById('hud').style.display='none';
+  document.getElementById('hint-bar').style.display='none';
+  showAIThink(false);
+  if(threeInit){clearHi();}
+}
+
+// Default mode
+setMode('pvp');
+</script>
+</body>
+</html>

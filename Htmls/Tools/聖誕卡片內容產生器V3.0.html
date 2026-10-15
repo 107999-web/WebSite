@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖誕卡片內容產生器 V3.0</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic Pro", "メイリオ", sans-serif;
+            background-color: #fef6f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #e66465;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ffd1d1;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: white;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #e66465;
+        }
+
+        .target-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .target-btn {
+            padding: 8px 16px;
+            border: 2px solid #ffd1d1;
+            border-radius: 20px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .target-btn.selected {
+            background-color: #e66465;
+            color: white;
+            border-color: #e66465;
+        }
+
+        .example-messages {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .message-option {
+            padding: 15px;
+            border: 2px solid #ffd1d1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .message-option:hover {
+            background-color: #fff8f8;
+        }
+
+        .message-option.selected {
+            background-color: #ffe6e6;
+            border-color: #e66465;
+        }
+
+        .custom-message textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ffd1d1;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: white;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .custom-message textarea:focus {
+            outline: none;
+            border-color: #e66465;
+        }
+
+        .custom-message.selected textarea {
+            background-color: #fff8f8;
+            border-color: #e66465;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff8f8;
+            border-radius: 10px;
+            border: 2px solid #ffd1d1;
+            min-height: 100px;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+		
+.generate-btn {
+            background-color: #e66465;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .generate-btn:hover {
+            background-color: #d55657;
+        }
+
+        .signature-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .signature-input {
+            margin-top: 10px;
+        }
+
+        #signature {
+            text-align: center;
+        }
+
+        .christmas-decoration {
+            position: fixed;
+            font-size: 24px;
+            opacity: 0.5;
+        }
+		
+		.button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .copy-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+			margin: 20px auto;
+        }
+
+        .copy-btn:hover {
+            background-color: #45a049;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .date-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+
+        .date-input select {
+            width: auto;
+            padding: 8px;
+        }
+
+        /* 成功提示的樣式 */
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            animation: fadeOut 1.5s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+		
+		.custom-target-input {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+		}
+
+		.custom-target-input input {
+			flex: 1;
+			padding: 8px;
+			border: 2px solid #ffd1d1;
+			border-radius: 10px;
+			font-size: 16px;
+		}
+
+		.add-custom-btn {
+			background-color: #e66465;
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 20px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		.add-custom-btn:hover {
+			background-color: #d55657;
+		}
+		
+		.edit-btn {
+			background-color: #FFA500;
+			color: white;
+			border: none;
+			padding: 12px 30px;
+			border-radius: 25px;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+			margin: 20px auto;
+		}
+
+		.edit-btn:hover {
+			background-color: #FF8C00;
+		}
+
+		.result-container {
+			position: relative;
+			margin-top: 30px;
+		}
+
+		.result-edit {
+			width: 100%;
+			min-height: 100px;
+			padding: 20px;
+			border-radius: 10px;
+			border: 2px solid #ffd1d1;
+			background-color: #fff8f8;
+			font-family: inherit;
+			font-size: inherit;
+			resize: vertical;
+			box-sizing: border-box;
+			display: none;
+		}
+
+		.result-edit:focus {
+			outline: none;
+			border-color: #e66465;
+		}
+		
+
+        #snow1 { top: 20px; left: 20px; }
+        #snow2 { top: 40px; right: 40px; }
+        #snow3 { bottom: 30px; left: 40px; }
+        #snow4 { bottom: 50px; right: 30px; }
+    </style>
+</head>
+
+<body>
+    <div class="christmas-decoration" id="snow1">❄</div>
+    <div class="christmas-decoration" id="snow2">❄</div>
+    <div class="christmas-decoration" id="snow3">❄</div>
+    <div class="christmas-decoration" id="snow4">❄</div>
+    
+    <div class="container">
+        <h1>🎄 聖誕卡片內容產生器🎄</h1>
+        
+        <div class="form-group">
+            <label>選擇前綴詞：</label>
+            <select id="prefix">
+                <option value="親愛的">親愛的</option>
+                <option value="最愛的">最愛的</option>
+                <option value="最敬愛的">最敬愛的</option>
+                <option value="">省略</option>
+            </select>
+        </div>
+
+		<div class="form-group">
+			<label>選擇對象（可複選）：</label>
+			<div class="target-buttons" id="targetButtons">
+				<button class="target-btn" data-value="爸爸">爸爸</button>
+				<button class="target-btn" data-value="媽媽">媽媽</button>
+				<button class="target-btn" data-value="老師">老師</button>
+				<button class="target-btn" data-value="爺爺">爺爺</button>
+				<button class="target-btn" data-value="奶奶">奶奶</button>
+				<button class="target-btn" data-value="外公">外公</button>
+				<button class="target-btn" data-value="外婆">外婆</button>
+				<button class="target-btn" data-value="哥哥">哥哥</button>
+				<button class="target-btn" data-value="姐姐">姐姐</button>
+				<button class="target-btn" data-value="弟弟">弟弟</button>
+				<button class="target-btn" data-value="妹妹">妹妹</button>
+			</div>
+			<div class="custom-target-input" style="margin-top: 10px;">
+				<input type="text" id="customTarget" placeholder="請輸入自訂對象">
+				<button class="target-btn add-custom-btn" onclick="addCustomTarget()">新增</button>
+			</div>
+		</div>
+
+        <div class="form-group">
+            <label>選擇祝福語：</label>
+            <div class="example-messages" id="messageOptions">
+                <div class="message-option" data-index="0">
+                    在這個充滿歡樂的聖誕節，願您充滿幸福與快樂！感謝您一直以來的關愛與照顧。
+                </div>
+                <div class="message-option" data-index="1">
+                    聖誕節快樂！願這個溫馨的節日帶給您無限的歡樂與祝福。
+                </div>
+                <div class="message-option" data-index="2">
+                    讓我們一起度過這個溫暖的聖誕節，祝您節日愉快，平安喜樂！
+                </div>
+                <div class="message-option" data-index="3">
+                    願聖誕老人帶給您滿滿的祝福，讓您的每一天都充滿歡笑與幸福！
+                </div>
+                <div class="message-option" data-index="4">
+                    在這個特別的日子裡，獻上我最真摰的祝福，願您聖誕快樂，Merry Christmas！
+                </div>
+                <div class="message-option custom-message" data-index="5">
+                    <textarea id="customMessage" placeholder="請輸入自訂祝福語..." rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+		
+		<div class="form-group">
+            <label>姓名：</label>
+            <div class="signature-group">
+                <select id="signaturePrefix">
+                    <option value="">省略</option>
+                    <option value="最愛你的">最愛你的</option>
+                    <option value="最愛妳的">最愛妳的</option>
+                    <option value="最愛你們的">最愛你們的</option>
+                    <option value="永遠愛你的">永遠愛你的</option>
+                    <option value="永遠愛妳的">永遠愛妳的</option>
+                    <option value="永遠愛你們的">永遠愛你們的</option>
+                    <option value="摯愛你的">摯愛你的</option>
+                    <option value="摯愛妳的">摯愛妳的</option>
+                    <option value="摯愛你們的">摯愛你們的</option>
+                    <option value="感恩的">感恩的</option>
+                    <option value="想念的">想念的</option>
+                </select>
+                <select id="signaturePrefix2">
+                    <option value="">省略</option>
+                    <option value="寶貝兒子">寶貝兒子</option>
+                    <option value="寶貝女兒">寶貝女兒</option>
+                    <option value="學生">學生</option>
+                    <option value="孝順的兒子">孝順的兒子</option>
+                    <option value="孝順的女兒">孝順的女兒</option>
+                    <option value="乖孫">乖孫</option>
+                    <option value="乖孫女">乖孫女</option>
+                    <option value="同學">同學</option>
+                    <option value="朋友">朋友</option>
+                </select>
+                <select id="signatureSuffix">
+                    <option value="">省略</option>
+                    <option value="敬上">敬上</option>
+                    <option value="敬啟">敬啟</option>
+                </select>
+            </div>
+            <div class="signature-input">
+                <input type="text" id="signature" placeholder="請輸入姓名">
+            </div>
+            
+            <div class="form-group" >
+                <label>日期：</label>
+                <div class="date-input" align="center">
+                    <select id="year">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                    </select>
+                    年
+                    <select id="month">
+                        <!-- 將由 JavaScript 生成 -->
+                    </select>
+                    月
+                    <select id="day">
+                        <!-- 將由 JavaScript 生成 -->
+                    </select>
+                    日
+                </div>
+            </div>
+
+            <div class="button-group">
+				<button class="generate-btn" onclick="generateMessage()">產生卡片內容</button>
+				<button class="edit-btn" onclick="toggleEdit()">編輯內容</button>
+				<button class="copy-btn" onclick="copyMessage()">複製內容</button>
+			</div>
+
+			<div class="result-container">
+				<!-- 用於顯示文字的 div -->
+				<div class="result" id="result"></div>
+				<!-- 用於編輯的 textarea，初始隱藏 -->
+				<textarea class="result-edit" id="resultEdit" style="display: none;"></textarea>
+			</div>
+        </div>
+        
+    </div>
+	
+	
+	<script>
+        // 設置按鈕點擊事件
+        document.querySelectorAll('.target-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        // 設置消息選擇事件
+        document.querySelectorAll('.message-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.message-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+
+        function generateMessage() {
+			const prefix = document.getElementById('prefix').value;
+			let selectedTargets = Array.from(document.querySelectorAll('.target-btn.selected'))
+				.map(btn => btn.dataset.value)
+				.join('、');
+			
+			// 检查并移除最后的顿号（如果存在）
+			if (selectedTargets.endsWith('、')) {
+				selectedTargets = selectedTargets.slice(0, -1);
+			}
+			
+			if (!selectedTargets) {
+				alert('請選擇至少一個對象');
+				return;
+			}
+
+			const selectedMessage = document.querySelector('.message-option.selected');
+			if (!selectedMessage) {
+				alert('請選擇一個祝福語');
+				return;
+			}
+
+			// 判断是否为自定祝福语
+			let messageText;
+			if (selectedMessage.classList.contains('custom-message')) {
+				messageText = document.getElementById('customMessage').value.trim();
+				if (!messageText) {
+					alert('請輸入自訂祝福語');
+					return;
+				}
+			} else {
+				messageText = selectedMessage.textContent.trim();
+			}
+
+			const signaturePrefix = document.getElementById('signaturePrefix').value;
+			const signaturePrefix2 = document.getElementById('signaturePrefix2').value;
+			const signature = document.getElementById('signature').value.trim();
+			const signatureSuffix = document.getElementById('signatureSuffix').value;
+			
+			if (!signature) {
+				alert('請輸入姓名');
+				return;
+			}
+
+			// 组合署名
+			let signatureLine = signaturePrefix;
+			if (signaturePrefix2) {
+				signatureLine += `${signaturePrefix2}　`;
+			}
+			signatureLine += signature;
+			if (signatureSuffix) {
+				signatureLine += `　${signatureSuffix}`;
+			}
+			
+			const fullMessage = `${prefix}${selectedTargets}：\n　　${messageText}\n${signatureLine}\n${getCurrentDate()}`;
+			
+			document.getElementById('result').textContent = fullMessage;
+		}
+
+        // 生成月份選項
+        const monthSelect = document.getElementById('month');
+        for (let i = 1; i <= 12; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            monthSelect.appendChild(option);
+        }
+
+        // 生成日期選項
+        function updateDays() {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            const daySelect = document.getElementById('day');
+            
+            // 計算該月天數
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            // 清空現有選項
+            daySelect.innerHTML = '';
+            
+            // 添加新的日期選項
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+        }
+
+        // 監聽年月變化
+        document.getElementById('year').addEventListener('change', updateDays);
+        document.getElementById('month').addEventListener('change', updateDays);
+
+        // 設置當前日期
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('year').value = now.getFullYear();
+            document.getElementById('month').value = now.getMonth() + 1;
+            updateDays();
+            document.getElementById('day').value = now.getDate();
+        }
+
+        // 複製功能
+        function copyMessage() {
+            const result = document.getElementById('result').textContent;
+            if (!result) {
+                alert('請先產生卡片內容');
+                return;
+            }
+
+            navigator.clipboard.writeText(result).then(() => {
+                // 顯示複製成功提示
+                const successMessage = document.createElement('div');
+                successMessage.className = 'copy-success';
+                successMessage.textContent = '複製成功！';
+                document.body.appendChild(successMessage);
+
+                // 1.5秒後移除提示
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 1500);
+            }).catch(err => {
+                alert('複製失敗，請手動複製');
+            });
+        }
+
+        function getCurrentDate() {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            const day = document.getElementById('day').value;
+            return `${year}年${month}月${day}日`;
+        }
+		
+		function addCustomTarget() {
+			const customTarget = document.getElementById('customTarget').value.trim();
+			
+			if (!customTarget) {
+				alert('請輸入自訂對象');
+				return;
+			}
+			
+			// 檢查是否已經有這個對象
+			const existingTargets = Array.from(document.querySelectorAll('.target-btn'))
+				.map(btn => btn.dataset.value);
+			if (existingTargets.includes(customTarget)) {
+				alert('此對象已存在');
+				return;
+			}
+			
+			// 創建新的對象按鈕
+			const targetBtn = document.createElement('button');
+			targetBtn.className = 'target-btn';
+			// 確保 data-value 中只有對象名稱，沒有額外的符號
+			targetBtn.setAttribute('data-value', customTarget);
+			targetBtn.textContent = customTarget;
+			
+			// 添加點擊事件
+			targetBtn.addEventListener('click', function() {
+				this.classList.toggle('selected');
+			});
+			
+			// 添加到按鈕區域
+			document.getElementById('targetButtons').appendChild(targetBtn);
+			
+			// 清空輸入框
+			document.getElementById('customTarget').value = '';
+		}
+		
+		let isEditing = false;
+
+		function toggleEdit() {
+			const resultDiv = document.getElementById('result');
+			const resultEdit = document.getElementById('resultEdit');
+			const editBtn = document.querySelector('.edit-btn');
+
+			isEditing = !isEditing;
+			
+			if (isEditing) {
+				// 切換到編輯模式
+				resultEdit.value = resultDiv.textContent;
+				resultDiv.style.display = 'none';
+				resultEdit.style.display = 'block';
+				editBtn.textContent = '保存修改';
+				editBtn.style.backgroundColor = '#4CAF50';
+			} else {
+				// 保存修改
+				resultDiv.textContent = resultEdit.value;
+				resultDiv.style.display = 'block';
+				resultEdit.style.display = 'none';
+				editBtn.textContent = '編輯內容';
+				editBtn.style.backgroundColor = '#FFA500';
+			}
+		}
+
+		// 修改複製功能，使其能夠複製編輯後的內容
+		function copyMessage() {
+			const resultDiv = document.getElementById('result');
+			const resultEdit = document.getElementById('resultEdit');
+			const textToCopy = isEditing ? resultEdit.value : resultDiv.textContent;
+
+			if (!textToCopy) {
+				alert('請先產生卡片內容');
+				return;
+			}
+
+			navigator.clipboard.writeText(textToCopy).then(() => {
+				const successMessage = document.createElement('div');
+				successMessage.className = 'copy-success';
+				successMessage.textContent = '複製成功！';
+				document.body.appendChild(successMessage);
+
+				setTimeout(() => {
+					successMessage.remove();
+				}, 1500);
+			}).catch(err => {
+				alert('複製失敗，請手動複製');
+			});
+		}
+
+        // 頁面載入時設置當前日期
+        window.addEventListener('load', setCurrentDate);
+    </script>
+</body>
+</html>

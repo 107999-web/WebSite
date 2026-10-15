@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 象棋暗棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0e0600;
+  font-family:'Microsoft JhengHei','微軟正黑體','PingFang TC',sans-serif;}
+canvas{display:block;}
+
+/* ─── DIALOG ─── */
+#dialog-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.82);
+  display:flex;align-items:center;justify-content:center;z-index:1000;}
+.dlg{
+  background:linear-gradient(155deg,#1a0a00 0%,#311508 55%,#1a0a00 100%);
+  border:2px solid #b06030;border-radius:18px;padding:40px 50px;
+  text-align:center;min-width:380px;
+  box-shadow:0 30px 90px rgba(0,0,0,0.95),inset 0 1px 0 rgba(255,180,80,0.1);}
+.dlg h1{color:#e8a840;font-size:30px;letter-spacing:6px;margin-bottom:4px;
+  text-shadow:0 2px 16px rgba(220,150,40,0.5);}
+.dlg .sub{color:#7a4820;font-size:12px;margin-bottom:24px;line-height:1.8;}
+.rule-box{
+  background:rgba(0,0,0,0.4);border:1px solid #4a2810;
+  border-radius:10px;padding:14px 16px;margin-bottom:22px;
+  text-align:left;font-size:12px;color:#8a6030;line-height:1.9;}
+.rule-box b{color:#b08040;}
+.mode-row{display:flex;gap:12px;margin-bottom:22px;}
+.m-btn{flex:1;padding:11px 0;background:#1e0c00;color:#a07030;
+  border:1.5px solid #5a2c10;border-radius:9px;cursor:pointer;
+  font-size:13px;font-family:inherit;line-height:1.5;transition:all 0.2s;}
+.m-btn:hover{background:#3a1a08;border-color:#a07030;}
+.m-btn.sel{background:#4a2010;border-color:#d09040;color:#e8b850;
+  box-shadow:0 0 14px rgba(180,120,40,0.3);}
+.go-btn{width:100%;padding:14px;letter-spacing:4px;
+  background:linear-gradient(135deg,#b06030,#d08040 50%,#b06030);
+  color:#0e0600;border:none;border-radius:10px;cursor:pointer;
+  font-size:16px;font-weight:bold;font-family:inherit;
+  box-shadow:0 5px 18px rgba(180,100,30,0.5);transition:all 0.2s;}
+.go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(180,100,30,0.7);}
+
+/* ─── HUD ─── */
+#hud{position:fixed;top:0;left:0;right:0;padding:12px 16px;
+  display:none;justify-content:space-between;align-items:center;z-index:200;}
+.hud-pill{background:rgba(6,3,0,0.9);border:1px solid #4a2810;
+  border-radius:22px;padding:7px 18px;display:flex;align-items:center;gap:10px;
+  pointer-events:all;backdrop-filter:blur(3px);}
+#turn-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+#turn-txt{color:#d8a050;font-size:14px;letter-spacing:1px;}
+.cnt-box{display:flex;gap:6px;align-items:center;}
+.cnt-pill{padding:5px 12px;border-radius:14px;font-size:12px;letter-spacing:1px;}
+.cnt-red{background:rgba(80,20,0,0.85);border:1px solid #8b3010;color:#ff9060;}
+.cnt-blk{background:rgba(0,10,30,0.85);border:1px solid #204080;color:#8ab0ff;}
+.cnt-hid{background:rgba(20,12,0,0.85);border:1px solid #5a4020;color:#9a7040;}
+.hud-btns{display:flex;gap:7px;}
+.hud-btn{padding:6px 14px;background:rgba(6,3,0,0.9);
+  border:1px solid #4a2810;color:#a07030;border-radius:18px;
+  cursor:pointer;font-size:11px;font-family:inherit;
+  transition:border-color 0.15s;pointer-events:all;}
+.hud-btn:hover{border-color:#a07030;}
+
+/* ─── STATUS BANNER ─── */
+#status-banner{
+  position:fixed;top:72px;left:50%;transform:translateX(-50%);
+  background:rgba(6,3,0,0.9);border:1px solid #6a3820;
+  border-radius:20px;padding:6px 20px;color:#c08040;
+  font-size:12px;letter-spacing:2px;z-index:190;
+  display:none;white-space:nowrap;}
+
+/* ─── HINT ─── */
+#hint-bar{position:fixed;bottom:14px;left:0;right:0;text-align:center;
+  color:#4a2c10;font-size:11px;z-index:99;pointer-events:none;
+  display:none;letter-spacing:1px;}
+
+/* ─── AI THINKING ─── */
+#ai-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(6,3,0,0.95);border:1px solid #5a3010;
+  border-radius:12px;padding:14px 28px;color:#a07030;
+  font-size:13px;display:none;z-index:300;letter-spacing:2px;}
+
+/* ─── WIN OVERLAY ─── */
+#win-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;z-index:2000;}
+#win-overlay h2{font-size:48px;letter-spacing:6px;margin-bottom:10px;
+  text-shadow:0 0 50px currentColor;}
+.win-sub{color:#7a5020;font-size:13px;margin-bottom:34px;letter-spacing:2px;}
+.play-again{padding:14px 48px;
+  background:linear-gradient(135deg,#b06030,#d08040 50%,#b06030);
+  color:#0e0600;border:none;border-radius:10px;cursor:pointer;
+  font-size:15px;font-weight:bold;font-family:inherit;letter-spacing:3px;
+  box-shadow:0 5px 18px rgba(180,100,30,0.5);}
+.play-again:hover{transform:translateY(-2px);}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+
+<!-- DIALOG -->
+<div id="dialog-overlay">
+  <div class="dlg">
+    <h1>象棋暗棋</h1>
+    <div class="sub">3D 立體棋盤 · 4×8 棋格 · 32枚棋子隨機暗置</div>
+    <div class="rule-box">
+      <b>規則</b>：每回合可翻一枚暗棋或移動/吃掉己方明棋<br>
+      <b>吃法</b>：帥>仕>相>車>馬>炮>兵　<b>例外</b>：兵吃帥、帥不吃兵<br>
+      <b>炮</b>：只能隔一子跳吃，不能直接吃子<br>
+      <b>勝利</b>：吃掉對方所有棋子
+    </div>
+    <div class="mode-row">
+      <button class="m-btn sel" id="pvp-btn" onclick="setMode('pvp')">
+        雙人對戰<br><small style="font-size:10px;opacity:0.6">輪流操作</small>
+      </button>
+      <button class="m-btn" id="ai-btn" onclick="setMode('ai')">
+        電腦對戰<br><small style="font-size:10px;opacity:0.6">翻出顏色為你的棋</small>
+      </button>
+    </div>
+    <button class="go-btn" onclick="startGame()">翻 牌 開 局</button>
+  </div>
+</div>
+
+<!-- WIN -->
+<div id="win-overlay">
+  <h2 id="win-msg"></h2>
+  <div class="win-sub">對局結束</div>
+  <button class="play-again" onclick="backToMenu()">再來一局</button>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-pill">
+    <div id="turn-dot"></div>
+    <span id="turn-txt">紅方行動</span>
+  </div>
+  <div class="cnt-box">
+    <div class="cnt-pill cnt-red" id="cnt-red">紅 16</div>
+    <div class="cnt-pill cnt-hid" id="cnt-hid">暗 32</div>
+    <div class="cnt-pill cnt-blk" id="cnt-blk">黑 16</div>
+  </div>
+  <div class="hud-btns">
+    <button class="hud-btn" onclick="undoDark()">悔棋</button>
+    <button class="hud-btn" onclick="resetView()">重置視角</button>
+    <button class="hud-btn" onclick="backToMenu()">結束</button>
+  </div>
+</div>
+
+<div id="status-banner"></div>
+<div id="ai-box">電腦思考中⋯</div>
+<div id="hint-bar">拖曳旋轉視角 · 滾輪縮放 · 點擊暗棋翻面 / 選棋移動</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════
+   DARK CHESS LOGIC
+═══════════════════════════════════════════════════════ */
+const ROWS=4, COLS=8;
+
+// All 32 pieces (16 red + 16 black)
+const ALL_PIECES=[
+  '紅帥',
+  '紅仕','紅仕','紅相','紅相',
+  '紅俥','紅俥','紅傌','紅傌',
+  '紅炮','紅炮',
+  '紅兵','紅兵','紅兵','紅兵','紅兵',
+  '黑將',
+  '黑士','黑士','黑象','黑象',
+  '黑車','黑車','黑馬','黑馬',
+  '黑包','黑包',
+  '黑卒','黑卒','黑卒','黑卒','黑卒'
+];
+
+// Rank: higher value beats lower
+const RANK={
+  '帥':6,'將':6,
+  '仕':5,'士':5,
+  '相':4,'象':4,
+  '俥':3,'車':3,   // 紅俥=黑車
+  '傌':2,'馬':2,   // 紅傌=黑馬
+  '炮':1,'包':1,   // 紅炮=黑包
+  '兵':0,'卒':0
+};
+
+function sd(p){return p?(p[0]==='紅'?'red':'black'):null;}
+function nm(p){return p?p[1]:null;}
+function opp(s){return s==='red'?'black':'red';}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=0|Math.random()*(i+1);
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// Board cell: {piece:'紅帥', revealed:bool} | null
+function createDarkBoard(){
+  const pieces=shuffle(ALL_PIECES);
+  let idx=0;
+  return Array.from({length:ROWS},()=>
+    Array.from({length:COLS},()=>({piece:pieces[idx++],revealed:false}))
+  );
+}
+
+function cloneDark(b){
+  return b.map(row=>row.map(cell=>cell?{...cell}:null));
+}
+
+function inB(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS;}
+
+// Can attacker directly capture defender?
+function canCapture(att,def){
+  const an=nm(att),dn=nm(def);
+  if(sd(att)===sd(def)) return false;
+  if(an==='炮'||an==='包') return false; // 炮/包需隔子跳吃
+  // 兵/卒 beats 帥/將
+  if((an==='兵'||an==='卒')&&(dn==='帥'||dn==='將')) return true;
+  // 帥/將 cannot beat 兵/卒
+  if((an==='帥'||an==='將')&&(dn==='兵'||dn==='卒')) return false;
+  return RANK[an]>=RANK[dn]; // 同階可互吃（如仕吃士）
+}
+
+// Get valid moves for a revealed piece at (r,c)
+// Returns [[nr,nc,isCap], ...]
+function getValidMovesDark(b,r,c){
+  const cell=b[r][c];
+  if(!cell||!cell.revealed) return [];
+  const s=sd(cell.piece),n=nm(cell.piece);
+  const moves=[],caps=[];
+
+  // Standard 1-step orthogonal movement
+  for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+    const nr=r+dr,nc=c+dc;
+    if(!inB(nr,nc)) continue;
+    const t=b[nr][nc];
+    if(!t){moves.push([nr,nc,false]);continue;}         // empty
+    if(!t.revealed) continue;                           // hidden piece blocks
+    if(sd(t.piece)===s) continue;                       // own piece blocks
+    if(n!=='炮'&&n!=='包'&&canCapture(cell.piece,t.piece)) caps.push([nr,nc,true]);
+  }
+
+  // Cannon jump capture (any range, needs exactly 1 screen)
+  if(n==='炮'||n==='包'){  // 炮(紅)/包(黑) 同樣規則
+    for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+      let nr=r+dr,nc=c+dc,screened=false;
+      while(inB(nr,nc)){
+        const t=b[nr][nc];
+        if(t){
+          if(!screened) screened=true; // first piece = screen
+          else{
+            // second piece = target (must be revealed enemy)
+            if(t.revealed&&sd(t.piece)!==s) caps.push([nr,nc,true]);
+            break;
+          }
+        }
+        nr+=dr;nc+=dc;
+      }
+    }
+  }
+  return[...moves,...caps];
+}
+
+function getAllMovesDark(b,s){
+  const all=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=b[r][c];
+    if(cell&&cell.revealed&&sd(cell.piece)===s)
+      getValidMovesDark(b,r,c).forEach(m=>all.push([r,c,...m]));
+  }
+  return all;
+}
+
+function getHidden(b){
+  const h=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++)
+    if(b[r][c]&&!b[r][c].revealed) h.push([r,c]);
+  return h;
+}
+
+function countSide(b,s){
+  let n=0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=b[r][c];
+    if(cell&&cell.revealed&&sd(cell.piece)===s) n++;
+  }
+  return n;
+}
+
+/* ─── GAME STATE ─── */
+let gBoard,gSide,gSel,gMoves,gHistory,gMode,gOver,gMyColor,gAIColor,gPhase,gBusy;
+
+function initState(){
+  gBoard=createDarkBoard();
+  gSide='red';       // red goes first
+  gSel=null;gMoves=[];gHistory=[];
+  gOver=false;gBusy=false;
+  gMyColor=null;gAIColor=null;
+  gPhase='init';     // waiting for first flip
+}
+
+function applyFlip(r,c){
+  gHistory.push({b:cloneDark(gBoard),s:gSide,ph:gPhase,mc:gMyColor,ac:gAIColor});
+  gBoard[r][c].revealed=true;
+  const fc=sd(gBoard[r][c].piece);
+  if(gPhase==='init'){
+    gMyColor=fc;gAIColor=opp(fc);
+    gPhase='play';
+  }
+  gSide=opp(gSide);
+  gSel=null;gMoves=[];
+}
+
+function applyMoveDark(r,c,nr,nc){
+  gHistory.push({b:cloneDark(gBoard),s:gSide,ph:gPhase,mc:gMyColor,ac:gAIColor});
+  gBoard[nr][nc]=gBoard[r][c];
+  gBoard[r][c]=null;
+  gSide=opp(gSide);
+  gSel=null;gMoves=[];
+}
+
+function undoDark(){
+  if(gBusy||gHistory.length===0) return;
+  const steps=gMode==='ai'&&gHistory.length>=2?2:1;
+  for(let i=0;i<steps&&gHistory.length;i++){
+    const h=gHistory.pop();
+    gBoard=h.b;gSide=h.s;gPhase=h.ph;gMyColor=h.mc;gAIColor=h.ac;
+  }
+  gSel=null;gMoves=[];gOver=false;
+  syncAll();updateHUD();showBanner('');
+}
+
+/* ─── AI ─── */
+const PV={'帥':1000,'將':1000,'仕':600,'士':600,'相':450,'象':450,
+           '車':550,'馬':350,'炮':400,'兵':120,'卒':120};
+
+function evalDark(b,s){
+  let sc=0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=b[r][c];
+    if(!cell||!cell.revealed) continue;
+    const v=PV[nm(cell.piece)]||0;
+    if(sd(cell.piece)===s) sc+=v; else sc-=v;
+  }
+  return sc;
+}
+
+function doAI(){
+  if(gOver||gSide!==gAIColor){showAIBox(false);return;}
+  showAIBox(true);
+
+  setTimeout(()=>{
+    // 1. Best capture among revealed pieces
+    const moves=getAllMovesDark(gBoard,gAIColor);
+    const caps=moves.filter(m=>m[4]);
+
+    if(caps.length>0){
+      caps.sort((a,b)=>{
+        const va=PV[nm(gBoard[a[2]][a[3]].piece)]||0;
+        const vb=PV[nm(gBoard[b[2]][b[3]].piece)]||0;
+        return vb-va;
+      });
+      const[r,c,nr,nc]=caps[0];
+      showAIBox(false);
+      animateMove(r,c,nr,nc,()=>{
+        applyMoveDark(r,c,nr,nc);
+        syncAll();updateHUD();checkEnd();
+      });
+      return;
+    }
+
+    // 2. Flip hidden piece
+    const hidden=getHidden(gBoard);
+    if(hidden.length>0){
+      const[r,c]=hidden[0|Math.random()*hidden.length];
+      showAIBox(false);
+      execFlip(r,c);
+      return;
+    }
+
+    // 3. Best regular move
+    if(moves.length>0){
+      const[r,c,nr,nc]=moves[0|Math.random()*moves.length];
+      showAIBox(false);
+      animateMove(r,c,nr,nc,()=>{
+        applyMoveDark(r,c,nr,nc);
+        syncAll();updateHUD();checkEnd();
+      });
+    } else {
+      showAIBox(false);
+      checkEnd();
+    }
+  },350);
+}
+
+/* ─── WIN CHECK ─── */
+function checkEnd(){
+  const redCnt=countSide(gBoard,'red');
+  const blkCnt=countSide(gBoard,'black');
+  const allHid=getHidden(gBoard).length;
+
+  if(allHid>0) return false; // game still going if hidden pieces remain
+
+  if(redCnt===0){endGame('黑方勝利','#6699ff');return true;}
+  if(blkCnt===0){endGame('紅方勝利','#ff7755');return true;}
+
+  // No hidden pieces: check if current side can move
+  if(getAllMovesDark(gBoard,gSide).length===0){
+    const winner=gSide==='red'?'黑方勝利':'紅方勝利';
+    const col=gSide==='red'?'#6699ff':'#ff7755';
+    endGame(winner,col);return true;
+  }
+  return false;
+}
+
+function endGame(msg,col){
+  gOver=true;
+  const el=document.getElementById('win-msg');
+  el.textContent=msg;el.style.color=col;
+  document.getElementById('win-overlay').style.display='flex';
+}
+
+/* ═══════════════════════════════════════════════════════
+   THREE.JS SCENE
+═══════════════════════════════════════════════════════ */
+const SP=1.22; // spacing between squares
+
+function colX(c){return(c-3.5)*SP;}
+function rowZ(r){return(r-1.5)*SP;}
+function xToC(x){return Math.round(x/SP+3.5);}
+function zToR(z){return Math.round(z/SP+1.5);}
+
+let scene,camera,renderer,raycaster;
+let pGroups=[],hiMeshes=[];
+let isDrag=false,prevMX=0,prevMY=0,cSX=0,cSY=0;
+let camTheta=0.15,camPhi=0.72,camR=11.5;
+const camTgt=new THREE.Vector3(0,0,0);
+const txCache={};
+let threeReady=false;
+
+function initThree(){
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0c0500);
+  scene.fog=new THREE.Fog(0x0c0500,16,38);
+
+  camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,0.1,80);
+  applyCamera();
+
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  raycaster=new THREE.Raycaster();
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffe0b0,0.5));
+  const sun=new THREE.DirectionalLight(0xfff0d0,1.2);
+  sun.position.set(4,12,5);sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);
+  [sun.shadow.camera.left,sun.shadow.camera.right]=[(-8),(8)];
+  [sun.shadow.camera.top,sun.shadow.camera.bottom]=[8,-8];
+  scene.add(sun);
+  scene.add(new THREE.DirectionalLight(0x604020,0.3).setPosition(-6,4,-4));
+  const pt=new THREE.PointLight(0xffa040,0.85,20);
+  pt.position.set(0,7,0);scene.add(pt);
+
+  buildDarkBoard();
+
+  addEventListener('resize',()=>{
+    camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+  });
+  renderer.domElement.addEventListener('mousedown',onMD);
+  renderer.domElement.addEventListener('mousemove',onMM);
+  renderer.domElement.addEventListener('mouseup',onMU);
+  renderer.domElement.addEventListener('wheel',onWh,{passive:true});
+  renderer.domElement.addEventListener('touchstart',onTS,{passive:false});
+  renderer.domElement.addEventListener('touchmove',onTM,{passive:false});
+  renderer.domElement.addEventListener('touchend',onTE);
+
+  renderer.setAnimationLoop(renderLoop);
+}
+
+// Fix DirectionalLight.setPosition (not a method in r128, just set position)
+THREE.DirectionalLight.prototype.setPosition=function(x,y,z){
+  this.position.set(x,y,z);return this;
+};
+
+function applyCamera(){
+  const x=camR*Math.sin(camPhi)*Math.sin(camTheta);
+  const y=camR*Math.cos(camPhi);
+  const z=camR*Math.sin(camPhi)*Math.cos(camTheta);
+  camera.position.set(x,y,z);camera.lookAt(camTgt);
+}
+function resetView(){camTheta=0.15;camPhi=0.72;camR=11.5;applyCamera();}
+
+// Pending animations for the render loop
+const animQueue=[];
+function renderLoop(){
+  // Process animations
+  const now=performance.now();
+  for(let i=animQueue.length-1;i>=0;i--){
+    const a=animQueue[i];
+    const t=Math.min(1,(now-a.start)/a.dur);
+    a.fn(t);
+    if(t>=1){a.done&&a.done();animQueue.splice(i,1);}
+  }
+  renderer.render(scene,camera);
+}
+
+/* ─── BOARD GEOMETRY ─── */
+function buildDarkBoard(){
+  const bw=(COLS-1)*SP+1.4, bh=(ROWS-1)*SP+1.4;
+
+  // Pedestal
+  const ped=new THREE.Mesh(
+    new THREE.BoxGeometry(bw+1.8,0.55,bh+1.8),
+    new THREE.MeshPhongMaterial({color:0x4a2008,shininess:12})
+  );
+  ped.position.y=-0.38;ped.receiveShadow=true;scene.add(ped);
+
+  // Board body
+  const bod=new THREE.Mesh(
+    new THREE.BoxGeometry(bw,0.20,bh),
+    new THREE.MeshPhongMaterial({color:0xA85C28,shininess:20})
+  );
+  bod.position.y=-0.10;bod.receiveShadow=true;scene.add(bod);
+
+  // Board surface
+  const sf=new THREE.Mesh(
+    new THREE.PlaneGeometry(bw-0.08,bh-0.08),
+    new THREE.MeshPhongMaterial({color:0xC8783A,shininess:8})
+  );
+  sf.rotation.x=-Math.PI/2;sf.position.y=0.002;sf.receiveShadow=true;scene.add(sf);
+
+  // Grid lines
+  const lv=[];
+  for(let r=0;r<ROWS;r++){const z=rowZ(r);lv.push(colX(0),0.01,z,colX(COLS-1),0.01,z);}
+  for(let c=0;c<COLS;c++){const x=colX(c);lv.push(x,0.01,rowZ(0),x,0.01,rowZ(ROWS-1));}
+  const lg=new THREE.BufferGeometry();
+  lg.setAttribute('position',new THREE.Float32BufferAttribute(lv,3));
+  scene.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x2a1000})));
+
+  // Decorative cross-markers on all squares
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) addMark(rowZ(r),colX(c));
+
+  // Frame
+  const fmat=new THREE.MeshPhongMaterial({color:0x7a3a10,shininess:35});
+  const ft=0.12;
+  [[bw+ft*2,ft,0,0,-(bh/2+ft/2)],[bw+ft*2,ft,0,0,bh/2+ft/2],
+   [ft,bh+ft*2,-(bw/2+ft/2),0,0],[ft,bh+ft*2,bw/2+ft/2,0,0]]
+  .forEach(([w,h,x,_,z])=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,0.12,h),fmat);
+    m.position.set(x,0.04,z);m.castShadow=true;scene.add(m);
+  });
+
+  // "暗棋" title on board side
+  addBoardLabel();
+}
+
+function addMark(z,x){
+  const s=0.07,g=0.26,y=0.016;
+  const v=[];
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz])=>{
+    v.push(x+sx*g,y,z+sz*g, x+sx*(g+s),y,z+sz*g);
+    v.push(x+sx*g,y,z+sz*g, x+sx*g,y,z+sz*(g+s));
+  });
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+  scene.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:0x2a1000})));
+}
+
+function addBoardLabel(){
+  const cv=document.createElement('canvas');cv.width=512;cv.height=128;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='rgba(0,0,0,0)';ctx.fillRect(0,0,512,128);
+  ctx.fillStyle='rgba(80,30,0,0.5)';
+  ctx.font='bold 60px Microsoft JhengHei,serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('象棋暗棋',256,64);
+  const tex=new THREE.CanvasTexture(cv);
+  const m=new THREE.Mesh(
+    new THREE.PlaneGeometry(5.5,1.4),
+    new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false})
+  );
+  m.rotation.x=-Math.PI/2;
+  m.position.set(0,0.018,rowZ(ROWS-1)+1.15);
+  scene.add(m);
+}
+
+/* ─── TEXTURES ─── */
+function makeHiddenTex(){
+  if(txCache['H']) return txCache['H'];
+  const sz=256,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;
+  const ctx=cv.getContext('2d');
+  // Body gradient (warm dark wood)
+  const g=ctx.createRadialGradient(sz/2-20,sz/2-20,6,sz/2,sz/2,sz/2-4);
+  g.addColorStop(0,'#7a4818');g.addColorStop(0.5,'#4a2808');g.addColorStop(1,'#200e02');
+  ctx.beginPath();ctx.arc(sz/2,sz/2,sz/2-4,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle='#6a3808';ctx.lineWidth=6;ctx.stroke();
+  ctx.beginPath();ctx.arc(sz/2,sz/2,sz/2-18,0,Math.PI*2);
+  ctx.strokeStyle='#8a4818';ctx.lineWidth=2;ctx.stroke();
+  // Radial lines (subtle)
+  ctx.strokeStyle='rgba(160,90,30,0.12)';ctx.lineWidth=1;
+  for(let i=0;i<12;i++){
+    const a=i/12*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(sz/2,sz/2);
+    ctx.lineTo(sz/2+Math.cos(a)*(sz/2-22),sz/2+Math.sin(a)*(sz/2-22));ctx.stroke();
+  }
+  // '棋' character (very subtle)
+  ctx.fillStyle='rgba(180,100,40,0.35)';
+  ctx.font=`bold ${sz*0.44|0}px Microsoft JhengHei,serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('棋',sz/2,sz/2+3);
+  txCache['H']=new THREE.CanvasTexture(cv);return txCache['H'];
+}
+
+function makePieceTex(char,isRed){
+  const k=char+(isRed?'R':'B');
+  if(txCache[k]) return txCache[k];
+  const sz=256,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;
+  const ctx=cv.getContext('2d');
+  // Disc
+  ctx.beginPath();ctx.arc(sz/2,sz/2,sz/2-4,0,Math.PI*2);
+  if(isRed){
+    const g=ctx.createRadialGradient(sz/2-22,sz/2-22,6,sz/2,sz/2,sz/2-4);
+    g.addColorStop(0,'#f0d050');g.addColorStop(0.5,'#c08808');g.addColorStop(1,'#5a3a00');
+    ctx.fillStyle=g;
+  }else{
+    const g=ctx.createRadialGradient(sz/2-20,sz/2-20,6,sz/2,sz/2,sz/2-4);
+    g.addColorStop(0,'#505050');g.addColorStop(0.5,'#1c1c1c');g.addColorStop(1,'#050505');
+    ctx.fillStyle=g;
+  }
+  ctx.fill();
+  ctx.strokeStyle=isRed?'#c08010':'#404040';ctx.lineWidth=6;ctx.stroke();
+  ctx.beginPath();ctx.arc(sz/2,sz/2,sz/2-18,0,Math.PI*2);
+  ctx.strokeStyle=isRed?'#e0b830':'#606060';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.save();
+  ctx.shadowColor=isRed?'rgba(60,20,0,0.9)':'rgba(0,0,0,0.9)';ctx.shadowBlur=5;
+  ctx.fillStyle=isRed?'#880000':'#d0c080';
+  ctx.font=`bold ${sz*0.46|0}px Microsoft JhengHei,serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(char,sz/2,sz/2+3);ctx.restore();
+  txCache[k]=new THREE.CanvasTexture(cv);return txCache[k];
+}
+
+/* ─── PIECE MESHES ─── */
+function makePieceGroup(cell,r,c){
+  const revealed=cell.revealed;
+  const isRed=sd(cell.piece)==='red';
+  const bodyColor=revealed?(isRed?0xA87010:0x141414):0x5a2c08;
+  const rimColor=revealed?(isRed?0xc08020:0x282828):0x7a3c14;
+  const topTex=revealed?makePieceTex(nm(cell.piece),isRed):makeHiddenTex();
+
+  const grp=new THREE.Group();
+
+  // Cylinder body
+  const body=new THREE.Mesh(
+    new THREE.CylinderGeometry(0.40,0.43,0.20,32),
+    new THREE.MeshPhongMaterial({color:bodyColor,shininess:80,
+      specular:isRed&&revealed?new THREE.Color(0.2,0.12,0):new THREE.Color(0.06,0.06,0.06)})
+  );
+  body.castShadow=true;grp.add(body); // child 0
+
+  // Top disc
+  const top=new THREE.Mesh(
+    new THREE.CircleGeometry(0.40,32),
+    new THREE.MeshPhongMaterial({map:topTex,shininess:12})
+  );
+  top.rotation.x=-Math.PI/2;top.position.y=0.101;grp.add(top); // child 1
+
+  // Rim
+  const rim=new THREE.Mesh(
+    new THREE.TorusGeometry(0.41,0.028,8,32),
+    new THREE.MeshPhongMaterial({color:rimColor,shininess:80})
+  );
+  rim.rotation.x=Math.PI/2;rim.position.y=-0.088;grp.add(rim); // child 2
+
+  grp.position.set(colX(c),0.21,rowZ(r));
+  // Flip black revealed pieces to face their direction
+  if(revealed&&!isRed) grp.rotation.y=Math.PI;
+
+  const ud={row:r,col:c,piece:cell.piece,revealed};
+  grp.userData=ud;
+  grp.children.forEach(ch=>ch.userData=ud);
+  return grp;
+}
+
+/* ─── SCENE SYNC ─── */
+function syncAll(){
+  pGroups.forEach(g=>scene.remove(g));pGroups=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=gBoard[r][c];
+    if(cell){const g=makePieceGroup(cell,r,c);scene.add(g);pGroups.push(g);}
+  }
+  clearHi();
+  if(gSel) showHi();
+}
+
+function findGrp(r,c){return pGroups.find(g=>g.userData.row===r&&g.userData.col===c);}
+
+function clearHi(){hiMeshes.forEach(m=>scene.remove(m));hiMeshes=[];}
+function showHi(){
+  clearHi();
+  if(!gSel) return;
+  const[sr,sc]=gSel;
+  const ring=mkRing(0xffdd00,0.46,0.51);
+  ring.position.set(colX(sc),0.12,rowZ(sr));scene.add(ring);hiMeshes.push(ring);
+  gMoves.forEach(([mr,mc,isCap])=>{
+    const dot=mkDot(isCap?0xff4444:0x44ff88,isCap?0.28:0.20);
+    dot.position.set(colX(mc),0.12,rowZ(mr));scene.add(dot);hiMeshes.push(dot);
+  });
+}
+
+function mkRing(col,i,o){
+  const m=new THREE.Mesh(
+    new THREE.RingGeometry(i,o,32),
+    new THREE.MeshBasicMaterial({color:col,side:THREE.DoubleSide,transparent:true,opacity:0.88,depthWrite:false})
+  );
+  m.rotation.x=-Math.PI/2;return m;
+}
+function mkDot(col,r){
+  const m=new THREE.Mesh(
+    new THREE.CircleGeometry(r,24),
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.65,side:THREE.DoubleSide,depthWrite:false})
+  );
+  m.rotation.x=-Math.PI/2;return m;
+}
+
+/* ─── FLIP ANIMATION ─── */
+function execFlip(r,c){
+  if(gBusy||gOver) return;
+  const cell=gBoard[r][c];
+  if(!cell||cell.revealed) return;
+  const grp=findGrp(r,c);
+  if(!grp) return;
+
+  gBusy=true;
+  const start=performance.now();
+  const dur=360;
+  let swapped=false;
+
+  animQueue.push({
+    start,dur,
+    fn(t){
+      if(t<0.5){
+        grp.scale.y=1-t*2; // shrink
+      } else {
+        if(!swapped){
+          swapped=true;
+          // Reveal in game state
+          applyFlip(r,c);
+          // Update mesh visuals
+          const isRed=sd(gBoard[r][c].piece)==='red';
+          grp.children[0].material.color.setHex(isRed?0xA87010:0x141414);
+          grp.children[1].material.map=makePieceTex(nm(gBoard[r][c].piece),isRed);
+          grp.children[1].material.needsUpdate=true;
+          grp.children[2].material.color.setHex(isRed?0xc08020:0x282828);
+          if(!isRed) grp.rotation.y=Math.PI; else grp.rotation.y=0;
+          grp.userData.revealed=true;
+          grp.userData.piece=gBoard[r][c].piece;
+          grp.children.forEach(ch=>{ch.userData.revealed=true;ch.userData.piece=gBoard[r][c].piece;});
+        }
+        grp.scale.y=(t-0.5)*2; // grow
+      }
+    },
+    done(){
+      grp.scale.y=1;
+      gBusy=false;
+      updateHUD();
+      showBannerAfterFlip(r,c);
+      if(gMode==='ai'&&gSide===gAIColor&&!gOver) doAI();
+    }
+  });
+}
+
+function showBannerAfterFlip(r,c){
+  const cell=gBoard[r][c];
+  if(!cell) return;
+  const colorName=sd(cell.piece)==='red'?'紅':'黑';
+  showBanner(`翻出 ${colorName}${nm(cell.piece)}`);
+  setTimeout(()=>showBanner(''),1800);
+}
+
+/* ─── MOVE ANIMATION ─── */
+function animateMove(r,c,nr,nc,onDone){
+  gBusy=true;
+  const grp=findGrp(r,c);
+  if(!grp){onDone&&onDone();gBusy=false;return;}
+
+  // Remove captured piece immediately
+  const capGrp=findGrp(nr,nc);
+  if(capGrp){scene.remove(capGrp);pGroups.splice(pGroups.indexOf(capGrp),1);}
+
+  const sx=colX(c),sz=rowZ(r),tx=colX(nc),tz=rowZ(nr);
+  const start=performance.now(),dur=300;
+
+  animQueue.push({
+    start,dur,
+    fn(t){
+      const et=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2; // ease in-out
+      grp.position.x=sx+(tx-sx)*et;
+      grp.position.z=sz+(tz-sz)*et;
+      grp.position.y=0.21+Math.sin(et*Math.PI)*0.5; // hop arc
+    },
+    done(){
+      grp.position.set(tx,0.21,tz);
+      grp.userData.row=nr;grp.userData.col=nc;
+      grp.children.forEach(ch=>{ch.userData.row=nr;ch.userData.col=nc;});
+      gBusy=false;
+      onDone&&onDone();
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOUSE / TOUCH
+═══════════════════════════════════════════════════════ */
+function onMD(e){if(e.button!==0)return;isDrag=true;prevMX=e.clientX;prevMY=e.clientY;cSX=e.clientX;cSY=e.clientY;}
+function onMM(e){
+  if(!isDrag)return;
+  camTheta-=(e.clientX-prevMX)*0.005;
+  camPhi=Math.max(0.18,Math.min(1.5,camPhi+(e.clientY-prevMY)*0.005));
+  prevMX=e.clientX;prevMY=e.clientY;applyCamera();
+}
+function onMU(e){
+  if(e.button!==0)return;
+  const dx=e.clientX-cSX,dy=e.clientY-cSY;
+  if(Math.sqrt(dx*dx+dy*dy)<6) handleClick(e.clientX,e.clientY);
+  isDrag=false;
+}
+function onWh(e){camR=Math.max(5.5,Math.min(22,camR+e.deltaY*0.014));applyCamera();}
+
+let ptD=null;
+function onTS(e){
+  e.preventDefault();
+  if(e.touches.length===1){isDrag=true;const t=e.touches[0];prevMX=t.clientX;prevMY=t.clientY;cSX=t.clientX;cSY=t.clientY;}
+  else if(e.touches.length===2){isDrag=false;ptD=td2(e);}
+}
+function onTM(e){
+  e.preventDefault();
+  if(e.touches.length===1&&isDrag){
+    const t=e.touches[0];
+    camTheta-=(t.clientX-prevMX)*0.007;
+    camPhi=Math.max(0.18,Math.min(1.5,camPhi+(t.clientY-prevMY)*0.007));
+    prevMX=t.clientX;prevMY=t.clientY;applyCamera();
+  }else if(e.touches.length===2){
+    const d=td2(e);if(ptD)camR=Math.max(5.5,Math.min(22,camR-(d-ptD)*0.04));
+    ptD=d;applyCamera();
+  }
+}
+function onTE(e){
+  if(e.changedTouches.length===1&&isDrag){
+    const t=e.changedTouches[0];
+    const dx=t.clientX-cSX,dy=t.clientY-cSY;
+    if(Math.sqrt(dx*dx+dy*dy)<10) handleClick(t.clientX,t.clientY);
+  }
+  isDrag=false;ptD=null;
+}
+function td2(e){const[a,b]=[e.touches[0],e.touches[1]];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);}
+
+/* ─── CLICK → GAME ─── */
+function handleClick(mx,my){
+  if(gBusy||gOver) return;
+  if(gMode==='ai'&&gSide===gAIColor) return;
+
+  const rect=renderer.domElement.getBoundingClientRect();
+  const nx=((mx-rect.left)/rect.width)*2-1;
+  const ny=-((my-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:nx,y:ny},camera);
+
+  // Raycast pieces
+  const tops=[];pGroups.forEach(g=>g.children.forEach(ch=>tops.push(ch)));
+  const hits=raycaster.intersectObjects(tops);
+  if(hits.length>0){
+    const ud=hits[0].object.userData;
+    if(ud.row!==undefined){onSquare(ud.row,ud.col);return;}
+  }
+  // Raycast board plane
+  const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+  const pt=new THREE.Vector3();
+  if(raycaster.ray.intersectPlane(plane,pt)){
+    const c=xToC(pt.x),r=zToR(pt.z);
+    if(inB(r,c)) onSquare(r,c);
+  }
+}
+
+function onSquare(r,c){
+  if(gBusy||gOver) return;
+  const cell=gBoard[r][c];
+
+  // Click hidden piece → flip
+  if(cell&&!cell.revealed){
+    clearHi();gSel=null;gMoves=[];
+    execFlip(r,c);return;
+  }
+
+  // --- During 'init' phase, only flipping allowed ---
+  if(gPhase==='init') return;
+
+  // Click own revealed piece → select or deselect
+  if(cell&&cell.revealed&&sd(cell.piece)===gSide){
+    if(gSel&&gSel[0]===r&&gSel[1]===c){
+      gSel=null;gMoves=[];clearHi();return;
+    }
+    gSel=[r,c];
+    gMoves=getValidMovesDark(gBoard,r,c);
+    showHi();return;
+  }
+
+  // Click a valid move destination
+  if(gSel){
+    const mv=gMoves.find(([mr,mc])=>mr===r&&mc===c);
+    if(mv){
+      const[sr,sc]=gSel;
+      clearHi();gSel=null;gMoves=[];
+      animateMove(sr,sc,r,c,()=>{
+        applyMoveDark(sr,sc,r,c);
+        updateHUD();
+        if(!checkEnd()&&gMode==='ai'&&gSide===gAIColor) doAI();
+      });
+      return;
+    }
+    // Click empty area → deselect
+    gSel=null;gMoves=[];clearHi();
+  }
+}
+
+/* ─── HUD ─── */
+function updateHUD(){
+  const dot=document.getElementById('turn-dot');
+  const txt=document.getElementById('turn-txt');
+
+  // In init phase: show "翻牌決定顏色"
+  if(gPhase==='init'){
+    dot.style.cssText='background:#a07030;box-shadow:0 0 8px #a07030;';
+    txt.textContent='翻牌決定顏色';txt.style.color='#c09040';
+  } else if(gSide==='red'){
+    dot.style.cssText='background:#cc3322;box-shadow:0 0 8px #cc3322;';
+    txt.textContent=`紅方行動${gMode==='ai'&&gSide===gMyColor?' (你)':''}`;
+    txt.style.color='#ff9060';
+  } else {
+    dot.style.cssText='background:#5577cc;box-shadow:0 0 8px #5577cc;';
+    txt.textContent=`黑方行動${gMode==='ai'&&gSide===gMyColor?' (你)':''}`;
+    txt.style.color='#88aaff';
+  }
+
+  const red=countSide(gBoard,'red');
+  const blk=countSide(gBoard,'black');
+  const hid=getHidden(gBoard).length;
+  document.getElementById('cnt-red').textContent=`紅 ${red}`;
+  document.getElementById('cnt-blk').textContent=`黑 ${blk}`;
+  document.getElementById('cnt-hid').textContent=`暗 ${hid}`;
+}
+
+function showBanner(msg){
+  const el=document.getElementById('status-banner');
+  if(msg){el.textContent=msg;el.style.display='block';}
+  else el.style.display='none';
+}
+function showAIBox(v){document.getElementById('ai-box').style.display=v?'block':'none';}
+
+/* ─── GAME FLOW ─── */
+let gModeSet='pvp';
+function setMode(m){
+  gModeSet=m;
+  document.getElementById('pvp-btn').classList.toggle('sel',m==='pvp');
+  document.getElementById('ai-btn').classList.toggle('sel',m==='ai');
+}
+
+function startGame(){
+  gMode=gModeSet;
+  document.getElementById('dialog-overlay').style.display='none';
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('hint-bar').style.display='block';
+  initState();
+  if(!threeReady){initThree();threeReady=true;}
+  syncAll();updateHUD();
+  showBanner('點擊任意暗棋翻面，翻出的顏色即為你的棋');
+  setTimeout(()=>showBanner(''),2500);
+}
+
+function backToMenu(){
+  document.getElementById('win-overlay').style.display='none';
+  document.getElementById('dialog-overlay').style.display='flex';
+  document.getElementById('hud').style.display='none';
+  document.getElementById('hint-bar').style.display='none';
+  document.getElementById('status-banner').style.display='none';
+  showAIBox(false);
+  if(threeReady){clearHi();animQueue.length=0;}
+}
+
+setMode('pvp');
+</script>
+</body>
+</html>

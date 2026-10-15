@@ -1,0 +1,118 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 堂｜2×2 活塞門：第一個大型機關</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="15">
+<main class="wrap">
+
+<section class="hero" style="--u:#FFB74D">
+  <span class="tag">第 15 堂 ／ 單元4　大型機關</span>
+  <h1>2×2 活塞門：第一個大型機關 🏰</h1>
+  <p>前 14 堂學到的元件，要開始組合成大型機關了！2×2 活塞門是最經典的紅石作品：4 個方塊同時收進牆裡，門口就打開。先用 MakeCode 一秒蓋好門框，再專心接線。</p>
+  <div class="chips"><span class="chip">🧱 黏性活塞 ×4、石頭、拉桿／壓力板、紅石粉、紅石火把、中繼器</span><span class="chip">💻 MakeCode：搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>會畫設計圖，把大機關拆成「門框、活塞、線路」三部分。</li><li>做出拉桿控制的 2×2 活塞門。</li><li>🦊 用火把做出「平常關著、踩壓力板才開」的門。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：看老師的 2×2 門示範：猜猜裡面有幾支活塞？</div></div>
+<div class="slot" data-min="10" data-label="第1節 MakeCode"><b>10 分</b><div><b>MakeCode</b>：frame 指令一秒蓋好門框</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：網頁俯視圖接線 → 遊戲中裝 4 支黏性活塞＋線路</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：🦊 反過來的門：用火把讓門「平常關著」；🐣 加上兩側按鈕</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：門參觀日：哪一組的門最漂亮、最快？</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、設計圖</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">🗺️</span><b>設計圖</b>大機關先畫在格子紙上：哪裡是活塞、哪裡是線，再動手蓋。</div><div class="lc"><span class="ic">🏰</span><b>2×2 門的原理</b>門口左右兩邊各有上下 2 支黏性活塞，每支黏著 1 塊門板。通電 → 4 塊門板推出來 → 關門。</div><div class="lc"><span class="ic">🔄</span><b>加火把反過來</b>在線路上加一支火把：平常有電（門關），按開關後沒電（門開）。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>網頁是「從上往下看」的俯視圖，只看得到下排的活塞；遊戲裡上排也要放一樣的，再用紅石把上下都接到。</li><li>活塞的電要同時送到 4 支，線路要接到每一支的「後面或側面」。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：拉桿控制的 2×2 門 🏰</h3></header>
+  <div class="items">🎒 準備物品：（MakeCode 蓋門框）黏性活塞 ×4、石頭 ×4、紅石粉、紅石火把、拉桿</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s15a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>用 MakeCode 輸入 <code>frame</code>，面前出現有 2×2 門口的牆。</li><li>門口左邊牆裡上下各放一支黏性活塞（朝右），右邊上下各放一支（朝左），每支前面黏一塊石頭。</li><li>在牆後面鋪紅石粉接到 4 支活塞（上排可以用石頭＋紅石火把把電往上送）。</li><li>拉桿打開 → 4 塊石頭推出來關門；關掉 → 門打開。</li></ol>
+  <div class="tip">💡 上排活塞最難接：在上排活塞的後面放一顆石頭，石頭<b>下面</b>放一支紅石火把頂著——火把會讓上面的石頭帶電，石頭再讓旁邊的活塞動。先在網頁把下排想清楚，再到遊戲處理上排。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出 1×2（只有下排）的門，再挑戰上排。</div><div class="lv f"><b>🦊 五、六年級</b>：做出完整的 2×2 門。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：平常關著、踩了才開 🚶</h3></header>
+  <div class="items">🎒 準備物品：壓力板 ×2、紅石火把、石頭</div>
+  
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>在網頁完成 🦊 挑戰：把線路上的一格換成火把。</li><li>在遊戲裡門前後各放一個壓力板。</li><li>壓力板 → 石頭 → 紅石火把 → 原本的活塞線路。</li><li>平常火把亮 → 門關著；踩上壓力板 → 火把熄 → 門打開，走過去門又關上！</li></ol>
+  <div class="tip">💡 這就是第 2 堂的 NOT！大型機關都是用小元件組合起來的。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：在門兩側各加一個按鈕。</div><div class="lv f"><b>🦊 五、六年級</b>：做出壓力板自動門。</div></div>
+</section>
+
+<section class="mission" id="mc">
+  <header><h3>💻 MakeCode：一秒蓋好門框</h3></header>
+  <p>大型機關最花時間的是蓋牆。用「填充」先蓋好整面牆，再用一次填充把門口挖空，就能專心在紅石線路上。</p>
+  <div class="mcwrap">
+    <div><b>積木</b>（積木上的文字可能因版本略有不同）
+<pre class="mc">player hat: 當聊天指令 {&quot;frame&quot;}
+  blocks: 填充 [石磚] 從 {~-3 ~0 ~3} 到 {~3 ~4 ~3} [取代]
+  blocks: 填充 [空氣] 從 {~-1 ~0 ~3} 到 {~0 ~1 ~3} [取代]</pre></div>
+    <div><div class="row"><b>JavaScript</b><button class="btn sm blue" data-copy="js15">📋 複製</button></div>
+<pre class="js" id="js15">player.onChat(&quot;frame&quot;, function () {
+    blocks.fill(STONE_BRICKS, pos(-3, 0, 3), pos(3, 4, 3), FillOperation.Replace)
+    blocks.fill(AIR, pos(-1, 0, 3), pos(0, 1, 3), FillOperation.Replace)
+})</pre>
+      <p class="small">在 MakeCode 上方切換到「JavaScript」，整段貼上，再切回「積木」就會變成上面的積木。</p></div>
+  </div>
+  <div class="dl"><a class="btn green" href="../makecode/第15堂_一秒蓋好門框.mkcd" download>⬇️ 下載 MakeCode 檔（.mkcd）</a>
+    <span class="small">Minecraft Education 按 <kbd>C</kbd> → MakeCode → <b>匯入</b> → 選這個檔案，打開就是上面的積木，不用自己拼。</span></div>
+  <h4>🧪 試試看</h4>
+  <ol class="steps"><li>找一塊空地，面向南方（Z 變大的方向）輸入 <code>frame</code>。</li><li>面前 3 格會出現 7 格寬、5 格高的石磚牆，中間有 2×2 的門口。</li><li>想把門做大一點？改數字：牆寬、門口位置都可以調整。</li><li>牆後面挖空間放活塞和線路。</li></ol>
+  <div class="note">📌 座標 <code>~-3 ~0 ~3</code>：x 往左 3、y 不變、z 往前 3。這裡的「前」是世界的南方，不是你面向的方向。</div>
+</section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>畫出你的 2×2 門設計圖（用格子紙或在紅石日誌裡寫下每一格放什麼）。</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>基岩版 2×2 門的上排活塞常用「石頭＋紅石火把」或「黏性活塞推紅石方塊」供電；網上有很多「2x2 piston door bedrock」教學影片可參考。</li><li>可以用<b>結構方塊</b>把老師做好的門存起來，讓進度落後的組直接載入研究。</li><li>網頁只示意「下排」的俯視圖，上排請在遊戲中處理，這是本課的除錯重點。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s15a": {"title": "🏰 2×2 活塞門（俯視圖）", "desc": "牆上兩支黏性活塞各拉著一塊石頭，中間 G1、G2 是門口。從拉桿鋪線到兩支活塞。", "rows": [". . . . . . . .", "# k> # .:G1 .:G2 # k< #", ". ? ? ? ? ? ? .", ". . . ? . . . .", ". . . L:A . . . ."], "tools": ["dust", "torch"], "names": {"A": "拉桿", "G1": "門口左", "G2": "門口右"}, "challenges": [{"name": "拉桿開 → 關門；拉桿關 → 開門", "level": "🐣", "steps": [{"set": {"A": true}, "expect": {"G1": true, "G2": true}}, {"set": {"A": false}, "expect": {"G1": false, "G2": false}}]}, {"name": "反過來：平常關著，拉桿開才開門（要用火把）", "level": "🦊", "steps": [{"set": {"A": false}, "expect": {"G1": true, "G2": true}}, {"set": {"A": true}, "expect": {"G1": false, "G2": false}}]}]}};
+window.QUIZ = [{"q": "2×2 活塞門總共需要幾支黏性活塞？", "o": ["2 支", "4 支", "8 支"], "a": 1, "why": "左右各 2 支（上下），共 4 支。"}, {"q": "為什麼要用「黏性」活塞？", "o": ["推得比較遠", "縮回時把門板拉回來", "比較便宜"], "a": 1, "why": "門要能開能關，門板要被拉回來。"}, {"q": "想讓門「平常關著、踩了才開」，要加什麼？", "o": ["紅石火把", "音符盒", "漏斗"], "a": 0, "why": "火把把訊號反過來（NOT）。"}, {"q": "大型機關動手前，最好先做什麼？", "o": ["畫設計圖", "直接蓋", "先拆掉"], "a": 0, "why": "先畫設計圖，可以少走很多冤枉路。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

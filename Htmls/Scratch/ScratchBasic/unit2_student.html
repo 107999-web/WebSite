@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 2：說話與變裝</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🎭 單元 2 <em>說話與變裝</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit1_student.html">單元1</a>
+      <a class="on" href="unit2_student.html">單元2</a>
+      <a href="unit3_student.html">單元3</a>
+      <a href="unit4_student.html">單元4</a>
+      <a href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>說話與變裝</h1>
+    <p>上一課角色學會了走路，這一課要讓它<b>開口說話、換衣服、變大變小，還會隱形</b>。用的是「外觀類」的積木。</p>
+    <div class="goals">
+      <div><b>目標 1</b>　會讓角色說話，並且知道「持續 2 秒」和一般版本差在哪裡。</div>
+      <div><b>目標 2</b>　會用造型做出走路動畫，會換背景做出不同場景。</div>
+      <div><b>目標 3</b>　能用尺寸和圖像效果做出「變身」的特效。</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <section class="sec">
+        <h2><span class="n">1</span>先玩玩看</h2>
+        <p>按按看這幾個按鈕，右邊的角色會立刻有反應。先感受一下，等一下再看積木。</p>
+        <div class="quiz">
+          <div class="q">🎨 換裝實驗室</div>
+          <div class="row">
+            <button class="btn sm" data-do="nextCostume">換下一個造型</button>
+            <button class="btn sm" data-do="nextBackdrop">換下一張背景</button>
+            <button class="btn ghost sm" data-do="bigger">變大</button>
+            <button class="btn ghost sm" data-do="smaller">變小</button>
+            <button class="btn ghost sm" data-do="ghost">變透明</button>
+            <button class="btn ghost sm" data-do="color">變色</button>
+            <button class="btn ghost sm" data-do="clear">全部復原</button>
+          </div>
+          <div class="fb" id="fb2">造型有兩個、背景有三張，多按幾次會繞回來喔！</div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>這一課的積木</h2>
+        <p>每一塊都可以改數字或文字，按「試一試」右邊的角色就會做給你看。</p>
+        <div id="blocks2"></div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>跟著做</h2>
+
+        <div class="work">
+          <h3>💬 作品 1：打招呼小劇場</h3>
+          <ol>
+            <li>先用<b>說出「你好！」持續 2 秒</b>，角色會說完自己閉嘴。</li>
+            <li>再用<b>想著「今天天氣真好」持續 2 秒</b>，泡泡的樣子會不一樣。</li>
+            <li>最後用<b>說出（空白）</b>把泡泡清掉 —— 這一招要記起來！</li>
+          </ol>
+          <div id="demo1"></div>
+        </div>
+
+        <div class="work">
+          <h3>🚶 作品 2：走路動畫</h3>
+          <ol>
+            <li>角色有兩個造型，一直切換就會像在走路。</li>
+            <li>每換一次造型就<b>移動一點點</b>，看起來就真的在前進。</li>
+            <li>真正做作品時，要放進「重複無限次」並加上「等待 0.2 秒」，不然會太快。</li>
+          </ol>
+          <div id="demo2"></div>
+        </div>
+
+        <div class="work">
+          <h3>✨ 作品 3：變身魔法</h3>
+          <ol>
+            <li>先讓角色<b>變大</b>，再套上<b>顏色效果</b>，看起來就像在施法。</li>
+            <li>用<b>幻影效果</b>讓它慢慢消失，再用<b>顯示／隱藏</b>做出瞬間移動。</li>
+            <li>最後一定要<b>圖像效果清除</b>、<b>尺寸設為 100</b>，把角色變回原樣。</li>
+          </ol>
+          <div id="demo3"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">4</span>挑戰任務</h2>
+        <div class="mission">
+          <div><span>⭐</span><div>讓角色自我介紹：說出名字、想著喜歡的東西，最後把泡泡清乾淨。</div></div>
+          <div><span>⭐⭐</span><div>做一個<b>會走路的角色</b>：一邊換造型一邊往前走，走到舞台邊緣就轉頭。</div></div>
+          <div><span>⭐⭐⭐</span><div>做一個<b>隱形斗篷</b>：按下空白鍵角色變透明，再按一次變回來。</div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">5</span>我學會了嗎</h2>
+        <div class="self">
+          <label><input type="checkbox"><span>我知道「說出…持續 2 秒」會<b>自己消失</b>，一般的「說出」<b>會一直留著</b>。</span></label>
+          <label><input type="checkbox"><span>我會用「造型換成下一個」做出走路動畫。</span></label>
+          <label><input type="checkbox"><span>我知道<b>背景是整個舞台的</b>，不是某一個角色的。</span></label>
+          <label><input type="checkbox"><span>我知道「幻影」效果越大越透明，100 就完全看不見。</span></label>
+          <label><input type="checkbox"><span>我記得在遊戲開始時把角色<b>復原</b>（顯示、尺寸設為 100、效果清除）。</span></label>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台</h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">尺寸</div><div class="v" id="rs">100</div></div>
+          <div><div class="k">造型</div><div class="v" id="rc">1</div></div>
+          <div><div class="k">背景</div><div class="v" id="rb">1</div></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" id="optArrow" checked> 方向箭頭</label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設角色</button>
+        </div>
+        <div class="note">舞台上的那叢草是<b>道具</b>，可以用來看出「圖層」的前後關係。</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>🎭 單元 2・說話與變裝　·　上一課：<a href="unit1_student.html">單元 1 讓角色動起來</a></footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+Stage.init(document.getElementById('stage'));
+UI.bindReadout({size:'rs',costume:'rc',backdrop:'rb'});
+Stage.reset();
+document.getElementById('reset').addEventListener('click',function(){Stage.reset();});
+document.getElementById('optArrow').addEventListener('change',function(e){Stage.setArrow(e.target.checked);});
+
+/* --- 換裝實驗室 --- */
+var acts={
+  nextCostume:function(){return Stage.run('nextCostume',{});},
+  nextBackdrop:function(){return Stage.run('nextBackdrop',{});},
+  bigger:function(){return Stage.run('changeSize',{DS:25});},
+  smaller:function(){return Stage.run('changeSize',{DS:-25});},
+  ghost:function(){return Stage.run('changeEffect',{FX:'幻影',V:20});},
+  color:function(){return Stage.run('changeEffect',{FX:'顏色',V:35});},
+  clear:function(){Stage.run('clearEffects',{});return Stage.run('setSize',{SIZE:100});}
+};
+document.querySelectorAll('[data-do]').forEach(function(b){
+  b.addEventListener('click',function(){acts[b.dataset.do]();});
+});
+
+/* --- 這一課的積木 --- */
+var host=document.getElementById('blocks2');
+['sayfor','say','nextcostume','switchbackdrop','changesize','setsize','seteffect','cleareffects','hide','show','gotolayer']
+  .forEach(function(id){UI.tryRow(id,host);});
+
+/* --- 示範腳本 --- */
+UI.script([
+  {id:'sayfor',args:{MSG:'你好！',SECS:2}},
+  {id:'thinkfor',args:{MSG:'今天天氣真好',SECS:2}},
+  {id:'say',args:{MSG:'我們一起玩吧'}},
+  {id:'say',args:{MSG:''}}
+],document.getElementById('demo1'));
+
+UI.script([
+  {id:'gotoxy',args:{X:-150,Y:-40}},{id:'rotstyle',args:{STYLE:'左-右'}},{id:'pointdir',args:{DIR:90}},
+  {id:'nextcostume',args:{}},{id:'move',args:{STEPS:50}},
+  {id:'nextcostume',args:{}},{id:'move',args:{STEPS:50}},
+  {id:'nextcostume',args:{}},{id:'move',args:{STEPS:50}},
+  {id:'nextcostume',args:{}},{id:'move',args:{STEPS:50}}
+],document.getElementById('demo2'));
+
+UI.script([
+  {id:'setsize',args:{SIZE:100}},{id:'cleareffects',args:{}},
+  {id:'changesize',args:{DS:60}},{id:'seteffect',args:{FX:'顏色',V:80}},
+  {id:'seteffect',args:{FX:'幻影',V:60}},
+  {id:'hide',args:{}},{id:'gotoxy',args:{X:120,Y:60}},{id:'show',args:{}},
+  {id:'cleareffects',args:{}},{id:'setsize',args:{SIZE:100}}
+],document.getElementById('demo3'));
+</script>
+</body>
+</html>

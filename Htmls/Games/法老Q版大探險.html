@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>法老Q版大探險 👑</title>
+    <style>
+        :root {
+            --bg-sand: #f7d070;
+            --pyramid-dark: #cc9933;
+            --sky-blue: #a0e0e6;
+            --text-brown: #5c4017;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fdf2d6;
+            font-family: 'Segoe UI', Microsoft JhengHei, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            color: var(--text-brown);
+        }
+
+        h1 {
+            margin: 5px 0;
+            font-size: 30px;
+            color: #d49300;
+            text-shadow: 2px 2px 0px #fff;
+        }
+
+        .instructions {
+            font-size: 14px;
+            color: #8c6d3f;
+            margin-bottom: 15px;
+        }
+
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            background: linear-gradient(to bottom, #ffe89e 0%, #f4c454 70%, #d49a24 70%);
+            border: 8px solid #fff;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(212, 154, 36, 0.3);
+            overflow: hidden;
+        }
+
+        /* 背景可愛金字塔裝飾 */
+        .deco-pyramid {
+            position: absolute;
+            bottom: 120px;
+            right: 100px;
+            width: 0;
+            height: 0;
+            border-left: 120px solid transparent;
+            border-right: 120px solid transparent;
+            border-bottom: 140px solid rgba(255, 255, 255, 0.4);
+            z-index: 1;
+        }
+        .deco-pyramid.small {
+            right: 280px;
+            bottom: 120px;
+            border-left: 70px solid transparent;
+            border-right: 70px solid transparent;
+            border-bottom: 80px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* UI 層 */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 22px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        #score-board {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px solid #d49300;
+        }
+
+        /* Q版法老 (純CSS繪製) */
+        #pharaoh {
+            position: absolute;
+            bottom: 120px; /* 站在沙漠地面上 */
+            left: 100px;
+            width: 55px;
+            height: 65px;
+            z-index: 5;
+            transform-origin: bottom center;
+        }
+
+        /* 法老身體與黃藍相間面具 */
+        .pharaoh-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #ffeb3b; /* 皮膚金黃 */
+            border-radius: 20px 20px 10px 10px;
+            box-shadow: inset -4px -4px 0 #fbc02d, 0 6px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        /* 法老的條紋頭巾 (Nemis) */
+        .pharaoh-headwear {
+            position: absolute;
+            top: 0; left: -5px; width: 65px; height: 35px;
+            background: repeating-linear-gradient(90deg, #0d47a1, #0d47a1 10px, #ffd54f 10px, #ffd54f 20px);
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* 可愛腮紅與小眼睛 */
+        .pharaoh-face {
+            position: absolute;
+            top: 32px; left: 0; width: 100%; height: 25px;
+            background: #ffe082;
+        }
+        .pharaoh-face::before {
+            content: '•  •';
+            position: absolute;
+            width: 100%; text-align: center;
+            font-size: 18px; color: #333; font-weight: bold; top: -5px;
+        }
+        .pharaoh-face::after {
+            content: ''; position: absolute; top: 6px; left: 8px;
+            width: 8px; height: 5px; background: #ff8a80; border-radius: 50%;
+            box-shadow: 32px 0 #ff8a80;
+        }
+
+        /* 奔跑與跳躍動畫 */
+        .running {
+            animation: bounce 0.4s infinite alternate ease-in-out;
+        }
+        @keyframes bounce {
+            0% { transform: translateY(0) scaleY(1); }
+            100% { transform: translateY(-4px) scaleY(0.96); }
+        }
+
+        /* 障礙物與寶物通用 */
+        .game-object {
+            position: absolute;
+            bottom: 120px;
+            font-size: 38px;
+            z-index: 4;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
+        /* 特效粒子 */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 20px;
+            z-index: 6;
+            animation: popOut 0.5s ease-out forwards;
+        }
+        @keyframes popOut {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--mx), var(--my)) scale(1.3); opacity: 0; }
+        }
+
+        /* 畫面屏蔽層 */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(253, 242, 214, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        .btn {
+            padding: 12px 35px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f4c454, #d49300);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(212, 147, 0, 0.4);
+            transition: transform 0.1s;
+            margin-top: 15px;
+            border: 3px solid #fff;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn:active { transform: scale(0.95); }
+
+        #game-over-screen { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>👑 法老Q版大探險 👑</h1>
+    <div class="instructions">操作提示：按【空白鍵 Space】或【上方向鍵 ↑】跳躍，支援空中【二段跳】！</div>
+
+    <div id="game-container" onclick="triggerJump()">
+        <div class="deco-pyramid"></div>
+        <div class="deco-pyramid small"></div>
+
+        <div id="ui-layer">
+            <div id="score-board">分數: <span id="score">0</span></div>
+        </div>
+
+        <div id="pharaoh" class="running">
+            <div class="pharaoh-body">
+                <div class="pharaoh-headwear"></div>
+                <div class="pharaoh-face"></div>
+            </div>
+        </div>
+
+        <div id="start-screen" class="screen">
+            <span style="font-size: 65px;">✨🏺✨</span>
+            <h2 style="color: #d49300; margin: 10px 0;">金字塔的神祕奇遇</h2>
+            <p style="color: #8c6d3f; font-size: 15px; text-align: center; padding: 0 40px; line-height: 1.6;">
+                可愛的小法老在金字塔深處迷路了！<br>
+                幫他跳過小木乃伊 𓀾 與聖甲蟲 𓆣，收集神聖的符號 ☥ 吧！
+            </p>
+            <button class="btn" onclick="event.stopPropagation(); startGame();">開始探險</button>
+        </div>
+
+        <div id="game-over-screen" class="screen">
+            <span style="font-size: 65px;">🤕</span>
+            <h2 style="color: #cc3333; margin: 10px 0;">探險結束啦！</h2>
+            <p style="font-size: 22px; font-weight: bold; margin: 5px 0;">最終分數: <span id="final-score">0</span></p>
+            <button class="btn" onclick="event.stopPropagation(); startGame();">重新挑戰</button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const pharaoh = document.getElementById('pharaoh');
+        const scoreEl = document.getElementById('score');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreEl = document.getElementById('final-score');
+
+        // 遊戲物理與計時參數
+        let score = 0;
+        let gameActive = false;
+        let gameObjects = [];
+        let spawnTimer = 0;
+        let spawnInterval = 90; // 每隔幾影格嘗試生成障礙物或寶物
+        let gameSpeed = 5;
+
+        // 跳躍邏輯變數
+        let pharaohY = 0; // 相對於地面的高度
+        let velocityY = 0;
+        let jumpCount = 0;
+        const gravity = 0.6;
+        const jumpStrength = 11.5;
+
+        // 監聽鍵盤事件
+        window.addEventListener('keydown', (e) => {
+            if (['Space', 'ArrowUp'].includes(e.code)) {
+                e.preventDefault(); // 防止網頁下拉
+                triggerJump();
+            }
+        });
+
+        // 跳躍觸發器（支援二段跳）
+        function triggerJump() {
+            if (!gameActive) return;
+            
+            if (jumpCount < 2) {
+                velocityY = jumpStrength;
+                jumpCount++;
+                pharaoh.classList.remove('running'); // 跳躍時停止走路晃動動畫
+                
+                // 加一點點可愛的小旋轉回饋
+                if (jumpCount === 2) {
+                    pharaoh.style.transform = `translateY(${-pharaohY}px) rotate(360deg)`;
+                    pharaoh.style.transition = 'transform 0.4s ease-out';
+                    createParticles(130, 400 - 120 - pharaohY, '✨');
+                } else {
+                    pharaoh.style.transition = 'none';
+                }
+            }
+        }
+
+        // 開始/重設遊戲
+        function startGame() {
+            // 清理舊物件
+            document.querySelectorAll('.game-object').forEach(el => el.remove());
+            gameObjects = [];
+
+            // 狀態初始化
+            score = 0;
+            gameSpeed = 5;
+            spawnInterval = 90;
+            pharaohY = 0;
+            velocityY = 0;
+            jumpCount = 0;
+            gameActive = true;
+
+            scoreEl.innerText = score;
+            pharaoh.className = 'running';
+            pharaoh.style.transform = 'translateY(0px) rotate(0deg)';
+            pharaoh.style.transition = 'none';
+
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+
+            // 啟動主迴圈
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 生成障礙物或寶物
+        function spawnObject() {
+            const rand = Math.random();
+            let type = '';
+            let char = '';
+
+            if (rand < 0.4) {
+                type = 'mummy'; // 木乃伊障礙
+                char = '𓀾';
+            } else if (rand < 0.7) {
+                type = 'beetle'; // 聖甲蟲障礙（矮一點但速度稍有變化）
+                char = '𓆣';
+            } else {
+                type = 'ankh'; // 安卡寶石（需要跳起來拿）
+                char = '☥';
+            }
+
+            const el = document.createElement('div');
+            el.classList.add('game-object');
+            el.innerText = char;
+            container.appendChild(el);
+
+            // 如果是寶石，隨機讓它飄在半空中
+            let objY = 0;
+            if (type === 'ankh') {
+                objY = Math.random() < 0.5 ? 40 : 90;
+            }
+
+            el.style.left = '840px';
+            el.style.bottom = (120 + objY) + 'px';
+
+            gameObjects.push({
+                el: el,
+                x: 840,
+                y: objY,
+                type: type,
+                width: 30,
+                height: type === 'ankh' ? 40 : 50
+            });
+        }
+
+        // 建立可愛的放射粒子特效
+        function createParticles(x, y, char) {
+            for (let i = 0; i < 5; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.innerText = char;
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+
+                const mx = (Math.random() - 0.5) * 120 + 'px';
+                const my = (Math.random() - 0.7) * 120 + 'px';
+                p.style.setProperty('--mx', mx);
+                p.style.setProperty('--my', my);
+
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 500);
+            }
+        }
+
+        // 遊戲主迴圈（60 FPS 物理運算）
+        function gameLoop() {
+            if (!gameActive) return;
+
+            // 1. 處理法老跳躍物理
+            pharaohY += velocityY;
+            velocityY -= gravity;
+
+            if (pharaohY <= 0) {
+                pharaohY = 0;
+                velocityY = 0;
+                jumpCount = 0;
+                if (!pharaoh.classList.contains('running')) {
+                    pharaoh.classList.add('running');
+                    pharaoh.style.transform = 'translateY(0px) rotate(0deg)';
+                    pharaoh.style.transition = 'none';
+                }
+            } else {
+                // 如果不是在二段跳的旋轉中，維持高度位移
+                if (jumpCount < 2) {
+                    pharaoh.style.transform = `translateY(${-pharaohY}px)`;
+                }
+            }
+
+            // 2. 物件生成調度
+            spawnTimer++;
+            if (spawnTimer >= spawnInterval) {
+                spawnObject();
+                spawnTimer = 0;
+                // 隨著分數漸進提高難度
+                if (spawnInterval > 50) spawnInterval -= 0.5;
+                gameSpeed += 0.08;
+            }
+
+            // 3. 移動所有物件並進行碰撞檢測
+            for (let i = gameObjects.length - 1; i >= 0; i--) {
+                let obj = gameObjects[i];
+                obj.x -= gameSpeed;
+                obj.el.style.left = obj.x + 'px';
+
+                // 法老的核心碰撞箱 AABB 範圍 (法老固定在 X: 100, 寬約 45)
+                const pharaohLeft = 100 - 22;
+                const pharaohRight = 100 + 22;
+                const pharaohTop = pharaohY + 65;
+                const pharaohBottom = pharaohY;
+
+                const objLeft = obj.x - obj.width / 2;
+                const objRight = obj.x + obj.width / 2;
+                const objTop = obj.y + obj.height;
+                const objBottom = obj.y;
+
+                // 檢查是否重疊
+                if (pharaohRight > objLeft && pharaohLeft < objRight && pharaohTop > objBottom && pharaohBottom < objTop) {
+                    if (obj.type === 'ankh') {
+                        // 吃到安卡寶物
+                        score += 50;
+                        scoreEl.innerText = score;
+                        createParticles(obj.x, 400 - 120 - obj.y, '☀️');
+                        obj.el.remove();
+                        gameObjects.splice(i, 1);
+                    } else {
+                        // 撞到障礙物 (木乃伊或甲蟲)
+                        endGame();
+                        return;
+                    }
+                    continue;
+                }
+
+                // 超出左側邊界移除物件並加基本分
+                if (obj.x < -40) {
+                    if (obj.type !== 'ankh') {
+                        score += 10; // 成功躲過障礙物加分
+                        scoreEl.innerText = score;
+                    }
+                    obj.el.remove();
+                    gameObjects.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 遊戲結束
+        function endGame() {
+            gameActive = false;
+            finalScoreEl.innerText = score;
+            gameOverScreen.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

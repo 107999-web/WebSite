@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 6：一次記住很多件事</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.lab{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.lab button{border:2px solid #FF661A;background:var(--paper);border-radius:999px;padding:6px 14px;
+  font-family:var(--f-round);font-weight:700;font-size:.86rem;color:#E64D00;cursor:pointer;transition:transform .16s}
+.lab button:hover{transform:scale(1.06);background:color-mix(in srgb,#FF661A 12%,var(--paper))}
+.lab input{font-family:var(--f-round);font-size:.86rem;padding:6px 14px;border-radius:999px;
+  border:2px solid var(--line);background:var(--paper2);color:var(--ink);width:110px}
+.rowsbox{margin-top:14px;background:var(--paper2);border:3px solid var(--line);border-radius:18px;padding:12px}
+.rowsbox .rr{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;padding:3px 0}
+.rowsbox .rr .n{font-family:var(--f-num);font-weight:800;color:var(--ink2);text-align:right}
+.rowsbox .rr .c{background:#FF661A;color:#fff;border-radius:999px;padding:3px 14px;font-weight:700;font-size:.9rem}
+.rowsbox .none{color:var(--ink2);font-size:.9rem}
+.rowsbox .len{margin-top:8px;font-size:.84rem;color:var(--ink2);font-weight:700}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+@media(max-width:760px){.vs{grid-template-columns:1fr}}
+.vs>div{background:var(--paper2);border:2px dashed var(--line);border-radius:18px;padding:12px}
+.vs h4{font-size:.95rem;margin:0 0 6px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📋 單元 6 <em>一次記住很多件事</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit4_student.html">單元4</a>
+      <a href="unit5_student.html">單元5</a>
+      <a class="on" href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>一次記住很多件事</h1>
+    <p>上一課的<b>變數</b>是一個盒子，只能裝一樣東西。這一課的<b>清單</b>是<b>一整排有編號的盒子</b>，可以一次記住全班的名字、每一關的分數、玩家的答題紀錄。</p>
+    <div class="goals">
+      <div><b>目標 1</b>　知道清單和變數的差別：一個裝一樣，一個裝很多樣。</div>
+      <div><b>目標 2</b>　會用<b>編號</b>取出清單裡的某一項，並知道第一項是 <b>1</b>。</div>
+      <div><b>目標 3</b>　會用<b>重複 清單長度 次</b>把整張清單走過一遍。</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <section class="sec">
+        <h2><span class="n">1</span>一排有編號的盒子</h2>
+        <p>清單的每一格都有自己的<b>編號</b>：第 1 項、第 2 項、第 3 項⋯⋯。<br>
+          在下面打字再按按鈕，同時看小舞台<b>右上角</b>的清單監看器。</p>
+        <div class="work">
+          <h3>🧪 清單實驗室（排行榜）</h3>
+          <div class="lab" id="lab"></div>
+          <div class="rowsbox" id="rows"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:10px 0 0">注意：<b>刪除第 1 項</b>之後，原本的第 2 項會自動變成第 1 項——編號會整個往前移。</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>這一課的積木</h2>
+        <p>清單積木在 Scratch 裡放在<b>「變數」分類</b>裡，顏色比變數<b>深一點</b>。先按「試一試」感覺一下每一塊在做什麼。</p>
+        <div id="blocksL"></div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>加在最後面 vs 插在中間</h2>
+        <p>「添加」和「插入」很像，但結果差很多。兩段都跑跑看，比較清單最後長什麼樣。</p>
+        <div class="work">
+          <div class="vs">
+            <div>
+              <h4>➕ 添加：永遠接在最後面</h4>
+              <div id="vsA"></div>
+              <p style="font-size:.88rem;color:var(--ink2);margin:8px 0 0">結果是 <b>小明 → 小華 → 冠軍</b>。</p>
+            </div>
+            <div>
+              <h4>⤴ 插入：擠進指定的位置</h4>
+              <div id="vsB"></div>
+              <p style="font-size:.88rem;color:var(--ink2);margin:8px 0 0">結果是 <b>冠軍 → 小明 → 小華</b>，原本的人都往後挪。</p>
+            </div>
+          </div>
+          <div class="note" style="margin-top:14px">
+            還有一塊<b>替換</b>：它是<b>換掉</b>某一項的內容，清單<b>長度不會變</b>。<br>
+            三塊一起記：<b>添加＝加在最後</b>、<b>插入＝擠進去（變長）</b>、<b>替換＝換掉（不變長）</b>。
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">4</span>用迴圈把整張清單走一遍</h2>
+        <p>這是清單<b>最重要的用法</b>：用一個變數當<b>編號</b>，從 1 數到清單的長度，每一圈取出一項。</p>
+        <div class="work">
+          <h3>🚶 例子：把名單一個一個唸出來</h3>
+          <p style="font-size:.93rem">「重複」的次數欄位放進<b>清單的長度</b>，「第幾項」的欄位放進<b>編號</b>這個變數，每跑完一圈就讓編號加 1。</p>
+          <div id="walk"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:8px 0 0">看得出來嗎？這裡有<b>三層嵌套</b>：說出的欄位裡放著「第幾項」，而「第幾項」的欄位裡又放著「編號」。</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">5</span>跟著做</h2>
+
+        <div class="work">
+          <h3>📝 作品 1：點名冊</h3>
+          <ol>
+            <li>綠旗下面先「<b>刪除排行榜的所有項目</b>」，清空舊資料。</li>
+            <li>用「添加」把三個名字放進去，再「清單顯示」。</li>
+            <li>最後說出「清單的長度」，看看總共幾個人。</li>
+          </ol>
+          <div id="demo1"></div>
+        </div>
+
+        <div class="work">
+          <h3>🏆 作品 2：查名次</h3>
+          <ol>
+            <li>先建好一張排行榜。</li>
+            <li>用「<b>○○ 在 排行榜 裡的項目編號</b>」查某個人排第幾。</li>
+            <li>查一個<b>不在清單裡</b>的名字，看看回傳什麼——答案是 <b>0</b>。</li>
+          </ol>
+          <div id="demo2"></div>
+        </div>
+
+        <div class="work">
+          <h3>🔁 作品 3：把每一項都唸一遍</h3>
+          <ol>
+            <li>編號設為 1。</li>
+            <li>重複<b>清單的長度</b>次：說出第「編號」項，然後編號改變 1。</li>
+            <li>清單有幾項就唸幾次，以後加人也不用改程式。</li>
+          </ol>
+          <div id="demo3"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">6</span>自己拼拼看</h2>
+        <p>白色按鈕直接加進腳本；有 <b>⤵</b> 的按鈕要<b>放進欄位</b>。試著自己做出一張會顯示長度的清單。</p>
+        <div class="quiz fillhost">
+          <div class="q">🧱 動作積木（直接加進腳本）</div>
+          <div class="row" id="palA"></div>
+          <div class="q" style="margin-top:14px">📋 放進欄位用的積木</div>
+          <div class="row" id="palB"></div>
+          <div class="list" id="mylist" style="max-height:none;margin-top:14px"></div>
+          <div class="runbar">
+            <button class="btn flag" id="run">🏳 執行</button>
+            <button class="btn stopb" id="stop">■ 停止</button>
+            <button class="btn ghost" id="clear">清空</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">7</span>挑戰任務</h2>
+        <div class="mission">
+          <div><span>⭐</span><div>把作品 1 改成<b>五個人</b>，並確認說出的長度真的變成 5。</div></div>
+          <div><span>⭐⭐</span><div>做一個<b>問答紀錄器</b>：問玩家三個問題，把每次的「詢問的答案」都添加到清單裡。</div></div>
+          <div><span>⭐⭐⭐</span><div>做一個<b>不重複的報名表</b>：加入之前先用「清單包含 ○○？」檢查，已經有的就不要再加。</div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">8</span>我學會了嗎</h2>
+        <div class="self">
+          <label><input type="checkbox"><span>我說得出<b>變數</b>和<b>清單</b>的差別。</span></label>
+          <label><input type="checkbox"><span>我知道清單的第一項是 <b>1</b> 不是 0。</span></label>
+          <label><input type="checkbox"><span>我分得出<b>添加、插入、替換</b>三塊的差別。</span></label>
+          <label><input type="checkbox"><span>我知道<b>刪掉一項之後，後面的編號會往前移</b>。</span></label>
+          <label><input type="checkbox"><span>我會用「重複 <b>清單的長度</b> 次」把整張清單走一遍。</span></label>
+          <label><input type="checkbox"><span>我知道找不到東西時，「項目編號」會回傳 <b>0</b>。</span></label>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台 <span style="font-size:.76rem;color:var(--ink2);font-weight:400">（右上角是清單監看器）</span></h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">清單長度</div><div class="v" id="rlen">0</div></div>
+          <div><div class="k">編號</div><div class="v" id="rno">0</div></div>
+          <div><div class="k">方向</div><div class="v" id="rd">90</div></div>
+        </div>
+        <div class="opts">
+          <label style="display:flex;align-items:center;gap:5px">速度
+            <select id="speed" style="border:2px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--paper);color:var(--ink);font-family:var(--f-round);font-weight:700">
+              <option value="480">慢</option><option value="260" selected>中</option><option value="90">快</option>
+            </select>
+          </label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設全部</button>
+        </div>
+        <div class="note" style="font-size:.86rem">清單監看器超過 <b>6 項</b>只會顯示前 6 項，但資料全部都在，程式讀得到。</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>📋 單元 6・一次記住很多件事　·　上一課：<a href="unit5_student.html">單元 5 讓程式記住事情</a>　·　下一課：<a href="unit7_student.html">單元 7 把程式包起來重複用</a></footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+var LN='排行榜';
+Stage.init(document.getElementById('stage'));
+Stage.onChange(function(s){
+  document.getElementById('rlen').textContent=(s.lists[LN]||[]).length;
+  document.getElementById('rno').textContent=s.vars['編號'];
+  document.getElementById('rd').textContent=Math.round(s.dir);
+});
+Stage.reset();
+Stage.run('listShowM',{L:LN});
+document.getElementById('reset').addEventListener('click',function(){
+  UI.stopAll();Stage.reset();Stage.run('listShowM',{L:LN});
+});
+document.getElementById('speed').addEventListener('change',function(e){UI.setSpeed(Number(e.target.value));});
+
+/* 1. 清單實驗室 */
+(function(){
+  var lab=document.getElementById('lab'), rows=document.getElementById('rows');
+  var inp=document.createElement('input');
+  inp.type='text';inp.value='小明';inp.setAttribute('aria-label','要加入的內容');
+  lab.appendChild(inp);
+  function btn(txt,fn){
+    var b=document.createElement('button');b.textContent=txt;
+    b.addEventListener('click',function(){fn(inp.value);draw();});
+    lab.appendChild(b);
+  }
+  btn('添加到最後面',function(v){Stage.run('listAdd',{L:LN,IT:v});});
+  btn('插入到第 1 項',function(v){Stage.run('listInsertAt',{L:LN,N:1,IT:v});});
+  btn('替換第 1 項',function(v){Stage.run('listReplaceAt',{L:LN,N:1,IT:v});});
+  btn('刪除第 1 項',function(){Stage.run('listDeleteAt',{L:LN,N:1});});
+  btn('全部刪除',function(){Stage.run('listDeleteAll',{L:LN});});
+  btn('顯示監看器',function(){Stage.run('listShowM',{L:LN});});
+  btn('隱藏監看器',function(){Stage.run('listHideM',{L:LN});});
+  function draw(){
+    rows.textContent='';
+    var arr=Stage.state.lists[LN]||[];
+    if(!arr.length){
+      var e=document.createElement('div');e.className='none';e.textContent='（清單是空的）';rows.appendChild(e);
+    }
+    arr.forEach(function(v,i){
+      var r=document.createElement('div');r.className='rr';
+      r.innerHTML='<span class="n">'+(i+1)+'</span><span><span class="c"></span></span>';
+      r.querySelector('.c').textContent=String(v);
+      rows.appendChild(r);
+    });
+    var l=document.createElement('div');l.className='len';
+    l.textContent='清單的長度 ＝ '+arr.length;
+    rows.appendChild(l);
+  }
+  Stage.onChange(draw);
+  draw();
+})();
+
+/* 2. 積木試玩 */
+var hl=document.getElementById('blocksL');
+['listreport','listadd','listinsert','listreplace','listdel','listdelall',
+ 'listitem','listindexof','listlength','listcontains','listshow','listhide']
+  .forEach(function(id){UI.tryRow(id,hl);});
+
+/* 3. 添加 vs 插入 */
+UI.script([
+  {id:'listdelall',args:{L:LN}},{id:'listshow',args:{L:LN}},
+  {id:'listadd',args:{L:LN,IT:'小明'}},
+  {id:'listadd',args:{L:LN,IT:'小華'}},
+  {id:'listadd',args:{L:LN,IT:'冠軍'}}
+],document.getElementById('vsA'),'▶ 跑跑看');
+
+UI.script([
+  {id:'listdelall',args:{L:LN}},{id:'listshow',args:{L:LN}},
+  {id:'listadd',args:{L:LN,IT:'小明'}},
+  {id:'listadd',args:{L:LN,IT:'小華'}},
+  {id:'listinsert',args:{L:LN,N:1,IT:'冠軍'}}
+],document.getElementById('vsB'),'▶ 跑跑看');
+
+/* 4. 走訪整張清單 */
+function walkScript(host,label){
+  return UI.script([
+    {id:'listdelall',args:{L:LN}},{id:'listshow',args:{L:LN}},
+    {id:'listadd',args:{L:LN,IT:'小明'}},
+    {id:'listadd',args:{L:LN,IT:'小華'}},
+    {id:'listadd',args:{L:LN,IT:'小美'}},
+    {id:'setvar',args:{V:'編號',N:'1'}},{id:'showvar',args:{V:'編號'}},
+    {id:'repeat',args:{N:{__b:'listlength',args:{L:LN}}},body:[
+      {id:'sayfor',args:{MSG:{__b:'listitem',args:{L:LN,N:{__b:'varreport',args:{V:'編號'}}}},SECS:0.9}},
+      {id:'changevar',args:{V:'編號',N:1}}
+    ]}
+  ],host,label);
+}
+walkScript(document.getElementById('walk'),'▶ 看示範');
+
+/* 5. 三個作品 */
+UI.script([
+  {id:'whenflag'},
+  {id:'listdelall',args:{L:LN}},{id:'listshow',args:{L:LN}},
+  {id:'listadd',args:{L:LN,IT:'小明'}},
+  {id:'listadd',args:{L:LN,IT:'小華'}},
+  {id:'listadd',args:{L:LN,IT:'小美'}},
+  {id:'sayfor',args:{MSG:{__b:'opjoin',args:{A:'總共有 ',B:{__b:'listlength',args:{L:LN}}}},SECS:2}}
+],document.getElementById('demo1'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'listdelall',args:{L:LN}},{id:'listshow',args:{L:LN}},
+  {id:'listadd',args:{L:LN,IT:'小明'}},
+  {id:'listadd',args:{L:LN,IT:'小華'}},
+  {id:'listadd',args:{L:LN,IT:'小美'}},
+  {id:'sayfor',args:{MSG:{__b:'opjoin',args:{A:'小美排第 ',B:{__b:'listindexof',args:{L:LN,IT:'小美'}}}},SECS:2}},
+  {id:'sayfor',args:{MSG:{__b:'opjoin',args:{A:'小王排第 ',B:{__b:'listindexof',args:{L:LN,IT:'小王'}}}},SECS:2}}
+],document.getElementById('demo2'),'🏳 執行');
+
+walkScript(document.getElementById('demo3'),'🏳 執行');
+
+/* 6. 自己拼拼看 */
+var builder=UI.Builder(document.getElementById('mylist'),'先按「刪除 排行榜 的所有項目」清空，再開始加東西。');
+function label(b){
+  return b.parts.map(function(p){
+    if(p.t==='txt'||p.t==='ico')return p.v;
+    if(p.t==='arg')return '('+p.v+')';
+    if(p.t==='bool')return '〈 〉';
+    if(p.k)return '('+(p.v===''||p.v===undefined?'　':p.v)+')';
+    return '';
+  }).join(' ').replace(/\s+/g,' ').trim();
+}
+function defArgs(b){var a={};b.parts.forEach(function(p){if(p.k&&p.t!=='bool')a[p.k]=p.v;});return a;}
+function makePal(hostId,ids,fill){
+  var host=document.getElementById(hostId);
+  ids.forEach(function(id){
+    var b=UI.byId(id); if(!b)return;
+    var btn=document.createElement('button');
+    btn.className='btn ghost sm';
+    btn.textContent=(fill?'⤵ ':'')+label(b);
+    btn.style.borderColor=b.tone==='list'?'#FF661A':'var(--c-'+b.cat+')';
+    if(fill)btn.style.color=b.tone==='list'?'#E64D00':'var(--c-'+b.cat+'-d)';
+    btn.addEventListener('click',function(){
+      if(fill)UI.startFill(b,defArgs(b));
+      else builder.add(b,defArgs(b));
+    });
+    host.appendChild(btn);
+  });
+}
+makePal('palA',['whenflag','listdelall','listadd','listinsert','listreplace','listdel','listshow','listhide',
+  'setvar','changevar','repeat','ifthen','sayfor','wait'],false);
+makePal('palB',['listreport','listitem','listlength','listindexof','listcontains','varreport','opjoin','opeq'],true);
+
+document.getElementById('run').addEventListener('click',function(){
+  var t=this;t.disabled=true;builder.run(function(){t.disabled=false;});
+});
+document.getElementById('stop').addEventListener('click',function(){
+  builder.stop();document.getElementById('run').disabled=false;
+});
+document.getElementById('clear').addEventListener('click',function(){builder.clear();});
+</script>
+</body>
+</html>

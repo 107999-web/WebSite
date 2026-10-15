@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scratch 積木教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&family=Nunito:wght@700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+body{min-height:100vh;display:grid;place-items:center;padding:34px 18px}
+.box{max-width:960px;width:100%;text-align:center}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.82rem;padding:5px 16px;border-radius:999px}
+h1{font-size:clamp(1.7rem,5vw,2.6rem);font-weight:800;margin:14px 0 6px}
+p.sub{color:var(--ink2);margin:0 auto 26px;max-width:34em}
+.cards2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;align-items:stretch}
+.citem{display:flex;flex-direction:column;gap:8px}
+a.c{flex:1;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);background:var(--paper);
+  border:3px solid var(--line);border-radius:24px;padding:22px 18px;box-shadow:var(--shadow);transition:transform .2s}
+a.c:hover{transform:translateY(-4px)}
+a.c .ico{font-size:2.2rem;line-height:1}
+a.c b{display:block;font-size:1.1rem;font-weight:800;margin:8px 0 6px}
+a.c span{font-size:.88rem;color:var(--ink2);line-height:1.6}
+a.tlink{display:block;text-decoration:none;font-size:.84rem;font-weight:700;color:var(--ink2);
+  background:var(--paper2);border:2px solid var(--line);border-radius:999px;padding:6px 12px;transition:border-color .2s}
+a.tlink:hover{border-color:var(--accent);color:var(--accent-d)}
+.road{margin-top:28px;background:var(--paper);border:3px dashed var(--line);border-radius:22px;padding:16px 20px;text-align:left}
+.road h3{font-size:1rem;margin-bottom:6px}
+.road ul{margin:6px 0 0;padding-left:1.2em;font-size:.9rem;color:var(--ink2)}
+.road li{margin:4px 0}
+.road li b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="badge">國小中高年級・互動教材</span>
+  <h1>Scratch 積木教室</h1>
+  <p class="sub">每一塊積木都能直接試玩，角色會在小舞台上動給你看。</p>
+
+  <div class="cards2">
+    <div class="citem">
+      <a class="c" href="guide.html">
+        <span class="ico">🧩</span><b>積木圖鑑</b>
+        <span>115 塊積木依類別查詢、搜尋、任務索引，每塊都能「試一試」並組成小腳本</span>
+      </a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit1_student.html">
+        <span class="ico">📘</span><b>單元 1・讓角色動起來</b>
+        <span>座標大冒險、動作類積木、三個作品</span>
+      </a>
+      <a class="tlink" href="unit1_teacher.html">📗 單元 1 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit2_student.html">
+        <span class="ico">🎭</span><b>單元 2・說話與變裝</b>
+        <span>換裝實驗室、外觀類積木、三個作品</span>
+      </a>
+      <a class="tlink" href="unit2_teacher.html">📙 單元 2 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit3_student.html">
+        <span class="ico">🔁</span><b>單元 3・讓程式自己跑</b>
+        <span>迴圈與條件、自己拼腳本、三個作品</span>
+      </a>
+      <a class="tlink" href="unit3_teacher.html">📕 單元 3 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit4_student.html">
+        <span class="ico">🔍</span><b>單元 4・讓角色有感覺</b>
+        <span>偵測與運算、把積木放進積木、三個作品</span>
+      </a>
+      <a class="tlink" href="unit4_teacher.html">📘 單元 4 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit5_student.html">
+        <span class="ico">📦</span><b>單元 5・讓程式記住事情</b>
+        <span>變數、計分板與生命值、三個作品</span>
+      </a>
+      <a class="tlink" href="unit5_teacher.html">📒 單元 5 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit6_student.html">
+        <span class="ico">📋</span><b>單元 6・一次記住很多件事</b>
+        <span>清單、編號與走訪、三個作品</span>
+      </a>
+      <a class="tlink" href="unit6_teacher.html">📓 單元 6 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="unit7_student.html">
+        <span class="ico">🧩</span><b>單元 7・把程式包起來重複用</b>
+        <span>自訂積木、定義與呼叫、參數</span>
+      </a>
+      <a class="tlink" href="unit7_teacher.html">📕 單元 7 教師版</a>
+    </div>
+    <div class="citem">
+      <a class="c" href="worksheet.html">
+        <span class="ico">📝</span><b>紙本學習單</b>
+        <span>七個單元各一張 A4，含積木圖、紙筆題與自我檢核</span>
+      </a>
+    </div>
+    <div class="citem">
+      <a class="c" href="assess.html">
+        <span class="ico">📄</span><b>紙本評量</b>
+        <span>100 分總結測驗，解答可一鍵收合後列印</span>
+      </a>
+    </div>
+    <div class="citem">
+      <a class="c" href="mistakes.html">
+        <span class="ico">⚠️</span><b>易錯點總表</b>
+        <span>症狀診斷表＋115 塊積木的「容易搞混」，可搜尋、可列印</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="road">
+    <h3>🗺️ 建置進度</h3>
+    <ul>
+      <li><b>第一期（已完成）</b>：圖鑑骨架、舞台模擬器、動作 18 塊、外觀 20 塊、單元 1 與 2</li>
+      <li><b>第二期（已完成）</b>：事件 8 塊、外加控制 11 塊、偵測 18 塊、運算 18 塊、單元 3 與 4，並支援「積木放進積木」的嵌套</li>
+      <li><b>第三期（已完成）</b>：變數 5 塊、清單 12 塊、函式積木 5 塊、單元 5</li>
+      <li><b>第四期（已完成）</b>：易錯點總表、紙本學習單七張、紙本評量（含解答）</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>易錯點總表：Scratch 積木教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.mrow{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:14px;align-items:start;
+  padding:12px 0;border-top:1px dashed var(--line)}
+.mrow:first-of-type{border-top:none}
+.mrow .bk{overflow-x:auto;padding-bottom:4px}
+.mrow .tx{font-size:.92rem}
+.mrow .tx b{color:var(--accent-d)}
+@media(max-width:620px){.mrow{grid-template-columns:1fr;gap:8px}}
+.catbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.catbar button{border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;
+  font-family:var(--f-round);font-weight:700;font-size:.86rem;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:7px}
+.catbar button.on{border-color:var(--accent);background:var(--paper2)}
+.catbar button .bd{width:12px;height:12px;border-radius:50%}
+.catgrp{margin-top:8px}
+.catgrp h3{font-size:1rem;display:flex;align-items:center;gap:8px;margin:18px 0 0}
+.catgrp h3 .bd{width:14px;height:14px;border-radius:50%}
+.catgrp.hide{display:none}
+.mrow.hide{display:none}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.tools input{font-family:var(--f-round);font-size:.92rem;padding:8px 16px;border-radius:999px;
+  border:2px solid var(--line);background:var(--paper);color:var(--ink);min-width:220px;flex:1}
+.diag{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:10px}
+.diag th,.diag td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+.diag th{background:var(--paper2);font-size:.82rem;color:var(--ink2);font-weight:800}
+.diag td:first-child{font-weight:700;width:28%}
+.diag td:nth-child(2){width:32%}
+.wraps{overflow-x:auto}
+@media print{
+  header.top,.tools,.catbar,.noprint{display:none!important}
+  body{background:#fff;background-image:none;font-size:12px}
+  .wrap{padding:0;max-width:none}
+  .tsec,.card,.mrow{break-inside:avoid;box-shadow:none}
+  .catgrp.hide,.mrow.hide{display:none!important}
+  a{color:#000;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">⚠️ 易錯點總表 <em>115 塊積木</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit1_student.html">單元1</a>
+      <a href="unit2_student.html">單元2</a>
+      <a href="unit3_student.html">單元3</a>
+      <a href="unit4_student.html">單元4</a>
+      <a href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>易錯點總表</h1>
+    <p>把圖鑑裡每一塊積木的「⚠️ 容易搞混」集中在同一頁，方便備課前掃一遍，也可以直接列印成教室裡的參考表。<br>
+      上半部是<b>症狀診斷表</b>：學生說「我的程式怪怪的」時，從症狀往回找原因。</p>
+    <div class="tools noprint">
+      <input id="q" type="search" placeholder="搜尋積木名稱或易錯點內容…" aria-label="搜尋">
+      <button class="btn ghost sm" id="clearq">清除</button>
+      <button class="btn sm" id="print">🖨 列印這一頁</button>
+      <span id="count" style="font-size:.85rem;color:var(--ink2);font-weight:700"></span>
+    </div>
+    <div class="catbar noprint" id="catbar"></div>
+  </section>
+
+  <div class="tsec">
+    <h3>一、症狀診斷表（學生最常回報的狀況）</h3>
+    <p style="font-size:.9rem;color:var(--ink2);margin:6px 0 0">依「學生怎麼描述」排序，不是依積木類別。課堂巡桌時最好用。</p>
+    <div class="wraps">
+    <table class="diag">
+      <thead><tr><th>學生說的症狀</th><th>最可能的原因</th><th>先檢查這裡</th></tr></thead>
+      <tbody>
+        <tr><td>按了綠旗完全沒反應</td><td>腳本最上面沒有事件積木</td><td>最上面是不是「當 🏳 被點擊」？積木有沒有真的接在一起？</td></tr>
+        <tr><td>只動了一下就停了</td><td>動作積木放在 C 型積木<b>下面</b>而不是<b>裡面</b></td><td>把積木拖進凹槽，看凹槽有沒有被撐開。</td></tr>
+        <tr><td>程式好像沒跑，角色沒動</td><td>迴圈裡沒有「等待」，快到看不見</td><td>在迴圈裡加「等待 0.2 秒」再跑一次。</td></tr>
+        <tr><td>角色亂飛、方向不對</td><td>迴轉方式是「左﹣右」，只會翻面不會轉</td><td>把迴轉方式設成「任意」再看方向。</td></tr>
+        <tr><td>角色卡在邊緣一直抖</td><td>碰到邊緣後沒有轉身，下一圈又碰到</td><td>「碰到邊緣就反彈」有沒有放在迴圈裡？</td></tr>
+        <tr><td>「如果」好像沒作用</td><td>「如果」只檢查<b>一次</b></td><td>把「如果」整塊放進「重複無限次」裡面。</td></tr>
+        <tr><td>程式停不下來</td><td>用了「重複無限次」</td><td>次數確定的用「重複 N 次」，有結束條件的用「重複直到」。</td></tr>
+        <tr><td>「重複無限次」下面接不了積木</td><td>它的形狀是平的，永遠輪不到下面</td><td>改用「重複直到 條件」，做完才往下走。</td></tr>
+        <tr><td>迴圈一次都沒跑</td><td>「重複直到」是<b>先檢查再做</b>，一開始條件就成立</td><td>把條件唸出來：「重複直到 ___ 成立」現在成立嗎？</td></tr>
+        <tr><td>說話的字一閃就不見</td><td>用了「說出…持續 N 秒」，時間太短</td><td>要一直留著就用沒有「持續」的那一塊。</td></tr>
+        <tr><td>換造型看不出在走路</td><td>沒有等待，或只有一個造型</td><td>「換下一個造型 → 等待 0.2 秒」要成對出現。</td></tr>
+        <tr><td>角色不見了找不到</td><td>用了「隱藏」，或幻影效果 100</td><td>放一塊「顯示」＋「清除圖像效果」再跑。</td></tr>
+        <tr><td>圓形／六角形積木放不上去</td><td>形狀不對，它們不是動作積木</td><td>它們要放進<b>別塊積木的欄位</b>，不能單獨接在腳本上。</td></tr>
+        <tr><td>答對了卻說我答錯</td><td>答案多一個空格，或用「＝」比對太嚴格</td><td>先確認前後沒空格；想寬鬆一點改用「字串 ___ 包含 ___」。</td></tr>
+        <tr><td>第二次玩，限時挑戰馬上結束</td><td>忘了「計時器重置」，計時接著上次累加</td><td>綠旗下面第一塊放「計時器重置」。</td></tr>
+        <tr><td>「且」永遠不成立</td><td>兩個六角形欄位有一格是空的</td><td>兩邊都要放進布林積木才會運作。</td></tr>
+        <tr><td>數字算出來一長串小數</td><td>隨機取數有一格填了小數，或除不盡</td><td>兩格都填整數；或包一層「四捨五入數值」。</td></tr>
+        <tr><td>分數／位置記不住</td><td>「詢問的答案」只有一格，會被新答案蓋掉</td><td>需要保存的值要存進<b>變數</b>。</td></tr>
+        <tr><td>分數一直是 0 或 1</td><td>「變數 ___ 設為 0」被放進迴圈裡，每圈都歸零</td><td>歸零只放在綠旗下面，迴圈裡用「改變 1」。</td></tr>
+        <tr><td>分數扣不掉</td><td>想減分卻用了正數</td><td>「變數 ___ 改變 <b>-1</b>」，沒有另一塊減少積木。</td></tr>
+        <tr><td>清單拿不到東西</td><td>把第一項當成第 0 項</td><td>清單的第一項是 <b>1</b>；拿超過長度會回傳空白而不是報錯。</td></tr>
+        <tr><td>用迴圈刪清單卻刪錯</td><td>刪掉一項之後，後面的編號會整個往前移</td><td>從<b>最後一項往前刪</b>，或直接用「刪除所有項目」。</td></tr>
+        <tr><td>自訂積木按了沒反應</td><td>只放了呼叫積木，沒有同名的「定義」</td><td>同一段腳本裡要有「定義 ○○」，名字也要一樣。</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、逐塊易錯點（依類別）</h3>
+    <p style="font-size:.9rem;color:var(--ink2);margin:6px 0 10px">內容與<a href="guide.html">積木圖鑑</a>同步，改了圖鑑這裡就會跟著變。</p>
+    <div id="list"></div>
+    <div class="empty" id="empty" hidden>找不到符合的內容，換個關鍵字試試看。</div>
+  </div>
+
+  <footer>⚠️ 易錯點總表　·　資料來源：<a href="guide.html">積木圖鑑</a> 的 115 塊積木　·　Scratch 積木教室</footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+var READY=BLOCK_CATS.filter(function(c){return c.ready;});
+var curCat='all', kw='';
+var listEl=document.getElementById('list'), rows=[], groups={};
+
+/* 類別篩選鈕 */
+var bar=document.getElementById('catbar');
+function catBtn(id,name,color){
+  var b=document.createElement('button');
+  b.dataset.cat=id;
+  b.innerHTML=(color?'<span class="bd" style="background:'+color+'"></span>':'')+name;
+  if(id===curCat)b.classList.add('on');
+  b.addEventListener('click',function(){
+    curCat=id;document.getElementById('q').value='';kw='';
+    bar.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.cat===curCat);});
+    update();
+  });
+  bar.appendChild(b);
+}
+catBtn('all','全部','');
+READY.forEach(function(c){catBtn(c.id,c.name,c.color);});
+
+/* 逐塊列表 */
+READY.forEach(function(c){
+  var g=document.createElement('div');g.className='catgrp';g.dataset.cat=c.id;
+  var h=document.createElement('h3');
+  h.innerHTML='<span class="bd" style="background:'+c.color+'"></span>'+c.name+'類';
+  g.appendChild(h);
+  BLOCKS.filter(function(b){return b.cat===c.id;}).forEach(function(b){
+    var r=document.createElement('div');r.className='mrow';r.dataset.id=b.id;
+    var bk=document.createElement('div');bk.className='bk';
+    bk.appendChild(UI.blockEl(b,false,null));
+    var tx=document.createElement('div');tx.className='tx';
+    tx.innerHTML=b.miss;
+    r.appendChild(bk);r.appendChild(tx);
+    g.appendChild(r);
+    rows.push({el:r,block:b,grp:c.id});
+  });
+  listEl.appendChild(g);
+  groups[c.id]=g;
+});
+
+function textOf(b){
+  return b.parts.map(function(p){return p.v!==undefined?String(p.v):'';}).join('')+' '+
+    b.miss.replace(/<[^>]+>/g,'')+' '+b.desc.replace(/<[^>]+>/g,'');
+}
+function update(){
+  var n=0, seen={};
+  rows.forEach(function(r){
+    var on=(curCat==='all'||r.grp===curCat) && (!kw||textOf(r.block).indexOf(kw)>=0);
+    r.el.classList.toggle('hide',!on);
+    if(on){n++;seen[r.grp]=true;}
+  });
+  READY.forEach(function(c){groups[c.id].classList.toggle('hide',!seen[c.id]);});
+  document.getElementById('empty').hidden=n>0;
+  document.getElementById('count').textContent='顯示 '+n+' / '+rows.length+' 塊';
+}
+document.getElementById('q').addEventListener('input',function(e){
+  kw=e.target.value.trim();update();
+});
+document.getElementById('clearq').addEventListener('click',function(){
+  document.getElementById('q').value='';kw='';update();
+});
+document.getElementById('print').addEventListener('click',function(){window.print();});
+update();
+</script>
+</body>
+</html>

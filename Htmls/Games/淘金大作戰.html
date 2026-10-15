@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁小遊戲：接金幣！</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #2c3e50;
+            font-family: 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+        h1 {
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #score-board {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        /* 遊戲畫布 */
+        #game-container {
+            width: 400px;
+            height: 500px;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        /* 玩家（接金幣的籃子） */
+        #player {
+            width: 80px;
+            height: 20px;
+            background-color: #e74c3c;
+            position: absolute;
+            bottom: 10px;
+            left: 160px; /* 初始置中 (400-80)/2 */
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        /* 金幣 */
+        .coin {
+            width: 25px;
+            height: 25px;
+            background-color: #f1c40f;
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 2px solid #f39c12;
+        }
+        /* 遊戲結束畫面 */
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>💰 淘金大作戰 💰</h1>
+    <div id="score-board">分數: <span id="score">0</span></div>
+
+    <div id="game-container">
+        <div id="player"></div>
+        
+        <div id="game-over">
+            <h2>遊戲結束！</h2>
+            <p>你的最終分數是: <span id="final-score">0</span></p>
+            <button onclick="resetGame()">再玩一次</button>
+        </div>
+    </div>
+
+    <p style="margin-top: 15px; font-size: 14px; color: #bdc3c7;">操作方式：使用鍵盤左右方向鍵 (← / →) 移動籃子</p>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreDisplay = document.getElementById('final-score');
+
+        // 遊戲參數設定
+        const containerWidth = 400;
+        const containerHeight = 500;
+        let playerWidth = 80;
+        let playerX = 160;
+        let playerSpeed = 15;
+        
+        let score = 0;
+        let gameInterval;
+        let coinInterval;
+        let isGameOver = false;
+        let coins = [];
+
+        // 監聽鍵盤事件
+        document.addEventListener('keydown', (e) => {
+            if (isGameOver) return;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'Left') {
+                playerX -= playerSpeed;
+                if (playerX < 0) playerX = 0; // 靠左邊界
+            } else if (e.key === 'ArrowRight' || e.key === 'Right') {
+                playerX += playerSpeed;
+                if (playerX > containerWidth - playerWidth) {
+                    playerX = containerWidth - playerWidth; // 靠右邊界
+                }
+            }
+            player.style.left = playerX + 'px';
+        });
+
+        // 隨機生成金幣
+        function createCoin() {
+            if (isGameOver) return;
+
+            const coin = document.createElement('div');
+            coin.classList.add('coin');
+            
+            // 隨機 X 軸位置
+            const randomX = Math.floor(Math.random() * (containerWidth - 25));
+            coin.style.left = randomX + 'px';
+            coin.style.top = '-30px';
+            
+            container.appendChild(coin);
+            
+            // 儲存金幣資訊 (DOM 元素, 當前 Y 座標, 下落速度)
+            coins.push({
+                element: coin,
+                y: -30,
+                speed: Math.random() * 3 + 2 // 速度在 2~5 之間隨機
+            });
+        }
+
+        // 更新遊戲狀態（金幣下落與碰撞偵測）
+        function updateGame() {
+            for (let i = coins.length - 1; i >= 0; i--) {
+                let coin = coins[i];
+                coin.y += coin.speed;
+                coin.element.style.top = coin.y + 'px';
+
+                // 取得金幣的 X 座標
+                let coinX = parseInt(coin.element.style.left);
+
+                // 碰撞偵測：接住金幣 (金幣掉到籃子高度，且 X 座標在籃子範圍內)
+                if (coin.y >= containerHeight - 30 && coin.y <= containerHeight - 10) {
+                    if (coinX + 25 >= playerX && coinX <= playerX + playerWidth) {
+                        score += 10;
+                        scoreDisplay.innerText = score;
+                        coin.element.remove();
+                        coins.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                // 沒接住，掉出螢幕外 -> 遊戲結束
+                if (coin.y > containerHeight) {
+                    endGame();
+                }
+            }
+        }
+
+        // 開始遊戲
+        function startGame() {
+            gameInterval = setInterval(updateGame, 20); // 每 20 毫秒更新一次畫面
+            coinInterval = setInterval(createCoin, 1000); // 每 1 秒生成一個金幣
+        }
+
+        // 結束遊戲
+        function endGame() {
+            isGameOver = true;
+            clearInterval(gameInterval);
+            clearInterval(coinInterval);
+            finalScoreDisplay.innerText = score;
+            gameOverScreen.style.display = 'flex';
+        }
+
+        // 重置遊戲
+        function resetGame() {
+            // 清除畫面上所有的金幣
+            coins.forEach(coin => coin.element.remove());
+            coins = [];
+            
+            // 重置數據
+            score = 0;
+            scoreDisplay.innerText = score;
+            playerX = 160;
+            player.style.left = playerX + 'px';
+            isGameOver = false;
+            
+            // 隱藏結束畫面並重新啟動
+            gameOverScreen.style.display = 'none';
+            startGame();
+        }
+
+        // 初始化啟動
+        startGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 5：讓程式記住事情</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.lab{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.lab button{border:2px solid var(--c-variables);background:var(--paper);border-radius:999px;padding:6px 14px;
+  font-family:var(--f-round);font-weight:700;font-size:.86rem;color:var(--c-variables-d);cursor:pointer;transition:transform .16s}
+.lab button:hover{transform:scale(1.06);background:color-mix(in srgb,var(--c-variables) 12%,var(--paper))}
+.boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px}
+.boxes>div{background:var(--paper2);border:3px solid var(--line);border-radius:18px;padding:10px;text-align:center}
+.boxes .k{font-size:.78rem;color:var(--ink2);font-weight:700}
+.boxes .v{font-family:var(--f-num);font-weight:800;font-size:1.3rem;color:var(--c-variables-d)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+@media(max-width:760px){.vs{grid-template-columns:1fr}}
+.vs>div{background:var(--paper2);border:2px dashed var(--line);border-radius:18px;padding:12px}
+.vs h4{font-size:.95rem;margin:0 0 6px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📦 單元 5 <em>讓程式記住事情</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit3_student.html">單元3</a>
+      <a href="unit4_student.html">單元4</a>
+      <a class="on" href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>讓程式記住事情</h1>
+    <p>到目前為止，程式跑完就<b>什麼都不記得</b>。這一課要給它一個<b>會記住東西的盒子</b>——變數。有了它，才做得出分數、生命值、關卡、倒數計時。</p>
+    <div class="goals">
+      <div><b>目標 1</b>　知道<b>變數</b>是一個有名字的盒子，裡面裝著會變的值。</div>
+      <div><b>目標 2</b>　分得清「<b>設為</b>」是整個換掉、「<b>改變</b>」是在原本的數字上加減。</div>
+      <div><b>目標 3</b>　會用變數做出<b>計分板</b>與<b>生命值</b>，並知道歸零要放在哪裡。</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <section class="sec">
+        <h2><span class="n">1</span>變數就是一個有名字的盒子</h2>
+        <p>盒子上貼著名字（例如「分數」），裡面放著一個值。程式可以隨時<b>換掉</b>裡面的東西，也可以<b>加加減減</b>。<br>
+          按按看下面的按鈕，注意小舞台<b>左上角</b>的橙色方塊怎麼變。</p>
+        <div class="work">
+          <h3>🧪 變數實驗室</h3>
+          <div class="lab" id="lab"></div>
+          <div class="boxes" id="boxes"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:10px 0 0">舞台上看得到的方塊叫<b>監看器</b>。在真實的 Scratch 裡，把積木清單中變數左邊的<b>勾選框</b>打勾就會出現。</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>這一課的積木</h2>
+        <p>只有五塊，但它們是做遊戲的關鍵。<b>圓形</b>那塊代表「盒子裡的值」，要放進別的欄位裡用。</p>
+        <div id="blocksV"></div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>「設為」和「改變」差在哪</h2>
+        <p>這是這一課<b>最容易搞錯</b>的地方。兩段程式都跑一次，看分數最後停在幾。</p>
+        <div class="work">
+          <div class="vs">
+            <div>
+              <h4>😩 兩塊都用「設為 1」</h4>
+              <div id="vsA"></div>
+              <p style="font-size:.88rem;color:var(--ink2);margin:8px 0 0">分數永遠是 <b>1</b>——因為每一圈都把盒子整個換成 1。</p>
+            </div>
+            <div>
+              <h4>😎 用「改變 1」</h4>
+              <div id="vsB"></div>
+              <p style="font-size:.88rem;color:var(--ink2);margin:8px 0 0">分數會變成 <b>5</b>——因為是在原本的數字上加。</p>
+            </div>
+          </div>
+          <div class="note" style="margin-top:14px">
+            口訣：<b>「設為」＝整個換掉</b>（開場歸零用）、<b>「改變」＝加上去</b>（遊戲中計分用）。<br>
+            所以「變數 分數 設為 0」只能放在<b>綠旗下面</b>，千萬不要放進迴圈裡。
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">4</span>把變數放進欄位</h2>
+        <p>圓形積木可以放進任何白色欄位——這就是單元 4 學過的<b>嵌套</b>。變數放進去之後，那個數字就<b>隨時可以改</b>了。</p>
+        <div class="work">
+          <h3>🏃 例子：用變數控制速度</h3>
+          <p style="font-size:.93rem">把「速度」放進「移動 ___ 點」的欄位，之後只要改速度這一個盒子，整段程式的快慢就跟著變。</p>
+          <div id="nest1"></div>
+        </div>
+        <div class="work">
+          <h3>💬 例子：把分數唸出來</h3>
+          <p style="font-size:.93rem">用「字串組合」把文字和變數接起來，說出來就會是完整的一句話。</p>
+          <div id="nest2"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">5</span>跟著做</h2>
+
+        <div class="work">
+          <h3>🪙 作品 1：計分板</h3>
+          <ol>
+            <li>綠旗下面先「<b>變數 分數 設為 0</b>」再「顯示」——每一局都從 0 開始。</li>
+            <li>重複無限次：面朝鼠標、往前走。</li>
+            <li>如果<b>碰到鼠標</b>，就「分數改變 1」並<b>跳到隨機位置</b>，這樣才不會一直重複加分。</li>
+          </ol>
+          <div id="demo1"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:8px 0 0">🖱 執行後把滑鼠移到小舞台上讓角色追到你，看左上角的分數往上跳。看夠了按<b>停止</b>。</p>
+        </div>
+
+        <div class="work">
+          <h3>❤️ 作品 2：生命值</h3>
+          <ol>
+            <li>「變數 生命 設為 3」，並顯示出來。</li>
+            <li><b>重複直到 生命 ＝ 0</b>：角色一直往前走。</li>
+            <li>碰到邊緣就「生命改變 <b>-1</b>」並轉身——減分要填<b>負數</b>。</li>
+            <li>生命歸零，迴圈自動結束，說「遊戲結束」。</li>
+          </ol>
+          <div id="demo2"></div>
+        </div>
+
+        <div class="work">
+          <h3>⚡ 作品 3：可以調的速度</h3>
+          <ol>
+            <li>「變數 速度 設為 5」並顯示。</li>
+            <li>重複無限次：移動 <b>速度</b> 點、碰到邊緣就反彈。</li>
+            <li><b>按住空白鍵</b>就「速度改變 1」，角色會越跑越快。</li>
+          </ol>
+          <div id="demo3"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:8px 0 0">⌨️ 執行後請先點一下網頁空白處，再按住<b>空白鍵</b>。</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">6</span>自己拼拼看</h2>
+        <p>白色按鈕直接加進腳本；<span style="color:var(--c-variables-d);font-weight:800">橙色</span>、<span style="color:var(--c-sensing-d);font-weight:800">藍色</span>、<span style="color:var(--c-operators-d);font-weight:800">綠色</span>按鈕要<b>放進欄位</b>。試著自己拼出一個計分板。</p>
+        <div class="quiz fillhost">
+          <div class="q">🧱 動作積木（直接加進腳本）</div>
+          <div class="row" id="palA"></div>
+          <div class="q" style="margin-top:14px">📦 放進欄位用的積木</div>
+          <div class="row" id="palB"></div>
+          <div class="list" id="mylist" style="max-height:none;margin-top:14px"></div>
+          <div class="runbar">
+            <button class="btn flag" id="run">🏳 執行</button>
+            <button class="btn stopb" id="stop">■ 停止</button>
+            <button class="btn ghost" id="clear">清空</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">7</span>挑戰任務</h2>
+        <div class="mission">
+          <div><span>⭐</span><div>把作品 1 的「分數改變 1」改成 <b>10</b>，做一個一次得十分的版本。</div></div>
+          <div><span>⭐⭐</span><div>把作品 1 和作品 2 合起來：<b>碰到鼠標加分、碰到邊緣扣血</b>，生命歸零就結束。</div></div>
+          <div><span>⭐⭐⭐</span><div>做一個<b>會越來越難的遊戲</b>：每加 5 分就讓「速度改變 1」（提示：用「除以 5 的餘數 ＝ 0」判斷）。</div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">8</span>我學會了嗎</h2>
+        <div class="self">
+          <label><input type="checkbox"><span>我知道<b>變數</b>是一個有名字的盒子，裡面裝著會變的值。</span></label>
+          <label><input type="checkbox"><span>我分得出「<b>設為</b>」是整個換掉、「<b>改變</b>」是在原本的數字上加減。</span></label>
+          <label><input type="checkbox"><span>我知道「設為 0」要放在<b>綠旗下面</b>，不能放進迴圈裡。</span></label>
+          <label><input type="checkbox"><span>我知道要<b>減少</b>就在「改變」裡填<b>負數</b>。</span></label>
+          <label><input type="checkbox"><span>我會把<b>圓形的變數積木</b>放進別的欄位裡。</span></label>
+          <label><input type="checkbox"><span>我知道「隱藏」只是不顯示，<b>值還在</b>。</span></label>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台 <span style="font-size:.76rem;color:var(--ink2);font-weight:400">（左上角就是變數監看器）</span></h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">x 座標</div><div class="v" id="rx">0</div></div>
+          <div><div class="k">y 座標</div><div class="v" id="ry">0</div></div>
+          <div><div class="k">方向</div><div class="v" id="rd">90</div></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" id="optArrow" checked> 方向箭頭</label>
+          <label style="display:flex;align-items:center;gap:5px">速度
+            <select id="speed" style="border:2px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--paper);color:var(--ink);font-family:var(--f-round);font-weight:700">
+              <option value="480">慢</option><option value="260" selected>中</option><option value="90">快</option>
+            </select>
+          </label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設全部</button>
+        </div>
+        <div class="note" style="font-size:.86rem">按「重設全部」會讓角色歸位，<b>四個變數也一起歸零</b>。</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>📦 單元 5・讓程式記住事情　·　上一課：<a href="unit4_student.html">單元 4 讓角色有感覺</a>　·　下一課：<a href="unit6_student.html">單元 6 一次記住很多件事</a></footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+Stage.init(document.getElementById('stage'));
+UI.bindReadout({x:'rx',y:'ry',dir:'rd'});
+Stage.reset();
+document.getElementById('reset').addEventListener('click',function(){UI.stopAll();Stage.reset();});
+document.getElementById('optArrow').addEventListener('change',function(e){Stage.setArrow(e.target.checked);});
+document.getElementById('speed').addEventListener('change',function(e){UI.setSpeed(Number(e.target.value));});
+
+/* 1. 變數實驗室 */
+(function(){
+  var lab=document.getElementById('lab'), boxes=document.getElementById('boxes');
+  function btn(txt,fn){
+    var b=document.createElement('button');b.textContent=txt;
+    b.addEventListener('click',function(){fn();draw();});
+    lab.appendChild(b);
+  }
+  btn('分數 改變 1',function(){Stage.run('changeVar',{V:'分數',N:1});});
+  btn('分數 改變 -1',function(){Stage.run('changeVar',{V:'分數',N:-1});});
+  btn('分數 設為 100',function(){Stage.run('setVar',{V:'分數',N:'100'});});
+  btn('分數 設為 0',function(){Stage.run('setVar',{V:'分數',N:'0'});});
+  btn('生命 改變 -1',function(){Stage.run('changeVar',{V:'生命',N:-1});});
+  btn('my variable 設為「哈囉」',function(){Stage.run('setVar',{V:'my variable',N:'哈囉'});});
+  btn('顯示 速度',function(){Stage.run('showVar',{V:'速度'});});
+  btn('隱藏 速度',function(){Stage.run('hideVar',{V:'速度'});});
+  function draw(){
+    boxes.textContent='';
+    VAR_NAMES.forEach(function(n){
+      var d=document.createElement('div');
+      d.innerHTML='<div class="k">'+n+(Stage.state.varShow[n]?' 👁':'')+'</div><div class="v">'+
+        String(Stage.state.vars[n])+'</div>';
+      boxes.appendChild(d);
+    });
+  }
+  Stage.onChange(draw);
+  draw();
+})();
+
+/* 2. 積木試玩 */
+var hv=document.getElementById('blocksV');
+['varreport','setvar','changevar','showvar','hidevar'].forEach(function(id){UI.tryRow(id,hv);});
+
+/* 3. 設為 vs 改變 */
+UI.script([
+  {id:'setvar',args:{V:'分數',N:'0'}},{id:'showvar',args:{V:'分數'}},
+  {id:'repeat',args:{N:5},body:[
+    {id:'setvar',args:{V:'分數',N:'1'}},{id:'wait',args:{SECS:0.2}}
+  ]},
+  {id:'say',args:{MSG:'分數是…'}}
+],document.getElementById('vsA'),'▶ 跑跑看');
+
+UI.script([
+  {id:'setvar',args:{V:'分數',N:'0'}},{id:'showvar',args:{V:'分數'}},
+  {id:'repeat',args:{N:5},body:[
+    {id:'changevar',args:{V:'分數',N:1}},{id:'wait',args:{SECS:0.2}}
+  ]},
+  {id:'say',args:{MSG:'分數是…'}}
+],document.getElementById('vsB'),'▶ 跑跑看');
+
+/* 4. 嵌套 */
+UI.script([
+  {id:'gotoxy',args:{X:-170,Y:0}},{id:'pointdir',args:{DIR:90}},
+  {id:'setvar',args:{V:'速度',N:'30'}},{id:'showvar',args:{V:'速度'}},
+  {id:'repeat',args:{N:8},body:[
+    {id:'move',args:{STEPS:{__b:'varreport',args:{V:'速度'}}}},
+    {id:'wait',args:{SECS:0.15}}
+  ]}
+],document.getElementById('nest1'),'▶ 看示範');
+
+UI.script([
+  {id:'setvar',args:{V:'分數',N:'87'}},{id:'showvar',args:{V:'分數'}},
+  {id:'sayfor',args:{MSG:{__b:'opjoin',args:{A:'我的分數是 ',B:{__b:'varreport',args:{V:'分數'}}}},SECS:2}}
+],document.getElementById('nest2'),'▶ 看示範');
+
+/* 5. 三個作品 */
+UI.script([
+  {id:'whenflag'},
+  {id:'setvar',args:{V:'分數',N:'0'}},{id:'showvar',args:{V:'分數'}},
+  {id:'gotoxy',args:{X:-120,Y:-60}},{id:'rotstyle',args:{STYLE:'任意'}},
+  {id:'forever',body:[
+    {id:'pointtowards',args:{TO:'鼠標'}},
+    {id:'move',args:{STEPS:12}},
+    {id:'ifthen',args:{COND:{__b:'touching',args:{WHAT:'鼠標'}}},body:[
+      {id:'changevar',args:{V:'分數',N:1}},
+      {id:'gototarget',args:{TO:'隨機'}}
+    ]}
+  ]}
+],document.getElementById('demo1'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'setvar',args:{V:'生命',N:'3'}},{id:'showvar',args:{V:'生命'}},
+  {id:'gotoxy',args:{X:0,Y:0}},{id:'pointdir',args:{DIR:90}},{id:'rotstyle',args:{STYLE:'左-右'}},
+  {id:'repeatuntil',args:{COND:{__b:'opeq',args:{A:{__b:'varreport',args:{V:'生命'}},B:'0'}}},body:[
+    {id:'move',args:{STEPS:25}},
+    {id:'ifthen',args:{COND:{__b:'touching',args:{WHAT:'邊緣'}}},body:[
+      {id:'changevar',args:{V:'生命',N:-1}},
+      {id:'turnright',args:{DEG:180}},
+      {id:'sayfor',args:{MSG:'啊！撞牆了',SECS:0.5}}
+    ]}
+  ]},
+  {id:'sayfor',args:{MSG:'遊戲結束',SECS:2}}
+],document.getElementById('demo2'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'setvar',args:{V:'速度',N:'5'}},{id:'showvar',args:{V:'速度'}},
+  {id:'gotoxy',args:{X:0,Y:0}},{id:'pointdir',args:{DIR:90}},{id:'rotstyle',args:{STYLE:'左-右'}},
+  {id:'forever',body:[
+    {id:'move',args:{STEPS:{__b:'varreport',args:{V:'速度'}}}},
+    {id:'bounce'},
+    {id:'ifthen',args:{COND:{__b:'keypressed',args:{KEY:'空白'}}},body:[
+      {id:'changevar',args:{V:'速度',N:1}}
+    ]}
+  ]}
+],document.getElementById('demo3'),'🏳 執行');
+
+/* 6. 自己拼拼看 */
+var builder=UI.Builder(document.getElementById('mylist'),'先加一塊「當 🏳 被點擊」，再往下堆。');
+function label(b){
+  return b.parts.map(function(p){
+    if(p.t==='txt'||p.t==='ico')return p.v;
+    if(p.t==='bool')return '〈 〉';
+    if(p.k)return '('+(p.v===''||p.v===undefined?'　':p.v)+')';
+    return '';
+  }).join(' ').replace(/\s+/g,' ').trim();
+}
+function defArgs(b){var a={};b.parts.forEach(function(p){if(p.k&&p.t!=='bool')a[p.k]=p.v;});return a;}
+function makePal(hostId,ids,fill){
+  var host=document.getElementById(hostId);
+  ids.forEach(function(id){
+    var b=UI.byId(id); if(!b)return;
+    var btn=document.createElement('button');
+    btn.className='btn ghost sm';
+    btn.textContent=(fill?'⤵ ':'')+label(b);
+    btn.style.borderColor='var(--c-'+b.cat+')';
+    if(fill)btn.style.color='var(--c-'+b.cat+'-d)';
+    btn.addEventListener('click',function(){
+      if(fill)UI.startFill(b,defArgs(b));
+      else builder.add(b,defArgs(b));
+    });
+    host.appendChild(btn);
+  });
+}
+makePal('palA',['whenflag','setvar','changevar','showvar','hidevar','forever','repeat','ifthen','repeatuntil',
+  'move','pointtowards','gototarget','sayfor','wait'],false);
+makePal('palB',['varreport','touching','keypressed','opadd','oprandom','opgt','oplt','opeq','opjoin'],true);
+
+document.getElementById('run').addEventListener('click',function(){
+  var t=this;t.disabled=true;builder.run(function(){t.disabled=false;});
+});
+document.getElementById('stop').addEventListener('click',function(){
+  builder.stop();document.getElementById('run').disabled=false;
+});
+document.getElementById('clear').addEventListener('click',function(){builder.clear();});
+</script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 創作歷程紀錄本｜AI 環保小創客</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .pending-list { display: flex; flex-direction: column; gap: 8px; }
+    .pending-item {
+      display: flex; gap: 10px; align-items: center; padding: 10px 14px; border-radius: 12px;
+      background: var(--warn-soft); border: 1px solid #ffd9bf; cursor: pointer; text-align: left; font: inherit; width: 100%;
+    }
+    .pending-item:hover { border-color: var(--accent); }
+    .pending-item .p { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: .9rem; }
+    .q { margin-bottom: 18px; }
+    .q label { font-weight: 700; display: block; margin-bottom: 6px; }
+    .rub { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; background: var(--surface); }
+    .rub-levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    .rub-levels label {
+      border: 1.5px solid var(--line); border-radius: 10px; padding: 8px; font-size: .84rem; cursor: pointer; display: block;
+    }
+    .rub-levels label b { display: block; font-size: .9rem; }
+    .rub-levels input { display: none; }
+    .rub-levels label:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+    @media (max-width: 700px) { .rub-levels { grid-template-columns: 1fr 1fr; } }
+    .saved-hint { font-size: .85rem; color: var(--primary); min-height: 1.2em; }
+  </style>
+</head>
+<body>
+<header id="topnav"></header>
+
+<main class="page">
+  <div class="page-head">
+    <h1>📒 AI 創作歷程紀錄本</h1>
+    <p>每一次和 AI 對話都記下來：我問了什麼、AI 回了什麼、我覺得怎麼樣、下一版要怎麼改。</p>
+  </div>
+  <div class="print-only" id="printHead"></div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab" data-tab="add">✏️ 新增紀錄</button>
+    <button class="tab" data-tab="timeline">🕒 我的歷程</button>
+    <button class="tab" data-tab="reflect">🌱 反思與自評</button>
+    <button class="tab" data-tab="backup">💾 備份與送出</button>
+  </div>
+
+  <!-- ===== 新增／編輯 ===== -->
+  <section data-panel="add">
+    <div class="split">
+      <form class="card card-top-bar" id="entryForm" onsubmit="return false">
+        <h3 id="formTitle">✏️ 新增一筆紀錄</h3>
+        <div class="field"><label class="req">任務</label><div class="chips" id="fTask"></div></div>
+        <div class="row-2">
+          <div class="field"><label>平台</label><select id="fPlatform"></select></div>
+          <div class="field"><label>第幾版</label><input type="number" id="fVersion" min="1" max="99"></div>
+        </div>
+        <div class="field">
+          <label class="req" for="fPrompt">我的提示詞</label>
+          <textarea id="fPrompt" rows="5" placeholder="把你貼給 AI 的提示詞完整貼在這裡"></textarea>
+        </div>
+        <div class="field">
+          <label>這一版用了哪些修改技巧？ <span class="hint">（第 1 版可以不選）</span></label>
+          <div class="chips" id="fStrat"></div>
+        </div>
+        <div class="field">
+          <label for="fResponse">AI 的回應</label>
+          <textarea id="fResponse" rows="4" placeholder="AI 回答了什麼？圖片長什麼樣子？用自己的話簡單描述，或貼上重點。"></textarea>
+        </div>
+        <div class="field">
+          <label>我給這一版幾顆星？</label>
+          <div class="stars-input" id="fRating"></div>
+        </div>
+        <div class="row-2">
+          <div class="field"><label for="fGood">👍 好的地方</label><textarea id="fGood" rows="3" placeholder="哪裡符合我的想法？"></textarea></div>
+          <div class="field"><label for="fImprove">🔧 下一版要改</label><textarea id="fImprove" rows="3" placeholder="哪裡不滿意？打算用哪一招修改？"></textarea></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="saveEntry">💾 儲存紀錄</button>
+          <button class="btn ghost hidden" id="cancelEdit">取消編輯</button>
+          <span class="spacer" style="flex:1"></span>
+          <button class="btn danger sm hidden" id="deleteEntry">🗑️ 刪除這筆</button>
+        </div>
+      </form>
+
+      <div class="sticky">
+        <div class="card">
+          <h3>⏳ 等待填寫結果</h3>
+          <p class="small muted">從「提示詞積木」複製的提示詞會出現在這裡。看完 AI 的結果後，點一下補上回應和評價。</p>
+          <div class="pending-list" id="pendingList"></div>
+        </div>
+        <div class="card tinted" style="margin-top:16px">
+          <h3>💡 好的評價怎麼寫？</h3>
+          <ul class="small" style="padding-left:18px;margin:0">
+            <li>不要只寫「很好」「不好」，要說出<strong>哪裡</strong>好、<strong>哪裡</strong>不好。</li>
+            <li>和你的草圖或構想比較：AI 有做到你想要的嗎？</li>
+            <li>「下一版要改」寫出你打算用哪一招，例如：「用『一次改一件事』，只把背景改成沙灘」。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 時間軸 ===== -->
+  <section data-panel="timeline" class="hidden">
+    <div class="btn-row no-print" style="margin-bottom:16px">
+      <div class="chips" id="tlFilter"></div>
+      <span style="flex:1"></span>
+      <button class="btn ghost sm" onclick="window.print()">🖨️ 列印歷程</button>
+    </div>
+    <div id="timeline"></div>
+  </section>
+
+  <!-- ===== 反思 ===== -->
+  <section data-panel="reflect" class="hidden">
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>🌱 創作反思</h3>
+        <div id="questions"></div>
+      </div>
+      <div class="card">
+        <h3>🎯 自我評量</h3>
+        <p class="small muted">每一項選一個最符合自己的程度。老師也會用同樣的標準評量。</p>
+        <div id="selfRubric"></div>
+      </div>
+    </div>
+    <p class="saved-hint" id="reflectSaved"></p>
+  </section>
+
+  <!-- ===== 備份與送出 ===== -->
+  <section data-panel="backup" class="hidden">
+    <div class="stat-tiles" id="backupStats" style="margin-bottom:20px"></div>
+    <div class="grid grid-2">
+      <div class="card card-top-bar" style="--task:var(--primary)">
+        <h3>📤 送出給老師</h3>
+        <div id="cloudStatus"></div>
+        <button class="btn" id="submitBtn">📤 送出我的歷程</button>
+        <p class="small muted" style="margin-top:10px">可以送出很多次，老師那邊只會保留你最新的一份。</p>
+      </div>
+      <div class="card card-top-bar" style="--task:var(--info)">
+        <h3>💾 備份檔</h3>
+        <p class="small">資料存在<strong>這台電腦的瀏覽器</strong>裡。換電腦、清除瀏覽紀錄前，請先匯出備份檔，存到 Google 雲端硬碟或上傳到 Classroom。</p>
+        <div class="btn-row">
+          <button class="btn ghost" id="exportBtn">⬇️ 匯出備份檔</button>
+          <label class="btn ghost" for="importFile">⬆️ 匯入備份檔</label>
+          <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;border-color:#f3c4c4">
+      <h3>⚠️ 清除這台電腦上的資料</h3>
+      <p class="small muted">使用共用電腦、課程結束後才需要清除。清除前請先匯出備份檔。</p>
+      <button class="btn danger sm" id="clearBtn">清除所有資料</button>
+    </div>
+  </section>
+</main>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  const E = window.Eco;
+  E.renderNav('journal.html');
+  E.footer();
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const params = new URLSearchParams(location.search);
+
+  // ---------- 分頁 ----------
+  function showTab(name) {
+    $$('#tabs .tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
+    $$('[data-panel]').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== name));
+    if (name === 'timeline') renderTimeline();
+    if (name === 'backup') renderBackup();
+    if (name === 'add') renderPending();
+  }
+  $('#tabs').addEventListener('click', ev => {
+    const t = ev.target.closest('.tab');
+    if (t) showTab(t.dataset.tab);
+  });
+
+  // ---------- 表單 ----------
+  let editingId = null;
+  let rating = 0;
+
+  $('#fTask').innerHTML = Object.entries(E.TASKS).map(([k, t]) =>
+    `<button type="button" class="chip task-chip" data-value="${k}" style="--task:var(--t-${k})">${t.icon} ${t.name}</button>`).join('');
+  $('#fPlatform').innerHTML = E.PLATFORMS.map(p => `<option>${p}</option>`).join('');
+  $('#fStrat').innerHTML = E.strategyChipsHTML();
+  E.bindChips($('#fStrat'), { multi: true });
+  E.bindChips($('#fTask'), {
+    onChange: task => {
+      if (!task) return;
+      $('#fPlatform').value = E.TASKS[task].platform;
+      if (!editingId) $('#fVersion').value = E.nextVersion(task);
+      $('#entryForm').style.setProperty('--task', `var(--t-${task})`);
+    }
+  });
+
+  const starBox = $('#fRating');
+  starBox.innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" data-n="${n}" aria-label="${n} 顆星">★</button>`).join('');
+  function setRating(n) {
+    rating = n;
+    [...starBox.children].forEach(b => b.classList.toggle('on', Number(b.dataset.n) <= n));
+  }
+  starBox.addEventListener('click', ev => {
+    const b = ev.target.closest('button');
+    if (b) setRating(Number(b.dataset.n) === rating ? 0 : Number(b.dataset.n));
+  });
+
+  function resetForm(task) {
+    editingId = null;
+    $('#formTitle').textContent = '✏️ 新增一筆紀錄';
+    $('#cancelEdit').classList.add('hidden');
+    $('#deleteEntry').classList.add('hidden');
+    ['fPrompt', 'fResponse', 'fGood', 'fImprove'].forEach(id => { $('#' + id).value = ''; });
+    E.setChips($('#fStrat'), []);
+    setRating(0);
+    task = task || E.getChips($('#fTask')) || 'research';
+    E.setChips($('#fTask'), task);
+    $('#fPlatform').value = E.TASKS[task].platform;
+    $('#fVersion').value = E.nextVersion(task);
+    $('#entryForm').style.setProperty('--task', `var(--t-${task})`);
+  }
+
+  function loadEntry(id) {
+    const e = E.state.entries.find(x => x.id === id);
+    if (!e) { E.toast('找不到這筆紀錄', 'warn'); return; }
+    editingId = id;
+    $('#formTitle').textContent = `✏️ 編輯：${E.TASKS[e.task].name} 第 ${e.version} 版`;
+    E.setChips($('#fTask'), e.task);
+    $('#fPlatform').value = e.platform;
+    $('#fVersion').value = e.version;
+    $('#fPrompt').value = e.prompt;
+    $('#fResponse').value = e.response;
+    $('#fGood').value = e.good;
+    $('#fImprove').value = e.improve;
+    E.setChips($('#fStrat'), e.strategies || []);
+    setRating(Number(e.rating) || 0);
+    $('#cancelEdit').classList.remove('hidden');
+    $('#deleteEntry').classList.remove('hidden');
+    $('#entryForm').style.setProperty('--task', `var(--t-${e.task})`);
+    showTab('add');
+    $('#entryForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => (e.prompt ? $('#fResponse') : $('#fPrompt')).focus(), 300);
+  }
+
+  $('#saveEntry').addEventListener('click', () => {
+    if (!E.profileReady()) { E.openProfile(); return; }
+    const task = E.getChips($('#fTask'));
+    const prompt = $('#fPrompt').value.trim();
+    if (!task) { E.toast('請選擇任務', 'warn'); return; }
+    if (!prompt) { E.toast('請貼上你的提示詞', 'warn'); $('#fPrompt').focus(); return; }
+    const data = {
+      task, platform: $('#fPlatform').value, version: Number($('#fVersion').value) || E.nextVersion(task),
+      prompt, response: $('#fResponse').value.trim(), rating,
+      good: $('#fGood').value.trim(), improve: $('#fImprove').value.trim(),
+      strategies: E.getChips($('#fStrat'), true)
+    };
+    const dup = E.state.entries.find(x => x.task === task && Number(x.version) === data.version && x.id !== editingId);
+    if (dup && !confirm(`「${E.TASKS[task].name}」已經有第 ${data.version} 版了，還是要儲存嗎？`)) return;
+    if (editingId) { E.updateEntry(editingId, data); E.toast('✅ 已更新紀錄', 'ok'); }
+    else { E.addEntry(data); E.toast(`✅ 已記錄 ${E.TASKS[task].name} 第 ${data.version} 版`, 'ok'); }
+    if (params.has('edit')) history.replaceState(null, '', 'journal.html');
+    resetForm(task);
+    renderPending();
+  });
+  $('#cancelEdit').addEventListener('click', () => resetForm());
+  $('#deleteEntry').addEventListener('click', () => {
+    if (!editingId || !confirm('確定要刪除這筆紀錄嗎？刪除後無法復原。')) return;
+    E.deleteEntry(editingId);
+    E.toast('🗑️ 已刪除');
+    resetForm();
+    renderPending();
+  });
+
+  function renderPending() {
+    const list = E.sortEntries(E.state.entries.filter(E.isPending));
+    $('#pendingList').innerHTML = list.length ? list.map(e => `
+      <button class="pending-item" data-id="${E.esc(e.id)}">
+        <span>${E.TASKS[e.task].icon}</span><b>${E.TASKS[e.task].name} 第 ${E.esc(e.version)} 版</b>
+        <span class="p">${E.esc(e.prompt)}</span>
+      </button>`).join('') : '<p class="small muted">🎉 全部都填好了！</p>';
+  }
+  $('#pendingList').addEventListener('click', ev => {
+    const b = ev.target.closest('.pending-item');
+    if (b) loadEntry(b.dataset.id);
+  });
+
+  // ---------- 時間軸 ----------
+  let tlTask = '';
+  $('#tlFilter').innerHTML = `<button type="button" class="chip on" data-value="">全部</button>` +
+    Object.entries(E.TASKS).map(([k, t]) => `<button type="button" class="chip" data-value="${k}">${t.icon} ${t.name}</button>`).join('');
+  E.bindChips($('#tlFilter'), { onChange: v => { tlTask = v; renderTimeline(); } });
+  function renderTimeline() {
+    $('#timeline').innerHTML = E.timelineHTML(E.state.entries, {
+      editable: true, task: tlTask,
+      emptyText: '還沒有紀錄。到「提示詞積木」寫下第一個提示詞吧！'
+    });
+    const p = E.state.profile;
+    $('#printHead').innerHTML = `<h2>AI 創作歷程｜${E.esc(p.cls)} 班 ${E.esc(p.seat)} 號 ${E.esc(p.name)}｜議題：${E.esc(p.topic || '—')}</h2>`;
+  }
+  $('#timeline').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-edit]');
+    if (b) loadEntry(b.dataset.edit);
+  });
+
+  // ---------- 反思 ----------
+  const QUESTIONS = [
+    ['best', '哪一次修改提示詞，讓結果進步最多？你改了什麼？為什麼有效？'],
+    ['aiGood', 'AI 在哪些地方幫了你很大的忙？'],
+    ['human', '哪些地方 AI 做不到或做不好，一定要靠「人」來完成？'],
+    ['skill', '你最常用、最有效的迭代技巧是哪一招？舉一個例子。'],
+    ['ethics', '使用 AI 創作時，要注意哪些事情？（例如：查證、標示、個資、著作權）'],
+    ['future', '以後你還想用 AI 做什麼？你會怎麼跟它合作？']
+  ];
+  const R = E.state.reflection;
+  $('#questions').innerHTML = QUESTIONS.map(([k, q], i) => `
+    <div class="q"><label for="q_${k}">${i + 1}. ${q}</label>
+    <textarea id="q_${k}" data-q="${k}" rows="3">${E.esc((R.answers || {})[k] || '')}</textarea></div>`).join('');
+  $('#selfRubric').innerHTML = E.RUBRIC.map(r => `
+    <div class="rub"><b>${r.name}</b> <span class="small muted">— ${r.desc}</span>
+      <div class="rub-levels">${r.levels.map((d, i) => `
+        <label><input type="radio" name="self_${r.id}" value="${i + 1}" ${Number((R.self || {})[r.id]) === i + 1 ? 'checked' : ''}>
+        <b>${i + 1} ${E.LEVEL_NAMES[i]}</b>${d}</label>`).join('')}</div>
+    </div>`).join('');
+
+  let saveTimer;
+  function saveReflection() {
+    const answers = {};
+    $$('[data-q]').forEach(t => { answers[t.dataset.q] = t.value; });
+    const self = {};
+    E.RUBRIC.forEach(r => {
+      const c = document.querySelector(`input[name="self_${r.id}"]:checked`);
+      if (c) self[r.id] = Number(c.value);
+    });
+    E.state.reflection = { answers, self, updatedAt: new Date().toISOString() };
+    E.save();
+    $('#reflectSaved').textContent = `✅ 已自動儲存（${E.fmtTime(E.state.reflection.updatedAt)}）`;
+  }
+  $('[data-panel="reflect"]').addEventListener('input', () => { clearTimeout(saveTimer); saveTimer = setTimeout(saveReflection, 600); });
+  $('[data-panel="reflect"]').addEventListener('change', saveReflection);
+
+  // ---------- 備份與送出 ----------
+  function renderBackup() {
+    const st = E.stats(E.state);
+    const tiles = [[st.count, '提示詞紀錄'], [st.pending, '待填寫結果'], [st.stratTotal, '使用迭代技巧'],
+      [`${st.plansDone}/3`, '後製構想單'], [`${st.reflected}/6`, '反思題']];
+    $('#backupStats').innerHTML = tiles.map(([n, l]) => `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    const c = E.cloud();
+    const last = E.state.lastSubmit ? `上次送出：${E.fmtTime(E.state.lastSubmit)}` : '還沒有送出過';
+    $('#cloudStatus').innerHTML = c.gasUrl
+      ? `<div class="callout ok"><strong>☁️ 已連接老師的收件匣</strong>${last}</div>`
+      : `<div class="callout warn"><strong>老師還沒有設定雲端收件</strong>請用老師給的「學生專用連結」打開這個網站，或改用右邊的「匯出備份檔」，上傳到 Google Classroom。</div>`;
+    $('#submitBtn').disabled = !c.gasUrl;
+  }
+
+  $('#submitBtn').addEventListener('click', async () => {
+    if (!E.profileReady()) { E.openProfile(); return; }
+    const st = E.stats(E.state);
+    if (st.pending && !confirm(`還有 ${st.pending} 筆紀錄沒有填寫結果，確定要先送出嗎？`)) return;
+    const btn = $('#submitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ 送出中…';
+    try {
+      const r = await E.submitToCloud();
+      E.toast(r.unverified ? '📤 已送出（網路限制無法確認，請請老師檢查是否收到）' : `✅ 送出成功！老師收到了 ${r.count ?? st.count} 筆紀錄`, 'ok', 5000);
+    } catch (err) {
+      E.toast('❌ ' + err.message, 'warn', 6000);
+    } finally {
+      btn.textContent = '📤 送出我的歷程';
+      renderBackup();
+    }
+  });
+
+  $('#exportBtn').addEventListener('click', () => { E.exportData(); E.toast('⬇️ 已下載備份檔', 'ok'); });
+  $('#importFile').addEventListener('change', async ev => {
+    const f = ev.target.files[0];
+    ev.target.value = '';
+    if (!f) return;
+    try {
+      const r = E.importData(await E.readJsonFile(f));
+      E.toast(`✅ 匯入完成：新增 ${r.added} 筆、更新 ${r.updated} 筆`, 'ok');
+      renderBackup();
+      renderPending();
+    } catch (err) { E.toast('❌ ' + err.message, 'warn', 5000); }
+  });
+  $('#clearBtn').addEventListener('click', () => {
+    if (!confirm('確定要清除這台電腦上的所有紀錄嗎？')) return;
+    if (!confirm('再確認一次：你已經匯出備份檔或送出給老師了嗎？清除後無法復原。')) return;
+    E.clearAll();
+    location.href = 'journal.html';
+  });
+
+  // ---------- 初始化 ----------
+  resetForm(E.TASKS[params.get('task')] ? params.get('task') : null);
+  renderPending();
+  const tab = params.get('tab');
+  if (params.get('edit')) loadEntry(params.get('edit'));
+  else showTab(['timeline', 'reflect', 'backup'].includes(tab) ? tab : 'add');
+  if (!E.profileReady()) setTimeout(() => E.openProfile(), 400);
+})();
+</script>
+</body>
+</html>

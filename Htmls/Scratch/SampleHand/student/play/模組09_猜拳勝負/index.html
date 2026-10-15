@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模組09_猜拳勝負</title>
+<link rel="stylesheet" href="assets/player.css">
+</head>
+<body>
+<div class="titlebar">
+  <h1>模組09_猜拳勝負</h1>
+  <span class="sub">角色 8・積木 413</span>
+</div>
+
+<div class="warnbox">⚠️ 這個作品用到「Handpose2Scratch（手部偵測）」，網頁版<b>可以直接執行</b>，按下綠旗時瀏覽器會詢問是否允許使用攝影機。第一次開啟需要幾秒鐘載入模型。</div>
+
+<div class="wrap">
+  <div class="bar">
+    <button class="btn go" id="btnGo">▶ 開始（綠旗）</button>
+    <button class="btn stop" id="btnStop">■ 停止</button>
+    <span class="spacer"></span>
+    <button class="btn ghost" id="btnTurbo">⚡ 加速模式：關</button>
+    <button class="btn ghost" id="btnFull">⛶ 全螢幕</button>
+  </div>
+  <div class="stagebox" id="stageBox">
+    <canvas id="stage" width="480" height="360" tabindex="0"></canvas>
+    <div class="monitors" id="monitors"></div>
+    <div class="loading" id="loading"><div>正在載入作品<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div><div style="font-size:.82rem">第一次開啟需要幾秒鐘</div></div>
+  </div>
+  <div class="askbar" id="askBar" style="display:none">
+    <span class="lab" id="askLabel"></span>
+    <input id="askInput" type="text" placeholder="在這裡輸入答案，按 Enter 送出">
+    <button class="btn" id="askBtn">送出</button>
+  </div>
+</div>
+
+<div class="note">
+  操作：先點一下舞台再用鍵盤；手機或平板可以直接用手指點。<br>
+  由「SB3 轉網頁工具」轉換　·　執行引擎：Scratch VM（scratch-vm / scratch-render）
+</div>
+
+<script src="../engine/scratch-runtime.js"></script>
+<script src="assets/aivideo.js"></script>
+<script src="../engine/handpose-runtime.js"></script>
+<script src="assets/handpose.js"></script>
+<script src="assets/player.js"></script>
+<script src="assets/project.js"></script>
+
+<script>
+(function(){
+  var box = document.getElementById('stageBox');
+  var loading = document.getElementById('loading');
+  ScratchPlayer({
+    canvas: document.getElementById('stage'),
+    monitorLayer: document.getElementById('monitors'),
+    stageBox: box,
+    askBar: document.getElementById('askBar'),
+    askInput: document.getElementById('askInput'),
+    askBtn: document.getElementById('askBtn'),
+    askLabel: document.getElementById('askLabel'),
+    data: window.PROJECT_DATA
+  }).then(function(vm){
+    loading.style.display = 'none';
+    window.__ready = true;
+    window.__vm = vm;   // 方便除錯：可在主控台查看變數
+    document.getElementById('btnGo').addEventListener('click', function(){
+      if (vm.runtime.audioEngine && vm.runtime.audioEngine.audioContext &&
+          vm.runtime.audioEngine.audioContext.state === 'suspended') {
+        vm.runtime.audioEngine.audioContext.resume();
+      }
+      vm.greenFlag();
+      document.getElementById('stage').focus();
+    });
+    document.getElementById('btnStop').addEventListener('click', function(){ vm.stopAll(); });
+    var turbo = false;
+    document.getElementById('btnTurbo').addEventListener('click', function(){
+      turbo = !turbo; vm.setTurboMode(turbo);
+      this.textContent = '⚡ 加速模式：' + (turbo ? '開' : '關');
+    });
+    document.getElementById('btnFull').addEventListener('click', function(){
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (box.requestFullscreen) box.requestFullscreen();
+    });
+    
+  }).catch(function(e){
+    var msg = String(e && e.message ? e.message : e);
+    var friendly = (window.BLOCKED_EXT && window.BLOCKED_EXT.length)
+      ? '這個作品用到「' + window.BLOCKED_EXT.join('、') + '」，網頁版沒有這些積木，所以無法執行。<br>請改用 stretch3.github.io 開啟原始的 .sb3 檔。'
+      : '可能是檔案毀損，或使用了網頁版不支援的功能。';
+    loading.innerHTML = '<div style="color:#D9534F;font-weight:800;font-size:1.05rem">作品載入失敗</div>' +
+      '<div style="font-size:.9rem;max-width:32em;line-height:1.8">' + friendly + '</div>' +
+      '<div style="font-size:.76rem;color:#9AA5B1;max-width:32em">技術訊息：' + msg + '</div>';
+    window.__err = msg;
+    console.error(e);
+  });
+})();
+</script>
+</body>
+</html>

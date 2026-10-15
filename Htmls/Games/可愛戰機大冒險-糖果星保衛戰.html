@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可愛戰機大冒險 🚀</title>
+    <style>
+        /* 可愛柔和的網頁背景 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffebf0;
+            font-family: 'Comic Sans MS', 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        h1 {
+            color: #ff6b81;
+            margin: 10px 0;
+            text-shadow: 2px 2px #fff;
+            font-size: 28px;
+        }
+
+        /* 遊戲主容器 */
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 600px;
+            background: #2b1b54; /* 深紫色星空 */
+            border: 6px solid #ffa5b0;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 107, 129, 0.3);
+            overflow: hidden;
+            cursor: none; /* 隱藏鼠標，用戰機代替 */
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* 頂部 UI 面板 */
+        #ui-board {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 15px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ui-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff4757;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #level-tag {
+            color: #3742fa;
+        }
+
+        /* 介面與按鈕 */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(43, 27, 84, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            color: white;
+            text-align: center;
+        }
+
+        .screen h2 {
+            font-size: 32px;
+            color: #ff7f50;
+            text-shadow: 2px 2px #fff;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: #2f3542;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 154, 158, 0.5);
+            transition: transform 0.1s;
+            margin-top: 20px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .tips {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #ced6e0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 糖果星保衛戰</h1>
+
+    <div id="game-container">
+        <div id="ui-board">
+            <div class="ui-item">命: <span id="lives-display">❤️❤️❤️</span></div>
+            <div class="ui-item">等級: <span id="level-tag">Lv.1</span></div>
+            <div class="ui-item">分: <span id="score-display">0</span></div>
+        </div>
+
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+        <div id="start-screen" class="screen">
+            <h2>可愛戰機大冒險</h2>
+            <p>吃到糖果🍬 武器最高可升至 30 級！</p>
+            <button onclick="startGame()">點擊開始 🎮</button>
+            <div class="tips">滑鼠或觸控移動戰機，會自動射擊</div>
+        </div>
+
+        <div id="gameover-screen" class="screen" style="display: none;">
+            <h2>Game Over 😭</h2>
+            <p>最終得分: <span id="final-score">0</span></p>
+            <p>最高武器等級: <span id="final-level">1</span> / 30</p>
+            <button onclick="startGame()">再戰一次 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const livesDisplay = document.getElementById('lives-display');
+        const levelTag = document.getElementById('level-tag');
+        const scoreDisplay = document.getElementById('score-display');
+        const startScreen = document.getElementById('start-screen');
+        const gameoverScreen = document.getElementById('gameover-screen');
+        const finalScore = document.getElementById('final-score');
+        const finalLevel = document.getElementById('final-level');
+
+        // 遊戲狀態與實體
+        let gameActive = false;
+        let player, bullets, enemies, items, particles, stars;
+        let score = 0;
+        let shootTimer = 0;
+        let spawnTimer = 0;
+
+        // 初始化遊戲資料
+        function initGame() {
+            player = {
+                x: canvas.width / 2,
+                y: 500,
+                size: 20, // 碰撞半徑
+                lives: 3,
+                level: 1, // 武器等級 1 ~ 30
+                invincible: 0 // 無敵幀數
+            };
+            bullets = [];
+            enemies = [];
+            items = [];
+            particles = [];
+            score = 0;
+            shootTimer = 0;
+            spawnTimer = 0;
+
+            // 背景星星
+            stars = [];
+            for(let i=0; i<50; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 2 + 0.5
+                });
+            }
+            updateUI();
+        }
+
+        // 開始遊戲
+        function startGame() {
+            initGame();
+            startScreen.style.display = 'none';
+            gameoverScreen.style.display = 'none';
+            gameActive = true;
+            gameLoop();
+        }
+
+        // 控制移動 (滑鼠與觸控)
+        function moveHandler(e) {
+            if (!gameActive) return;
+            let rect = canvas.getBoundingClientRect();
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            player.x = clientX - rect.left;
+            player.y = clientY - rect.top;
+
+            // 邊界限制
+            if(player.x < 15) player.x = 15;
+            if(player.x > canvas.width - 15) player.x = canvas.width - 15;
+            if(player.y < 15) player.y = 15;
+            if(player.y > canvas.height - 15) player.y = canvas.height - 15;
+        }
+        canvas.addEventListener('mousemove', moveHandler);
+        canvas.addEventListener('touchmove', (e) => { moveHandler(e); e.preventDefault(); }, {passive: false});
+
+        function updateUI() {
+            livesDisplay.innerText = "❤️".repeat(player.lives) + "🤍".repeat(3 - player.lives);
+            levelTag.innerText = `Lv.${player.level} ${player.level === 30 ? "MAX" : ""}`;
+            scoreDisplay.innerText = score;
+        }
+
+        // 碰撞偵測 (圓形)
+        function checkCollision(obj1, obj2) {
+            let dx = obj1.x - obj2.x;
+            let dy = obj1.y - obj2.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < (obj1.size + obj2.size);
+        }
+
+        // 新增漂浮文字或特效
+        function addParticle(x, y, text, color) {
+            particles.push({ x: x, y: y, text: text, color: color, life: 40 });
+        }
+
+        // 武器發射邏輯 (1~30級的動態計算核心)
+        function handleShooting() {
+            shootTimer++;
+            // 等級越高，冷卻越快 (最慢15幀，最快3幀)
+            let fireRate = Math.max(3, 15 - Math.floor(player.level / 2.5)); 
+
+            if (shootTimer >= fireRate) {
+                shootTimer = 0;
+                
+                // 1. 正前方扇形彈幕：等級越高，子彈數越多 (最多15發)
+                let forwardBullets = Math.min(15, 1 + Math.floor(player.level / 2));
+                // 擴散角度：等級越高越廣
+                let spreadAngle = Math.min(Math.PI / 1.5, 0.1 * forwardBullets); 
+                let startAngle = -Math.PI / 2 - spreadAngle / 2;
+                let angleStep = forwardBullets > 1 ? spreadAngle / (forwardBullets - 1) : 0;
+
+                // 子彈顏色隨等級變化
+                let hue = (player.level * 12) % 360; 
+                let bulletColor = `hsl(${hue}, 100%, 70%)`;
+                
+                // 子彈大小與速度
+                let bulletSpeed = 7 + Math.min(5, Math.floor(player.level / 6));
+                let bulletSize = 4 + Math.min(6, Math.floor(player.level / 5));
+
+                for (let i = 0; i < forwardBullets; i++) {
+                    let angle = forwardBullets === 1 ? -Math.PI / 2 : startAngle + i * angleStep;
+                    bullets.push({
+                        x: player.x,
+                        y: player.y - 15,
+                        vx: Math.cos(angle) * bulletSpeed,
+                        vy: Math.sin(angle) * bulletSpeed,
+                        size: bulletSize,
+                        color: bulletColor
+                    });
+                }
+
+                // 2. 側邊防禦與後方火力 (10級以上解鎖)
+                if (player.level >= 10) {
+                    let extraSides = Math.floor((player.level - 5) / 5); // 10級1對，30級5對
+                    for(let i = 1; i <= extraSides; i++) {
+                        // 往兩側後方發射
+                        bullets.push({ x: player.x, y: player.y, vx: i*1.5, vy: Math.abs(i)*2, size: 4, color: '#fff' });
+                        bullets.push({ x: player.x, y: player.y, vx: -i*1.5, vy: Math.abs(i)*2, size: 4, color: '#fff' });
+                    }
+                }
+            }
+        }
+
+        // 遊戲主迴圈
+        function gameLoop() {
+            if (!gameActive) return;
+
+            // 清空與畫背景
+            ctx.fillStyle = '#2b1b54';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 星星動畫
+            ctx.fillStyle = '#feca57';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+                ctx.fill();
+                star.y += star.speed;
+                if(star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+
+            // 處理發射
+            handleShooting();
+
+            // 更新與畫子彈
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                
+                ctx.fillStyle = b.color;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = b.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // 重置陰影
+
+                // 超出邊界移除
+                if (b.y < -20 || b.y > canvas.height + 20 || b.x < -20 || b.x > canvas.width + 20) {
+                    bullets.splice(i, 1);
+                }
+            }
+
+            // 生成怪物
+            spawnTimer++;
+            // 隨著分數提高，怪物生成變快
+            let spawnRate = Math.max(15, 50 - Math.floor(score / 100));
+            if (spawnTimer >= spawnRate) {
+                spawnTimer = 0;
+                let emojis = ['👾', '🛸', '👻', '🎈'];
+                enemies.push({
+                    x: Math.random() * (canvas.width - 30) + 15,
+                    y: -30,
+                    size: 16,
+                    vy: 2 + Math.random() * 2 + (score / 2000),
+                    emoji: emojis[Math.floor(Math.random() * emojis.length)]
+                });
+            }
+
+            // 更新怪物與碰撞判斷
+            ctx.font = "28px Arial";
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.y += e.vy;
+                ctx.fillText(e.emoji, e.x, e.y);
+
+                if (e.y > canvas.height + 30) {
+                    enemies.splice(i, 1);
+                    continue;
+                }
+
+                // 子彈打中怪物
+                let hit = false;
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    if (checkCollision(bullets[j], e)) {
+                        score += 10;
+                        bullets.splice(j, 1);
+                        hit = true;
+                        
+                        // 20% 機率掉落糖果 (武器升級)
+                        if (Math.random() < 0.20) {
+                            items.push({ x: e.x, y: e.y, size: 15, vy: 1.5 });
+                        }
+                        break;
+                    }
+                }
+
+                if (hit) {
+                    addParticle(e.x, e.y, "💥", "#ff0");
+                    enemies.splice(i, 1);
+                    updateUI();
+                    continue;
+                }
+
+                // 怪物撞到玩家 (非無敵狀態)
+                if (player.invincible <= 0 && checkCollision(player, e)) {
+                    player.lives--;
+                    player.invincible = 60; // 約1秒無敵
+                    // 受傷掉 2 級武器做為懲罰，最低不低於1
+                    player.level = Math.max(1, player.level - 2); 
+                    
+                    addParticle(player.x, player.y - 30, "Ouch!💔", "#ff4757");
+                    enemies.splice(i, 1);
+                    updateUI();
+
+                    if (player.lives <= 0) {
+                        gameOver();
+                        return;
+                    }
+                }
+            }
+
+            // 處理掉落道具 (糖果🍬)
+            for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                item.y += item.vy;
+                ctx.font = "24px Arial";
+                ctx.fillText("🍬", item.x, item.y);
+
+                if (item.y > canvas.height + 20) {
+                    items.splice(i, 1);
+                    continue;
+                }
+
+                // 吃到道具
+                if (checkCollision(player, item)) {
+                    items.splice(i, 1);
+                    if (player.level < 30) {
+                        player.level++;
+                        addParticle(player.x, player.y - 20, "Level Up!✨", "#1dd1a1");
+                    } else {
+                        score += 100; // 滿級給分數
+                        addParticle(player.x, player.y - 20, "+100💯", "#feca57");
+                    }
+                    updateUI();
+                }
+            }
+
+            // 更新特效文字
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                ctx.fillStyle = p.color;
+                ctx.font = "bold 16px Arial";
+                ctx.fillText(p.text, p.x, p.y);
+                p.y -= 1;
+                p.life--;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            // 畫玩家戰機 (無敵閃爍效果)
+            if (player.invincible > 0) {
+                player.invincible--;
+            }
+            
+            let drawPlayer = true;
+            if (player.invincible > 0 && Math.floor(player.invincible / 5) % 2 === 0) {
+                drawPlayer = false; 
+            }
+
+            if (drawPlayer) {
+                ctx.font = "36px Arial";
+                ctx.fillText("🚀", player.x, player.y);
+                // 畫一個小圈圈表示防護罩
+                if(player.invincible > 0) {
+                    ctx.beginPath();
+                    ctx.arc(player.x, player.y, 25, 0, Math.PI*2);
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            gameActive = false;
+            finalScore.innerText = score;
+            finalLevel.innerText = player.level;
+            gameoverScreen.style.display = 'flex';
+        }
+
+    </script>
+</body>
+</html>

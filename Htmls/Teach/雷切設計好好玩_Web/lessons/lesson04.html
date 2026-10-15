@@ -1,0 +1,92 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 堂｜布林運算魔法：造型吊飾｜雷切設計好好玩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="4">
+<main class="wrap">
+
+<section class="hero" style="--u:#f08a24">
+  <span class="tag">第 4 堂 ／ 單元2　平面吊飾</span>
+  <h1>布林運算魔法：造型吊飾 ☁️</h1>
+  <p>把好幾個圓合在一起就變成雲朵，用小圓一挖就有掛孔！布林運算是雷射設計最常用的魔法。</p>
+  <div class="chips"><span class="chip">🎁 今日作品：雲朵／愛心／動物造型吊飾</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>會用聯集、差集、交集、互斥</li><li>知道「差集是上面的形狀挖掉下面的」</li><li>做出外框只有一條線、有掛孔的造型吊飾</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 回顧"><b>5 分</b><div><b>回顧</b>：看上次切的作品：有沒有切斷？邊緣焦不焦？</div></div>
+<div class="slot" data-min="15" data-label="第1節 布林運算實驗"><b>15 分</b><div><b>布林運算實驗</b>：遊樂場拖拉形狀，試五種運算</div></div>
+<div class="slot" data-min="20" data-label="第1節 跟著做：雲朵"><b>20 分</b><div><b>跟著做：雲朵</b>：4 個圓聯集成雲朵，再用差集挖出掛孔</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 任務：造型吊飾"><b>25 分</b><div><b>任務：造型吊飾</b>：用布林運算做出自己的造型＋掛孔</div></div>
+<div class="slot" data-min="10" data-label="第2節 切割"><b>10 分</b><div><b>切割</b>：合併切；等待時互相檢查檔案</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：說說你用了哪幾種運算</div></div></div>
+  <p class="small">按「⏱ 計時」會在右下角倒數，投影上課很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 魔法小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">➕</span><b>聯集</b>多個形狀合成一個外框。</div><div class="lc"><span class="ic">➖</span><b>差集</b>上面的形狀把下面的挖掉。</div><div class="lc"><span class="ic">✖️</span><b>交集</b>只留下重疊的部分。</div><div class="lc"><span class="ic">⚡</span><b>互斥</b>重疊的地方挖掉，其他留下。</div><div class="lc"><span class="ic">✂️</span><b>分割</b>把下面的形狀切成好幾塊。</div><div class="lc"><span class="ic">🔗</span><b>要重疊才合得起來</b>兩個形狀沒碰在一起，聯集後還是分開的兩塊。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>布林運算要先選取兩個以上的形狀；文字、群組要先轉成路徑、取消群組。</li><li>聯集後可能變成黑色填滿，記得改回「無填色＋紅色邊框」。</li><li>切割前檢查：外框只剩一條紅線，沒有重疊的線。</li></ul>
+</section>
+
+<h2 style="margin-top:26px">🧪 互動實驗室</h2><div class="tool" data-tool="boolean"></div>
+
+<section class="card">
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0">⌨️ Inkscape 快捷鍵小卡</h2><button class="btn sm ghost" data-flipall>全部翻面</button></div>
+  <p class="small">先猜猜看這個按鍵是做什麼的，再點卡片翻面。</p>
+  <div class="keys"><div class="key"><div class="in"><div class="f">Ctrl＋＋</div><div class="b">聯集</div></div></div><div class="key"><div class="in"><div class="f">Ctrl＋－</div><div class="b">差集</div></div></div><div class="key"><div class="in"><div class="f">Ctrl＋＊</div><div class="b">交集</div></div></div><div class="key"><div class="in"><div class="f">Ctrl＋^</div><div class="b">互斥</div></div></div><div class="key"><div class="in"><div class="f">Ctrl＋/</div><div class="b">分割</div></div></div><div class="key"><div class="in"><div class="f">Home／End</div><div class="b">移到最上層／最下層</div></div></div><div class="key"><div class="in"><div class="f">Ctrl＋G</div><div class="b">群組</div></div></div><div class="key"><div class="in"><div class="f">Ctrl＋Shift＋G</div><div class="b">取消群組</div></div></div></div>
+</section>
+
+<h2 style="margin-top:26px">🛠️ 動手做</h2>
+<p class="small">每完成一個步驟，點一下打勾 ✓（會記在這台電腦）。</p>
+<section class="mission" id="m1">
+  <header><h3>🛠️ 任務 1：跟著做：雲朵吊飾</h3></header>
+  <div class="items">🎒 準備：Inkscape</div>
+  <ol class="steps"><li>畫 4 個大小不同的圓，排成雲朵形狀（一定要互相重疊）。</li><li>框選全部（或 <kbd>Ctrl</kbd>＋<kbd>A</kbd>），按 <kbd>Ctrl</kbd>＋<kbd>＋</kbd> 聯集。</li><li>畫一個 4 mm 的小圓，放在雲朵上方、裡面一點的位置。</li><li>同時選取雲朵和小圓，按 <kbd>Ctrl</kbd>＋<kbd>－</kbd> 差集 → 挖出掛孔。</li><li>改成無填色、紅色邊框；用 W／H 確認在 50 mm 以內。</li></ol>
+  
+  
+</section>
+<section class="mission" id="m2">
+  <header><h3>🛠️ 任務 2：我的造型吊飾</h3></header>
+  <div class="items">🎒 準備：Inkscape、紙筆</div>
+  <ol class="steps"><li>想一個造型（動物、水果、交通工具），先在紙上用圓形和方形拆解。</li><li>在 Inkscape 畫出每個部位，重疊後聯集成一個外框。</li><li>用差集挖出眼睛或窗戶（挖掉的那塊會掉下來，要完全在裡面）。</li><li>挖掛孔；想雕刻的表情改成黑色填滿。</li><li>存檔「第04堂_造型吊飾.svg」，交給老師合併切割。</li></ol>
+  
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：雲朵或愛心＋掛孔。</div><div class="lv f"><b>🦊 五、六年級</b>：用至少 4 次布林運算做出動物造型，還有雕刻的表情。</div></div>
+</section>
+
+
+
+
+<section class="card pink">
+  <h2>🏆 闖關測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<details class="card noprint">
+  <summary><b>👩‍🏫 老師備課提醒</b>（點開）</summary>
+  <ul><li>Inkscape 差集的順序（上減下）最常搞錯，可以請學生先用遊樂場試。</li><li>學生作品收齊後，老師在 Beam Studio 合併排版一次切，下課前或下一堂開頭發回。</li></ul>
+</details>
+
+</main>
+<script>window.QUIZ = [{"q": "兩個圓要合成一個外框，用哪個運算？", "o": ["聯集", "差集", "交集", "分割"], "a": 0, "why": "聯集＝合體。"}, {"q": "用小圓在大圓上挖洞，小圓要放在？", "o": ["下面", "上面", "旁邊", "都可以"], "a": 1, "why": "差集是「上面挖下面」。"}, {"q": "兩個形狀沒碰在一起，聯集後會？", "o": ["變成一塊", "還是分開的兩塊", "消失", "變黑"], "a": 1, "why": "要重疊才會合成一塊。"}, {"q": "為什麼重疊的線要先合併？", "o": ["重疊的地方會被切兩次、燒焦", "比較漂亮", "機器會壞掉", "不用合併"], "a": 0, "why": "同一條線切兩次，邊緣會很黑。"}];</script>
+<script src="../assets/meta.js"></script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

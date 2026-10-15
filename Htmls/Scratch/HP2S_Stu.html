@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>Handpose2Scratch 學生實作單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --cream:#FFF6F9; --paper:#FFFFFF; --paper2:#FFEDF3; --ink:#5D4037; --ink2:#8A776E; --line:#FBD6E3;
+  --pink:#FF8FAB; --pink-d:#EE5E84; --mint:#5FC9A4; --sky:#6FB7E4; --butter:#FFC86B; --lilac:#BFA3E8;
+  --block:#0FBD8C; --block-d:#0BA277; --block-op:#4C97FF; --block-op-d:#3373CC;
+  --ok:#3FAE86; --no:#E8607D;
+  --shadow:0 10px 24px rgba(255,143,171,.24); --shadow-s:0 4px 12px rgba(255,143,171,.2);
+  --f-round:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --f-num:'Nunito','M PLUS Rounded 1c',sans-serif;
+  --c-thumb:#FF8FAB; --c-index:#FFA94D; --c-middle:#5FC9A4; --c-ring:#6FB7E4; --c-pinky:#BFA3E8; --c-wrist:#A1887F;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cream:#261E29; --paper:#312836; --paper2:#3D3144; --ink:#FBEAF1; --ink2:#C7B3C0; --line:#4E4057;
+  --pink:#FF9FB9; --pink-d:#FFB8CC; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --cream:#261E29; --paper:#312836; --paper2:#3D3144; --ink:#FBEAF1; --ink2:#C7B3C0; --line:#4E4057;
+  --pink:#FF9FB9; --pink-d:#FFB8CC; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-round);font-size:16px;line-height:1.85;
+  background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:24px 24px}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px;padding-block:0 64px}
+h1,h2,h3{text-wrap:balance;line-height:1.4;margin:0}
+a{color:var(--pink-d)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in srgb,var(--cream) 84%,transparent);border-bottom:3px dotted var(--line)}
+nav .inner{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--paper);border:2px solid var(--line);
+  border-radius:50px;padding:5px 15px;font-size:.88rem;font-weight:700;transition:transform .18s,background .18s}
+nav a:hover{transform:translateY(-2px) scale(1.05);background:var(--paper2)}
+header.hero{padding-block:42px 26px;text-align:center}
+.badge{display:inline-block;background:var(--butter);color:#5D4037;font-weight:800;font-size:.82rem;padding:5px 16px;
+  border-radius:50px;border:2px solid var(--paper);box-shadow:var(--shadow-s)}
+header.hero h1{font-size:clamp(1.9rem,5.6vw,3rem);font-weight:800;margin:16px 0 6px}
+header.hero p{color:var(--ink2);margin:0 auto;max-width:32em}
+section{margin-top:44px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-head .dot{width:16px;height:16px;border-radius:50%;background:var(--pink);flex:0 0 auto;box-shadow:0 0 0 5px color-mix(in srgb,var(--pink) 22%,transparent)}
+.sec-head h2{font-size:clamp(1.3rem,3.6vw,1.7rem);font-weight:800}
+.card{background:var(--paper);border:3px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:22px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+/* checklist */
+.check{display:grid;gap:12px;counter-reset:s}
+.check .it{counter-increment:s;display:grid;grid-template-columns:38px 1fr 44px;gap:12px;align-items:start;
+  background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow-s);transition:border-color .2s,background .2s}
+.check .it.done{border-color:var(--ok);background:color-mix(in srgb,var(--mint) 12%,var(--paper))}
+.check .it .n{width:34px;height:34px;border-radius:50%;background:var(--pink);color:#fff;font-family:var(--f-num);font-weight:800;display:grid;place-items:center}
+.check .it.done .n{background:var(--ok)}
+.check .it b{display:block;font-weight:800}
+.check .it span.d{color:var(--ink2);font-size:.93rem}
+.check .it button{background:var(--paper2);border:3px solid var(--line);border-radius:50%;width:42px;height:42px;
+  font-size:1.2rem;cursor:pointer;color:var(--ink2);transition:transform .18s}
+.check .it button:hover{transform:scale(1.12)}
+.check .it.done button{background:var(--ok);border-color:var(--ok);color:#fff}
+.bar{height:16px;border-radius:50px;background:var(--paper2);border:3px solid var(--line);overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--butter));width:0;transition:width .35s}
+/* hand */
+.hand-layout{display:grid;grid-template-columns:minmax(250px,1fr) minmax(270px,1fr);gap:18px;align-items:start}
+@media(max-width:740px){.hand-layout{grid-template-columns:1fr}}
+.hand-box{background:linear-gradient(170deg,var(--paper2),var(--paper));border:3px solid var(--line);border-radius:26px;padding:10px;box-shadow:var(--shadow)}
+svg.hand{width:100%;height:auto;display:block}
+svg.hand .bone{stroke:var(--line);stroke-width:9;stroke-linecap:round;fill:none}
+svg.hand .palm{fill:color-mix(in srgb,var(--pink) 14%,transparent)}
+svg.hand g.pt{cursor:pointer}
+svg.hand g.pt circle.ring{fill:none;stroke:none}
+svg.hand g.pt circle.core{stroke:var(--paper);stroke-width:3.5;transition:r .18s}
+svg.hand g.pt text{font-family:var(--f-num);font-size:11px;font-weight:800;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+svg.hand.quiz g.pt text{opacity:0}
+svg.hand g.pt:hover circle.core,svg.hand g.pt.on circle.core{r:16}
+svg.hand g.pt.on circle.ring{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:4 5;opacity:.8}
+svg.hand g.pt.right circle.core{fill:var(--ok)!important}
+svg.hand g.pt.wrong circle.core{fill:var(--no)!important}
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;padding:0 6px 6px}
+.legend span{font-size:.8rem;font-weight:700;border-radius:50px;padding:3px 11px;color:#4A3530;border:2px solid var(--paper)}
+.info{background:var(--paper2);border:3px solid var(--line);border-radius:22px;padding:14px 16px}
+.info .no{font-family:var(--f-num);font-size:2.1rem;font-weight:800;line-height:1.1}
+.info .zh{font-size:1.2rem;font-weight:800}
+.info .meta{color:var(--ink2);font-size:.9rem}
+.btn{background:var(--pink);color:#fff;border:none;border-radius:50px;padding:10px 24px;font-family:var(--f-round);
+  font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(255,143,171,.45);transition:transform .18s}
+.btn:hover{transform:scale(1.06)}
+.btn.ghost{background:var(--paper);color:var(--ink);border:3px solid var(--line);box-shadow:none}
+.quizbox{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow-s);margin-top:12px}
+.quizbox .q{font-size:1.15rem;font-weight:800}
+.quizbox .fb{font-weight:800;min-height:1.9em}
+.quizbox .fb.ok{color:var(--ok)}
+.quizbox .fb.no{color:var(--no)}
+.score{font-family:var(--f-num);font-weight:800;color:var(--ink2);font-size:.92rem}
+/* blocks */
+.blk{display:inline-flex;align-items:center;gap:6px;background:var(--block);color:#fff;font-weight:700;font-size:.95rem;
+  padding:7px 14px;border-radius:10px;box-shadow:0 3px 0 var(--block-d);margin:3px 0;line-height:1.5}
+.blk.rep{border-radius:50px}
+.blk.ctl{background:var(--butter);box-shadow:0 3px 0 #E0A63F;color:#4A3530}
+.blk.mot{background:var(--block-op);box-shadow:0 3px 0 var(--block-op-d)}
+.blk.op{background:#59C059;box-shadow:0 3px 0 #389438}
+.blk .drop{background:rgba(0,0,0,.18);border-radius:50px;padding:1px 10px}
+.blk .num{background:#fff;color:#4A3530;border-radius:50px;padding:0 10px;font-family:var(--f-num);font-weight:800}
+.blkcard{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:16px 18px;box-shadow:var(--shadow-s)}
+.blkcard p{margin:8px 0 0;font-size:.94rem}
+.code{background:var(--paper2);border:2px dashed var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:2px;margin-top:8px}
+.code .ind1{margin-left:18px}.code .ind2{margin-left:36px}
+.note{background:color-mix(in srgb,var(--butter) 26%,var(--paper));border:3px solid color-mix(in srgb,var(--butter) 55%,var(--line));
+  border-radius:20px;padding:12px 16px;font-size:.94rem}
+details{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:4px 16px;box-shadow:var(--shadow-s)}
+details+details{margin-top:10px}
+details summary{cursor:pointer;font-weight:800;padding:10px 0;list-style:none;display:flex;gap:8px;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'？';color:var(--pink-d);font-weight:800}
+details[open] summary::before{content:'！'}
+details .body{padding:0 0 12px;font-size:.94rem}
+ul.tidy{margin:8px 0 0;padding-left:1.2em}ul.tidy li{margin:3px 0}
+.mission{display:grid;gap:10px}
+.mission .m{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--paper);
+  border:3px solid var(--line);border-radius:20px;padding:12px 16px}
+.mission .m .star{font-size:1.1rem}
+footer{margin-top:50px;text-align:center;color:var(--ink2);font-size:.86rem}
+:focus-visible{outline:3px solid var(--pink-d);outline-offset:3px;border-radius:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<nav><div class="inner">
+  <a href="#start">① 準備</a>
+  <a href="#hand">② 認識 21 點</a>
+  <a href="#blocks">③ 積木</a>
+  <a href="#make">④ 動手做</a>
+  <a href="#mission">⑤ 挑戰任務</a>
+  <a href="#help">求救區</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">🌸 學生實作單</span>
+  <h1>讓 Scratch 看見你的手</h1>
+  <p>今天我們要用 <b>Handpose2Scratch</b>，只靠一支攝影機，就讓電腦看見你的手指，並且用手指來控制角色！</p>
+</header>
+
+<section id="start">
+  <div class="sec-head"><span class="dot"></span><h2>① 準備工作（做完打勾）</h2></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="check" id="check">
+    <div class="it" data-k="1"><div class="n">1</div><div><b>用 Chrome 打開 stretch3</b><span class="d">網址：stretch3.github.io（要用 Chrome 喔，其他瀏覽器可能不能用）</span></div><button aria-label="完成">✓</button></div>
+    <div class="it" data-k="2"><div class="n">2</div><div><b>點左下角的「添加擴展」</b><span class="d">找到有一隻手的 <b>Handpose2Scratch</b>，點下去，等它載入幾秒鐘。</span></div><button aria-label="完成">✓</button></div>
+    <div class="it" data-k="3"><div class="n">3</div><div><b>按「允許」使用攝影機</b><span class="d">舞台上看到自己的畫面，就成功了！</span></div><button aria-label="完成">✓</button></div>
+    <div class="it" data-k="4"><div class="n">4</div><div><b>測試看看有沒有偵測到手</b><span class="d">把 <span class="blk rep">食指尖 (9) 的 x 座標</span> 拖出來，手舉到鏡頭前，點一下積木看看有沒有數字。</span></div><button aria-label="完成">✓</button></div>
+  </div>
+  <div class="note" style="margin-top:14px">💡 手要<b>整隻</b>舉到鏡頭前，距離大約一個手臂長，光線要夠亮，電腦才看得清楚！</div>
+</section>
+
+<section id="hand">
+  <div class="sec-head"><span class="dot" style="background:var(--mint);box-shadow:0 0 0 5px color-mix(in srgb,var(--mint) 22%,transparent)"></span><h2>② 認識手上的 21 個點</h2></div>
+  <p style="margin:0 0 14px;color:var(--ink2)">電腦會在你的手上找出 <b>21 個關節點</b>，每個點都有一個編號。<b>點點看下圖的圓點</b>，認識它們的名字吧！</p>
+  <div class="hand-layout">
+    <div>
+      <div class="hand-box">
+        <svg class="hand" id="svg" viewBox="0 0 380 500" role="img" aria-label="手部 21 個關節點位置圖">
+          <polygon class="palm" points="190,448 148,408 150,276 190,266 228,272 264,292"></polygon>
+          <g id="bones"></g><g id="points"></g>
+        </svg>
+        <div class="legend">
+          <span style="background:var(--c-wrist)">手腕</span>
+          <span style="background:var(--c-thumb)">拇指 2–5</span>
+          <span style="background:var(--c-index)">食指 6–9</span>
+          <span style="background:var(--c-middle)">中指 10–13</span>
+          <span style="background:var(--c-ring)">無名指 14–17</span>
+          <span style="background:var(--c-pinky)">小指 18–21</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="info" id="info">
+        <div class="no" id="i-no">9</div>
+        <div class="zh" id="i-zh">食指尖</div>
+        <div class="meta" id="i-desc">食指最前端，最常拿來當「滑鼠游標」或畫筆。</div>
+      </div>
+      <div class="quizbox">
+        <div class="q" id="q-title">🎯 關節點小測驗</div>
+        <p style="margin:6px 0;font-size:.93rem;color:var(--ink2)" id="q-hint">準備好了嗎？按下按鈕，看你能不能在圖上找到正確的位置！</p>
+        <div class="fb" id="q-fb"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn" id="q-btn">開始測驗</button>
+          <button class="btn ghost" id="q-end" hidden>結束測驗</button>
+          <span class="score" id="q-score"></span>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px">☝️ 小秘訣：每根手指都是<b>從手掌往指尖數</b>。第三關節在手掌旁邊，指尖在最前面。</div>
+    </div>
+  </div>
+</section>
+
+<section id="blocks">
+  <div class="sec-head"><span class="dot" style="background:var(--sky);box-shadow:0 0 0 5px color-mix(in srgb,var(--sky) 22%,transparent)"></span><h2>③ 你會用到的 6 個積木</h2></div>
+  <div class="grid2">
+    <div class="blkcard">
+      <span class="blk rep">(部位) 的 x 座標</span>
+      <p>👉 這個部位在舞台上的<b>左右位置</b>，數字大約是 <b>−240 到 240</b>。</p>
+    </div>
+    <div class="blkcard">
+      <span class="blk rep">(部位) 的 y 座標</span>
+      <p>👉 這個部位在舞台上的<b>上下位置</b>，數字大約是 <b>−180 到 180</b>。手舉高，數字變大。</p>
+    </div>
+    <div class="blkcard">
+      <span class="blk rep">(部位) 的 z 座標</span>
+      <p>👉 手離鏡頭的<b>遠近</b>。手越靠近鏡頭，數字越小。（比較難，最後再玩）</p>
+    </div>
+    <div class="blkcard">
+      <span class="blk">將攝影機 <span class="drop">鏡像開啟 ▾</span></span>
+      <p>👉 打開或關掉攝影機畫面。<b>鏡像開啟</b>就像照鏡子，你往右，角色也往右，最好操作。</p>
+    </div>
+    <div class="blkcard">
+      <span class="blk">將攝影機的透明度設為 <span class="num">50</span></span>
+      <p>👉 數字 <b>0</b> 是畫面很清楚，<b>100</b> 是完全看不到畫面。做遊戲時設 70～100 比較好看。</p>
+    </div>
+    <div class="blkcard">
+      <span class="blk">將倍率設為 <span class="drop">0.75 ▾</span></span>
+      <p>👉 手移動一點點，角色要跑多遠。<b>0.75 是預設值</b>，改成 2.0 角色會跑得超快！</p>
+    </div>
+  </div>
+  <div class="note" style="margin-top:14px">⚠️ 這個擴充功能<b>沒有</b>「當…時」的積木，所以要記得把偵測放進 <span class="blk ctl">重複無限次</span> 裡面，電腦才會一直看著你的手。</div>
+</section>
+
+<section id="make">
+  <div class="sec-head"><span class="dot" style="background:var(--butter);box-shadow:0 0 0 5px color-mix(in srgb,var(--butter) 30%,transparent)"></span><h2>④ 動手做做看</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>🐱 作品 1：角色跟著食指尖跑</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">第一個作品，先讓角色黏在你的食指上。</p>
+      <div class="code">
+        <div><span class="blk ctl">當 🏳 被點擊</span></div>
+        <div><span class="blk">將攝影機的透明度設為 <span class="num">60</span></span></div>
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk mot">定位到 x: <span class="num">食指尖 x</span> y: <span class="num">食指尖 y</span></span></div>
+      </div>
+      <p style="font-size:.92rem">✅ 成功的話，角色會跟著你的食指到處跑！試試看把「食指尖」換成「拇指尖」會怎樣？</p>
+    </div>
+    <div class="card">
+      <h3>✏️ 作品 2：用手指在空中畫畫</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">拇指和食指<b>捏起來</b>就下筆，<b>放開</b>就停筆。</p>
+      <div class="code">
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk mot">定位到 x: <span class="num">食指尖 x</span> y: <span class="num">食指尖 y</span></span></div>
+        <div class="ind1"><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">拇指尖 x − 食指尖 x 的距離 &lt; 40</span> 那麼</span></div>
+        <div class="ind2"><span class="blk" style="background:#0FBD8C">下筆</span></div>
+        <div class="ind1"><span class="blk ctl">否則</span></div>
+        <div class="ind2"><span class="blk" style="background:#0FBD8C">停筆</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>👍 作品 3：偵測「比讚」</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">比讚的時候，<b>拇指尖最高</b>，其他手指都彎下去了。</p>
+      <div class="code">
+        <div><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">拇指尖 y &gt; 食指尖 y</span> 那麼</span></div>
+        <div class="ind1"><span class="blk" style="background:var(--pink);box-shadow:0 3px 0 var(--pink-d)">說出「讚！」</span></div>
+      </div>
+      <p style="font-size:.92rem">想一想：為什麼要比「y 座標」？因為 y 就是<b>上下</b>的位置呀！</p>
+    </div>
+    <div class="card">
+      <h3>✊ 作品 4：握拳變小、張開變大</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">用「中指尖」和「手腕」的距離，控制角色的大小。</p>
+      <div class="code">
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk ctl">將 [開合] 設為（中指尖 y − 手腕 y）</span></div>
+        <div class="ind1"><span class="blk mot">將尺寸設為 <span class="num">開合</span> %</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mission">
+  <div class="sec-head"><span class="dot" style="background:var(--lilac);box-shadow:0 0 0 5px color-mix(in srgb,var(--lilac) 22%,transparent)"></span><h2>⑤ 挑戰任務</h2></div>
+  <div class="mission">
+    <div class="m"><span class="star">⭐</span><div><b>基本任務</b>：完成作品 1，並且換成用「拇指尖」控制角色。</div></div>
+    <div class="m"><span class="star">⭐⭐</span><div><b>進階任務</b>：完成作品 2，畫出你的名字，再加一個「按空白鍵全部清除」的功能。</div></div>
+    <div class="m"><span class="star">⭐⭐⭐</span><div><b>高手任務</b>：做一個「打氣球」小遊戲 —— 氣球隨機出現，食指尖碰到就加 1 分。</div></div>
+    <div class="m"><span class="star">🏆</span><div><b>魔王任務</b>：做一台猜拳機！用「有幾根手指是伸直的」來判斷石頭、剪刀、布。</div></div>
+  </div>
+</section>
+
+<section id="help">
+  <div class="sec-head"><span class="dot"></span><h2>求救區：卡住了怎麼辦</h2></div>
+  <details open><summary>看不到攝影機畫面</summary><div class="body">看看網址列旁邊有沒有「攝影機被封鎖」的小圖示，點開改成「允許」，然後重新整理頁面。也要確認沒有開著其他會用到攝影機的程式。</div></details>
+  <details><summary>有畫面，但積木一直是空白的</summary><div class="body">代表電腦還沒看到你的手。請把<b>整隻手</b>舉到鏡頭前、手掌面向鏡頭、光線要亮，而且<b>一次只伸一隻手</b>喔！</div></details>
+  <details><summary>角色會突然跳到角落</summary><div class="body">因為手離開畫面時，積木會回傳「空白」。解決方法：在移動之前先加一個判斷 —— 「如果（食指尖的 x 座標）＞ −250 才移動」。</div></details>
+  <details><summary>動作卡卡的、很慢</summary><div class="body">關掉其他分頁和程式，把攝影機透明度調高一點，畫面會比較順。</div></details>
+  <details><summary>我的作品要怎麼存起來？</summary><div class="body">點「檔案 → 儲存到你的電腦」，會得到一個 .sb3 檔案。下次要打開時，一樣要先開 stretch3，再選「檔案 → 從你的電腦挑選」。<b>注意：這個作品不能放到 Scratch 官方網站，會顯示不出來喔！</b></div></details>
+</section>
+
+<footer>🎀 Handpose2Scratch 學生實作單　·　加油，你一定做得到！</footer>
+</div>
+
+<script>
+const F={w:'var(--c-wrist)',t:'var(--c-thumb)',i:'var(--c-index)',m:'var(--c-middle)',r:'var(--c-ring)',p:'var(--c-pinky)'};
+const LM=[
+ [1,'手腕',190,448,'w','整隻手的基準點，在手掌下面中間的位置。'],
+ [2,'拇指根部',148,408,'t','拇指連著手掌的地方。'],
+ [3,'拇指第二關節',110,372,'t','拇指從手掌往外數的第二個關節。'],
+ [4,'拇指第一關節',86,336,'t','最靠近拇指尖的關節。'],
+ [5,'拇指尖',66,300,'t','拇指最前面。常常和食指尖一起做「捏東西」的動作。'],
+ [6,'食指第三關節',150,276,'i','食指連著手掌的關節（手背上摸得到）。'],
+ [7,'食指第二關節',141,214,'i','食指中間的關節，可以用來看手指有沒有彎。'],
+ [8,'食指第一關節',136,176,'i','最靠近食指尖的關節。'],
+ [9,'食指尖',132,138,'i','食指最前端，最常拿來當「滑鼠游標」或畫筆。'],
+ [10,'中指第三關節',190,266,'m','中指連著手掌的關節，差不多在手掌正中間。'],
+ [11,'中指第二關節',189,198,'m','中指中間的關節。'],
+ [12,'中指第一關節',188,156,'m','最靠近中指尖的關節。'],
+ [13,'中指尖',187,114,'m','中指最前端，也是整隻手最高的點。'],
+ [14,'無名指第三關節',228,272,'r','無名指連著手掌的關節。'],
+ [15,'無名指第二關節',234,208,'r','無名指中間的關節。'],
+ [16,'無名指第一關節',237,168,'r','最靠近無名指尖的關節。'],
+ [17,'無名指尖',239,130,'r','無名指最前端。'],
+ [18,'小指第三關節',264,292,'p','小指連著手掌的關節，在手掌最外側。'],
+ [19,'小指第二關節',278,244,'p','小指中間的關節。'],
+ [20,'小指第一關節',284,212,'p','最靠近小指尖的關節。'],
+ [21,'小指尖',288,180,'p','小指最前端，是 21 個點裡的最後一個。']
+];
+const BONES=[[1,2],[2,3],[3,4],[4,5],[1,6],[6,7],[7,8],[8,9],[6,10],[10,11],[11,12],[12,13],[10,14],[14,15],[15,16],[16,17],[14,18],[18,19],[19,20],[20,21],[1,18]];
+const NS='http://www.w3.org/2000/svg';
+const at=(el,o)=>{for(const k in o)el.setAttribute(k,o[k]);return el};
+const bg=document.getElementById('bones'),pg=document.getElementById('points'),svg=document.getElementById('svg');
+BONES.forEach(([a,b])=>{const A=LM[a-1],B=LM[b-1];
+  bg.appendChild(at(document.createElementNS(NS,'line'),{x1:A[2],y1:A[3],x2:B[2],y2:B[3],class:'bone'}))});
+LM.forEach(d=>{
+  const g=at(document.createElementNS(NS,'g'),{class:'pt',tabindex:'0',role:'button','aria-label':d[0]+' '+d[1],'data-n':d[0]});
+  g.appendChild(at(document.createElementNS(NS,'circle'),{class:'ring',cx:d[2],cy:d[3],r:22}));
+  g.appendChild(at(document.createElementNS(NS,'circle'),{class:'core',cx:d[2],cy:d[3],r:13,fill:F[d[4]]}));
+  const t=document.createElementNS(NS,'text');at(t,{x:d[2],y:d[3]+.5});t.textContent=d[0];g.appendChild(t);
+  const go=()=>{quiz.on?answer(d[0]):pick(d[0])};
+  g.addEventListener('click',go);
+  g.addEventListener('focus',()=>{if(!quiz.on)pick(d[0])});
+  g.addEventListener('mouseenter',()=>{if(!quiz.on)pick(d[0])});
+  pg.appendChild(g)});
+function pick(n){const d=LM[n-1];
+  document.querySelectorAll('.pt.on').forEach(e=>e.classList.remove('on'));
+  document.querySelector('.pt[data-n="'+n+'"]').classList.add('on');
+  document.getElementById('i-no').textContent=n;
+  document.getElementById('i-no').style.color=F[d[4]];
+  document.getElementById('i-zh').textContent=d[1];
+  document.getElementById('i-desc').textContent=d[5]}
+pick(9);
+/* ---- quiz ---- */
+const quiz={on:false,target:0,right:0,total:0};
+const qBtn=document.getElementById('q-btn'),qEnd=document.getElementById('q-end'),
+      qTitle=document.getElementById('q-title'),qHint=document.getElementById('q-hint'),
+      qFb=document.getElementById('q-fb'),qScore=document.getElementById('q-score');
+function clearMark(){document.querySelectorAll('.pt.right,.pt.wrong,.pt.on').forEach(e=>e.classList.remove('right','wrong','on'))}
+function nextQ(){clearMark();quiz.target=1+Math.floor(Math.random()*21);
+  qTitle.textContent='🎯 請點出：'+LM[quiz.target-1][1];
+  qHint.textContent='在左邊的手圖上，點選你覺得正確的圓點。';qFb.textContent='';qFb.className='fb'}
+function answer(n){if(!quiz.on)return;quiz.total++;
+  const t=document.querySelector('.pt[data-n="'+quiz.target+'"]');
+  if(n===quiz.target){quiz.right++;t.classList.add('right');qFb.textContent='🎉 答對了！這就是 '+LM[n-1][1]+'（'+n+'）';qFb.className='fb ok'}
+  else{document.querySelector('.pt[data-n="'+n+'"]').classList.add('wrong');t.classList.add('right');
+    qFb.textContent='再看一次～你點的是 '+LM[n-1][1]+'（'+n+'），正確的是綠色那一點。';qFb.className='fb no'}
+  qScore.textContent='答對 '+quiz.right+' / '+quiz.total+' 題';
+  qBtn.textContent='下一題'}
+qBtn.addEventListener('click',()=>{
+  if(!quiz.on){quiz.on=true;quiz.right=0;quiz.total=0;svg.classList.add('quiz');qEnd.hidden=false;qScore.textContent=''}
+  nextQ();qBtn.textContent='換一題'});
+qEnd.addEventListener('click',()=>{quiz.on=false;svg.classList.remove('quiz');qEnd.hidden=true;clearMark();
+  qTitle.textContent='🎯 關節點小測驗';
+  qHint.textContent=quiz.total?('這一輪答對 '+quiz.right+' / '+quiz.total+' 題，做得好！'):'';
+  qFb.textContent='';qFb.className='fb';qBtn.textContent='再玩一次';pick(9)});
+/* ---- checklist ---- */
+const items=[...document.querySelectorAll('#check .it')],bar=document.getElementById('bar');
+items.forEach(it=>it.querySelector('button').addEventListener('click',()=>{
+  it.classList.toggle('done');
+  bar.style.width=(items.filter(i=>i.classList.contains('done')).length/items.length*100)+'%'}));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>程式說明文件・森林動物搬家記（溪流上游）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/forest.css">
+<style>
+.docwrap{max-width:900px;margin:0 auto;padding:0 18px 60px}
+.docsec{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:14px 18px;margin-top:16px}
+.docsec h3{font-size:1.05rem;margin:0 0 6px}
+.docsec .hint{font-size:.84rem;color:var(--ink2);margin:0 0 8px}
+.f{display:block;width:100%;font-family:inherit;font-size:.95rem;color:var(--ink);background:var(--paper2);
+  border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px}
+textarea.f{min-height:88px;resize:vertical;line-height:1.7}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.lbl{font-size:.82rem;color:var(--ink2);font-weight:700;margin-top:8px;display:block}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.saveinfo{font-size:.84rem;color:var(--ink2)}
+@media print{
+  header.top,.toolbar,.noprint{display:none!important}
+  body{background:#fff}
+  .docsec{break-inside:avoid;border-color:#bbb;box-shadow:none}
+  .f{background:#fff;border-color:#ccc}
+  textarea.f{min-height:0;height:auto;overflow:visible}
+  @page{size:A4;margin:14mm}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📄 程式說明文件 <em>森林動物搬家記・溪流上游</em></div>
+    <div class="unitnav" style="margin-left:auto"><a href="index.html">← 回製作教學</a></div>
+  </div>
+</header>
+<div class="docwrap">
+  <section class="hero">
+    <h1>程式說明文件</h1>
+    <p>題目最後一行要求交程式說明文件，內容要說明<b>頭部或手部互動方式</b>與<b>故事分支條件</b>。
+      下面已經先填好這份範例作品的內容，<b>請把數值與文字換成你自己的</b>，改完按「列印 / 存成 PDF」。</p>
+    <div class="toolbar noprint">
+      <button class="btn" id="doPrint">🖨️ 列印 / 存成 PDF</button>
+      <button class="btn ghost" id="doReset">↺ 還原成範例內容</button>
+      <button class="btn ghost" id="doClear">🧹 全部清空</button>
+      <span class="saveinfo" id="saveInfo">內容會自動存在這台電腦的瀏覽器</span>
+    </div>
+  </section>
+
+  <div class="docsec">
+    <h3>一、基本資料</h3>
+    <div class="row2">
+      <div><span class="lbl">作品名稱</span><input class="f" data-k="title" value="森林動物搬家記：溪流上游，最後一窪水"></div>
+      <div><span class="lbl">組別</span><input class="f" data-k="group" value="國小動畫 AI 互動組"></div>
+      <div><span class="lbl">學校／班級</span><input class="f" data-k="school" value=""></div>
+      <div><span class="lbl">製作者</span><input class="f" data-k="author" value=""></div>
+      <div><span class="lbl">使用的擴充功能</span><input class="f" data-k="ext" value="Handpose2Scratch（stretch3），手部 21 點偵測"></div>
+      <div><span class="lbl">執行環境</span><input class="f" data-k="env" value="Chrome + 網路攝影機，stretch3.github.io"></div>
+    </div>
+  </div>
+
+  <div class="docsec">
+    <h3>二、故事大綱</h3>
+    <p class="hint">用兩三句話說明故事，並點出生物與森林的關係。</p>
+    <textarea class="f" data-k="story">用青蛙的視角說故事：牠住的溪流上游水潭一天比一天淺，同伴一隻隻不見了。溪邊的樹被砍掉，沒有遮蔭使水溫升高、水量變少；垃圾卡在溪床；還有人半夜把廢水倒進溪裡。觀看者用手部動作參與復育：撈起垃圾、種回溪邊的樹、張開手掌擋住偷倒的廢水，讓水潭恢復成青蛙、翠鳥與水蠆都能生活的家。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>三、三種生物與三種環境問題</h3>
+    <div class="row2">
+      <div><span class="lbl">生物</span><textarea class="f" data-k="bio">1. 青蛙（主角，水太淺太髒就必須搬家）
+2. 翠鳥（水質好、岸上有樹才會回來停棲）
+3. 水蠆／蜻蜓幼蟲（對水質最敏感，被廢水污染就消失）</textarea></div>
+      <div><span class="lbl">環境問題</span><textarea class="f" data-k="prob">1. 垃圾淤積在溪床（寶特瓶、塑膠袋、罐頭）
+2. 溪邊樹木被砍，沒有遮蔭、水溫升高、水變少
+3. 有人偷倒廢水，水源受到污染（遊戲中還會有人亂丟垃圾，讓垃圾問題也是動態的）</textarea></div>
+    </div>
+  </div>
+
+  <div class="docsec">
+    <h3>四、互動方式（題目要求說明）</h3>
+    <p class="hint">要寫出：用哪些動作、電腦怎麼判斷、以及<b>如何判斷玩家回到預備姿勢、避免重複判定</b>。</p>
+    <textarea class="f" data-k="inter">互動採用「手部動作」，以 Handpose2Scratch 取得手部 21 個關節點的舞台座標，每一次判斷都先確認「手腕 (1) 的 x 座標 > −250」（偵測不到手時積木回傳空字串）。
+
+判斷規則（只用加減與比大小）：
+・手腕 y < −40　→　預備姿勢（手放低）
+・手腕 y > 80　→　手舉高＝種一棵樹
+・手在畫面中間（不是左也不是右），且 張開幅度 =｜食指尖 (9) x − 小指尖 (21) x｜> 90　→　張開手掌＝擋住偷倒的廢水
+
+判斷順序：預備 → 舉高 → 左 → 右 → 張開 → 中間。「張開」必須排在左右之後，否則玩家張著手掌揮手時會一路被判成「張開」，撈垃圾的動作永遠無法完成。
+・手腕 x < −100 之後再 > 100　→　從左揮到右＝撈起一件垃圾（用「揮動階段」記錄已經到過左邊）
+
+避免重複判定：使用旗標變數「可以觸發」。偵測到預備姿勢時把「可以觸發」設為 1，觸發任何一個動作後立刻設為 0，因此必須把手放低回到預備姿勢，才能做下一個動作（手一直舉著也只會種一棵樹）。
+
+揮動（撈垃圾）的抗雜訊處理：真人揮手會畫出弧線，中間常常掃過「舉高」或掉回「預備」，因此
+(1) 看到「預備」只把「可以觸發」設為 1，不把「揮動階段」歸零；
+(2) 看到「左」時同時用「揮動時間」記下計時器，超過 2 秒沒揮到右邊才把這次揮動作廢；
+(3)「揮動階段 = 1」期間不接受種樹與擋住，避免揮動被中途的一瞬間打斷（也避免誤種樹）。
+撈到垃圾後「可以觸發」仍會設回 0，同一個動作不會被重複判定。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>五、行動與場景變化對照（題目任務三）</h3>
+    <textarea class="f" data-k="change">・撈起一件垃圾：垃圾 −1、水質 +5 → 畫面上少一個垃圾分身，水色變清；若溪裡已經沒有垃圾，改廣播「沒垃圾了」讓青蛙回話，玩家才知道動作有被辨識。
+・種一棵樹：遮蔭 +1（最多 8，位置由 x ＝ 編號 × 52 − 236 算出）→ 岸上多一棵樹；遮蔭 ≥ 3 時樹換成大樹造型；種滿 8 棵後再種，青蛙會說「樹已經夠多了」。
+・擋下偷倒廢水：水質不變，出現防護罩動畫與提示「擋下來了」。
+・水質 ≥ 50／70／85：水草由少變中變多；水質 ≥ 70 水潭變大變清澈，青蛙換成開心造型。
+・水蠆：水蠆在 = 1 且 水質 ≥ 45 且 垃圾 ≤ 3 時出現。
+・翠鳥：水質 ≥ 65 且 遮蔭 ≥ 2 時飛回來停棲（動物重新出現）。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>六、環境惡化的機制（不適當的選擇）</h3>
+    <textarea class="f" data-k="worse">遊戲開始時用「隨機取數 1 到 4」抽出三個不重複的回合：兩個回合發生「偷倒廢水」，一個回合發生「有人亂丟垃圾」，所以每次玩的節奏都不一樣。
+
+事件一・偷倒廢水（第 5 秒出現，可以擋）：廢水管出現並播放警告聲，玩家有 4 秒可以張開手掌擋住。
+・擋下來：水質不變，擋下次數 +1。
+・沒有擋到：水質 −20、垃圾 +1、水蠆在 = 0（水蠆立刻消失），水面變混濁，青蛙說「好臭……水變得好濁！」。
+
+事件二・有人亂丟垃圾（第 5 秒出現，不能擋，只能撈）：垃圾 +2（垃圾已經有 5 個時只 +1，因為分身只有 6 個）、水質 −3，提示卡顯示「有人把垃圾丟進溪裡！」，青蛙說「唉……又有人把垃圾丟進溪裡了。」
+
+另外每個回合結束時會有自然變化：
+・遮蔭 ≥ 6 → 水質 +5（樹蔭很密）
+・遮蔭 4～5 → 水質 +3（樹蔭讓水溫下降）
+・遮蔭 = 3 → 水質不變
+・遮蔭 ≤ 2 → 水質 −5（沒有遮蔭，水溫升高、水變少）
+・垃圾 ≥ 4 → 水質再 −3
+所以玩家什麼都不做，環境就會持續惡化。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>七、故事分支條件（題目要求說明）</h3>
+    <p class="hint">至少兩種發展。要寫清楚「什麼數值會走到哪一個結局」。</p>
+    <textarea class="f" data-k="branch">四個回合結束後，依照「水質」與「垃圾」決定結局：
+・好結局：水質 ≥ 70 且 垃圾 ≤ 2　→　蛙卵順利孵化、翠鳥回來築巢，青蛙留下來。
+・壞結局：水質 < 40　→　水太淺又太髒，青蛙沿著乾涸的溪床離開，畫面上青蛙走出舞台。
+・普通結局：其餘情況（水質 40～69，或水質雖然夠但垃圾還有 3 個以上）　→　水潭保住了，但翠鳥還沒回來。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>八、變數與門檻一覽</h3>
+    <textarea class="f" data-k="vars">水質 0～100（起始 45）、垃圾 0～6（起始 5）、遮蔭 0～8（起始 1）
+手勢、可以觸發、揮動階段、手腕x、手腕y、張開幅度：動作判斷用
+偷倒中、擋下成功、擋下次數、水蠆在：事件與生物狀態
+偷倒回合A、偷倒回合B、垃圾回合：開始時用隨機取數抽出的事件回合（1～4，三個不重複）
+階段、回合、結局、開始時間、事件開始：流程控制
+編號、計數（僅適用當前角色）：垃圾與小樹的分身編號
+
+門檻：預備 y < −40／舉高 y > 80／左右 ±80／張開幅度 > 90（手在中間時才判斷）／揮動逾時 2 秒
+時間：每回合 12 秒、事件在第 5 秒出現、偷倒的反應時間 4 秒
+位置公式：小樹 x ＝ 編號 × 52 − 236、y ＝ 編號 × 2 ＋ 6</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>九、角色與程式架構</h3>
+    <textarea class="f" data-k="arch">舞台：主流程（開場 → 抽事件回合 → 4 回合 → 結局判定）、自訂積木「整理水質」與「抽事件回合」、三個動作的處理、兩種事件的處理、回合結束的自然變化。
+手勢偵測：自訂積木「辨識手勢」（勾選不重新整理畫面）、可以觸發旗標、鍵盤測試（↑ 種樹、← 撈垃圾、B 擋住）。
+青蛙：開場旁白、回合提示、依水質換表情、三種結局的台詞與離開動畫。
+翠鳥、水蠆、水面、水草、垃圾（6 個分身）、小樹（8 個分身，位置用編號算出來）：收到「重畫」訊息後依變數決定造型與顯示；本體以區域變數「計數」產生分身、編號保持 0，分身產生後再設定自己的「編號」，避免本體被誤認成一個垃圾。
+廢水管、防護罩：偷倒事件與擋下效果。提示、結局卡：文字卡。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>十、測試紀錄</h3>
+    <p class="hint">寫下自己實際測到的結果，評審會看重這一段。</p>
+    <textarea class="f" data-k="test">1. 動作辨識：預備、舉高、左、右、張開五種狀態都能正確顯示在畫面下方的牌子上。
+2. 重複判定：手一直舉著 1.5 秒，遮蔭只增加 1，確認回到預備姿勢的判斷有效。
+3. 三種結局：什麼都不做 → 壞結局；只撈垃圾不種樹 → 普通結局；撈垃圾＋種樹＋擋下偷倒 → 好結局。
+4. 隨機事件：連玩兩次，事件回合不一樣，而且偷倒兩個回合與亂丟垃圾的回合不會重複。
+5. 種樹上限：連續種到第 8 棵之後再種，青蛙會說「樹已經夠多了」，遮蔭不再增加。
+6. 待調整：（在教室電腦實測後填寫，例如門檻值要改成多少）</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>十一、參考資料與說明</h3>
+    <textarea class="f" data-k="ref">・Handpose2Scratch：Junya Ishihara（champierre）開發，TensorFlow.js handpose 模型，於 stretch3.github.io 使用。
+・情境構想：臺北市貓咪盃 AI 互動組情境選擇卡「溪流上游，最後一窪水」。
+・角色、背景、音效皆為自行製作。</textarea>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY='forest2026.doc';
+  var fields=[].slice.call(document.querySelectorAll('[data-k]'));
+  var defaults={};fields.forEach(function(f){defaults[f.getAttribute('data-k')]=f.value;});
+  function save(){
+    var o={};fields.forEach(function(f){o[f.getAttribute('data-k')]=f.value;});
+    try{localStorage.setItem(KEY,JSON.stringify(o));document.getElementById('saveInfo').textContent='已自動儲存（'+new Date().toLocaleTimeString('zh-TW')+'）';}
+    catch(e){document.getElementById('saveInfo').textContent='這個瀏覽器不允許儲存，請記得列印或另存 PDF。';}
+  }
+  try{
+    var o=JSON.parse(localStorage.getItem(KEY)||'{}');
+    fields.forEach(function(f){var k=f.getAttribute('data-k');if(o[k]!=null)f.value=o[k];});
+  }catch(e){}
+  fields.forEach(function(f){f.addEventListener('input',save);});
+  function grow(t){if(t.tagName==='TEXTAREA'){t.style.height='auto';t.style.height=(t.scrollHeight+4)+'px';}}
+  fields.forEach(function(f){grow(f);f.addEventListener('input',function(){grow(f);});});
+  document.getElementById('doPrint').addEventListener('click',function(){fields.forEach(grow);window.print();});
+  document.getElementById('doReset').addEventListener('click',function(){
+    if(!confirm('要把所有欄位還原成範例內容嗎？'))return;
+    fields.forEach(function(f){f.value=defaults[f.getAttribute('data-k')];grow(f);});save();
+  });
+  document.getElementById('doClear').addEventListener('click',function(){
+    if(!confirm('要清空所有欄位嗎？'))return;
+    fields.forEach(function(f){f.value='';grow(f);});save();
+  });
+})();
+</script>
+</body>
+</html>

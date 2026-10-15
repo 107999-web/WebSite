@@ -1,0 +1,1012 @@
+{
+  "Unit 01": {
+    "icon": "🚗",
+    "color": "#6366f1",
+    "words": [
+      {
+        "word": "SCOOTER",
+        "hint": "機車",
+        "emoji": "🛵"
+      },
+      {
+        "word": "TAXI",
+        "hint": "計程車",
+        "emoji": "🚕"
+      },
+      {
+        "word": "TRAIN",
+        "hint": "火車",
+        "emoji": "🚂"
+      },
+      {
+        "word": "COLLAR",
+        "hint": "項圈",
+        "emoji": "🐾"
+      },
+      {
+        "word": "WINTER",
+        "hint": "冬天",
+        "emoji": "❄️"
+      }
+    ]
+  },
+  "Unit 02": {
+    "icon": "🦓",
+    "color": "#f97316",
+    "words": [
+      {
+        "word": "ZEBRA",
+        "hint": "斑馬",
+        "emoji": "🦓"
+      },
+      {
+        "word": "ELEPHANT",
+        "hint": "大象",
+        "emoji": "🐘"
+      },
+      {
+        "word": "HIPPO",
+        "hint": "河馬",
+        "emoji": "🦛"
+      },
+      {
+        "word": "RHINO",
+        "hint": "犀牛",
+        "emoji": "🦏"
+      },
+      {
+        "word": "GIRAFFE",
+        "hint": "長頸鹿",
+        "emoji": "🦒"
+      },
+      {
+        "word": "JUMP",
+        "hint": "跳",
+        "emoji": "🦘"
+      },
+      {
+        "word": "SAILOR",
+        "hint": "船員；水手",
+        "emoji": "⚓"
+      },
+      {
+        "word": "SCISSORS",
+        "hint": "剪刀",
+        "emoji": "✂️"
+      }
+    ]
+  },
+  "Unit 03": {
+    "icon": "👔",
+    "color": "#8b5cf6",
+    "words": [
+      {
+        "word": "MATTER",
+        "hint": "事情",
+        "emoji": "💭"
+      },
+      {
+        "word": "CLERK",
+        "hint": "店員；職員",
+        "emoji": "💼"
+      },
+      {
+        "word": "SHIRT",
+        "hint": "襯衫",
+        "emoji": "👕"
+      },
+      {
+        "word": "PERCH",
+        "hint": "鳥棲息的木頭",
+        "emoji": "🌿"
+      }
+    ]
+  },
+  "Unit 04": {
+    "icon": "📚",
+    "color": "#3b82f6",
+    "words": [
+      {
+        "word": "FAVORITE",
+        "hint": "最喜歡的",
+        "emoji": "❤️"
+      },
+      {
+        "word": "SUBJECT",
+        "hint": "學科",
+        "emoji": "📚"
+      },
+      {
+        "word": "ART",
+        "hint": "美術；藝術",
+        "emoji": "🎨"
+      },
+      {
+        "word": "CHINESE",
+        "hint": "中文",
+        "emoji": "🇨🇳"
+      },
+      {
+        "word": "ENGLISH",
+        "hint": "英語",
+        "emoji": "🇬🇧"
+      },
+      {
+        "word": "MATH",
+        "hint": "數學",
+        "emoji": "📐"
+      },
+      {
+        "word": "FERN",
+        "hint": "蕨類植物",
+        "emoji": "🌿"
+      },
+      {
+        "word": "PURSE",
+        "hint": "女用錢包",
+        "emoji": "👛"
+      },
+      {
+        "word": "FRANCE",
+        "hint": "法國",
+        "emoji": "🇫🇷"
+      },
+      {
+        "word": "LOUVRE",
+        "hint": "羅浮宮",
+        "emoji": "🏛️"
+      }
+    ]
+  },
+  "Unit 05": {
+    "icon": "🎡",
+    "color": "#ec4899",
+    "words": [
+      {
+        "word": "CHILDREN",
+        "hint": "小孩",
+        "emoji": "👧"
+      },
+      {
+        "word": "CLASSMATE",
+        "hint": "同學",
+        "emoji": "👫"
+      },
+      {
+        "word": "LEOPARD",
+        "hint": "豹",
+        "emoji": "🐆"
+      },
+      {
+        "word": "BUFFALO",
+        "hint": "水牛",
+        "emoji": "🐃"
+      },
+      {
+        "word": "BEAUTIFUL",
+        "hint": "漂亮的",
+        "emoji": "💕"
+      },
+      {
+        "word": "PLACE",
+        "hint": "地方",
+        "emoji": "📍"
+      },
+      {
+        "word": "ODD",
+        "hint": "單數的",
+        "emoji": "🔢"
+      },
+      {
+        "word": "EVEN",
+        "hint": "雙數的",
+        "emoji": "🔢"
+      }
+    ]
+  },
+  "Unit 06": {
+    "icon": "📖",
+    "color": "#0891b2",
+    "words": [
+      {
+        "word": "DICTIONARY",
+        "hint": "字典",
+        "emoji": "📖"
+      },
+      {
+        "word": "WORD",
+        "hint": "字",
+        "emoji": "📝"
+      },
+      {
+        "word": "SENTENCE",
+        "hint": "句子",
+        "emoji": "📄"
+      },
+      {
+        "word": "DILIGENT",
+        "hint": "勤奮的",
+        "emoji": "💪"
+      },
+      {
+        "word": "GRADE",
+        "hint": "年級",
+        "emoji": "📊"
+      },
+      {
+        "word": "YARD",
+        "hint": "後院",
+        "emoji": "🏡"
+      },
+      {
+        "word": "PARTY",
+        "hint": "派對",
+        "emoji": "🎉"
+      },
+      {
+        "word": "HORN",
+        "hint": "號角",
+        "emoji": "🎺"
+      },
+      {
+        "word": "HARP",
+        "hint": "豎琴",
+        "emoji": "🎸"
+      },
+      {
+        "word": "KEEP",
+        "hint": "飼養",
+        "emoji": "🐾"
+      },
+      {
+        "word": "FIRST",
+        "hint": "第一的",
+        "emoji": "🥇"
+      },
+      {
+        "word": "SECOND",
+        "hint": "第二的",
+        "emoji": "🥈"
+      },
+      {
+        "word": "THIRD",
+        "hint": "第三的",
+        "emoji": "🥉"
+      },
+      {
+        "word": "FOURTH",
+        "hint": "第四的",
+        "emoji": "4️⃣"
+      },
+      {
+        "word": "FIFTH",
+        "hint": "第五的",
+        "emoji": "5️⃣"
+      },
+      {
+        "word": "SIXTH",
+        "hint": "第六的",
+        "emoji": "6️⃣"
+      }
+    ]
+  },
+  "Unit 07": {
+    "icon": "🌸",
+    "color": "#10b981",
+    "words": [
+      {
+        "word": "JAPAN",
+        "hint": "日本",
+        "emoji": "🇯🇵"
+      },
+      {
+        "word": "BELIEVE",
+        "hint": "相信",
+        "emoji": "💭"
+      },
+      {
+        "word": "SEASON",
+        "hint": "季節",
+        "emoji": "🍂"
+      },
+      {
+        "word": "SPRING",
+        "hint": "春天",
+        "emoji": "🌸"
+      },
+      {
+        "word": "SUMMER",
+        "hint": "夏天",
+        "emoji": "☀️"
+      },
+      {
+        "word": "FALL",
+        "hint": "秋天",
+        "emoji": "🍂"
+      },
+      {
+        "word": "WINTER",
+        "hint": "冬天",
+        "emoji": "❄️"
+      },
+      {
+        "word": "CORN",
+        "hint": "玉米",
+        "emoji": "🌽"
+      }
+    ]
+  },
+  "Unit 08": {
+    "icon": "🦋",
+    "color": "#f59e0b",
+    "words": [
+      {
+        "word": "PICNIC",
+        "hint": "野餐",
+        "emoji": "🧺"
+      },
+      {
+        "word": "SUSHI",
+        "hint": "壽司",
+        "emoji": "🍣"
+      },
+      {
+        "word": "DURIAN",
+        "hint": "榴槤",
+        "emoji": "🍈"
+      },
+      {
+        "word": "BUTTERFLY",
+        "hint": "蝴蝶",
+        "emoji": "🦋"
+      },
+      {
+        "word": "DRAGONFLY",
+        "hint": "蜻蜓",
+        "emoji": "🪲"
+      },
+      {
+        "word": "SKY",
+        "hint": "天空",
+        "emoji": "🌤️"
+      },
+      {
+        "word": "BUNNY",
+        "hint": "小兔子",
+        "emoji": "🐰"
+      },
+      {
+        "word": "PUPPY",
+        "hint": "小狗",
+        "emoji": "🐶"
+      },
+      {
+        "word": "SPY",
+        "hint": "偵察；監視",
+        "emoji": "🔍"
+      }
+    ]
+  },
+  "Unit 09": {
+    "icon": "🌏",
+    "color": "#dc2626",
+    "words": [
+      {
+        "word": "THAILAND",
+        "hint": "泰國",
+        "emoji": "🇹🇭"
+      },
+      {
+        "word": "JANUARY",
+        "hint": "一月",
+        "emoji": "❄️"
+      },
+      {
+        "word": "FEBRUARY",
+        "hint": "二月",
+        "emoji": "💝"
+      },
+      {
+        "word": "MARCH",
+        "hint": "三月",
+        "emoji": "🌸"
+      },
+      {
+        "word": "APRIL",
+        "hint": "四月",
+        "emoji": "🌷"
+      },
+      {
+        "word": "FUN",
+        "hint": "樂趣",
+        "emoji": "😄"
+      },
+      {
+        "word": "MUDDY",
+        "hint": "泥濘的",
+        "emoji": "💧"
+      },
+      {
+        "word": "FLY",
+        "hint": "蒼蠅",
+        "emoji": "🪰"
+      }
+    ]
+  },
+  "Unit 10": {
+    "icon": "🍱",
+    "color": "#7c3aed",
+    "words": [
+      {
+        "word": "SAVANNA",
+        "hint": "大草原",
+        "emoji": "🌾"
+      },
+      {
+        "word": "DELICIOUS",
+        "hint": "美味的",
+        "emoji": "😋"
+      },
+      {
+        "word": "SASHIMI",
+        "hint": "生魚片",
+        "emoji": "🐟"
+      },
+      {
+        "word": "RAMEN",
+        "hint": "拉麵",
+        "emoji": "🍜"
+      },
+      {
+        "word": "ODEN",
+        "hint": "黑輪",
+        "emoji": "🍢"
+      },
+      {
+        "word": "SUKIYAKI",
+        "hint": "壽喜燒",
+        "emoji": "🥩"
+      },
+      {
+        "word": "TEMPURA",
+        "hint": "天婦羅",
+        "emoji": "🍤"
+      },
+      {
+        "word": "MOCHI",
+        "hint": "麻糬",
+        "emoji": "🍡"
+      },
+      {
+        "word": "FRUIT",
+        "hint": "水果",
+        "emoji": "🍎"
+      },
+      {
+        "word": "LYCHEE",
+        "hint": "荔枝",
+        "emoji": "🍈"
+      },
+      {
+        "word": "MANGOSTEEN",
+        "hint": "山竹",
+        "emoji": "🌺"
+      },
+      {
+        "word": "RAMBUTAN",
+        "hint": "紅毛丹",
+        "emoji": "🍑"
+      },
+      {
+        "word": "JACKFRUIT",
+        "hint": "波羅蜜",
+        "emoji": "🍐"
+      },
+      {
+        "word": "TICKET",
+        "hint": "票",
+        "emoji": "🎫"
+      },
+      {
+        "word": "VISITOR",
+        "hint": "參觀者",
+        "emoji": "👤"
+      },
+      {
+        "word": "DIRTY",
+        "hint": "骯髒的",
+        "emoji": "🤢"
+      },
+      {
+        "word": "PENNY",
+        "hint": "一分錢",
+        "emoji": "💰"
+      },
+      {
+        "word": "STORE",
+        "hint": "商店",
+        "emoji": "🏪"
+      },
+      {
+        "word": "BROWN",
+        "hint": "棕色的",
+        "emoji": "🟫"
+      },
+      {
+        "word": "BOARD",
+        "hint": "木板",
+        "emoji": "🪵"
+      },
+      {
+        "word": "MOVE",
+        "hint": "移動",
+        "emoji": "🏃"
+      },
+      {
+        "word": "BARK",
+        "hint": "吠叫",
+        "emoji": "🐕"
+      }
+    ]
+  },
+  "Unit 11": {
+    "icon": "🦘",
+    "color": "#0284c7",
+    "words": [
+      {
+        "word": "AUSTRALIA",
+        "hint": "澳洲",
+        "emoji": "🦘"
+      },
+      {
+        "word": "MAY",
+        "hint": "五月",
+        "emoji": "🌻"
+      },
+      {
+        "word": "JUNE",
+        "hint": "六月",
+        "emoji": "☀️"
+      },
+      {
+        "word": "JULY",
+        "hint": "七月",
+        "emoji": "🏖️"
+      },
+      {
+        "word": "AUGUST",
+        "hint": "八月",
+        "emoji": "🌞"
+      },
+      {
+        "word": "CIRCUS",
+        "hint": "馬戲團",
+        "emoji": "🎪"
+      },
+      {
+        "word": "NEXT",
+        "hint": "接下來的",
+        "emoji": "➡️"
+      }
+    ]
+  },
+  "Unit 12": {
+    "icon": "🐨",
+    "color": "#16a34a",
+    "words": [
+      {
+        "word": "KOALA",
+        "hint": "無尾熊",
+        "emoji": "🐨"
+      },
+      {
+        "word": "KANGAROO",
+        "hint": "袋鼠",
+        "emoji": "🦘"
+      },
+      {
+        "word": "PARROT",
+        "hint": "鸚鵡",
+        "emoji": "🦜"
+      },
+      {
+        "word": "SHARK",
+        "hint": "鯊魚",
+        "emoji": "🦈"
+      },
+      {
+        "word": "WHALE",
+        "hint": "鯨魚",
+        "emoji": "🐳"
+      },
+      {
+        "word": "START",
+        "hint": "開始",
+        "emoji": "🚀"
+      }
+    ]
+  },
+  "Unit 13": {
+    "icon": "🌊",
+    "color": "#0369a1",
+    "words": [
+      {
+        "word": "IDEA",
+        "hint": "想法；主意",
+        "emoji": "💡"
+      },
+      {
+        "word": "WORLD",
+        "hint": "世界",
+        "emoji": "🌍"
+      },
+      {
+        "word": "SEA",
+        "hint": "大海",
+        "emoji": "🌊"
+      },
+      {
+        "word": "DIVE",
+        "hint": "潛水",
+        "emoji": "🤿"
+      },
+      {
+        "word": "WALK",
+        "hint": "走路",
+        "emoji": "🚶"
+      },
+      {
+        "word": "LAWN",
+        "hint": "草地",
+        "emoji": "🌿"
+      }
+    ]
+  },
+  "Unit 14": {
+    "icon": "🗺️",
+    "color": "#b45309",
+    "words": [
+      {
+        "word": "AMERICA",
+        "hint": "美國",
+        "emoji": "🇺🇸"
+      },
+      {
+        "word": "FRANCE",
+        "hint": "法國",
+        "emoji": "🇫🇷"
+      },
+      {
+        "word": "JAPAN",
+        "hint": "日本",
+        "emoji": "🇯🇵"
+      },
+      {
+        "word": "THAILAND",
+        "hint": "泰國",
+        "emoji": "🇹🇭"
+      },
+      {
+        "word": "AUSTRALIA",
+        "hint": "澳洲",
+        "emoji": "🦘"
+      },
+      {
+        "word": "FAWN",
+        "hint": "幼鹿",
+        "emoji": "🦌"
+      }
+    ]
+  },
+  "Unit 15": {
+    "icon": "♻️",
+    "color": "#15803d",
+    "words": [
+      {
+        "word": "EARTH",
+        "hint": "地球",
+        "emoji": "🌍"
+      },
+      {
+        "word": "TRASH",
+        "hint": "垃圾",
+        "emoji": "🗑️"
+      },
+      {
+        "word": "LIGHT",
+        "hint": "燈",
+        "emoji": "💡"
+      },
+      {
+        "word": "REUSE",
+        "hint": "重複使用",
+        "emoji": "♻️"
+      },
+      {
+        "word": "PAPER",
+        "hint": "紙",
+        "emoji": "📄"
+      },
+      {
+        "word": "CARRY",
+        "hint": "攜帶",
+        "emoji": "👜"
+      },
+      {
+        "word": "RECYCLE",
+        "hint": "回收",
+        "emoji": "♻️"
+      },
+      {
+        "word": "CLEAN",
+        "hint": "打掃",
+        "emoji": "🧹"
+      },
+      {
+        "word": "SAVE",
+        "hint": "拯救",
+        "emoji": "💚"
+      },
+      {
+        "word": "PENGUIN",
+        "hint": "企鵝",
+        "emoji": "🐧"
+      },
+      {
+        "word": "PLATYPUS",
+        "hint": "鴨嘴獸",
+        "emoji": "🦆"
+      },
+      {
+        "word": "ECHIDNA",
+        "hint": "針鼴",
+        "emoji": "🦔"
+      },
+      {
+        "word": "EMU",
+        "hint": "鴯鶓",
+        "emoji": "🦅"
+      },
+      {
+        "word": "SEVENTH",
+        "hint": "第七的",
+        "emoji": "7️⃣"
+      },
+      {
+        "word": "EIGHTH",
+        "hint": "第八的",
+        "emoji": "8️⃣"
+      },
+      {
+        "word": "NINTH",
+        "hint": "第九的",
+        "emoji": "9️⃣"
+      },
+      {
+        "word": "TENTH",
+        "hint": "第十的",
+        "emoji": "🔟"
+      },
+      {
+        "word": "ELEVENTH",
+        "hint": "第十一的",
+        "emoji": "1️⃣"
+      },
+      {
+        "word": "TWELFTH",
+        "hint": "第十二的",
+        "emoji": "1️⃣"
+      },
+      {
+        "word": "THIRTEENTH",
+        "hint": "第十三的",
+        "emoji": "1️⃣"
+      },
+      {
+        "word": "TWENTIETH",
+        "hint": "第二十的",
+        "emoji": "2️⃣"
+      },
+      {
+        "word": "THIRTIETH",
+        "hint": "第三十的",
+        "emoji": "3️⃣"
+      },
+      {
+        "word": "WRAP",
+        "hint": "包裹",
+        "emoji": "🎁"
+      },
+      {
+        "word": "BOW",
+        "hint": "蝴蝶結",
+        "emoji": "🎀"
+      },
+      {
+        "word": "EXCHANGE",
+        "hint": "交換",
+        "emoji": "🔄"
+      },
+      {
+        "word": "CHERISH",
+        "hint": "珍惜",
+        "emoji": "💕"
+      },
+      {
+        "word": "FRIENDSHIP",
+        "hint": "友情",
+        "emoji": "🤝"
+      },
+      {
+        "word": "MALL",
+        "hint": "購物中心",
+        "emoji": "🛍️"
+      },
+      {
+        "word": "THROW",
+        "hint": "丟",
+        "emoji": "🎯"
+      },
+      {
+        "word": "WALL",
+        "hint": "牆壁",
+        "emoji": "🧱"
+      }
+    ]
+  },
+  "Unit 16": {
+    "icon": "📅",
+    "color": "#be185d",
+    "words": [
+      {
+        "word": "SEPTEMBER",
+        "hint": "九月",
+        "emoji": "🍂"
+      },
+      {
+        "word": "OCTOBER",
+        "hint": "十月",
+        "emoji": "🎃"
+      },
+      {
+        "word": "NOVEMBER",
+        "hint": "十一月",
+        "emoji": "🍁"
+      },
+      {
+        "word": "DECEMBER",
+        "hint": "十二月",
+        "emoji": "❄️"
+      },
+      {
+        "word": "MEET",
+        "hint": "遇見",
+        "emoji": "👋"
+      }
+    ]
+  },
+  "Unit 17": {
+    "icon": "🎁",
+    "color": "#d97706",
+    "words": [
+      {
+        "word": "YARN",
+        "hint": "紗線",
+        "emoji": "🧶"
+      },
+      {
+        "word": "CARD",
+        "hint": "卡片",
+        "emoji": "💳"
+      },
+      {
+        "word": "ROCK",
+        "hint": "岩石",
+        "emoji": "🪨"
+      },
+      {
+        "word": "SHOP",
+        "hint": "商店",
+        "emoji": "🛍️"
+      }
+    ]
+  },
+  "Unit 18": {
+    "icon": "⏰",
+    "color": "#6366f1",
+    "words": [
+      {
+        "word": "BREAKFAST",
+        "hint": "早餐",
+        "emoji": "🍳"
+      },
+      {
+        "word": "LUNCH",
+        "hint": "午餐",
+        "emoji": "🍱"
+      },
+      {
+        "word": "DINNER",
+        "hint": "晚餐",
+        "emoji": "🍽️"
+      },
+      {
+        "word": "DART",
+        "hint": "飛鏢",
+        "emoji": "🎯"
+      },
+      {
+        "word": "HURT",
+        "hint": "使受傷",
+        "emoji": "💢"
+      },
+      {
+        "word": "JAR",
+        "hint": "寬口瓶",
+        "emoji": "🫙"
+      },
+      {
+        "word": "WINNER",
+        "hint": "贏家",
+        "emoji": "🏆"
+      }
+    ]
+  },
+  "Unit 19": {
+    "icon": "🍳",
+    "color": "#ef4444",
+    "words": [
+      {
+        "word": "BREAD",
+        "hint": "麵包",
+        "emoji": "🍞"
+      },
+      {
+        "word": "PANCAKE",
+        "hint": "鬆餅",
+        "emoji": "🥞"
+      }
+    ]
+  },
+  "Unit 20": {
+    "icon": "✈️",
+    "color": "#8b5cf6",
+    "words": [
+      {
+        "word": "POPULAR",
+        "hint": "流行的",
+        "emoji": "⭐"
+      },
+      {
+        "word": "POSTCARD",
+        "hint": "明信片",
+        "emoji": "📮"
+      },
+      {
+        "word": "STAMP",
+        "hint": "郵票",
+        "emoji": "📬"
+      },
+      {
+        "word": "SEND",
+        "hint": "寄",
+        "emoji": "📤"
+      },
+      {
+        "word": "ENRICH",
+        "hint": "使豐富",
+        "emoji": "✨"
+      },
+      {
+        "word": "LIFE",
+        "hint": "生活",
+        "emoji": "🌟"
+      },
+      {
+        "word": "PASTE",
+        "hint": "貼上",
+        "emoji": "📌"
+      }
+    ]
+  }
+}

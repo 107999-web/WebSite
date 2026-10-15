@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>爆炸頭節奏大師 教材入口</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+:root{color-scheme:light dark;--cream:#FFF8F0;--paper:#fff;--ink:#4A4038;--ink2:#8C7F73;--line:#F0DFCC;--pink:#FF8FAB;--mint:#4FB894;--butter:#FFC86B;
+  --f:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cream:#231F1B;--paper:#2E2823;--ink:#F6EDE3;--ink2:#C2B3A4;--line:#4E4238}}
+:root[data-theme="dark"]{--cream:#231F1B;--paper:#2E2823;--ink:#F6EDE3;--ink2:#C2B3A4;--line:#4E4238}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f);line-height:1.8;
+  background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:26px 26px;min-height:100vh;display:grid;place-items:center;padding:32px 16px}
+.box{max-width:820px;width:100%;text-align:center}
+.badge{display:inline-block;background:var(--butter);color:#5D4037;font-weight:800;font-size:.82rem;padding:5px 16px;border-radius:50px}
+h1{font-size:clamp(1.7rem,5vw,2.6rem);font-weight:800;margin:14px 0 6px}
+p.sub{color:var(--ink2);margin:0 auto 26px;max-width:34em}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+a.card{display:block;text-decoration:none;color:var(--ink);background:var(--paper);border:3px solid var(--line);border-radius:26px;padding:24px 20px;transition:transform .2s}
+a.card:hover{transform:translateY(-4px) scale(1.02)}
+a.card .ico{font-size:2.4rem;line-height:1}
+a.card b{display:block;font-size:1.15rem;font-weight:800;margin:8px 0 4px}
+a.card span{font-size:.88rem;color:var(--ink2)}
+a.s{border-color:var(--pink)}a.p{border-color:var(--butter)}a.t{border-color:var(--mint)}
+footer{margin-top:26px;font-size:.82rem;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="badge">Handpose2Scratch 節奏遊戲專題</span>
+  <h1>爆炸頭節奏大師</h1>
+  <p class="sub">靈感來自 Bishi Bashi Special 的 Perm Mania：看師傅示範節奏，再用手勢（食指指左、上、右，握拳預備）照著做。</p>
+  <div class="cards">
+    <a class="card s" href="student/index.html"><div class="ico">🎵</div><b>學生製作教學</b><span>9 章逐步引導、積木圖、三個互動實驗室、自我檢核</span></a>
+    <a class="card p" href="student/play.html"><div class="ico">▶️</div><b>網頁試玩</b><span>用攝影機或鍵盤先玩一次，知道要做出什麼</span></a>
+    <a class="card t" href="teacher/index.html"><div class="ico">📗</div><b>教師手冊</b><span>節次安排、技術要點、常見狀況、評量</span></a>
+  </div>
+  <footer>範例專案：student/爆炸頭節奏大師_範例.sb3（請用 stretch3.github.io 開啟）</footer>
+</div>
+</body>
+</html>

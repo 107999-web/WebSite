@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可愛戰機大冒險 🚀</title>
+    <style>
+        /* 頁面基礎可愛風樣式 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f3e8ff; /* 溫柔的淡紫色背景 */
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #6b21a8;
+            margin: 10px 0 5px 0;
+            font-size: 28px;
+            text-shadow: 2px 2px #fff;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 遊戲主容器 */
+        #game-container {
+            position: relative;
+            width: 440px;
+            height: 600px;
+            border: 6px solid #c084fc;
+            border-radius: 24px;
+            box-shadow: 0 12px 24px rgba(107, 33, 168, 0.2);
+            overflow: hidden;
+            background: #1e1b4b; /* 深邃星空藍 */
+        }
+
+        canvas {
+            display: block;
+            cursor: none; /* 隱藏原本的滑鼠，用戰機代替 */
+        }
+
+        /* 頂部 UI 面板 */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none; /* 讓滑鼠點擊穿透到 Canvas */
+            z-index: 10;
+        }
+
+        .ui-box {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #4c1d95;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #weapon-tag {
+            color: #b45309;
+        }
+
+        /* 遊戲結束與開始畫面 */
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 27, 75, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            color: white;
+            text-align: center;
+        }
+
+        .overlay-screen h2 {
+            font-size: 36px;
+            color: #f472b6;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px #000;
+        }
+
+        .overlay-screen p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(236, 72, 153, 0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .tips {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #a78bfa;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>可愛戰機大冒險 🚀</h1>
+
+    <div id="game-container">
+        <div id="ui-layer">
+            <div class="ui-box">生命: <span id="lives-display">❤️❤️❤️</span></div>
+            <div class="ui-box">武器: <span id="weapon-tag">Lv.1 🍼</span></div>
+            <div class="ui-box">分數: <span id="score-display">0</span></div>
+        </div>
+
+        <canvas id="gameCanvas" width="440" height="600"></canvas>
+
+        <div id="menu-screen" class="overlay-screen">
+            <h2>拯救宇宙糖果星！</h2>
+            <p>躲避怪物，收集星星升級武器 🌟</p>
+            <button onclick="startGame()">點擊開始 🎮</button>
+            <div class="tips">操作方式：左右移動滑鼠或手指滑動控制戰機，會自動射擊</div>
+        </div>
+
+        <div id="gameover-screen" class="overlay-screen" style="display: none;">
+            <h2>Game Over 😭</h2>
+            <p>你的戰機墜毀了！最終得分: <span id="final-score">0</span></p>
+            <button onclick="startGame()">再戰一次 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI 元素
+        const livesDisplay = document.getElementById('lives-display');
+        const weaponTag = document.getElementById('weapon-tag');
+        const scoreDisplay = document.getElementById('score-display');
+        const menuScreen = document.getElementById('menu-screen');
+        const gameoverScreen = document.getElementById('gameover-screen');
+        const finalScoreDisplay = document.getElementById('final-score');
+
+        // 音效引擎 (Web Audio API)
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'laser') { // 發射子彈
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+            } else if (type === 'hit') { // 擊中怪物
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'powerup') { // 吃掉星星武器
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime + 0.06);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'hurt') { // 玩家扣血
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(10, audioCtx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            }
+        }
+
+        // 遊戲變數定義
+        let player, bullets, enemies, powerUps, stars, textEffects;
+        let gameActive = false;
+        let spawnTimer = 0;
+        let shootTimer = 0;
+
+        // 初始化/重置遊戲資料
+        function initGameData() {
+            player = {
+                x: canvas.width / 2 - 20,
+                y: 500,
+                w: 40,
+                h: 40,
+                lives: 3,
+                score: 0,
+                weaponLevel: 1, // 1~3 等
+                invincibleFrames: 0
+            };
+            bullets = [];
+            enemies = [];
+            powerUps = [];
+            textEffects = [];
+            spawnTimer = 0;
+            shootTimer = 0;
+
+            // 背景星星特效（背景流動）
+            stars = [];
+            for(let i=0; i<30; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speed: Math.random() * 2 + 1
+                });
+            }
+            updateUI();
+        }
+
+        // 開始按鈕點擊
+        function startGame() {
+            initAudio();
+            initGameData();
+            menuScreen.style.display = 'none';
+            gameoverScreen.style.display = 'none';
+            gameActive = true;
+            animate();
+        }
+
+        // 滑鼠與觸控事件監聽（移動戰機）
+        function movePlayer(clientX) {
+            if (!gameActive) return;
+            const rect = canvas.getBoundingClientRect();
+            let targetX = clientX - rect.left - player.w / 2;
+            // 邊界限制
+            if (targetX < 0) targetX = 0;
+            if (targetX > canvas.width - player.w) targetX = canvas.width - player.w;
+            player.x = targetX;
+        }
+
+        canvas.addEventListener('mousemove', (e) => movePlayer(e.clientX));
+        canvas.addEventListener('touchmove', (e) => {
+            movePlayer(e.touches[0].clientX);
+            e.preventDefault(); // 阻止手機網頁捲動
+        }, { passive: false });
+
+        // 更新頂部 UI 介面
+        function updateUI() {
+            // 生命愛心
+            livesDisplay.innerText = "❤️".repeat(player.lives) + "🖤".repeat(3 - player.lives);
+            // 分數
+            scoreDisplay.innerText = player.score;
+            // 武器等級狀態
+            if (player.weaponLevel === 1) weaponTag.innerText = "Lv.1 🍼 單發";
+            else if (player.weaponLevel === 2) weaponTag.innerText = "Lv.2 ⚡ 雙管";
+            else weaponTag.innerText = "Lv.3 🌟 滿級散彈";
+        }
+
+        // 碰撞偵測 AABB
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.w &&
+                   rect1.x + rect1.w > rect2.x &&
+                   rect1.y < rect2.y + rect2.h &&
+                   rect1.y + rect1.h > rect2.y;
+        }
+
+        // 生成漂浮文字特效（例如 +100 分 或 Level Up）
+        function spawnTextEffect(x, y, text, color) {
+            textEffects.push({ x: x, y: y, text: text, color: color, alpha: 1, life: 30 });
+        }
+
+        // 遊戲主循環
+        function animate() {
+            if (!gameActive) return;
+
+            // 1. 清空畫布並繪製星空背景
+            ctx.fillStyle = '#1e1b4b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 繪製與更新星空流星
+            ctx.fillStyle = '#a78bfa';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                star.y += star.speed;
+                if(star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+
+            // 2. 自動發射子彈邏輯
+            shootTimer++;
+            if (shootTimer >= 10) { // 每 10 幀發射一次
+                shootTimer = 0;
+                playSound('laser');
+                if (player.weaponLevel === 1) {
+                    bullets.push({ x: player.x + player.w / 2 - 4, y: player.y, w: 8, h: 18, vy: -8, type: 'normal' });
+                } else if (player.weaponLevel === 2) {
+                    bullets.push({ x: player.x + 4, y: player.y, w: 8, h: 18, vy: -8, type: 'normal' });
+                    bullets.push({ x: player.x + player.w - 12, y: player.y, w: 8, h: 18, vy: -8, type: 'normal' });
+                } else { // 等級 3 散彈
+                    bullets.push({ x: player.x + player.w / 2 - 4, y: player.y, w: 8, h: 18, vx: 0, vy: -8 });
+                    bullets.push({ x: player.x + 4, y: player.y, w: 8, h: 18, vx: -2, vy: -7.5 });
+                    bullets.push({ x: player.x + player.w - 12, y: player.y, w: 8, h: 18, vx: 2, vy: -7.5 });
+                }
+            }
+
+            // 更新與繪製子彈
+            ctx.fillStyle = '#fbbf24'; // 金黃色子彈
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                if (b.vx) b.x += b.vx;
+                b.y += b.vy;
+                
+                // 畫出可愛的糖果或子彈形狀 (這裡用圓角矩形)
+                ctx.beginPath();
+                ctx.arc(b.x + b.w/2, b.y + b.h/2, b.w/2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 移除越界子彈
+                if (b.y < -20 || b.x < -20 || b.x > canvas.width + 20) {
+                    bullets.splice(i, 1);
+                }
+            }
+
+            // 3. 生成怪物 (隨著分數越高，生成速度與速度會稍微變快)
+            spawnTimer++;
+            if (spawnTimer >= Math.max(20, 45 - Math.floor(player.score / 1500))) {
+                spawnTimer = 0;
+                let size = 32 + Math.random() * 12;
+                let emojis = ['👾', '🛸', '👻', '🎃', '🍭']; // 隨機可愛怪物
+                enemies.push({
+                    x: Math.random() * (canvas.width - size),
+                    y: -size,
+                    w: size,
+                    h: size,
+                    vy: 2 + Math.random() * 2 + (player.score / 4000),
+                    emoji: emojis[Math.floor(Math.random() * emojis.length)]
+                });
+            }
+
+            // 更新與繪製怪物
+            ctx.font = "30px Arial";
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.y += e.vy;
+
+                // 繪製怪物 Emoji
+                ctx.fillText(e.emoji, e.x + e.w/2, e.y + e.h/2);
+
+                // 怪物若到底部，則漏怪不扣血，但移除物件
+                if (e.y > canvas.height) {
+                    enemies.splice(i, 1);
+                    continue;
+                }
+
+                // 檢查是否被玩家子彈擊中
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    let b = bullets[j];
+                    if (checkCollision(b, e)) {
+                        playSound('hit');
+                        player.score += 100;
+                        spawnTextEffect(e.x + e.w/2, e.y, "+100", "#f472b6");
+                        updateUI();
+
+                        // 機率性掉落武器升級星星 (22% 機率)
+                        if (Math.random() < 0.22) {
+                            powerUps.push({
+                                x: e.x + e.w/2 - 12,
+                                y: e.y,
+                                w: 24,
+                                h: 24,
+                                vy: 2.5
+                            });
+                        }
+
+                        enemies.splice(i, 1);
+                        bullets.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+
+            // 4. 更新與繪製「武器升級星星 🌟」
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                let p = powerUps[i];
+                p.y += p.vy;
+
+                // 繪製閃亮星星
+                ctx.font = "26px Arial";
+                ctx.fillText("🌟", p.x + p.w/2, p.y + p.h/2);
+
+                // 星星越界移除
+                if (p.y > canvas.height) {
+                    powerUps.splice(i, 1);
+                    continue;
+                }
+
+                // 玩家吃到武器升級道具
+                if (checkCollision(p, player)) {
+                    playSound('powerup');
+                    powerUps.splice(i, 1);
+                    
+                    if (player.weaponLevel < 3) {
+                        player.weaponLevel++;
+                        spawnTextEffect(player.x + player.w/2, player.y - 20, "WEAPON UP! 🚀", "#fbbf24");
+                    } else {
+                        // 滿級後吃到道具給額外大加分
+                        player.score += 500;
+                        spawnTextEffect(player.x + player.w/2, player.y - 20, "MAX BONUS +500! ✨", "#34d399");
+                    }
+                    updateUI();
+                }
+            }
+
+            // 5. 處理玩家受傷與無敵狀態
+            if (player.invincibleFrames > 0) {
+                player.invincibleFrames--;
+            }
+
+            // 玩家與怪物碰撞偵測
+            if (player.invincibleFrames === 0) {
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    if (checkCollision(enemies[i], player)) {
+                        playSound('hurt');
+                        player.lives--;
+                        player.invincibleFrames = 75; // 無敵大約 1.25 秒
+                        // 受傷後武器會退階一級，增添遊戲挑戰性
+                        if (player.weaponLevel > 1) player.weaponLevel--;
+                        
+                        spawnTextEffect(player.x + player.w/2, player.y - 20, "Ouch! ❤️-1", "#ef4444");
+                        updateUI();
+                        enemies.splice(i, 1);
+
+                        // 檢查是否死亡
+                        if (player.lives <= 0) {
+                            gameActive = false;
+                            finalScoreDisplay.innerText = player.score;
+                            gameoverScreen.style.display = 'flex';
+                            return;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // 6. 繪製玩家戰機 (無敵狀態時會閃爍)
+            let drawPlayer = true;
+            if (player.invincibleFrames > 0 && Math.floor(player.invincibleFrames / 5) % 2 === 0) {
+                drawPlayer = false; // 透過閃爍不繪製達到透明效果
+            }
+
+            if (drawPlayer) {
+                ctx.font = "38px Arial";
+                ctx.fillText("🚀", player.x + player.w/2, player.y + player.h/2);
+            }
+
+            // 7. 繪製並更新漂浮文字特效
+            for (let i = textEffects.length - 1; i >= 0; i--) {
+                let t = textEffects[i];
+                ctx.fillStyle = t.color;
+                ctx.font = "bold 16px Arial";
+                ctx.fillText(t.text, t.x, t.y);
+                t.y -= 1; // 向上飄
+                t.life--;
+                if (t.life <= 0) textEffects.splice(i, 1);
+            }
+
+            // 循環下一幀
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+</html>

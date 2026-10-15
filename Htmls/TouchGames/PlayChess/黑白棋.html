@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>黑白棋 3D</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#080414;color:#e8e0f0;font-family:'Segoe UI',sans-serif;overflow:hidden;}
+canvas{display:block;}
+
+#ui{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  display:flex;gap:18px;align-items:center;
+  background:rgba(8,4,20,0.88);border:1px solid #3a2060;
+  border-radius:14px;padding:10px 22px;
+  box-shadow:0 0 30px rgba(100,50,200,0.25);
+}
+.score-box{text-align:center;min-width:48px;}
+.score-label{font-size:11px;color:#9080b0;letter-spacing:1px;}
+.score-val{font-size:26px;font-weight:700;line-height:1.1;}
+#sc1{color:#aab0dd;}
+#sc2{color:#F5F0E0;}
+#turn-box{text-align:center;min-width:120px;}
+#turn-indicator{
+  font-size:13px;padding:5px 12px;border-radius:8px;
+  border:2px solid #4a2880;color:#c8b0e8;
+  transition:color 0.3s,border-color 0.3s;
+}
+#msg{font-size:12px;color:#c090e0;margin-top:4px;min-height:16px;}
+#newgame-btn{
+  padding:8px 18px;border-radius:9px;border:none;cursor:pointer;
+  background:#3a1870;color:#d8c8f0;font-size:13px;
+  transition:background 0.2s;white-space:nowrap;
+}
+#newgame-btn:hover{background:#5030a0;}
+
+/* ── Dialog ── */
+#dlg{
+  position:fixed;inset:0;background:rgba(4,2,10,0.93);
+  display:flex;align-items:center;justify-content:center;z-index:200;
+}
+.dlg-box{
+  background:#100820;border:1px solid #5530a8;
+  border-radius:20px;padding:40px 52px;text-align:center;
+  box-shadow:0 0 80px rgba(120,60,220,0.45);
+}
+.dlg-box h1{font-size:30px;color:#d0a0ff;margin-bottom:4px;letter-spacing:2px;}
+.dlg-box .sub{color:#8060b0;font-size:14px;margin-bottom:28px;}
+.player-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;margin-bottom:14px;
+}
+.player-row label{width:72px;text-align:right;color:#b898d8;font-size:14px;}
+.type-btn{
+  padding:7px 18px;border-radius:9px;border:1px solid #4a2080;
+  cursor:pointer;font-size:13px;color:#9070c0;background:transparent;
+  transition:all 0.2s;
+}
+.type-btn.active{background:#5030a0;color:#e8d0ff;border-color:#9070d0;}
+.type-btn:hover:not(.active){background:#2a1050;color:#c0a0e8;}
+#start-btn{
+  margin-top:24px;padding:13px 40px;border-radius:11px;border:none;
+  background:linear-gradient(135deg,#6030b8,#3d1890);color:#eedaff;
+  font-size:17px;cursor:pointer;font-weight:700;letter-spacing:1px;
+  box-shadow:0 4px 20px rgba(100,50,200,0.4);transition:all 0.2s;
+}
+#start-btn:hover{
+  background:linear-gradient(135deg,#7040c8,#5020a8);
+  box-shadow:0 4px 30px rgba(120,60,220,0.6);
+}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+
+<!-- ── Dialog ── -->
+<div id="dlg">
+  <div class="dlg-box">
+    <h1>⚫ 黑白棋 ⚪</h1>
+    <div class="sub">Othello · 3D</div>
+    <div class="player-row">
+      <label>⚫ 黑方</label>
+      <button class="type-btn active" id="p1h" onclick="setType(1,'human')">人類</button>
+      <button class="type-btn"        id="p1a" onclick="setType(1,'ai')">電腦 AI</button>
+    </div>
+    <div class="player-row">
+      <label>⚪ 白方</label>
+      <button class="type-btn"        id="p2h" onclick="setType(2,'human')">人類</button>
+      <button class="type-btn active" id="p2a" onclick="setType(2,'ai')">電腦 AI</button>
+    </div>
+    <button id="start-btn" onclick="startGame()">開始遊戲</button>
+  </div>
+</div>
+
+<!-- ── HUD ── -->
+<div id="ui" style="display:none;">
+  <div class="score-box">
+    <div class="score-label">⚫ BLACK</div>
+    <div class="score-val" id="sc1">2</div>
+  </div>
+  <div id="turn-box">
+    <div id="turn-indicator">— 等待中 —</div>
+    <div id="msg"></div>
+  </div>
+  <div class="score-box">
+    <div class="score-label">⚪ WHITE</div>
+    <div class="score-val" id="sc2">2</div>
+  </div>
+  <button id="newgame-btn" onclick="showDialog()">新遊戲</button>
+</div>
+
+<canvas id="c"></canvas>
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+
+// ══════════════════════════════════════
+//  GAME LOGIC
+// ══════════════════════════════════════
+const N = 8;
+const DIRS8 = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+function inBounds(r,c){ return r>=0&&r<N&&c>=0&&c<N; }
+
+function getValidMoves(board, player){
+  const opp = 3-player, moves = [];
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    if(board[r][c]!==0) continue;
+    let valid=false;
+    for(const[dr,dc]of DIRS8){
+      let nr=r+dr, nc=c+dc;
+      if(!inBounds(nr,nc)||board[nr][nc]!==opp) continue;
+      nr+=dr; nc+=dc;
+      while(inBounds(nr,nc)&&board[nr][nc]===opp){nr+=dr;nc+=dc;}
+      if(inBounds(nr,nc)&&board[nr][nc]===player){valid=true;break;}
+    }
+    if(valid) moves.push({r,c});
+  }
+  return moves;
+}
+
+function applyMove(board, r, c, player){
+  const opp = 3-player;
+  const nb = board.map(row=>[...row]);
+  nb[r][c] = player;
+  const flipped = [];
+  for(const[dr,dc]of DIRS8){
+    const line=[];
+    let nr=r+dr, nc=c+dc;
+    while(inBounds(nr,nc)&&nb[nr][nc]===opp){line.push({r:nr,c:nc});nr+=dr;nc+=dc;}
+    if(line.length&&inBounds(nr,nc)&&nb[nr][nc]===player){
+      for(const p of line){nb[p.r][p.c]=player;flipped.push(p);}
+    }
+  }
+  return{nb,flipped};
+}
+
+function countStones(board){
+  let b=0,w=0;
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    if(board[r][c]===1)b++;
+    else if(board[r][c]===2)w++;
+  }
+  return{b,w};
+}
+
+// ── AI evaluation ──
+// Positional weight table (classic Othello heuristic)
+const WMAT=[
+  [120,-20,20, 5, 5,20,-20,120],
+  [-20,-40,-5,-5,-5,-5,-40,-20],
+  [ 20, -5,15, 3, 3,15, -5, 20],
+  [  5, -5, 3, 3, 3, 3, -5,  5],
+  [  5, -5, 3, 3, 3, 3, -5,  5],
+  [ 20, -5,15, 3, 3,15, -5, 20],
+  [-20,-40,-5,-5,-5,-5,-40,-20],
+  [120,-20,20, 5, 5,20,-20,120]
+];
+
+function evaluate(board, aiPlayer){
+  const opp=3-aiPlayer;
+  let score=0;
+  // Positional
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    if(board[r][c]===aiPlayer) score+=WMAT[r][c];
+    else if(board[r][c]===opp) score-=WMAT[r][c];
+  }
+  // Mobility
+  const pm=getValidMoves(board,aiPlayer).length;
+  const om=getValidMoves(board,opp).length;
+  if(pm+om>0) score+=12*(pm-om)/(pm+om+1);
+  // Parity (late game)
+  const{b,w}=countStones(board);
+  const placed=b+w;
+  if(placed>50) score+=(aiPlayer===1?b-w:w-b)*2;
+  return score;
+}
+
+function minimax(board, depth, alpha, beta, maximizing, aiPlayer){
+  const cur = maximizing ? aiPlayer : 3-aiPlayer;
+  const moves = getValidMoves(board, cur);
+  if(depth===0||(!moves.length&&!getValidMoves(board,3-cur).length)){
+    return evaluate(board,aiPlayer);
+  }
+  if(!moves.length){
+    return minimax(board, depth-1, alpha, beta, !maximizing, aiPlayer);
+  }
+  if(maximizing){
+    let best=-1e9;
+    for(const{r,c}of moves){
+      const{nb}=applyMove(board,r,c,cur);
+      best=Math.max(best,minimax(nb,depth-1,alpha,beta,false,aiPlayer));
+      alpha=Math.max(alpha,best);
+      if(beta<=alpha) break;
+    }
+    return best;
+  } else {
+    let best=1e9;
+    for(const{r,c}of moves){
+      const{nb}=applyMove(board,r,c,cur);
+      best=Math.min(best,minimax(nb,depth-1,alpha,beta,true,aiPlayer));
+      beta=Math.min(beta,best);
+      if(beta<=alpha) break;
+    }
+    return best;
+  }
+}
+
+function aiPickMove(board, player){
+  const moves=getValidMoves(board,player);
+  if(!moves.length) return null;
+  const placed=board.flat().filter(x=>x!==0).length;
+  const depth=placed>52?8:placed>40?7:6;
+  let best=-1e9, pick=null;
+  for(const{r,c}of moves){
+    const{nb}=applyMove(board,r,c,player);
+    const s=minimax(nb,depth-1,-1e9,1e9,false,player);
+    if(s>best){best=s;pick={r,c};}
+  }
+  return pick;
+}
+
+// ══════════════════════════════════════
+//  THREE.JS
+// ══════════════════════════════════════
+let scene, camera, renderer, clock;
+let gBoard, gStones, gAnimating=false;
+let gCurPlayer=1, gPlayerTypes={1:'human',2:'ai'};
+let gHintMeshes=[], flipAnims=[];
+let camR=15, camTheta=0.82, camPhi=0.0;
+let isDrag=false, lmx=0, lmy=0;
+let raycaster, boardPlane;
+let hintGeo; // shared geometry for hints
+
+// ── Shared materials ──
+// Stone cylinder: topCap = black, bottomCap = white
+// Player 1 (black): rotation.x = 0   → topCap (black) faces up
+// Player 2 (white): rotation.x = PI  → bottomCap (white) faces up
+const MAT_SIDE  = new THREE.MeshPhongMaterial({color:0x1a1a2e, shininess:50});
+const MAT_BLACK = new THREE.MeshPhongMaterial({color:0x0a0a18, shininess:100, specular:new THREE.Color(0x3333aa)});
+const MAT_WHITE = new THREE.MeshPhongMaterial({color:0xF5F0E2, shininess:130, specular:new THREE.Color(0xaaaaaa)});
+const STONE_MATS = [MAT_SIDE, MAT_BLACK, MAT_WHITE];
+
+// Hint material (pulsing)
+const MAT_HINT  = new THREE.MeshPhongMaterial({
+  color:0x60b0ff, transparent:true, opacity:0.35, side:THREE.DoubleSide,
+  emissive:new THREE.Color(0x204060)
+});
+
+function makeStoneGroup(player){
+  const geo = new THREE.CylinderGeometry(0.42, 0.42, 0.14, 32, 1, false);
+  const mesh = new THREE.Mesh(geo, STONE_MATS);
+  mesh.castShadow = true;
+  const g = new THREE.Group();
+  g.add(mesh);
+  // Set initial rotation so correct face is up
+  g.rotation.x = (player===2) ? Math.PI : 0;
+  return g;
+}
+
+function addStone(r, c, player){
+  const g = makeStoneGroup(player);
+  g.position.set(c - 3.5, 0.07, r - 3.5);
+  scene.add(g);
+  gStones[r][c] = g;
+}
+
+function queueFlip(r, c, delayMs){
+  const g = gStones[r][c];
+  if(!g) return;
+  // gBoard[r][c] is already the NEW owner after applyMove
+  const targetRot = (gBoard[r][c]===1) ? 0 : Math.PI;
+  const fromRot   = g.rotation.x;
+  flipAnims.push({
+    group: g, fromRot, targetRot,
+    startTime: performance.now() + delayMs,
+    duration: 380,
+    done: false
+  });
+}
+
+function clearHints(){
+  for(const m of gHintMeshes) scene.remove(m);
+  gHintMeshes=[];
+}
+
+function showHints(){
+  clearHints();
+  if(gPlayerTypes[gCurPlayer]==='ai') return;
+  const moves = getValidMoves(gBoard, gCurPlayer);
+  if(!hintGeo) hintGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.04, 20);
+  for(const{r,c}of moves){
+    const m = new THREE.Mesh(hintGeo, MAT_HINT);
+    m.position.set(c-3.5, 0.02, r-3.5);
+    m.userData = {r, c};
+    scene.add(m);
+    gHintMeshes.push(m);
+  }
+}
+
+function updateHUD(){
+  const{b,w}=countStones(gBoard);
+  document.getElementById('sc1').textContent = b;
+  document.getElementById('sc2').textContent = w;
+  const ti = document.getElementById('turn-indicator');
+  if(gCurPlayer===1){
+    ti.textContent='⚫ 黑方回合';
+    ti.style.color='#aabbee';
+    ti.style.borderColor='#4455aa';
+  } else {
+    ti.textContent='⚪ 白方回合';
+    ti.style.color='#F5F0E0';
+    ti.style.borderColor='#999988';
+  }
+}
+
+function setMsg(text, autoClears){
+  document.getElementById('msg').textContent=text;
+  if(autoClears) setTimeout(()=>document.getElementById('msg').textContent='', autoClears);
+}
+
+// ── Move execution ──
+function doMove(r, c){
+  if(gAnimating) return;
+  if(gBoard[r][c]!==0) return;
+  const moves=getValidMoves(gBoard,gCurPlayer);
+  if(!moves.find(m=>m.r===r&&m.c===c)) return;
+
+  const{nb, flipped}=applyMove(gBoard, r, c, gCurPlayer);
+
+  // Place new stone (instantaneous)
+  addStone(r, c, gCurPlayer);
+  gBoard = nb;
+
+  clearHints();
+  gAnimating = true;
+  setMsg('');
+
+  // Stagger flips by Chebyshev distance from placement
+  for(const{r:fr, c:fc}of flipped){
+    const dist = Math.max(Math.abs(fr-r), Math.abs(fc-c));
+    queueFlip(fr, fc, dist*55);
+  }
+
+  if(!flipped.length){
+    // Shouldn't happen in legal Othello; guard anyway
+    setTimeout(onMoveComplete, 250);
+  }
+
+  updateHUD();
+}
+
+function onMoveComplete(){
+  gAnimating = false;
+  const next = 3-gCurPlayer;
+  const nextMoves = getValidMoves(gBoard, next);
+  const curMoves  = getValidMoves(gBoard, gCurPlayer);
+
+  if(!nextMoves.length && !curMoves.length){
+    endGame(); return;
+  }
+  if(!nextMoves.length){
+    // Opponent must pass
+    setMsg(`${next===1?'⚫ 黑方':'⚪ 白方'} 無路可走，跳過！`, 2200);
+    updateHUD();
+    showHints();
+    scheduleAI();
+    return;
+  }
+  gCurPlayer = next;
+  updateHUD();
+  showHints();
+  scheduleAI();
+}
+
+function endGame(){
+  clearHints();
+  const{b,w}=countStones(gBoard);
+  let result;
+  if(b>w)      result=`⚫ 黑方獲勝！ (${b} 比 ${w})`;
+  else if(w>b) result=`⚪ 白方獲勝！ (${w} 比 ${b})`;
+  else         result=`平局！ (${b} 比 ${w})`;
+  document.getElementById('turn-indicator').textContent='遊戲結束';
+  document.getElementById('turn-indicator').style.color='#d090ff';
+  document.getElementById('turn-indicator').style.borderColor='#8040c0';
+  setMsg(result);
+}
+
+function scheduleAI(){
+  if(gPlayerTypes[gCurPlayer]==='ai' && !gAnimating){
+    gAnimating = true;
+    setTimeout(()=>{
+      const move = aiPickMove(gBoard, gCurPlayer);
+      gAnimating = false;
+      if(move) doMove(move.r, move.c);
+      else onMoveComplete();
+    }, 450);
+  }
+}
+
+// ── Game init ──
+function initGame(){
+  // Remove old stones
+  if(gStones){
+    for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+      if(gStones[r]&&gStones[r][c]) scene.remove(gStones[r][c]);
+    }
+  }
+  clearHints();
+  flipAnims=[];
+  gAnimating=false;
+  setMsg('');
+
+  gBoard  = Array.from({length:N},()=>Array(N).fill(0));
+  gStones = Array.from({length:N},()=>Array(N).fill(null));
+
+  // Standard Othello start
+  gBoard[3][3]=2; gBoard[3][4]=1;
+  gBoard[4][3]=1; gBoard[4][4]=2;
+  addStone(3,3,2); addStone(3,4,1);
+  addStone(4,3,1); addStone(4,4,2);
+
+  gCurPlayer=1;
+  updateHUD();
+  showHints();
+  scheduleAI();
+}
+
+// ── Camera ──
+function updateCamera(){
+  if(!camera) return;
+  const x = camR*Math.sin(camTheta)*Math.sin(camPhi);
+  const y = camR*Math.cos(camTheta);
+  const z = camR*Math.sin(camTheta)*Math.cos(camPhi);
+  camera.position.set(x,y,z);
+  camera.lookAt(0,0,0);
+}
+
+// ── Raycasting ──
+function getBoardPos(e){
+  const rect = renderer.domElement.getBoundingClientRect();
+  const mx = (e.clientX-rect.left)/rect.width*2-1;
+  const my = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:mx,y:my}, camera);
+  const hit = new THREE.Vector3();
+  if(!raycaster.ray.intersectPlane(boardPlane, hit)) return null;
+  const c = Math.round(hit.x+3.5);
+  const r = Math.round(hit.z+3.5);
+  if(!inBounds(r,c)) return null;
+  return{r,c};
+}
+
+// ── Scene setup ──
+function initScene(){
+  // Renderer
+  renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x080414);
+  scene.fog = new THREE.FogExp2(0x080414, 0.042);
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+  updateCamera();
+  clock = new THREE.Clock();
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x1a1030, 1.1));
+  const sun = new THREE.DirectionalLight(0xffe8cc, 1.3);
+  sun.position.set(6, 12, 8);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024,1024);
+  sun.shadow.camera.near=0.5; sun.shadow.camera.far=40;
+  sun.shadow.camera.left=-8; sun.shadow.camera.right=8;
+  sun.shadow.camera.top=8;   sun.shadow.camera.bottom=-8;
+  scene.add(sun);
+  const rim = new THREE.DirectionalLight(0x6040ff, 0.5);
+  rim.position.set(-6,4,-6);
+  scene.add(rim);
+  const pt = new THREE.PointLight(0x9060ff, 1.0, 25);
+  pt.position.set(0, 9, 0);
+  scene.add(pt);
+
+  // Board surface
+  const boardMat = new THREE.MeshPhongMaterial({
+    color:0x0c0620, shininess:35,
+    specular:new THREE.Color(0x2a1050)
+  });
+  const boardMesh = new THREE.Mesh(new THREE.BoxGeometry(N,0.18,N), boardMat);
+  boardMesh.position.y = -0.09;
+  boardMesh.receiveShadow = true;
+  scene.add(boardMesh);
+
+  // Board frame
+  const frameMat = new THREE.MeshPhongMaterial({color:0x1a0c38, shininess:20});
+  const frameOuter = new THREE.Mesh(new THREE.BoxGeometry(N+0.4,0.22,N+0.4), frameMat);
+  frameOuter.position.y = -0.11;
+  scene.add(frameOuter);
+
+  // Grid lines
+  const lineMat = new THREE.LineBasicMaterial({color:0x2a1860, opacity:0.7, transparent:true});
+  for(let i=0;i<=N;i++){
+    const h = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-N/2,0.01,i-N/2), new THREE.Vector3(N/2,0.01,i-N/2)
+    ]);
+    scene.add(new THREE.Line(h, lineMat));
+    const v = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(i-N/2,0.01,-N/2), new THREE.Vector3(i-N/2,0.01,N/2)
+    ]);
+    scene.add(new THREE.Line(v, lineMat));
+  }
+
+  // Classic Othello marker dots (c3,c6,f3,f6 → row/col 2,5)
+  const dotGeo = new THREE.SphereGeometry(0.07,8,8);
+  const dotMat = new THREE.MeshBasicMaterial({color:0x3a2060});
+  for(const[dr,dc]of[[2,2],[2,5],[5,2],[5,5]]){
+    const d = new THREE.Mesh(dotGeo, dotMat);
+    d.position.set(dc-3.5, 0.015, dr-3.5);
+    scene.add(d);
+  }
+
+  // Star particles (background ambiance)
+  const starGeo = new THREE.BufferGeometry();
+  const starPos = new Float32Array(1200);
+  for(let i=0;i<starPos.length;i+=3){
+    starPos[i]  = (Math.random()-0.5)*120;
+    starPos[i+1]= Math.random()*60+5;
+    starPos[i+2]= (Math.random()-0.5)*120;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
+  const starMat = new THREE.PointsMaterial({color:0x9080d0, size:0.12, transparent:true, opacity:0.6});
+  scene.add(new THREE.Points(starGeo, starMat));
+
+  // Raycasting
+  raycaster   = new THREE.Raycaster();
+  boardPlane  = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+
+  // ── Event listeners (inside initScene to avoid renderer-undefined bug) ──
+  const cvs = renderer.domElement;
+
+  cvs.addEventListener('mousedown', e=>{isDrag=true;lmx=e.clientX;lmy=e.clientY;});
+  cvs.addEventListener('mouseup',   ()=>{isDrag=false;});
+  cvs.addEventListener('mousemove', e=>{
+    if(isDrag){
+      camPhi  -= (e.clientX-lmx)*0.005;
+      camTheta -= (e.clientY-lmy)*0.005;
+      camTheta = Math.max(0.18, Math.min(1.42, camTheta));
+      updateCamera();
+      lmx=e.clientX; lmy=e.clientY;
+    }
+  });
+  cvs.addEventListener('wheel', e=>{
+    camR = Math.max(7, Math.min(28, camR+e.deltaY*0.012));
+    updateCamera();
+  });
+  cvs.addEventListener('click', e=>{
+    if(!gAnimating && gPlayerTypes[gCurPlayer]==='human' && gBoard){
+      const pos = getBoardPos(e);
+      if(pos) doMove(pos.r, pos.c);
+    }
+  });
+
+  window.addEventListener('resize',()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+}
+
+// ── Animation loop ──
+function animate(){
+  requestAnimationFrame(animate);
+  const t   = clock.getElapsedTime();
+  const now = performance.now();
+
+  // Process flip animations
+  let anyActive=false;
+  for(const a of flipAnims){
+    if(a.done) continue;
+    if(now < a.startTime){ anyActive=true; continue; }
+    const raw = Math.min(1,(now-a.startTime)/a.duration);
+    const ease= raw<0.5 ? 2*raw*raw : -1+(4-2*raw)*raw; // quad ease-in-out
+    a.group.rotation.x = a.fromRot + (a.targetRot-a.fromRot)*ease;
+    // Lift arc for visual flair
+    a.group.position.y = 0.07 + Math.sin(raw*Math.PI)*0.28;
+    if(raw>=1){
+      a.group.rotation.x = a.targetRot;
+      a.group.position.y = 0.07;
+      a.done = true;
+    } else {
+      anyActive = true;
+    }
+  }
+
+  // All animations complete → advance turn
+  if(gAnimating && flipAnims.length>0 && !anyActive && flipAnims.every(a=>a.done)){
+    flipAnims=[];
+    onMoveComplete();
+  }
+
+  // Pulse hint discs
+  const pulse = 0.22+0.18*Math.sin(t*2.8);
+  for(const m of gHintMeshes){
+    m.material.opacity = pulse;
+    m.position.y = 0.02 + 0.008*Math.sin(t*3.5+m.position.x+m.position.z);
+  }
+
+  renderer.render(scene, camera);
+}
+
+// ── Dialog controls ──
+function setType(player, type){
+  gPlayerTypes[player] = type;
+  document.getElementById(`p${player}h`).classList.toggle('active', type==='human');
+  document.getElementById(`p${player}a`).classList.toggle('active', type==='ai');
+}
+
+function showDialog(){
+  document.getElementById('dlg').style.display='flex';
+  document.getElementById('ui').style.display='none';
+}
+
+function startGame(){
+  document.getElementById('dlg').style.display='none';
+  document.getElementById('ui').style.display='flex';
+  initGame();
+}
+
+// ── Bootstrap (listeners AFTER initScene creates renderer) ──
+initScene();
+animate();
+</script>
+</body>
+</html>

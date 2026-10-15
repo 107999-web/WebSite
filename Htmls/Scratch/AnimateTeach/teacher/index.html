@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scratch 動畫製作・教師手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<style>
+.tsec{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:16px 20px;margin-top:16px;box-shadow:var(--shadow-s)}
+.tsec>h3{font-size:1.1rem;margin-bottom:6px}
+.tsec p,.tsec li{font-size:.94rem}
+.tline{display:grid;grid-template-columns:90px minmax(0,1fr);gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.93rem}
+.tline:last-child{border-bottom:none}
+.tline .t{font-family:var(--f-num);font-weight:800;color:var(--accent-d)}
+.disc{display:grid;gap:10px;margin-top:10px}
+.disc>div{background:var(--paper2);border:2px solid var(--line);border-radius:16px;padding:10px 14px}
+.disc b.h{display:block;font-size:.98rem}
+.disc p{margin:4px 0 0;font-size:.9rem}
+.disc .ask{display:block;margin-top:6px;font-size:.86rem;color:var(--c-looks-d);font-weight:700}
+.key{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.key div{background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:7px 12px;font-size:.9rem}
+.key b{font-family:var(--f-num);color:var(--ok)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📘 Scratch 動畫製作 <em>教師手冊</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="../index.html">總入口</a>
+      <a href="../student/index.html">↗ 學生互動教學</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>Scratch 動畫製作・教師手冊</h1>
+    <p>對象：國小高年級　·　建議時數：<b>2 節</b>（選配第 3 節實作）　·　先備：廣播訊息、造型切換、重複迴圈　·　搭配：<a href="../student/index.html">學生互動教學</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、教材來源</h3>
+    <p>本教材改編自 <b>60319 李昀宸</b>同學製作的 Scratch 專案「動畫教學」。原作包含兩部分：</p>
+    <ul>
+      <li><b>18 頁投影片</b>（用 Scratch 做成，可點箭頭翻頁），分為「製作動畫的步驟」「廣播訊息」「動畫應該要有哪些元素」「我的程式機密」四章。</li>
+      <li><b>專案內部程式</b>：投影片本身的翻頁功能，程式旁留有 9 則註解，說明初始化、圖層、分身分工、避免重複廣播等技巧。</li>
+    </ul>
+    <p>學生版保留原作的全部 18 頁投影片與 .sb3 下載，所有引用處標示「昀宸說」並附原頁碼；其餘解說、互動示範、分鏡表、自我檢核與測驗為改編補充。</p>
+    <div class="note"><b>關於署名</b>　目前頁面上保留了學號與姓名。若要把學生版放到<b>校外公開網站</b>，建議先取得昀宸本人與家長同意；只在班級或校內使用則沒有問題。原作者的投影片第 2 頁也有姓名，如需移除，將投影片第 2 頁換掉即可。</div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、原作與本教材的對照</h3>
+    <div class="tablewrap"><table class="rubric">
+      <thead><tr><th style="width:14%">原作頁</th><th style="width:26%">原作內容</th><th style="width:24%">學生版段落</th><th>補充的互動</th></tr></thead>
+      <tbody>
+        <tr><td>1–2</td><td>封面、自我介紹</td><td>開頭、第 0 章</td><td>投影片翻閱器（18 頁）、縮圖、章節跳轉</td></tr>
+        <tr><td>3–5</td><td>看題目→想劇情→決定架構；手繪分鏡</td><td>1-1、1-2</td><td>三步驟說明、<b>可儲存與列印的分鏡表</b></td></tr>
+        <tr><td>6</td><td>不要一次播到底；秒數不要寫死</td><td>1-3、1-4</td><td><b>時間軸實驗</b>：拉動台詞長度，看「等待 3 秒」搶話或冷場</td></tr>
+        <tr><td>7</td><td>開頭動畫加分</td><td>1 章末</td><td>—</td></tr>
+        <tr><td>8–9</td><td>廣播與接收；命名要清楚</td><td>2-1、2-2</td><td><b>廣播示範</b>（三角色同時接收）、命名判斷 9 題</td></tr>
+        <tr><td>10–11</td><td>角色分工、分身；誰何時出現消失</td><td>2-3、2-4</td><td>分身程式重繪、樹狀圖</td></tr>
+        <tr><td>12–13</td><td>畫面・劇情・字幕・配音</td><td>第 3 章</td><td><b>「說出」vs 字幕造型</b>切換比較</td></tr>
+        <tr><td>14–16</td><td>定義積木「換頁（造型）」</td><td>4-1</td><td>積木數量計算器</td></tr>
+        <tr><td>17</td><td>幻影淡入；sin 擺動</td><td>4-2、4-3</td><td><b>淡入參數實驗</b>、<b>sin 即時擺動＋角度曲線</b></td></tr>
+        <tr><td>18</td><td>結語：看內部程式</td><td>第 5 章</td><td>背景音樂循環、造型編號繞圈、<b>按住滑鼠實驗</b></td></tr>
+        <tr><td>（.sb3）</td><td>程式內 9 則註解</td><td>第 5 章</td><td>逐則說明</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、建議教學流程</h3>
+    <div class="tline"><div class="t">第1節</div><div><b>規劃與廣播</b><br>
+      5 分鐘｜投影原作投影片，一頁一頁翻（也可請昀宸本人來講）。<br>
+      15 分鐘｜第 1 章：三步驟與分鏡表。<b>請每位學生當場填完分鏡表前三列</b>，這是後面所有技巧的基礎。<br>
+      10 分鐘｜「秒數不要寫死」實驗：請學生把台詞長度拉到 5 秒，問「為什麼小貓搶話了？」<br>
+      10 分鐘｜第 2 章廣播示範與命名判斷。</div></div>
+    <div class="tline"><div class="t">第2節</div><div><b>程式機密</b><br>
+      20 分鐘｜第 4 章三個機密。建議順序：淡入（最直觀）→ 定義積木 → sin（最有趣，放最後收心）。每個都先玩示範，再到 Scratch 實際拼一次。<br>
+      12 分鐘｜第 5 章挑兩段：<b>按住滑鼠實驗</b>與<b>背景音樂循環</b>——這兩個是學生作品最常見的錯誤。<br>
+      8 分鐘｜小測驗 6 題與自我檢核。</div></div>
+    <div class="tline"><div class="t">選配</div><div><b>第 3 節實作</b>：依第 1 節的分鏡表開始製作；或下載原作 .sb3，請學生替投影片加上「第 1 頁不能再往前」的判斷（見下方討論第 1 點）。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>四、原作程式完整解析</h3>
+    <p>專案共有 3 個目標（舞台、「幻燈片（你們看，命名要命名的好理解）」、「箭頭」），<b>沒有使用擴充功能</b>。以下是全部程式。</p>
+
+    <h4 style="margin:14px 0 6px">舞台</h4>
+    <p style="margin:0 0 6px;font-size:.9rem">背景音樂兩首（Chill、Chill2，實際只用到 Chill）；廣播兩個（下一頁、上一頁）；變數一個：「像這種變數，用不到，就應該刪掉」（未使用，是示範）。</p>
+    <div class="two">
+      <div class="pane"><div class="bscript" data-blk="bgmGood"></div></div>
+      <div class="pane"><div class="bscript" data-blk="looseSound"></div></div>
+    </div>
+
+    <h4 style="margin:16px 0 6px">幻燈片角色（18 個造型＝18 頁投影片）</h4>
+    <div class="two">
+      <div class="pane"><div class="bscript" data-blk="slideInit"></div></div>
+      <div class="pane"><div class="bscript" data-blk="slideNext"></div><div class="bscript" data-blk="slidePrev" style="margin-top:8px"></div>
+        <div class="bscript" data-blk="looseSin" style="margin-top:8px"></div></div>
+    </div>
+
+    <h4 style="margin:16px 0 6px">箭頭角色（2 個造型：下一頁、上一頁）</h4>
+    <div class="bscript" data-blk="arrowMain"></div>
+    <div class="bscript" data-blk="arrowClone" style="margin-top:10px"></div>
+    <p style="font-size:.88rem;margin:10px 0 4px;color:var(--ink2)">同一段「當分身產生」後面接著第二個「如果」：</p>
+    <div class="bscript" data-blk="arrowClone2Full"></div>
+  </div>
+
+  <div class="tsec">
+    <h3>五、可以和學生討論的地方</h3>
+    <p>原作寫得相當成熟，下面幾點不是「錯誤」，而是很好的<b>討論素材</b>——讓學生練習讀別人的程式、判斷設計的取捨。建議以提問方式帶，並肯定原作者的用心。</p>
+    <div class="disc">
+      <div><b class="h">1. 在第 1 頁按「上一頁」會跳到最後一頁</b>
+        <p>「造型換成（造型編號 − 1）」在第 1 頁時得到 0，Scratch 會把超出範圍的編號繞一圈，換成最後一個造型；同理最後一頁按「下一頁」會回到第 1 頁。學生版第 5 章有實驗可以觀察。</p>
+        <span class="ask">提問：做投影片時，這樣循環好不好？如果不想要，該怎麼改？</span></div>
+      <div><b class="h">2. 「上一頁」箭頭有兩層「重複無限次」</b>
+        <p>外層的重複無限次永遠不會進入第二圈（內層本身就不會結束），所以是多餘的，但不影響功能。「下一頁」箭頭只有一層。</p>
+        <span class="ask">提問：比對兩個箭頭的程式，找出哪裡不一樣？拿掉外層會有影響嗎？</span></div>
+      <div><b class="h">3. 造型名稱沒有照順序</b>
+        <p>18 個造型依序是 costume1～14、costume17、costume16、costume18、costume15。投影片播放順序是照<b>造型清單的排列</b>，不是照名字，所以功能正常；但和原作「命名要命名的好理解」的提醒可以做有趣的對照。</p>
+        <span class="ask">提問：如果要用「造型換成（名稱）」直接跳到某一頁，現在的名字會造成什麼問題？怎麼命名比較好？</span></div>
+      <div><b class="h">4. 專案裡留著兩塊沒接上的積木與一個沒用的變數</b>
+        <p>舞台上的「播放音效 Chill」、幻燈片角色上的「sin 數值」、以及變數「像這種變數，用不到，就應該刪掉」，旁邊都有註解，看得出是<b>刻意留下的示範</b>。</p>
+        <span class="ask">提醒：教學用的專案可以這樣做，但交比賽作品前，零散積木與沒用的變數都要清掉。</span></div>
+      <div><b class="h">5. 淡入程式沒有等待，約 1/3 秒就完成</b>
+        <p>「重複 10 次」裡沒有「等待」，Scratch 每一圈約 1/30 秒，所以 10 圈約 0.33 秒。學生若覺得太快，可以增加重複次數（配合減少每次改變量）或在迴圈中加等待。</p>
+        <span class="ask">提問：要讓淡入花 1 秒，可以怎麼改？（例：重複 20 次、每次 −5，迴圈裡加「等待 0.05 秒」，約 1 秒完成）</span></div>
+      <div><b class="h">6. 「換頁（造型）」要求造型與音效同名</b>
+        <p>同一個參數同時用於造型與音效，名稱不一致時該頁會<b>無聲而且不會報錯</b>。原作在圖旁有標註「把造型和音效名稱統一」，教學時要特別強調。</p></div>
+      <div><b class="h">7. sin 的說明深度</b>
+        <p>原作說「高中數學，我也不會解釋」。國小不需要介紹三角函數的定義，學生版只強調一件事：<b>sin 的結果在 −1 到 1 之間平滑來回</b>，乘上幅度、加上中心角度，就能算出擺動範圍。測驗第 4 題即考這個推算。</p></div>
+      <div><b class="h">8. 「比較可以加分（大概吧）」</b>
+        <p>原作者自己也加了「大概吧」。提醒學生：評分以題目的要求為準，開頭動畫應排在主要內容完成之後。</p></div>
+    </div>
+  </div>
+
+  <div class="tsec">
+    <h3>六、與貓咪盃動畫 AI 互動組的連結</h3>
+    <p>若本班有參加貓咪盃動畫 AI 互動組，本教材的幾個技巧可以直接遷移：</p>
+    <div class="tablewrap"><table class="rubric">
+      <thead><tr><th style="width:30%">本教材的技巧</th><th>在貓咪盃作品中的用法</th></tr></thead>
+      <tbody>
+        <tr><td>分鏡表（誰在哪個分鏡出現・消失）</td><td>任務四「至少兩種故事發展」：兩條故事線各自列一張分鏡表，寫程式前先確認分支點。</td></tr>
+        <tr><td>每一段用廣播分開</td><td>環境變好或惡化時廣播對應訊息，各場景角色各自接收，方便單獨測試某個結局。</td></tr>
+        <tr><td>秒數不要寫死</td><td>AI 動作偵測到之後<b>才</b>廣播下一段，不要用等待秒數猜觀看者什麼時候做完動作。</td></tr>
+        <tr><td>按住滑鼠不重複觸發</td><td>和 AI 動作的「旗標變數」是同一個概念：動作觸發一次後，要等回到預備狀態才能再觸發。</td></tr>
+        <tr><td>初始化</td><td>環境變數（樹木、水質、垃圾）在綠旗時要設回初始值。</td></tr>
+        <tr><td>命名要清楚</td><td>程式說明文件要寫出互動方式與分支條件；訊息與變數名稱取得好，文件也比較好寫。</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="tsec">
+    <h3>七、評量</h3>
+    <p><b>形成性評量</b>：學生版的「我的分鏡表」可列印收回，檢查是否寫出每個分鏡的出現與消失角色、結束時的廣播名稱。</p>
+    <p><b>小測驗答案</b>（學生版第 6 章，共 6 題）：</p>
+    <div class="key">
+      <div>1. <b>B</b>　講完才廣播</div><div>2. <b>B</b>　直到結束</div><div>3. <b>B</b>　−5</div>
+      <div>4. <b>A</b>　70°～110°</div><div>5. <b>A</b>　音效名稱不同</div><div>6. <b>B</b>　等待直到…不成立</div>
+    </div>
+    <div class="tablewrap"><table class="rubric">
+      <thead><tr><th style="width:18%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>規劃</b></td><td>分鏡表完整，程式與分鏡一致</td><td>有分鏡表但與程式有落差</td><td>沒有規劃直接做</td></tr>
+        <tr><td><b>結構</b></td><td>每段以廣播分開，可單獨測試；無寫死秒數</td><td>大致分段，少數地方用等待猜時間</td><td>一條程式播到底</td></tr>
+        <tr><td><b>四元素</b></td><td>畫面、劇情、字幕、配音俱全且清楚</td><td>缺一項或字幕不清楚</td><td>缺兩項以上</td></tr>
+        <tr><td><b>程式技巧</b></td><td>善用定義積木、圖像效果，並有初始化</td><td>用到其中一兩項</td><td>大量重複的積木</td></tr>
+        <tr><td><b>整理</b></td><td>命名清楚、無多餘變數與零散積木</td><td>部分命名不清</td><td>預設名稱為主</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="tsec">
+    <h3>八、課前準備</h3>
+    <div class="self" id="prep"></div>
+  </div>
+
+  <footer>📘 Scratch 動畫製作・教師手冊　·　原作：60319 李昀宸「動畫教學」</footer>
+</div>
+
+<script src="assets/blk.js"></script>
+<script>
+BLK.auto(SCRIPTS);
+['學生版在教室電腦能正常開啟，投影片圖片都載入。',
+ '已下載原作 .sb3，確認在 Scratch 中能開啟、翻頁與背景音樂正常。',
+ '已決定是否請昀宸本人到班上分享（建議第 1 節開頭 5 分鐘）。',
+ '分鏡表列印紙本已準備（或請學生在網頁上填寫後列印）。',
+ '教室喇叭音量已確認（原作有背景音樂）。',
+ '若要放到校外公開網站，已取得原作者與家長同意。'
+].forEach(function(t){var l=document.createElement('label');l.innerHTML='<input type="checkbox"><span>'+t+'</span>';document.getElementById('prep').appendChild(l);});
+</script>
+</body>
+</html>

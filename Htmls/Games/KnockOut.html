@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knockout Void - Vs CPU</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050508;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #game-wrapper {
+            position: relative;
+        }
+
+        canvas {
+            background-color: #0a0a12;
+            border: 2px solid #333;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            display: block;
+        }
+
+        #scoreboard {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+            font-size: 32px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .p1-score { color: #ff3366; text-shadow: 0 0 10px #ff3366; }
+        .p2-score { color: #ff9933; text-shadow: 0 0 10px #ff9933; }
+
+        #announcer {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: white;
+            text-align: center;
+            text-shadow: 3px 3px 0 #000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 10px;
+            border: 2px solid #555;
+            display: none;
+        }
+
+        .controls {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .key {
+            background: #222;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ccc;
+            border: 1px solid #444;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="scoreboard">
+            <div class="p1-score">P1: <span id="s1">0</span></div>
+            <div class="p2-score">CPU: <span id="s2">0</span></div>
+        </div>
+        <div id="announcer">Player 1 Wins!</div>
+    </div>
+    <div class="controls">
+        <span style="color: #ff3366;">Player 1:</span> <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span> to move | <span class="key">Space</span> to Dash-Ram<br>
+        <span style="color: #ff9933;">CPU:</span> Programmed to hunt you down.<br>
+        <em>Knock the CPU off the edge. Dashing adds massive knockback!</em>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const score1El = document.getElementById('s1');
+        const score2El = document.getElementById('s2');
+        const announcer = document.getElementById('announcer');
+
+        const keys = {};
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        let isPlaying = false;
+        let roundOver = false;
+
+        // Arena Setup
+        let arena = {
+            x: 400,
+            y: 300,
+            radius: 280,
+            minRadius: 50,
+            shrinkRate: 0.05
+        };
+
+        // Players
+        class Player {
+            constructor(x, y, color, controls, isBot = false) {
+                this.startX = x;
+                this.startY = y;
+                this.x = x;
+                this.y = y;
+                this.r = 18;
+                this.vx = 0;
+                this.vy = 0;
+                this.color = color;
+                this.controls = controls;
+                this.speed = 0.8;
+                this.friction = 0.94; // Slippery
+                this.score = 0;
+                this.isBot = isBot;
+                
+                // Dash mechanics
+                this.isDashing = false;
+                this.dashFrames = 0;
+                this.dashCooldown = 0;
+            }
+
+            reset() {
+                this.x = this.startX;
+                this.y = this.startY;
+                this.vx = 0;
+                this.vy = 0;
+                this.isDashing = false;
+                this.dashFrames = 0;
+                this.dashCooldown = 0;
+            }
+
+            update() {
+                if (roundOver) return;
+
+                // Cooldowns
+                if (this.dashCooldown > 0) this.dashCooldown--;
+                if (this.dashFrames > 0) {
+                    this.dashFrames--;
+                    if (this.dashFrames === 0) this.isDashing = false;
+                }
+
+                if (this.isBot) {
+                    this.updateBotLogic();
+                } else {
+                    this.updateHumanLogic();
+                }
+
+                // Physics application
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+
+            updateHumanLogic() {
+                // Normal Movement (disabled while dashing)
+                if (!this.isDashing) {
+                    if (keys[this.controls.up]) this.vy -= this.speed;
+                    if (keys[this.controls.down]) this.vy += this.speed;
+                    if (keys[this.controls.left]) this.vx -= this.speed;
+                    if (keys[this.controls.right]) this.vx += this.speed;
+                }
+
+                // Dash activation
+                if (keys[this.controls.dash] && this.dashCooldown === 0) {
+                    let dx = 0, dy = 0;
+                    if (keys[this.controls.up]) dy = -1;
+                    if (keys[this.controls.down]) dy = 1;
+                    if (keys[this.controls.left]) dx = -1;
+                    if (keys[this.controls.right]) dx = 1;
+
+                    if (dx === 0 && dy === 0) {
+                        const mag = Math.sqrt(this.vx**2 + this.vy**2);
+                        if (mag > 0.1) {
+                            dx = this.vx / mag;
+                            dy = this.vy / mag;
+                        } else {
+                            dx = 1; 
+                        }
+                    } else {
+                        const mag = Math.sqrt(dx**2 + dy**2);
+                        dx /= mag; dy /= mag;
+                    }
+
+                    const dashPower = 15;
+                    this.vx = dx * dashPower;
+                    this.vy = dy * dashPower;
+                    
+                    this.isDashing = true;
+                    this.dashFrames = 10;
+                    this.dashCooldown = 60; // 1 second cooldown
+                }
+            }
+
+            updateBotLogic() {
+                if (this.isDashing) return; // Can't change course while dashing
+
+                let targetX = p1.x;
+                let targetY = p1.y;
+
+                // Distance from bot to arena center
+                const distToCenter = Math.hypot(this.x - arena.x, this.y - arena.y);
+                
+                // Survival priority: If too close to edge, steer towards center instead of player
+                const edgeBuffer = 50;
+                if (distToCenter > arena.radius - edgeBuffer) {
+                    targetX = arena.x;
+                    targetY = arena.y;
+                }
+
+                // Calculate vector to target
+                let dx = targetX - this.x;
+                let dy = targetY - this.y;
+                let distToTarget = Math.hypot(dx, dy);
+
+                // Move towards target
+                if (distToTarget > 0) {
+                    // Slightly slower acceleration for CPU to make it fair against humans
+                    this.vx += (dx / distToTarget) * (this.speed * 0.8);
+                    this.vy += (dy / distToTarget) * (this.speed * 0.8);
+                }
+
+                // CPU Dash Logic
+                // It will only dash if it is close to P1, not too close to the edge (to avoid suicide), and off cooldown
+                const distanceToP1 = Math.hypot(p1.x - this.x, p1.y - this.y);
+                
+                if (distanceToP1 < 140 && distanceToP1 > 40 && this.dashCooldown === 0 && distToCenter < arena.radius - 80) {
+                    const dashPower = 15;
+                    // Aim directly at P1
+                    const aimX = p1.x - this.x;
+                    const aimY = p1.y - this.y;
+                    const aimMag = Math.hypot(aimX, aimY);
+
+                    this.vx = (aimX / aimMag) * dashPower;
+                    this.vy = (aimY / aimMag) * dashPower;
+                    
+                    this.isDashing = true;
+                    this.dashFrames = 10;
+                    this.dashCooldown = 80; // CPU has a slightly longer cooldown
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                
+                if (this.isDashing) {
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#fff';
+                } else if (this.dashCooldown > 0) {
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = 0.5;
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                    ctx.globalAlpha = 1;
+                }
+                
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+
+                // Draw bot "eye" indicator to look menacing
+                if (this.isBot && !this.isDashing) {
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        const p1 = new Player(200, 300, '#ff3366', {
+            up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD', dash: 'Space'
+        }, false);
+
+        // Player 2 is now a bot, so controls are ignored, color changed to Orange
+        const p2 = new Player(600, 300, '#ff9933', {}, true);
+
+        function checkCollisions() {
+            if (roundOver) return;
+
+            // Player vs Player
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            const minSpace = p1.r + p2.r;
+
+            if (dist < minSpace) {
+                // Resolve overlap
+                const overlap = minSpace - dist;
+                const nx = dx / dist;
+                const ny = dy / dist;
+
+                // Push them apart
+                p1.x -= nx * (overlap / 2);
+                p1.y -= ny * (overlap / 2);
+                p2.x += nx * (overlap / 2);
+                p2.y += ny * (overlap / 2);
+
+                // Knockback calculation
+                const kx = (p1.vx - p2.vx) * 0.8;
+                const ky = (p1.vy - p2.vy) * 0.8;
+
+                p1.vx -= kx;
+                p1.vy -= ky;
+                p2.vx += kx;
+                p2.vy += ky;
+
+                // Add massive force if one is dashing
+                const dashKnockback = 12;
+                if (p1.isDashing) {
+                    p2.vx += nx * dashKnockback;
+                    p2.vy += ny * dashKnockback;
+                    p1.isDashing = false; // end dash on hit
+                }
+                if (p2.isDashing) {
+                    p1.vx -= nx * dashKnockback;
+                    p1.vy -= ny * dashKnockback;
+                    p2.isDashing = false; 
+                }
+                
+                // Screen shake on hit
+                shakeScreen(5);
+            }
+
+            // Player vs Void (Ring out)
+            const checkRingOut = (p, otherP) => {
+                const distFromCenter = Math.sqrt((p.x - arena.x)**2 + (p.y - arena.y)**2);
+                if (distFromCenter > arena.radius) {
+                    endRound(otherP);
+                }
+            };
+
+            checkRingOut(p1, p2);
+            if (!roundOver) checkRingOut(p2, p1);
+        }
+
+        function endRound(winner) {
+            roundOver = true;
+            winner.score++;
+            
+            score1El.innerText = p1.score;
+            score2El.innerText = p2.score;
+
+            if (winner === p1) {
+                announcer.innerHTML = `<span style="color:#ff3366">Player 1</span> Scores!`;
+            } else {
+                announcer.innerHTML = `<span style="color:#ff9933">CPU</span> Scores!`;
+            }
+            
+            announcer.style.display = 'block';
+            shakeScreen(15);
+
+            setTimeout(() => {
+                startRound();
+            }, 2000);
+        }
+
+        function startRound() {
+            p1.reset();
+            p2.reset();
+            arena.radius = 280; // Reset arena size
+            roundOver = false;
+            announcer.style.display = 'none';
+        }
+
+        function shakeScreen(intensity) {
+            canvas.style.transform = `translate(${Math.random()*intensity - intensity/2}px, ${Math.random()*intensity - intensity/2}px)`;
+            setTimeout(() => canvas.style.transform = "translate(0, 0)", 50);
+        }
+
+        function drawArena() {
+            // Background grid pattern
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // The safe zone
+            ctx.beginPath();
+            ctx.arc(arena.x, arena.y, arena.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#1a1a24';
+            ctx.fill();
+            
+            // Glowing border
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = arena.radius < 100 ? '#ff0000' : '#444';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = ctx.strokeStyle;
+            ctx.stroke();
+            ctx.shadowBlur = 0; // reset
+        }
+
+        function update() {
+            if (!roundOver && arena.radius > arena.minRadius) {
+                arena.radius -= arena.shrinkRate;
+            }
+
+            p1.update();
+            p2.update();
+            checkCollisions();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawArena();
+            p1.draw();
+            p2.draw();
+
+            requestAnimationFrame(update);
+        }
+
+        startRound();
+        requestAnimationFrame(update);
+
+    </script>
+</body>
+</html>

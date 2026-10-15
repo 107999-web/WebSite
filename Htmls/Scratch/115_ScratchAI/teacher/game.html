@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI 節奏接龍大作戰・教師版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/comp.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📕 AI 節奏接龍大作戰 <em>教師版</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">教師首頁</a>
+      <a href="anim.html">動畫組</a>
+      <a class="on" href="game.html">遊戲組</a>
+      <a href="../student/game.html">↗ 學生版</a>
+      <a href="../student/ideas.html">↗ 情境卡</a>
+      <a href="../student/plan.html">↗ 進度表</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge g">臺北市 115 年度貓咪盃・初賽　國小遊戲 AI 互動組</span>
+    <h1>AI 節奏接龍大作戰・教師手冊</h1>
+    <p>對象：國小高年級　·　建議時數：<b>8～10 節</b>（含作品產出）　·　先備：變數、清單、迴圈與條件判斷　·　搭配：<a href="../student/game.html">學生版</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、這一題在考什麼</h3>
+    <p style="font-size:.94rem;margin-top:6px">這一題的程式難度明顯高於動畫組，核心是<b>清單</b>——沒有清單就做不出「序列」和「接龍」。建議只讓已經學過清單的學生挑戰這一組。</p>
+    <table class="rubric">
+      <thead><tr><th style="width:20%">題目任務</th><th style="width:26%">對應的程式能力</th><th>課堂上要確認學生會的事</th></tr></thead>
+      <tbody>
+        <tr><td><b>一</b>　三種動作＋預備姿勢</td><td>AI 擴充模組、<b>旗標變數（狀態機）</b></td><td>知道為什麼要有預備姿勢，而不只是「加個等待」。</td></tr>
+        <tr><td><b>二</b>　動作對應不同效果</td><td>音效積木、造型與動畫</td><td>三個動作要有<b>聽得出來</b>的差別，不是只有畫面閃一下。</td></tr>
+        <tr><td><b>三</b>　兩個關卡</td><td><b>清單</b>、亂數、迴圈走訪</td><td>會用「重複 清單的長度 次」搭配索引變數走訪整張清單。</td></tr>
+        <tr><td><b>四</b>　計分與連續加分</td><td>變數、運算</td><td>連續正確的加分要和一般得分<b>分開算</b>。</td></tr>
+        <tr><td><b>五</b>　難度遞增</td><td>變數控制等待時間</td><td>把「等待幾秒」換成變數，就能隨關卡變化。</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:12px">
+      <b>題目最看重的技術點，是任務一括號裡那句話</b>：「每個動作之間須能判斷玩家已回到預備姿勢，避免同一動作被重複判定」。
+      程式說明文件也指定要寫。這是一個<b>狀態機</b>概念，請務必花一整節課講。
+    </div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、建議教學流程</h3>
+    <div class="tline"><div class="t">第1節</div><div><b>玩過再讀題</b>：讓學生玩學生版第 2 段的完整遊戲，玩到輸為止。<b>提問</b>：「為什麼做完一個動作，按鈕會有一下不能按？」自然帶出預備姿勢。接著讀題、完成五張任務卡。</div></div>
+    <div class="tline"><div class="t">第2節</div><div><b>選動作、訂門檻</b>：三種動作不是隨便挑。帶學生實際比一比哪些動作<b>座標差距最大</b>——差距越大越不會誤判。這一節產出一張「動作對照表」。</div></div>
+    <div class="tline"><div class="t">第3節</div><div><b>單一動作偵測</b>：先只做一個動作，能穩定觸發就好。<b>刻意示範不加旗標的版本</b>，讓學生看到分數一秒跳三十分。</div></div>
+    <div class="tline"><div class="t">第4節</div><div><b>旗標與狀態機（關鍵節）</b>：加上旗標變數。學生版第 4 段的狀態機圖建議直接投影，並在黑板上走一次流程。完成後三個動作各做一份。</div></div>
+    <div class="tline"><div class="t">第5節</div><div><b>音效與動畫</b>：三個動作各給不同音符。若使用音樂擴充功能，記得先載入。這一節相對輕鬆，可讓學生喘口氣。</div></div>
+    <div class="tline"><div class="t">第6節</div><div><b>清單與亂數（關鍵節）</b>：建立節奏清單，用「重複（隨機取數 3 到 5）次：添加（隨機取數 1 到 3）」產生節奏。再用索引變數依序播放提示。</div></div>
+    <div class="tline"><div class="t">第7節</div><div><b>比對與第一關</b>：玩家動作與「清單的第（編號）項」比對。完成第一關的通過條件與失敗處理。</div></div>
+    <div class="tline"><div class="t">第8節</div><div><b>第二關接龍</b>：其實只要把「重新產生節奏」改成「<b>添加一個新動作</b>」。學生通常會很驚訝只差一行。</div></div>
+    <div class="tline"><div class="t">第9～10節</div><div><b>計分、難度與說明文件</b>：加上連續加分與速度遞減，最後<b>留一整節寫說明文件</b>，四個指定項目逐項對照。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、學生最常卡住的地方</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:24%">狀況</th><th style="width:34%">原因</th><th>處理方式</th></tr></thead>
+      <tbody>
+        <tr><td>一個動作被算成好幾次</td><td>沒有旗標，迴圈每圈都成立</td><td>本題核心。旗標變數：觸發設 1、回到預備姿勢設 0。<b>不要用「等待 1 秒」硬擋</b>，那會讓遊戲很難玩。</td></tr>
+        <tr><td>加了等待，但節奏跟不上</td><td>用等待代替狀態機</td><td>等待會卡住整個迴圈，快節奏時一定漏判。一定要改成旗標。</td></tr>
+        <tr><td>兩個動作互相誤判</td><td>門檻範圍重疊</td><td>例如「手向左 x ＜ −90」和「手舉高 y ＞ 80」可能同時成立。用<b>如果…否則</b>串起來，或加上互斥條件。</td></tr>
+        <tr><td>清單一直變長，永遠不重來</td><td>忘記在每輪開始前<b>刪除所有項目</b></td><td>初始化要放在綠旗下面或每輪開始處，不能放在迴圈裡。</td></tr>
+        <tr><td>玩家永遠答錯</td><td>索引變數忘記歸 1，或忘記遞增</td><td>檢查「編號 設為 1」的位置，以及答對後有沒有「編號 改變 1」。</td></tr>
+        <tr><td>提示播完就直接判定失敗</td><td>播放提示時沒有切換「現在輪到誰」的狀態</td><td>用一個變數區分「播放中／作答中」，播放中忽略玩家動作。</td></tr>
+        <tr><td>第二關做不出來</td><td>以為要重寫</td><td>只要把「重新產生節奏」換成「添加一個亂數動作」即可，序列自然變長。</td></tr>
+        <tr><td>分數爆增或變負</td><td>連續加分寫在錯的地方</td><td>把「一般得分」和「連續加分」分成兩個式子，先算再相加。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、程式說明文件的批改重點</h3>
+    <p style="font-size:.93rem;margin-top:6px">題目指定四個項目。批改時<b>只認具體數字與做法</b>，抄題目不給分。</p>
+    <table class="rubric">
+      <thead><tr><th style="width:26%">指定項目</th><th>算寫到了</th><th>不算</th></tr></thead>
+      <tbody>
+        <tr><td><b>動作判定方式</b>（含避免重複判定）</td><td>寫出模組、部位、三個動作各自的門檻數字，以及旗標變數的名稱與切換時機</td><td>「用手勢判斷」「加了判斷避免重複」</td></tr>
+        <tr><td><b>亂數節奏產生方法</b></td><td>寫出用哪塊積木、亂數範圍、產生幾個</td><td>「用亂數產生節奏」</td></tr>
+        <tr><td><b>動作序列的記錄方式</b></td><td>寫出清單名稱、每一項代表什麼、索引變數怎麼用</td><td>「存在清單裡」</td></tr>
+        <tr><td><b>關卡通過與結束條件</b></td><td>兩關的通過條件與遊戲結束條件都寫成數字</td><td>「答對就過關」「失敗就結束」</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>五、評分自檢表（可影印給學生互評）</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:24%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>動作判定</b></td><td>三種動作都很穩，幾乎不誤判，也不會重複觸發</td><td>大致可用，偶爾要重做</td><td>常誤判或一個動作算好幾次</td></tr>
+        <tr><td><b>關卡完整度</b></td><td>兩關都完成，條件明確，接龍會越來越長</td><td>兩關都有，但第二關較簡略</td><td>只有一關</td></tr>
+        <tr><td><b>回饋設計</b></td><td>動作、音效、畫面三者一致，玩家清楚知道對或錯</td><td>有聲音或動畫回饋</td><td>只有文字或沒有回饋</td></tr>
+        <tr><td><b>計分機制</b></td><td>有連續加分，錯誤處理合理，分數不會爆掉</td><td>有基本計分</td><td>沒有計分或算錯</td></tr>
+        <tr><td><b>說明文件</b></td><td>四個指定項目都有具體數字與做法</td><td>四項都有提到但偏簡略</td><td>缺項或只抄題目</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>六、差異化與延伸</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢的組別</b>：第一關固定 3 個動作（不用亂數 3～5），第二關做到 5 個動作即可。仍符合題目架構。</li>
+      <li><b>提早完成的組別</b>：加第三關（兩人輪流接龍）、加入節拍器背景音樂、把三個動作的判定包成<b>自訂積木</b>。</li>
+      <li><b>跨領域</b>：音樂的節奏與唱名（Do Mi Sol）、體育的反應訓練、數學的亂數與機率。</li>
+      <li><b>不插電</b>：全班玩一次「拍手接龍」——老師拍三下，學生模仿；答對後老師再加一下。玩過之後學生對「序列要記在哪裡」會非常有感。</li>
+      <li><b>無障礙考量</b>：若有肢體不便的學生，可保留鍵盤操作作為替代輸入，並在說明文件寫明設計理由。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>七、課前環境檢查</h3>
+    <div class="self" id="chk"></div>
+  </div>
+
+  <div class="tsec">
+    <h3>八、關於這份教材的模擬</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li>學生版的節奏遊戲是<b>本教材自製的完整示範</b>，用按鈕與鍵盤代替手勢，但<b>預備姿勢的狀態機是真的</b>——做完一個動作按鈕會鎖住，正好用來講解任務一。</li>
+      <li>音效以瀏覽器內建的 Web Audio 即時合成（Sol 392 Hz、Do 523 Hz、Mi 659 Hz），<b>不需要任何音檔</b>；若電腦靜音則只會看到畫面變化。</li>
+      <li>亂數節奏、序列比對、連續加分、速度遞減都是<b>實際運作</b>的，可以直接投影示範，不是靜態圖片。</li>
+      <li>積木中文字沿用先前 <b>Handpose2Scratch／Facemesh2Scratch 教材</b>已驗證的介面用詞；擴充模組的積木顏色為近似值。</li>
+    </ul>
+  </div>
+
+  <footer>📕 AI 節奏接龍大作戰・教師版　·　臺北市 115 年度國民中小學 Scratch 貓咪盃競賽 初賽題目</footer>
+</div>
+
+<script>
+var CHK=[
+ '每台電腦都能開啟 <b>stretch3.github.io</b> 並成功載入擴充功能。',
+ '攝影機權限已允許，畫面出得來。',
+ '喇叭或耳機可以出聲（這一組<b>聲音是評分項目</b>）。',
+ '學生已學過<b>清單</b>（沒學過的話要先補一節）。',
+ '教室光線充足，座位間距足夠。',
+ '已先自己跑過一次，記下三個動作的門檻值範圍。',
+ '已準備好作品存檔與繳交的方式（.sb3 檔）。'
+];
+(function(){
+  var h=document.getElementById('chk');
+  CHK.forEach(function(t){
+    var l=document.createElement('label');
+    l.innerHTML='<input type="checkbox"><span>'+t+'</span>';
+    h.appendChild(l);
+  });
+})();
+</script>
+</body>
+</html>

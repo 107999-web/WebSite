@@ -1,0 +1,118 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 堂｜紅石中繼器：補訊號、延遲、單行道</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="3">
+<main class="wrap">
+
+<section class="hero" style="--u:#E57373">
+  <span class="tag">第 3 堂 ／ 單元1　紅石入門</span>
+  <h1>紅石中繼器：補訊號、延遲、單行道 ⏩</h1>
+  <p>上次走廊的第 16 盞燈為什麼不亮？因為紅石訊號走 15 格就用完了！中繼器可以把訊號補滿，還能讓訊號「慢一點」到，做出跑馬燈。</p>
+  <div class="chips"><span class="chip">🧱 紅石中繼器、紅石粉、紅石燈、拉桿</span><span class="chip">💻 MakeCode：搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>會看紅石訊號強度，知道第 16 格會沒電。</li><li>會放中繼器補訊號，知道它只能往箭頭方向傳。</li><li>會調中繼器的延遲（1～4 格），做出跑馬燈。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：揭曉上週的謎：網頁打開「顯示訊號強度」數一數</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：中繼器三個功能：補到 15、單行道、延遲</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：用 MakeCode 一秒鋪出 30 格燈帶，找出不亮的地方，再用中繼器修好</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：跑馬燈：網頁調延遲、遊戲裡做 5 盞燈依序亮</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：誰的跑馬燈最快？誰的最慢？</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">⏩</span><b>紅石中繼器</b>把訊號<b>補回 15</b>；訊號<b>只能往箭頭方向</b>走；右鍵可以調<b>延遲 1～4 格</b>（每格 0.1 秒）。</div><div class="lc"><span class="ic">📏</span><b>訊號強度</b>電源旁邊是 15，每走一格少 1。強度 1 也算有電，0 才是沒電。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>中繼器放的方向很重要：箭頭（三角形）要指向「電要去的地方」。</li><li>中繼器像一個「單行道」，可以防止兩條線的電互相跑到對方那裡。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：30 格燈帶，修好它！ 📏</h3></header>
+  <div class="items">🎒 準備物品：（用 MakeCode 鋪好）拉桿、紅石中繼器</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s03a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>先用下面的 MakeCode 程式輸入 <code>lamps 30</code>，腳下會出現一排 30 盞燈，上面鋪滿紅石粉。</li><li>在第一格紅石粉旁邊放<b>拉桿</b>並打開。數一數：亮到第幾盞？</li><li>把第 15 格左右的紅石粉挖掉，換成<b>中繼器</b>（箭頭朝前進方向）。</li><li>後面的燈全部亮起來了！</li></ol>
+  <div class="tip">💡 中繼器放反了，電就過不去。放之前先看看自己面向哪一邊：中繼器的箭頭會朝向你「面對的方向」。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：在網頁和遊戲裡都修好燈帶。</div><div class="lv f"><b>🦊 五、六年級</b>：挑戰 50 格燈帶，最少需要幾個中繼器？</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：跑馬燈 🏃</h3></header>
+  <div class="items">🎒 準備物品：拉桿、紅石粉、紅石中繼器、紅石燈</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s03b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>拉桿 → 紅石粉 → 中繼器 → 紅石粉 → 中繼器……排成一排。</li><li>每段紅石粉旁邊（或下面）放一盞燈。</li><li>對中繼器按右鍵把延遲調到 4，打開拉桿看燈一顆一顆亮。</li><li>關掉拉桿，燈也會一顆一顆熄滅。</li></ol>
+  <div class="tip">💡 延遲 1 格 = 0.1 秒。4 個延遲 4 的中繼器，最後一盞燈要等 1.6 秒才亮。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出 5 盞燈的跑馬燈。</div><div class="lv f"><b>🦊 五、六年級</b>：做成一個圈，讓跑馬燈繞著舞台。</div></div>
+</section>
+
+<section class="mission" id="mc">
+  <header><h3>💻 MakeCode：一秒鋪好 30 格燈帶</h3></header>
+  <p>用程式「填充」可以瞬間鋪好很長的紅石線，方便測試訊號強度。聊天指令後面的數字可以決定要鋪幾格。</p>
+  <div class="mcwrap">
+    <div><b>積木</b>（積木上的文字可能因版本略有不同）
+<pre class="mc">player hat: 當聊天指令 {&quot;lamps&quot;} 參數 {num1}
+  blocks: 填充 [紅石燈] 從 {~1 ~-1 ~0} 到 {~num1 ~-1 ~0} [取代]
+  blocks: 填充 [紅石粉] 從 {~1 ~0 ~0} 到 {~num1 ~0 ~0} [取代]</pre></div>
+    <div><div class="row"><b>JavaScript</b><button class="btn sm blue" data-copy="js3">📋 複製</button></div>
+<pre class="js" id="js3">player.onChat(&quot;lamps&quot;, function (num1) {
+    blocks.fill(REDSTONE_LAMP, pos(1, -1, 0), pos(num1, -1, 0), FillOperation.Replace)
+    blocks.fill(REDSTONE_WIRE, pos(1, 0, 0), pos(num1, 0, 0), FillOperation.Replace)
+})</pre>
+      <p class="small">在 MakeCode 上方切換到「JavaScript」，整段貼上，再切回「積木」就會變成上面的積木。</p></div>
+  </div>
+  <div class="dl"><a class="btn green" href="../makecode/第03堂_一秒鋪好_30_格燈帶.mkcd" download>⬇️ 下載 MakeCode 檔（.mkcd）</a>
+    <span class="small">Minecraft Education 按 <kbd>C</kbd> → MakeCode → <b>匯入</b> → 選這個檔案，打開就是上面的積木，不用自己拼。</span></div>
+  <h4>🧪 試試看</h4>
+  <ol class="steps"><li>在平坦的地方，拼好積木後按 <kbd>T</kbd> 輸入 <code>lamps 30</code>。</li><li>腳下往東會出現 30 盞紅石燈（換掉地板），燈上面鋪滿紅石粉。</li><li>在自己腳下（燈帶起點）放拉桿並打開。</li><li>試試 <code>lamps 15</code>、<code>lamps 16</code>：哪一個全部都亮？</li></ol>
+  <div class="note">📌 紅石粉放在紅石燈「上面」，燈就一定會被點亮，這樣才能清楚看出訊號在哪裡用完。燈帶是往「東」（x 變大）鋪，請先按 F3 或開啟「顯示座標」確認方向。</div>
+</section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>生活中有什麼東西像「中繼器」？（提示：接力賽、延長線、手機基地台……）</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>燈帶程式會把地板換成燈，請在平坦世界操作，避免挖到洞。</li><li>如果學生看不懂方向，可以在世界設定開啟「顯示座標」，讓學生觀察往東走時 X 變大。</li><li>基岩版中繼器還有「鎖定」功能（從側面再接一個中繼器），🦊 學生可以自己探索。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s03a": {"title": "📏 應用 1：燈怎麼不亮？", "desc": "拉桿到燈有 20 格紅石粉。打開「顯示訊號強度」數數看，訊號在哪裡變 0？把其中一格換成中繼器（朝向 →）。", "rows": ["L:A ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- ~- O:L"], "tools": ["rep", "dust"], "names": {"A": "拉桿", "L": "燈"}, "challenges": [{"name": "拉桿打開，20 格外的燈要亮", "level": "🐣", "steps": [{"set": {"A": true}, "expect": {"L": true}}, {"set": {"A": false}, "expect": {"L": false}}]}]}, "s03b": {"title": "🏃 應用 2：跑馬燈", "desc": "打開拉桿看燈一顆一顆亮。用 🖐️ 點中繼器可以改延遲（1～4），試試看最快和最慢。", "rows": ["L:A - r>4 - r>4 - r>4 - r>4 -", ". O . O . O . O . O"], "tools": ["rep", "dust", "lamp"], "names": {"A": "拉桿"}}};
+window.QUIZ = [{"q": "紅石粉從拉桿出發，第幾格開始沒電？", "o": ["第 10 格", "第 16 格", "第 64 格"], "a": 1, "why": "15、14……1，第 16 格就是 0。"}, {"q": "中繼器不能做哪一件事？", "o": ["把訊號補回 15", "延遲訊號", "讓訊號往兩個方向傳"], "a": 2, "why": "中繼器是單行道，只往箭頭方向傳。"}, {"q": "中繼器調到延遲 4，要等多久訊號才通過？", "o": ["0.4 秒", "4 秒", "1 秒"], "a": 0, "why": "每格延遲 0.1 秒，4 格就是 0.4 秒。"}, {"q": "中繼器放反了會怎樣？", "o": ["電過不去", "電變更強", "會爆炸"], "a": 0, "why": "它只讓電往箭頭方向走。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

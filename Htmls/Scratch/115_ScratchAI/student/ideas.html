@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>情境選擇卡・貓咪盃 AI 互動組</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/comp.css">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tabs button{border:3px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;
+  padding:8px 18px;font-family:var(--f-round);font-weight:800;font-size:.9rem;cursor:pointer;transition:.18s}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,var(--paper));color:var(--accent-d)}
+
+.ideas{display:grid;gap:14px;margin-top:18px}
+.idea{background:var(--paper);border:3px solid var(--line);border-radius:22px;box-shadow:var(--shadow-s);overflow:hidden}
+.idea.anim{border-left:10px solid var(--c-sensing)}
+.idea.game{border-left:10px solid var(--c-operators)}
+.idea>summary{list-style:none;cursor:pointer;padding:15px 18px;display:grid;
+  grid-template-columns:auto 1fr auto;gap:13px;align-items:center}
+.idea>summary::-webkit-details-marker{display:none}
+.idea>summary:hover{background:var(--paper2)}
+.idea .no{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;
+  font-family:var(--f-num);font-weight:800;font-size:1.15rem;color:#fff;background:var(--c-sensing)}
+.idea.game .no{background:var(--c-operators)}
+.idea .hd{min-width:0}
+.idea .hd .gp,.idea .hd .tt,.idea .hd .sb2{display:block}
+.idea .hd .gp{font-size:.72rem;font-weight:800;color:var(--ink2);letter-spacing:.04em}
+.idea .hd .tt{font-weight:800;font-size:1.06rem;margin-top:1px}
+.idea .hd .sb2{font-size:.88rem;color:var(--ink2);margin-top:3px}
+.idea .rt{display:grid;justify-items:end;gap:4px}
+.idea .lv{font-size:.76rem;font-weight:800;color:var(--accent-d);white-space:nowrap}
+.idea .arw{font-size:.9rem;color:var(--ink2);font-weight:800}
+.idea[open] .arw{transform:rotate(90deg)}
+.idea .arw{display:inline-block;transition:transform .2s}
+.idea .body{padding:4px 18px 18px;border-top:2px dashed var(--line);margin-top:0}
+
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-top:12px;font-size:.92rem}
+.dl dt{font-weight:800;color:var(--accent-d);white-space:nowrap}
+.dl dd{margin:0;color:var(--ink2)}
+.dl dd b{color:var(--ink)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{background:var(--paper2);border:2px solid var(--line);border-radius:999px;padding:3px 11px;
+  font-size:.83rem;font-weight:700;color:var(--ink)}
+.chip.bad{border-color:var(--no);color:var(--no)}
+.chip.act{border-color:var(--ok);color:var(--ok)}
+
+.ends{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}
+.endbox{border:2px solid var(--line);border-radius:16px;padding:9px 13px;font-size:.88rem}
+.endbox .eh{font-weight:800;font-size:.92rem}
+.endbox.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.endbox.bad{border-color:var(--no);background:color-mix(in srgb,var(--no) 10%,var(--paper))}
+
+.chk{margin-top:13px;border:2px dashed var(--line);border-radius:16px;padding:10px 14px;background:var(--paper2)}
+.chk .ch{font-size:.86rem;font-weight:800;color:var(--ink2);margin-bottom:5px}
+.chk ul{margin:0;padding-left:1.15em;font-size:.86rem;color:var(--ink2)}
+.chk li{margin:3px 0}
+.chk li b{color:var(--ink)}
+
+.warn{margin-top:12px;background:color-mix(in srgb,var(--accent) 15%,var(--paper));
+  border:2px solid color-mix(in srgb,var(--accent) 42%,var(--line));border-radius:16px;
+  padding:9px 14px;font-size:.88rem}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:14px}
+.btn2{border:3px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;
+  padding:8px 17px;font-family:var(--f-round);font-weight:800;font-size:.88rem;cursor:pointer;transition:.18s}
+.btn2:hover{border-color:var(--accent);color:var(--accent-d)}
+
+@media(max-width:620px){
+  .idea>summary{grid-template-columns:auto 1fr;gap:10px}
+  .idea .rt{grid-column:1/-1;justify-items:start}
+  .dl{grid-template-columns:1fr;gap:2px 0}
+  .dl dd{margin-bottom:7px}
+}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:#fff!important;background-image:none!important}
+  .top,.tabs,.toolbar,.noprint,footer{display:none!important}
+  .wrap{max-width:none;padding:0}
+  .idea{display:block!important;break-inside:avoid;page-break-inside:avoid;box-shadow:none;border-width:2px;margin-bottom:8px}
+  .idea .body{display:block!important}
+  .sec{margin-top:14px}
+  *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">💡 情境選擇卡 <em>貓咪盃 AI 互動組</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="anim.html">動畫組</a>
+      <a href="game.html">遊戲組</a>
+      <a class="on" href="ideas.html">情境卡</a>
+      <a href="plan.html">進度表</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge">臺北市 115 年度貓咪盃・初賽　國小 AI 互動組</span>
+    <h1>十張情境選擇卡</h1>
+    <p>題目只有兩題，但同一題可以有很多種做法。這裡是<b>五個動畫組故事情境</b>與<b>五種遊戲組玩法</b>，
+      每一張都已經對照過題目的任務說明。<br>
+      挑一張你最想做的，然後把卡片上的數值<b>換成自己訂的</b>——這一步不能省，否則全班的作品會長得一樣。</p>
+    <div class="toolbar">
+      <button class="btn2" id="openAll">全部展開</button>
+      <button class="btn2" id="closeAll">全部收合</button>
+      <button class="btn2" id="doPrint">🖨️ 列印成 A4</button>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">1</span>先看清楚：哪些可以改，哪些不能改</h2>
+    <p>挑情境之前，先弄懂題目畫下的界線。改錯地方，做得再漂亮也會被扣分。</p>
+    <div class="cols2">
+      <div class="panelbox">
+        <h3>✅ 可以自由發揮</h3>
+        <ul style="font-size:.9rem;margin:8px 0 0;padding-left:1.15em;color:var(--ink2)">
+          <li>故事的角色、場景、美術風格</li>
+          <li>選哪三種生物、哪三種環境問題</li>
+          <li>用手部還是頭部、選哪幾個動作</li>
+          <li>所有<b>數值門檻</b>（但要寫進說明文件）</li>
+          <li>音效、動畫、介面的呈現方式</li>
+        </ul>
+      </div>
+      <div class="panelbox">
+        <h3>⛔ 不能改的題目底線</h3>
+        <ul style="font-size:.9rem;margin:8px 0 0;padding-left:1.15em;color:var(--ink2)">
+          <li>動畫組：<b>三種生物＋三種環境問題＋兩種故事發展</b>，而且不當選擇要讓環境<b>惡化</b></li>
+          <li>遊戲組：<b>至少三種動作</b>，且動作之間要判斷<b>回到預備姿勢</b></li>
+          <li>遊戲組第一關是<b>亂數 3～5 個動作</b>的節奏記憶</li>
+          <li>遊戲組第二關是系統<b>每次加一個</b>、序列越來越長的接龍</li>
+          <li>兩組都要交<b>程式說明文件</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">2</span>十張情境卡</h2>
+    <p>點一下卡片可以展開細節：生物與問題、變數設計、惡化或加分機制、結局或關卡，以及<b>逐條對照題目的檢核</b>。</p>
+    <div class="tabs" id="tabs">
+      <button class="on" data-f="all">全部（10）</button>
+      <button data-f="anim">🌳 動畫組（5）</button>
+      <button data-f="game">🎵 遊戲組（5）</button>
+    </div>
+    <div class="ideas" id="ideas"></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">3</span>十張卡共同的技術底線</h2>
+    <div class="tsec">
+      <h3>一、動作要挑「電腦看得穩」的</h3>
+      <p style="font-size:.92rem;margin-top:5px">題目自己就建議「優先選擇容易穩定判斷的動作」。
+        最穩的是<b>手舉高、手向左、手向右</b>；<b>張開手掌、點頭、左右轉頭</b>次之。
+        不要挑需要很細微差異才分得出來的動作，比賽現場的光線和你家不一樣。</p>
+    </div>
+    <div class="tsec">
+      <h3>二、預備姿勢＝一個旗標變數</h3>
+      <p style="font-size:.92rem;margin-top:5px">這是遊戲組<b>任務一明文要求</b>的事，動畫組也一樣需要（否則手一舉起來就種了幾十棵樹）。
+        做法是：觸發後把 <b>可以觸發</b> 設為 0，偵測到手回到預備區間才設回 1。
+        <b>不要用「等待幾秒」代替</b>，那不是狀態機，說明文件會寫不出來。</p>
+    </div>
+    <div class="tsec">
+      <h3>三、偵測不到時回傳的是空字串，不是 0</h3>
+      <p style="font-size:.92rem;margin-top:5px">手離開鏡頭、臉轉出畫面時，AI 積木回傳的是<b>空白</b>。
+        如果直接拿去比大小，Scratch 會當成 0，角色就會突然飛到畫面正中間。
+        所有判斷之前，都要先確認「偵測得到」——臉部用 <b>人數 &gt; 0</b>，手部先存進變數再檢查是不是空白。</p>
+    </div>
+    <div class="tsec">
+      <h3>四、說明文件邊做邊寫</h3>
+      <p style="font-size:.92rem;margin-top:5px">動畫組要寫<b>互動方式</b>與<b>故事分支條件</b>；
+        遊戲組要寫<b>動作判定方式（含如何避免重複判定）</b>、<b>亂數節奏產生方法</b>、
+        <b>動作序列的記錄方式</b>、<b>關卡通過與遊戲結束條件</b>。
+        這是照題目最後一行逐條列的，不是自由發揮。每決定一個數字就順手記下來，最後只要整理就好。</p>
+    </div>
+  </section>
+
+  <footer>💡 情境選擇卡　·　臺北市 115 年度國民中小學 Scratch 貓咪盃競賽 初賽題目　·　卡片上的數值皆為示範，請自行訂定</footer>
+</div>
+<script>
+var IDEAS=[
+{g:'anim',ic:'🐸',lv:'★★☆ 中等',t:'溪流上游，最後一窪水',
+ s:'用青蛙的視角說故事：牠住的水潭一天比一天淺，同伴一隻隻不見了。',
+ bio:['青蛙','翠鳥','蜻蜓幼蟲（水蠆）'],
+ prob:['水源被污染','垃圾淤積在溪床','溪邊樹木被砍，沒有遮蔭、水溫升高'],
+ act:['手向左右揮＝撈起垃圾','手舉高＝種回溪邊的樹','張開手掌擋住＝阻止有人偷倒廢水'],
+ vars:'<b>水質</b> 0～100　<b>垃圾</b> 0～6　<b>遮蔭</b> 0～5',
+ chg:'撈一次垃圾：垃圾 −1、水質 +5；種一棵樹：遮蔭 +1；水質越高，水池的顏色越清澈，畫面上的水草也越多。',
+ bad:'沒有及時擋下偷倒廢水 → <b>水質 −20、垃圾 +1</b>，水面立刻變色，蜻蜓幼蟲消失。',
+ eg:'水質 ≥ 70 且垃圾 ≤ 2　→　蛙卵順利孵化，翠鳥回來築巢',
+ eb:'水質 &lt; 40　→　青蛙沿著乾涸的溪床，一隻一隻離開',
+ w:'「阻止破壞行為」是題目任務二明文舉的例子，做出來很扎實。但記得要讓它<b>有失敗的可能</b>——如果每次都擋得下來，就沒有惡化了。'},
+
+{g:'anim',ic:'🦉',lv:'★★☆ 中等',t:'熄燈之後：夜晚的森林',
+ s:'主題是光害與噪音——小朋友很少想到，但一做出來非常有說服力。',
+ bio:['貓頭鷹','螢火蟲','蝙蝠'],
+ prob:['過亮的路燈（光害）','夜間施工的噪音','路邊老樹被移除'],
+ act:['張開手掌遮在鏡頭前＝關掉一盞燈','點頭＝確認保留這棵老樹','手向左右＝移走噪音來源'],
+ vars:'<b>亮度</b> 0～100（越低越好）　<b>噪音</b> 0～100　<b>老樹</b> 0～5',
+ chg:'關一盞燈：亮度 −15，畫面變暗一階、螢火蟲多兩隻；噪音降低時，貓頭鷹才會出現在枝頭上。',
+ bad:'同意再加裝照明 → <b>亮度 +25</b>，螢火蟲當場全部消失，蝙蝠也不再飛過畫面。',
+ eg:'亮度 ≤ 30 且老樹 ≥ 3　→　星空與滿樹螢火重新出現',
+ eb:'亮度 ≥ 80　→　森林被白光照得雪亮，卻一點聲音也沒有',
+ w:'畫面「變暗」不能讓觀看者看不到東西。建議用<b>星星與螢火蟲的亮點</b>把視覺補回來，暗但是好看，這是這張卡成敗的關鍵。'},
+
+{g:'anim',ic:'🏫',lv:'★☆☆ 入門',t:'學校旁邊那片小樹林',
+ s:'在地化版本：背景直接拍自己的校園，代入感最強，也最容易做完。',
+ bio:['麻雀','赤腹松鼠','獨角仙'],
+ prob:['落葉被掃得精光，土壤失去養分','飲料杯垃圾','外來種植物蔓延'],
+ act:['手向下壓＝把落葉留在原地','手向左右＝撿走垃圾','手舉高＝拔除外來種'],
+ vars:'<b>腐植土</b> 0～10　<b>垃圾</b> 0～6　<b>外來種</b> 0～5',
+ chg:'留下落葉：腐植土 +1，地面的顏色變深；腐植土 ≥ 5 時獨角仙的幼蟲才會出現在畫面下方。',
+ bad:'把落葉全部掃乾淨 → <b>腐植土 −3</b>，獨角仙幼蟲沒地方長，隔年成蟲就不見了。',
+ eg:'腐植土 ≥ 7 且垃圾 ≤ 1　→　小樹林成為校園的自然教室',
+ eb:'腐植土 ≤ 2　→　只剩幾隻麻雀的水泥空地',
+ w:'這張卡的特色是<b>「做得太多也不對」</b>——掃得太乾淨反而讓生物消失。這種層次評審會眼睛一亮，但一定要在畫面上講清楚原因，否則觀看者會以為是程式壞了。'},
+
+{g:'anim',ic:'🦩',lv:'★★☆ 中等',t:'紅樹林的中繼站',
+ s:'把「搬家」直接扣在候鳥遷徙上——十張卡裡題意扣得最緊的一張。',
+ bio:['黑面琵鷺','招潮蟹','彈塗魚'],
+ prob:['灘地被填土開發','養殖廢水排入','廢棄漁網纏繞'],
+ act:['手向左右撈＝清除廢棄漁網','手舉高＝種下水筆仔','向左／向右轉頭＝查看不同的灘地'],
+ vars:'<b>水筆仔</b> 0～8　<b>水質</b> 0～100　<b>漁網</b> 0～5',
+ chg:'種一棵水筆仔：水筆仔 +1，畫面的紅樹林往兩側長一截；漁網清完之後，招潮蟹才會從洞裡出來。',
+ bad:'同意一塊灘地被填平 → <b>水筆仔 −3</b>，可棲息的面積一次少掉一大塊，而且長不回來。',
+ eg:'水筆仔 ≥ 6 且水質 ≥ 65　→　明年候鳥依約回到這片灘地',
+ eb:'水筆仔 ≤ 2　→　整群候鳥改道飛往別處，灘地空無一鳥',
+ w:'紅樹林本身就是森林，題意站得住腳。<b>務必在故事開頭用一句話交代這是紅樹林</b>，評審才不會覺得離題。'},
+
+{g:'anim',ic:'⏳',lv:'★★★ 挑戰',t:'時光森林：十年、二十年、三十年',
+ s:'用時間軸當骨架，同一片森林呈現三個不同的樣貌。視覺衝擊最強，但工作量也最大。',
+ bio:['山羌','台灣藍鵲','面天樹蛙'],
+ prob:['山坡地被開發','外來種入侵','廢棄物堆置'],
+ act:['手舉高＝造林','手向左右＝清運廢棄物','張開手掌＝擋下一件開發案'],
+ vars:'<b>年代</b>（10／20／30）　<b>森林覆蓋</b> 0～100　<b>廢棄物</b> 0～6',
+ chg:'每完成一個階段的行動，年代 +10、背景換成下一個十年的樣子；森林覆蓋越高，畫面上的樹冠層次越多。',
+ bad:'讓一件開發案通過 → <b>森林覆蓋 −20</b>，而且下一個十年也補不回來，等於永久損失。',
+ eg:'三十年後森林覆蓋 ≥ 75　→　這裡成為受保護的生態廊道',
+ eb:'森林覆蓋 ≤ 30　→　山頭成了光禿的建地，動物全數遷離',
+ w:'技術上只多一個「年代」變數控制背景，難的是<b>要準備三組背景圖</b>。時間不夠就改成兩個階段（現在／二十年後），一樣符合題目。'},
+
+{g:'game',ic:'🔥',lv:'★★☆ 中等',t:'部落樂舞・火堆旁的節奏',
+ s:'把節奏接龍放進圍著火堆的樂舞場景，動作大、聲音沉，投影出來很有氣勢。',
+ mv:['手向左　→　低音木鼓','手舉高　→　竹鐘（高音）','手向右　→　沙鈴'],
+ fx:'每個正確動作讓<b>火堆竄高一截</b>並改變火光顏色；答錯時火光瞬間暗下來。',
+ l1:'系統亂數產生 3～5 個動作，依序播放提示。<b>連續 3 輪完全正確即過關。</b>',
+ l2:'系統產生節奏，玩家答對後系統<b>再加一個動作</b>，序列越接越長，接到 10 個即挑戰成功。',
+ sc:'每輪得分 ＝ 10 × 動作數。連續 3 輪不出錯進入「火光全開」狀態，該輪分數 <b>×2</b>。',
+ df:'每過一輪，提示的間隔縮短 40 毫秒，下限 250 毫秒。',
+ fl:'做錯扣一條命（共 3 條），命歸零即遊戲結束。',
+ w:'火堆動畫用<b>造型切換</b>就好，不要疊太多特效——畫面一卡，動作偵測也會跟著變遲鈍。'},
+
+{g:'game',ic:'🛰️',lv:'★★★ 挑戰',t:'太空中繼站・訊號接力',
+ s:'全部改用頭部動作，手可以放在鍵盤上；代價是判定門檻要調得更仔細。',
+ mv:['向左轉頭　→　左側訊號燈（低音）','向右轉頭　→　右側訊號燈（中音）','點頭　→　送出確認（高音）'],
+ fx:'三盞訊號燈分別亮起並發出不同電子音，艙外的太空船隨節奏往前推進一格。',
+ l1:'系統亂數產生 3～5 個訊號，依序閃燈提示。<b>連續 3 輪正確即過關。</b>',
+ l2:'系統每次在序列末端<b>增加一個新訊號</b>，接到 12 個即完成任務。',
+ sc:'每輪得分 ＝ 10 × 訊號數；連續正確每多一輪額外 +5（會累加）。',
+ df:'提示燈號的閃爍時間逐輪縮短，後面幾乎是一閃即逝。',
+ fl:'答錯扣 1 格氧氣（共 5 格），氧氣歸零即遊戲結束。',
+ w:'頭部動作的門檻值<b>受座位高度影響很大</b>，一定要把門檻做成變數，到比賽現場再調一次。這一點也要寫進說明文件。'},
+
+{g:'game',ic:'🍳',lv:'★☆☆ 入門',t:'廚房交響曲',
+ s:'門檻最低、最容易做完的一張。適合先把完整流程跑通，再回頭加動畫。',
+ mv:['手向左　→　切菜（Do）','手舉高　→　掀鍋蓋（Mi）','手向右　→　搖鹽罐（Sol）'],
+ fx:'每個動作除了音符，還有對應的食材<b>掉進鍋子裡</b>的動畫，鍋子會冒出不同顏色的煙。',
+ l1:'客人點一道 3～5 個步驟的菜（亂數產生），玩家照順序做出來。<b>連續完成 3 道即過關。</b>',
+ l2:'客人的點單每次<b>加一個步驟</b>，做到 10 個步驟的大餐即通關。',
+ sc:'每完成一道 ＋10 × 步驟數；連續不出錯每多一道額外 +5。',
+ df:'出菜的倒數時間逐道縮短，從 8 秒一路減到 4 秒。',
+ fl:'做錯該道菜重做，同一道連續失敗 3 次即遊戲結束。',
+ w:'這張最容易做完，<b>先求有再求好</b>：先把兩關和計分跑通，動畫和音效留到最後再補。'},
+
+{g:'game',ic:'🥁',lv:'★★★ 挑戰',t:'鼓王對決・兩人輪流',
+ s:'同一台電腦兩人輪流接龍，各自累計分數，先失誤的一方落敗。上課試玩時氣氛最熱烈。',
+ mv:['手向左　→　低音鼓','手舉高　→　鈸','手向右　→　高音鼓'],
+ fx:'兩位玩家有各自的鼓組顏色與舞臺燈光，正確時對應的鼓面會震動。',
+ l1:'兩人<b>各自</b>完成一次 3～5 個動作的節奏記憶關，都通過才進入第二關。',
+ l2:'系統產生節奏 → A 完成 → <b>系統加一個</b> → B 完成 → 系統再加一個，兩人輪流接下去。',
+ sc:'兩人分數分開累計；連續接對會加分，接得越長單輪分數越高。',
+ df:'序列每多一個動作，提示速度就加快一階。',
+ fl:'先失誤的一方落敗，遊戲結束並顯示雙方分數。',
+ w:'⚠️ <b>新增的動作一定要由系統亂數產生，不能改成由對手出題</b>，否則就不符合題目對第二關的定義了。另外需要一個「目前輪到誰」的變數，這也要寫進說明文件。'},
+
+{g:'game',ic:'🗼',lv:'★★☆ 中等',t:'節奏爬塔',
+ s:'把分數變成看得見的進度：每答對一輪，音樂精靈就往上爬一層，塔的高度就是成績。',
+ mv:['張開手掌　→　鐘聲','手向左　→　低音','手向右　→　高音'],
+ fx:'精靈每過一層就往上跳一格，塔身的燈依序點亮；答錯時掉回下一層。',
+ l1:'第 1～3 層是節奏記憶關：系統亂數產生 3～5 個動作依序提示。<b>爬完第 3 層即過關。</b>',
+ l2:'第 4 層起進入接龍：每爬一層，系統<b>在序列末端加一個動作</b>，爬到第 10 層即登頂。',
+ sc:'每層得分 ＝ 10 × 動作數；連續不失誤每層額外 +5。',
+ df:'<b>分層設計</b>：1～3 層提示有聲音也有動畫；第 4 層起提示<b>只剩動畫、沒有聲音</b>；第 7 層起速度再加快。',
+ fl:'失誤掉回下一層，掉到第 0 層即遊戲結束。',
+ w:'「越往上線索越少」比單純縮短時間更有層次。但<b>一定要在畫面上讓玩家知道規則變了</b>（例如「第 4 層起，靜音挑戰」的字卡），否則玩家會以為程式壞掉。'}
+];
+
+function esc(s){return s;}
+function chips(arr,cls){
+  return '<div class="chips">'+arr.map(function(x){return '<span class="chip'+(cls?' '+cls:'')+'">'+x+'</span>';}).join('')+'</div>';
+}
+function animBody(d){
+  return '<div class="body">'+
+   '<dl class="dl">'+
+    '<dt>三種生物</dt><dd>'+chips(d.bio)+'</dd>'+
+    '<dt>三種環境問題</dt><dd>'+chips(d.prob,'bad')+'</dd>'+
+    '<dt>互動動作</dt><dd>'+chips(d.act,'act')+'</dd>'+
+    '<dt>變數設計</dt><dd>'+d.vars+'</dd>'+
+    '<dt>場景怎麼變</dt><dd>'+d.chg+'</dd>'+
+    '<dt>惡化設計</dt><dd>'+d.bad+'</dd>'+
+   '</dl>'+
+   '<div class="ends">'+
+    '<div class="endbox good"><div class="eh">🌱 故事發展 A</div>'+d.eg+'</div>'+
+    '<div class="endbox bad"><div class="eh">🍂 故事發展 B</div>'+d.eb+'</div>'+
+   '</div>'+
+   '<div class="chk"><div class="ch">✔ 對照題目任務說明</div><ul>'+
+    '<li><b>任務一</b>　三種生物（'+d.bio.join('、')+'）與三種環境問題（'+d.prob.length+' 項）都有。</li>'+
+    '<li><b>任務二</b>　設計了 '+d.act.length+' 種頭部／手部互動，觀看者可參與復育行動。</li>'+
+    '<li><b>任務三</b>　每個行動都對應變數改變與畫面變化；不當選擇會讓環境<b>惡化</b>。</li>'+
+    '<li><b>任務四</b>　依數值分出<b>兩種</b>故事發展。</li>'+
+   '</ul></div>'+
+   '<div class="warn"><b>特別提醒　</b>'+d.w+'</div>'+
+  '</div>';
+}
+function gameBody(d){
+  return '<div class="body">'+
+   '<dl class="dl">'+
+    '<dt>三種動作</dt><dd>'+chips(d.mv,'act')+'</dd>'+
+    '<dt>對應效果</dt><dd>'+d.fx+'</dd>'+
+    '<dt>第一關・節奏記憶</dt><dd>'+d.l1+'</dd>'+
+    '<dt>第二關・節奏接龍</dt><dd>'+d.l2+'</dd>'+
+    '<dt>計分與加分</dt><dd>'+d.sc+'</dd>'+
+    '<dt>難度遞增</dt><dd>'+d.df+'</dd>'+
+    '<dt>結束條件</dt><dd>'+d.fl+'</dd>'+
+   '</dl>'+
+   '<div class="chk"><div class="ch">✔ 對照題目任務說明</div><ul>'+
+    '<li><b>任務一</b>　'+d.mv.length+' 種動作，且每個動作之間都要判斷<b>已回到預備姿勢</b>（用旗標變數）。</li>'+
+    '<li><b>任務二</b>　三個動作各自對應不同的音符／樂器聲音與舞臺動畫。</li>'+
+    '<li><b>任務三</b>　兩個關卡都在，第一關是亂數 3～5 個動作，第二關每次加一個；通過與結束條件都已自訂。</li>'+
+    '<li><b>任務四</b>　每輪得分、連續正確加分、做錯扣分或重挑，三件事都有。</li>'+
+    '<li><b>任務五</b>　難度會隨關卡進行逐漸增加。</li>'+
+   '</ul></div>'+
+   '<div class="warn"><b>特別提醒　</b>'+d.w+'</div>'+
+  '</div>';
+}
+(function(){
+  var host=document.getElementById('ideas');
+  var na=0,ng=0;
+  IDEAS.forEach(function(d,i){
+    var n = d.g==='anim' ? (++na) : (++ng);
+    var el=document.createElement('details');
+    el.className='idea '+d.g;
+    el.setAttribute('data-g',d.g);
+    el.innerHTML='<summary>'+
+      '<span class="no">'+d.ic+'</span>'+
+      '<span class="hd"><span class="gp">'+(d.g==='anim'?'動畫組 情境 '+n:'遊戲組 玩法 '+n)+'</span>'+
+      '<span class="tt">'+d.t+'</span><span class="sb2">'+d.s+'</span></span>'+
+      '<span class="rt"><span class="lv">'+d.lv+'</span><span class="arw">▸</span></span>'+
+      '</summary>'+ (d.g==='anim'?animBody(d):gameBody(d));
+    host.appendChild(el);
+  });
+  var tabs=document.getElementById('tabs');
+  tabs.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    [].forEach.call(tabs.children,function(x){x.classList.toggle('on',x===b);});
+    var f=b.getAttribute('data-f');
+    [].forEach.call(host.children,function(c){
+      c.style.display=(f==='all'||c.getAttribute('data-g')===f)?'':'none';
+    });
+  });
+  document.getElementById('openAll').addEventListener('click',function(){
+    [].forEach.call(host.children,function(c){c.open=true;});
+  });
+  document.getElementById('closeAll').addEventListener('click',function(){
+    [].forEach.call(host.children,function(c){c.open=false;});
+  });
+  document.getElementById('doPrint').addEventListener('click',function(){
+    [].forEach.call(host.children,function(c){c.open=true;c.style.display='';});
+    [].forEach.call(tabs.children,function(x,i){x.classList.toggle('on',i===0);});
+    window.print();
+  });
+})();
+</script>
+</body>
+</html>

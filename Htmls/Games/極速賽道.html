@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>極速賽道：方程式爭奪戰 🏎️</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #222;
+            background-image: radial-gradient(#333 20%, transparent 20%), radial-gradient(#333 20%, transparent 20%);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* 遊戲主容器 */
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 650px;
+            background: #111;
+            border: 4px solid #444;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 儀表板 / 數據列 */
+        #hud {
+            display: flex;
+            justify-content: space-between;
+            background: #000;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 3px solid #ffcc00;
+            letter-spacing: 1px;
+        }
+
+        .hud-val {
+            color: #ffcc00;
+        }
+
+        /* 專業賽車賽道 */
+        #track {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            background-color: #333; /* 柏油路色 */
+            /* 繪製賽道兩側的紅白路緣石與車道虛線 */
+            background-image: 
+                /* 左側緣 */
+                linear-gradient(90deg, #fff 0px, #fff 15px, #d9534f 15px, #d9534f 30px, transparent 30px),
+                /* 右側緣 */
+                linear-gradient(270deg, #fff 0px, #fff 15px, #d9534f 15px, #d9534f 30px, transparent 30px),
+                /* 車道線 1 */
+                linear-gradient(90deg, transparent 140px, #fff 140px, #fff 144px, transparent 144px),
+                /* 車道線 2 */
+                linear-gradient(90deg, transparent 256px, #fff 256px, #fff 260px, transparent 260px);
+            background-size: 100% 60px, 100% 60px, 100% 40px, 100% 40px;
+            animation: scroll-track 0s linear infinite;
+        }
+
+        @keyframes scroll-track {
+            from { background-position-y: 0px, 0px, 0px, 0px; }
+            to { background-position-y: 60px, 60px, 40px, 40px; }
+        }
+
+        /* 玩家賽車 (F1 方程式賽車風格) */
+        #player {
+            position: absolute;
+            bottom: 50px;
+            left: 175px; /* 初始中線車道 */
+            width: 50px;
+            height: 75px;
+            font-size: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transform-origin: center bottom;
+            transition: transform 0.05s ease;
+            filter: drop-shadow(0 8px 4px rgba(0,0,0,0.4));
+        }
+
+        /* 對手賽車 */
+        .enemy-car {
+            position: absolute;
+            width: 50px;
+            height: 75px;
+            font-size: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            filter: drop-shadow(0 6px 3px rgba(0,0,0,0.3));
+        }
+
+        /* 底部控制區域 (行動裝置專用) */
+        #mobile-controls {
+            display: flex;
+            width: 100%;
+            height: 80px;
+            background: #1a1a1a;
+            border-top: 2px solid #333;
+        }
+
+        .ctrl-btn {
+            flex: 1;
+            background: #252525;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.1s;
+        }
+
+        .ctrl-btn:active {
+            background: #ffcc00;
+            color: #000;
+        }
+
+        #btn-left { border-right: 1px solid #333; }
+
+        /* 面板覆蓋層 (開始 / 結束) */
+        .screen-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .screen-overlay h1 {
+            font-size: 28px;
+            color: #ffcc00;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .screen-overlay p {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #b38f00;
+            transition: all 0.1s;
+        }
+
+        .action-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b38f00;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="hud">
+            <div>時速: <span id="hud-speed" class="hud-val">0</span> KM/H</div>
+            <div>超越: <span id="hud-passed" class="hud-val">0</span> 輛</div>
+            <div>里程: <span id="hud-distance" class="hud-val">0</span> M</div>
+        </div>
+
+        <div id="track">
+            <div id="player">🏎️</div>
+        </div>
+
+        <div id="mobile-controls">
+            <button class="ctrl-btn" id="btn-left">◀ 靠左</button>
+            <button class="ctrl-btn" id="btn-right">靠右 ▶</button>
+        </div>
+
+        <div id="start-screen" class="screen-overlay">
+            <h1>Grand Prix Racing</h1>
+            <p style="color: #ffcc00; font-size: 12px;">專業賽道模擬賽</p>
+            <p>在高速前進的賽道上生存下來！<br>利用左右閃避技術，超越前方的所有對手車輛。<br><br><b>操作方式：</b><br>鍵盤：A / D 鍵 或 左右方向鍵<br>手機：點擊下方大按鈕</p>
+            <button class="action-btn" onclick="startRace()">進入賽道 🏁</button>
+        </div>
+
+        <div id="game-over-screen" class="screen-overlay hidden">
+            <h1 style="color: #d9534f;">比賽結束 💥</h1>
+            <p id="result-stats" style="color: #fff; font-size: 16px; margin: 15px 0;"></p>
+            <p>賽車在賽道上發生碰撞！請檢修後再度重回賽場。</p>
+            <button class="action-btn" onclick="startRace()">重新起跑 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        const track = document.getElementById('track');
+        const player = document.getElementById('player');
+        const hudSpeed = document.getElementById('hud-speed');
+        const hudPassed = document.getElementById('hud-passed');
+        const hudDistance = document.getElementById('hud-distance');
+        
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const resultStats = document.getElementById('result-stats');
+
+        // 對手賽車車型外觀陣列 (全都是各式跑車與賽車)
+        const enemyStyles = ['🏎️', '🏎️', '🚗', '🚘', '🚙', '🏎️'];
+        // 對手車輛可能出現的三個標準車道中心線 X 座標 (總寬400，扣除邊緣側緣與車寬)
+        const lanesX = [65, 175, 285]; 
+
+        // 遊戲核心數據
+        let gameActive = false;
+        let playerX = 175;
+        let speedKmH = 120; // 初始時速
+        let maxSpeedKmH = 320; // 最高極速
+        let carsPassed = 0;
+        let distanceM = 0;
+        
+        let enemies = [];
+        let spawnInterval = 1500; // 毫秒
+        let lastSpawnTime = 0;
+        let animationFrameId;
+
+        // 控制輸入
+        let keys = { Left: false, Right: false };
+
+        // 綁定鍵盤事件
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = false;
+        });
+
+        // 綁定手機點擊事件
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+
+        btnLeft.addEventListener('mousedown', () => keys.Left = true);
+        btnLeft.addEventListener('mouseup', () => keys.Left = false);
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys.Left = true; });
+        btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys.Left = false; });
+
+        btnRight.addEventListener('mousedown', () => keys.Right = true);
+        btnRight.addEventListener('mouseup', () => keys.Right = false);
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys.Right = true; });
+        btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys.Right = false; });
+
+        // 開始比賽
+        function startRace() {
+            // 清理舊車輛
+            enemies.forEach(car => car.element.remove());
+            enemies = [];
+
+            // 數據重置
+            playerX = 175;
+            speedKmH = 120;
+            carsPassed = 0;
+            distanceM = 0;
+            spawnInterval = 1500;
+
+            player.style.left = playerX + 'px';
+            player.style.transform = 'scale(1) rotate(0deg)';
+
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            // 根據時速計算賽道滾動動畫時間 (讓畫面動起來)
+            updateTrackSpeedAnimation();
+
+            gameActive = true;
+            lastSpawnTime = performance.now();
+            animationFrameId = requestAnimationFrame(gameEngine);
+        }
+
+        // 動態調整賽道捲動特效速度
+        function updateTrackSpeedAnimation() {
+            // 時速越高，animation-duration 的秒數要越短（捲動越快）
+            let duration = 40 / speedKmH; 
+            track.style.animationDuration = duration + 's';
+        }
+
+        // 生成對手賽車
+        function spawnEnemy() {
+            // 隨機挑選一個車道
+            const randomLaneIndex = Math.floor(Math.random() * lanesX.length);
+            const posX = lanesX[randomLaneIndex];
+
+            // 避免在同一個車道連續重疊生成
+            if (enemies.length > 0 && enemies[enemies.length - 1].lane === randomLaneIndex && enemies[enemies.length - 1].y < 100) {
+                return; 
+            }
+
+            const carElement = document.createElement('div');
+            carElement.classList.add('enemy-car');
+            carElement.innerText = enemyStyles[Math.floor(Math.random() * enemyStyles.length)];
+            carElement.style.left = posX + 'px';
+            carElement.style.top = '-80px';
+            
+            // 給對手賽車一點稍微不同的旋轉或濾鏡效果（模擬不同車隊）
+            const hueRotate = Math.floor(Math.random() * 360);
+            carElement.style.filter = `drop-shadow(0 6px 3px rgba(0,0,0,0.3)) hue-rotate(${hueRotate}deg)`;
+
+            track.appendChild(carElement);
+
+            enemies.push({
+                element: carElement,
+                x: posX,
+                y: -80,
+                lane: randomLaneIndex,
+                // 對手有隨機的微幅慢速（相對於玩家，看起來像是玩家在逼近他們）
+                relativeSpeed: Math.random() * 2 + 3 
+            });
+        }
+
+        // 精準的碰撞箱檢測 (AABB 演算法)
+        function isColliding(rect1, rect2) {
+            // 由於 Emojis 的賽車長寬有透明留白，內縮 8px 提高操控容錯率與真實感
+            const paddingX = 8;
+            const paddingY = 5;
+            return (
+                rect1.x + paddingX < rect2.x + rect2.width - paddingX &&
+                rect1.x + rect1.width - paddingX > rect2.x + paddingX &&
+                rect1.y + paddingY < rect2.y + rect2.height - paddingY &&
+                rect1.y + rect1.height - paddingY > rect2.y + paddingY
+            );
+        }
+
+        // 結束比賽
+        function triggerGameOver() {
+            gameActive = false;
+            cancelAnimationFrame(animationFrameId);
+            track.style.animationDuration = '0s';
+
+            // 顯示最終戰果
+            resultStats.innerHTML = `總行駛里程：<span style="color:#ffcc00">${Math.floor(distanceM)}</span> 公尺<br>總共超越車輛：<span style="color:#ffcc00">${carsPassed}</span> 輛`;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // 遊戲主引擎控制邏輯
+        function gameEngine(currentTime) {
+            if (!gameActive) return;
+
+            // 1. 處理玩家賽車橫向移動與動態車身傾斜
+            const currentTurnSpeed = (speedKmH / 30); // 速度越快，方向盤切換越靈敏
+            if (keys.Left && playerX > 35) { // 限制在左側路緣石內
+                playerX -= currentTurnSpeed;
+                player.style.transform = 'scale(1) rotate(-8deg)';
+            } else if (keys.Right && playerX < 315) { // 限制在右側路緣石內
+                playerX += currentTurnSpeed;
+                player.style.transform = 'scale(1) rotate(8deg)';
+            } else {
+                player.style.transform = 'scale(1) rotate(0deg)';
+            }
+            player.style.left = playerX + 'px';
+
+            // 2. 更新時速與里程累積
+            if (speedKmH < maxSpeedKmH) {
+                speedKmH += 0.05; // 線性加速
+            }
+            distanceM += (speedKmH / 3600) * 16.7; // 基於時速換算成每影格移動公尺數
+            
+            // 更新 HUD 介面
+            hudSpeed.innerText = Math.floor(speedKmH);
+            hudDistance.innerText = Math.floor(distanceM);
+
+            // 3. 定時生成對手賽車 (隨著速度變快，生成頻率略微提升)
+            let currentSpawnInterval = Math.max(700, spawnInterval - (speedKmH * 2));
+            if (currentTime - lastSpawnTime > currentSpawnInterval) {
+                spawnEnemy();
+                lastSpawnTime = currentTime;
+            }
+
+            // 4. 定義玩家車輛碰撞箱矩形
+            const playerRect = {
+                x: playerX,
+                y: 650 - 80 - 50 - 75, // 總高 - 控制列 - 底部留白 - 車高
+                width: 50,
+                height: 75
+            };
+
+            // 5. 更新對手車輛位置與碰撞判定
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let car = enemies[i];
+                
+                // 對手向下移動的速度受玩家當前車速動態影響
+                let moveStep = car.relativeSpeed * (speedKmH / 120);
+                car.y += moveStep;
+                car.element.style.top = car.y + 'px';
+
+                // 定義此對手車的碰撞箱
+                const enemyRect = {
+                    x: car.x,
+                    y: car.y,
+                    width: 50,
+                    height: 75
+                };
+
+                // 碰撞檢測
+                if (isColliding(playerRect, enemyRect)) {
+                    triggerGameOver();
+                    return;
+                }
+
+                // 當順利超越對手（對手移出賽道下方）
+                if (car.y > 580) {
+                    car.element.remove();
+                    enemies.splice(i, 1);
+                    carsPassed++;
+                    hudPassed.innerText = carsPassed;
+                }
+            }
+
+            // 持續執行下一個 Frame
+            animationFrameId = requestAnimationFrame(gameEngine);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+/* ===== 貓咪盃競賽教材 專用樣式（疊在 style.css 之上） ===== */
+.badge{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;
+  padding:5px 16px;border-radius:999px;margin-bottom:10px}
+.badge.g{background:var(--c-operators)}
+.badge.b{background:var(--c-sensing)}
+
+.cols2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:14px}
+@media(max-width:900px){.cols2{grid-template-columns:minmax(0,1fr)}}
+
+.panelbox{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow-s)}
+.panelbox h3{font-size:.98rem}
+
+/* 任務檢核卡 */
+.taskgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+.taskcard{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:var(--paper);
+  border:3px solid var(--line);border-radius:20px;padding:13px 16px;cursor:pointer;transition:border-color .2s,background .2s}
+.taskcard:has(input:checked){border-color:var(--ok);background:color-mix(in srgb,var(--ok) 9%,var(--paper))}
+.taskcard input{width:19px;height:19px;accent-color:var(--ok);margin-top:5px}
+.taskcard .tn{font-size:.74rem;font-weight:800;color:#fff;background:var(--accent);border-radius:999px;
+  padding:2px 10px;display:inline-block}
+.taskcard .tt{font-weight:800;font-size:1rem;margin-top:6px}
+.taskcard p{font-size:.9rem;margin:5px 0 0;color:var(--ink2)}
+.taskcard .tip{font-size:.84rem;margin-top:7px;background:var(--paper2);border-radius:12px;padding:6px 11px;color:var(--ink2)}
+
+/* 行動按鈕 */
+.actrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+.actbtn{border:2px solid var(--ok);background:var(--paper);border-radius:999px;padding:7px 15px;
+  font-family:var(--f-round);font-weight:700;font-size:.88rem;color:var(--ok);cursor:pointer;transition:transform .15s}
+.actbtn:hover{transform:scale(1.05);background:color-mix(in srgb,var(--ok) 12%,var(--paper))}
+.actbtn.no{border-color:var(--no);color:var(--no)}
+.actbtn.no:hover{background:color-mix(in srgb,var(--no) 12%,var(--paper))}
+
+/* 量表 */
+.meters{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+.meter{background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:7px 9px;text-align:center}
+.meter .k{font-size:.76rem;color:var(--ink2);font-weight:700}
+.meter .v{font-family:var(--f-num);font-weight:800;font-size:1.22rem;color:var(--accent-d)}
+.lifebar{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-top:12px}
+.lifebar .lifename{font-size:.82rem;font-weight:800;color:var(--ink2)}
+.lifebar .track{height:16px;background:var(--paper2);border:2px solid var(--line);border-radius:999px;overflow:hidden}
+.lifebar .fill{height:100%;width:0;border-radius:999px;transition:width .4s,background .4s;background:var(--no)}
+.lifebar .fill.mid{background:var(--accent)}
+.lifebar .fill.good{background:var(--ok)}
+.lifebar .lifeval{font-family:var(--f-num);font-weight:800;min-width:2.2em;text-align:right}
+.ending{margin-top:11px;border-radius:16px;padding:9px 14px;font-size:.9rem;border:2px solid var(--line);
+  background:var(--paper2);display:grid;gap:2px}
+.ending b{font-size:.98rem}
+.ending span{color:var(--ink2);font-size:.86rem}
+.ending.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.ending.bad{border-color:var(--no);background:color-mix(in srgb,var(--no) 10%,var(--paper))}
+
+/* 生物狀態 */
+.creatures{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.cre{display:grid;justify-items:center;gap:1px;background:var(--paper2);border:2px solid var(--line);
+  border-radius:14px;padding:7px;opacity:.45;transition:opacity .3s,border-color .3s}
+.cre.on{opacity:1;border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.cre .ic{font-size:1.4rem;line-height:1.1}
+.cre .nm{font-size:.8rem;font-weight:800}
+.cre .st{font-size:.72rem;color:var(--ink2)}
+
+.prog{background:var(--paper2);border:2px dashed var(--line);border-radius:16px;padding:11px 13px;margin-top:9px;
+  overflow-x:auto}
+.prog .snode{margin:2px 0}
+
+.sw{display:flex;gap:9px;align-items:center;margin-top:11px;font-size:.88rem;font-weight:700;color:var(--ink2)}
+.sw input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent)}
+
+/* 故事分支圖 */
+.branch{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.bnode{background:var(--paper);border:3px solid var(--line);border-radius:18px;padding:11px 15px;
+  font-weight:800;font-size:.93rem;flex:1 1 150px;min-width:0}
+.bnode span{display:block;font-weight:400;font-size:.82rem;color:var(--ink2);margin-top:3px}
+.bnode.start{border-color:var(--ink2)}
+.bnode.mid{border-color:var(--accent)}
+.bnode.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.bnode.bad{border-color:var(--no);background:color-mix(in srgb,var(--no) 10%,var(--paper))}
+.barrow{font-size:1.3rem;color:var(--ink2);font-weight:800}
+.bsplit{display:grid;gap:9px;flex:1 1 220px;min-width:0}
+
+/* 說明文件卡 */
+.docgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:14px}
+.doccard{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:13px 16px}
+.doccard .dt{font-weight:800;font-size:.98rem;color:var(--accent-d)}
+.doccard p{font-size:.9rem;margin:6px 0 0}
+.doccard .eg{font-size:.84rem;margin-top:8px;background:var(--paper2);border-radius:12px;padding:7px 11px;color:var(--ink2)}
+
+/* 遊戲組：節奏 */
+.moverow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;justify-content:center}
+.movebtn{border:3px solid var(--line);background:var(--paper);border-radius:20px;padding:12px 18px;
+  font-family:var(--f-round);font-weight:800;font-size:.95rem;color:var(--ink);cursor:pointer;
+  display:grid;justify-items:center;gap:3px;min-width:104px;transition:transform .12s,border-color .2s,background .2s}
+.movebtn .ic{font-size:1.7rem;line-height:1}
+.movebtn .nt{font-size:.74rem;color:var(--ink2);font-weight:700}
+.movebtn:hover{transform:translateY(-3px)}
+.movebtn.lit{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,var(--paper));transform:scale(1.07)}
+.movebtn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.seqrow{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px;min-height:44px}
+.seqchip{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;
+  border:2px solid var(--line);background:var(--paper2)}
+.seqchip.done{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--paper))}
+.seqchip.now{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,var(--paper))}
+.seqchip.hide{color:transparent}
+.scorerow{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.scorerow div{background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:7px;text-align:center}
+.scorerow .k{font-size:.74rem;color:var(--ink2);font-weight:700}
+.scorerow .v{font-family:var(--f-num);font-weight:800;font-size:1.2rem}
+.rmsg{margin-top:12px;border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 13%,var(--paper));
+  border-radius:16px;padding:9px 14px;font-weight:800;font-size:.93rem;color:var(--accent-d);text-align:center}
+.readypill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 14px;font-size:.84rem;
+  font-weight:800;border:2px solid var(--line);background:var(--paper2);color:var(--ink2)}
+.readypill.on{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--paper))}
+.readypill.off{border-color:var(--no);color:var(--no);background:color-mix(in srgb,var(--no) 12%,var(--paper))}
+
+/* 狀態機圖 */
+.fsm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;justify-content:center}
+.fsm .st{border:3px solid var(--line);border-radius:18px;padding:10px 16px;font-weight:800;font-size:.9rem;
+  background:var(--paper);text-align:center;min-width:120px}
+.fsm .st.a{border-color:var(--ok)}
+.fsm .st.b{border-color:var(--no)}
+.fsm .ar{font-size:.8rem;color:var(--ink2);font-weight:800;text-align:center;min-width:110px}
+.fsm .ar b{display:block;font-size:1.25rem;color:var(--accent-d)}
+
+/* 首頁 */
+.homecards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:22px}
+.hcard{display:flex;flex-direction:column;gap:9px}
+.hcard>a.c{flex:1;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);background:var(--paper);
+  border:3px solid var(--line);border-radius:24px;padding:22px 20px;box-shadow:var(--shadow);transition:transform .2s}
+.hcard>a.c:hover{transform:translateY(-4px)}
+.hcard .ico{font-size:2.3rem;line-height:1}
+.hcard b{display:block;font-size:1.12rem;font-weight:800;margin:9px 0 5px}
+.hcard span.d{font-size:.89rem;color:var(--ink2);line-height:1.6}
+.hcard .grp{font-size:.74rem;font-weight:800;color:#fff;background:var(--c-sensing);border-radius:999px;
+  padding:2px 11px;align-self:flex-start}
+.hcard .grp.g{background:var(--c-operators)}
+a.tlink{display:block;text-decoration:none;font-size:.85rem;font-weight:700;color:var(--ink2);
+  background:var(--paper2);border:2px solid var(--line);border-radius:999px;padding:7px 13px;text-align:center;transition:border-color .2s}
+a.tlink:hover{border-color:var(--accent);color:var(--accent-d)}

@@ -1,0 +1,173 @@
+/* lib.css — Scratch 函式庫專用樣式（沿用 style.css / anim.css 的元件，版型同〈手勢模組教室〉） */
+:root{--accent:#7A5CE0;--accent-d:#5B3FC4;--hi:#FF3B7A;--shadow-s:0 4px 12px rgba(122,92,224,.14);--stg1:#DFF3FF;--stg2:#FFF6E5;--grass:#9ED28B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--accent:#A48CFF;--accent-d:#C3B3FF}}
+:root[data-theme="dark"]{--accent:#A48CFF;--accent-d:#C3B3FF}
+
+header.top{background:color-mix(in srgb,var(--paper) 88%,transparent);border-bottom:2px solid var(--line)}
+header.top .brand a{color:inherit;text-decoration:none}
+.unitnav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.unitnav a{font-size:.82rem}
+.sm{font-size:.88rem;color:var(--ink2)}
+code{font-family:var(--f-num);background:var(--paper2);border-radius:6px;padding:0 5px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 3px 10px rgba(122,92,224,.28)}
+a.btn{text-decoration:none;display:inline-block}
+.btn.ghost{color:var(--ink)}
+kbd{font-family:var(--f-num);border:2px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;background:var(--paper)}
+
+/* ---------- 分類章節頁 ---------- */
+.catnav{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.catnav a{text-decoration:none;font-weight:800;font-size:.84rem;border-radius:999px;padding:3px 12px;border:2px solid var(--line);color:var(--ink);background:var(--paper)}
+.catnav a.on{background:var(--mc,var(--accent));border-color:var(--mc,var(--accent));color:#fff}
+.hero .kind{display:inline-block;color:#fff;background:var(--mc,var(--accent));border-radius:999px;padding:2px 12px;font-weight:800;font-size:.8rem}
+
+/* ---------- 函式卡 ---------- */
+article.func{margin-top:26px;scroll-margin-top:84px;border-top:2px dashed var(--line);padding-top:16px}
+.fcard{display:grid;gap:10px;margin-top:10px;background:var(--paper);border:3px solid var(--mc,var(--accent));border-radius:22px;padding:14px 18px;box-shadow:var(--shadow-s)}
+.fcard .fname{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fcard .fid{font-family:var(--f-num);font-weight:800;background:var(--mc,var(--accent));color:#fff;border-radius:10px;padding:1px 10px}
+.fcard .fname .sb{white-space:normal}
+.ftype{font-size:.76rem;font-weight:800;border-radius:999px;padding:2px 10px;border:2px solid}
+.ftype.A{color:#C2410C;border-color:#FDBA74;background:#FFF7ED}
+.ftype.B{color:#0F766E;border-color:#5EEAD4;background:#F0FDFA}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ftype.A{background:#3B2414;color:#FDBA74;border-color:#9A4A1C}
+  :root:not([data-theme="light"]) .ftype.B{background:#10302C;color:#5EEAD4;border-color:#1F6F66}}
+:root[data-theme="dark"] .ftype.A{background:#3B2414;color:#FDBA74;border-color:#9A4A1C}
+:root[data-theme="dark"] .ftype.B{background:#10302C;color:#5EEAD4;border-color:#1F6F66}
+.warp{font-size:.74rem;color:var(--ink2);border:1px dashed var(--line);border-radius:999px;padding:1px 9px}
+.fcard .io{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:.93rem;align-items:baseline}
+.fcard .io>b{color:var(--ink2);font-size:.82rem;white-space:nowrap}
+.bwrap{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 14px;margin-top:12px;overflow-x:auto}
+.bwrap>h4{margin:0 0 8px;font-size:.9rem;color:var(--ink2)}
+.bwrap>h4 small{font-weight:500}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:12px}
+
+/* 積木的呼叫（試玩台） */
+.callbox{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;min-height:44px;margin-top:10px;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:8px 12px}
+.callbox:empty::before{content:'按一個按鈕，這裡會顯示它等於 Scratch 裡的哪一塊積木。';font-size:.84rem;color:var(--ink2)}
+.callbox>em{font-style:normal;font-size:.78rem;color:var(--ink2);font-weight:700}
+.callbox .sb{font-size:.84rem;padding:6px 10px;white-space:normal}
+.callbox .svc{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.callbox.flash{animation:cflash .6s}
+@keyframes cflash{0%{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}100%{}}
+
+/* ---------- 迷你舞台 ---------- */
+.mst{position:relative;width:100%;overflow:hidden;border-radius:14px;border:2px solid var(--line);background:#fff;touch-action:none;outline:none}
+.mst:focus-visible{outline:3px solid var(--accent-d)}
+.mst-in{position:absolute;left:0;top:0;width:480px;height:360px;transform-origin:0 0}
+.mst-bg{position:absolute;inset:0;background:linear-gradient(var(--stg1),var(--stg2))}
+.mst-ground{position:absolute;left:0;right:0;bottom:0;background:var(--grass)}
+.mst-spr{position:absolute;inset:0}
+.mst-s{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.mst-s img{display:block;user-select:none;pointer-events:none}
+.mst-bub{position:absolute;left:0;top:0;max-width:170px;background:#fff;color:#575E75;border:2px solid #C9CDD6;border-radius:16px;
+  padding:5px 10px;font-size:14px;line-height:1.35;font-weight:700;box-shadow:0 2px 0 rgba(0,0,0,.06);word-break:break-all}
+.mst-bub::after{content:'';position:absolute;left:14px;bottom:-9px;width:12px;height:12px;background:#fff;border-right:2px solid #C9CDD6;border-bottom:2px solid #C9CDD6;transform:rotate(45deg)}
+
+/* ---------- 試玩台共用 ---------- */
+.labrow{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;margin-top:10px}
+.stagecol{flex:1 1 360px;min-width:0;max-width:520px}
+.labout{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.vrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vbox{display:inline-flex;flex-direction:column;align-items:center;min-width:58px;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:2px 8px}
+.vbox em{font-style:normal;font-size:.7rem;color:var(--ink2);font-weight:700}
+.vbox b{font-family:var(--f-num);font-size:1.02rem}
+label.rg{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.88rem;flex-wrap:wrap}
+label.rg input{width:150px;accent-color:var(--accent)}
+label.rg output{font-family:var(--f-num);font-weight:800;color:var(--accent-d);min-width:2.4em}
+label.tin{display:flex;gap:8px;align-items:center;font-weight:700;font-size:.88rem}
+label.tin input{flex:1;min-width:0}
+input.n{width:4.6em}input.w{width:7em}input.w2{width:13em;max-width:100%}
+.lab input:not([type]),.lab input[type=number],.lab select,.lab textarea{font-family:var(--f-round);font-size:.9rem;border:2px solid var(--line);border-radius:10px;padding:3px 8px;background:var(--paper);color:var(--ink)}
+.lab textarea{width:100%;resize:vertical}
+.fxlist{display:flex;flex-direction:column;gap:6px}
+.fxrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.86rem;font-weight:700}
+.fxrow .btn{min-width:9.5em;text-align:left}
+label.sw{display:flex;gap:6px;align-items:center;font-weight:800}
+details.dlg summary{cursor:pointer;font-weight:700;font-size:.88rem;color:var(--accent-d)}
+.subt{margin-top:6px;min-height:2.2em;background:#3F4A56;color:#fff;border-radius:10px;padding:4px 12px;font-weight:800;text-align:center}
+.calcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin-top:10px}
+.calc{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.calc.wide{grid-column:1/-1}
+.calc h4{margin:0 0 8px;font-size:.92rem}
+.crow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.88rem;font-weight:700;margin:4px 0}
+.res{margin-top:6px;font-size:.95rem}
+.res b{font-family:var(--f-num);font-size:1.15rem;color:var(--accent-d)}
+.ltrs{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px}
+.ltrs span{display:flex;flex-direction:column;align-items:center;min-width:26px;border:2px solid var(--line);border-radius:8px;padding:0 3px;font-weight:800}
+.ltrs span small{font-size:.62rem;color:var(--ink2);font-family:var(--f-num)}
+.ltrs span.on{border-color:var(--c-operators);background:color-mix(in srgb,var(--c-operators) 16%,var(--paper))}
+.big{font-family:var(--f-num);font-weight:800;font-size:2.4rem;line-height:1.2;text-align:center}
+.track{position:relative;height:12px;border-radius:999px;background:var(--paper2);border:2px solid var(--line);overflow:hidden}
+.track.big2{height:18px;margin:6px 0}
+.track i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent);border-radius:999px}
+.track i.ok{background:var(--ok)}
+.warpbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.warpbox h4{margin:0 0 6px;font-size:.9rem}
+.warpbox .track{height:26px}
+.warpbox .track i{width:22px;left:0;background:var(--c-myblocks);transform:translateX(-100%)}
+.scenes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.scard{display:flex;flex-direction:column;border:2px solid var(--line);border-radius:12px;padding:4px 10px;font-size:.84rem;opacity:.45}
+.scard small{color:var(--ink2);font-size:.72rem}
+.scard em{font-style:normal;font-weight:800;color:var(--no)}
+.scard.on{opacity:1;border-color:var(--ok)}
+.scard.on em{color:var(--ok)}
+.numline{display:block;width:100%;max-width:520px;margin-top:6px}
+.grid62{display:block;width:100%;max-width:300px;background:var(--paper2);border-radius:12px;touch-action:none}
+.grid62 .drag{cursor:grab}
+.bag{margin-top:6px;font-size:.82rem;display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.bag i{font-style:normal;font-family:var(--f-num);font-weight:800;border:2px solid var(--line);border-radius:8px;padding:0 6px}
+.bag i.h{border-color:var(--c-operators)}
+.sinebox{margin-top:12px;background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.sinebox h4{margin:0 0 6px;font-size:.9rem}
+.sinebox svg{display:block;width:100%;max-width:420px}
+/* 清單試玩台 */
+.listlab{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;margin-top:10px}
+.bars{flex:1 1 320px;display:flex;gap:6px;align-items:flex-end;min-height:220px;background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:12px 10px 6px;overflow-x:auto}
+.bar{flex:1 0 40px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:190px}
+.bar i{display:block;width:100%;background:var(--c-variables);border-radius:8px 8px 3px 3px;transition:height .2s}
+.bar b{font-family:var(--f-num);font-size:.86rem;margin-top:2px;white-space:nowrap}
+.bar small{font-size:.66rem;color:var(--ink2);font-family:var(--f-num)}
+.bar.a i{background:var(--c-motion)}.bar.b i{background:var(--c-myblocks)}.bar.done i{background:var(--ok)}
+/* 遊戲試玩台按鈕 */
+.pad{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.pad button{font-size:1.1rem;font-weight:800;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:14px;padding:8px 18px;touch-action:none;cursor:pointer}
+
+/* ---------- 首頁：兩種函式、函式地圖 ---------- */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin-top:12px}
+.kindcard{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:12px 16px}
+.kindcard.A{border-color:#FDBA74}.kindcard.B{border-color:#5EEAD4}
+.kindcard h4{margin:0 0 6px;font-size:1.02rem}
+.kindcard .flowv{display:flex;flex-direction:column;gap:5px;align-items:flex-start;margin-top:8px}
+.kindcard .sb{font-size:.84rem;padding:6px 10px;white-space:normal}
+.mapcat{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--mc);border-radius:16px;padding:8px 12px;margin-top:10px}
+.mapcat .mh{display:inline-block;text-decoration:none;color:var(--ink);font-weight:800;margin-bottom:6px}
+.mapcat .mh b{background:var(--mc);color:#fff;border-radius:8px;padding:0 8px;font-family:var(--f-num)}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{text-decoration:none;color:#fff;background:var(--c-myblocks);border-radius:8px;padding:3px 10px;font-size:.82rem;font-weight:700;display:inline-flex;gap:6px;align-items:baseline;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.fchip small{font-family:var(--f-num);opacity:.85}
+.fchip.B{background:#2AA89A}
+.fchip:hover{filter:brightness(1.08)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.84rem;margin-top:8px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.dltab td,.dltab th{text-align:left!important;font-size:.88rem}
+.dltab a{white-space:nowrap}
+.cats8{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin-top:12px}
+a.catcard{display:block;text-decoration:none;color:var(--ink);background:var(--paper);border:3px solid var(--mc);border-radius:20px;padding:12px 14px;transition:transform .2s}
+a.catcard:hover{transform:translateY(-3px)}
+a.catcard b{display:block;font-size:1.05rem}
+a.catcard b i{font-style:normal;background:var(--mc);color:#fff;border-radius:8px;padding:0 8px;margin-right:6px;font-family:var(--f-num)}
+a.catcard span{font-size:.84rem;color:var(--ink2)}
+.pitlist li{margin:6px 0}
+
+/* 其他 */
+.work{background:var(--paper);border:3px solid var(--line);border-radius:18px;padding:12px 16px;margin-top:14px}
+.work h3{font-size:1rem}
+.work ol{margin:6px 0 0;padding-left:1.3em}
+.work li{margin:4px 0;font-size:.94rem}
+details.ans{margin-top:4px;font-size:.88rem}
+details.ans summary{cursor:pointer;color:var(--accent-d);font-weight:700}
+.tablewrap{overflow-x:auto}
+footer{padding:0 16px}
+@media (max-width:640px){.fcard{padding:12px}.fcard .io{grid-template-columns:1fr}.fxrow .btn{min-width:0}}

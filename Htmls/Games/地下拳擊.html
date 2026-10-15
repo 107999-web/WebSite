@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地下拳擊：絕對相容版</title>
+    <style>
+        body {
+            background-color: #1a1a1a; /* 調亮背景，防止全黑錯誤 */
+            color: #fff;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 20px;
+        }
+        /* 遊戲外框 */
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            background-color: #2b1111; /* 深紅褐色背景 */
+            border: 4px solid #ff0033;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        #ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #442222;
+            border-top: 2px solid #ff0033;
+        }
+        /* UI 血條 */
+        .hp-container {
+            position: absolute;
+            top: 15px;
+            width: 220px;
+            height: 20px;
+            background-color: #555;
+            border: 2px solid #fff;
+        }
+        #p-box { left: 20px; }
+        #e-box { right: 20px; }
+        .hp-bar {
+            width: 100%;
+            height: 100%;
+        }
+        #player-hp { background-color: #00ffcc; }
+        #enemy-hp { background-color: #ff0055; }
+        
+        #score-board {
+            position: absolute;
+            top: 15px;
+            left: 350px;
+            width: 100px;
+            font-size: 1.5rem;
+            color: #ffcc00;
+        }
+
+        /* 角色設定 */
+        .char {
+            position: absolute;
+            bottom: 60px;
+            width: 50px;
+            height: 90px;
+            border-radius: 5px;
+        }
+        /* 白人玩家 */
+        #player {
+            background-color: #ffe0bd;
+            border: 2px solid #fff;
+        }
+        /* 黑人對手 */
+        #enemy {
+            background-color: #3d2314;
+            border: 2px solid #5c3a21;
+        }
+
+        /* 拳頭 */
+        .fist {
+            position: absolute;
+            top: 30px;
+            width: 30px;
+            height: 15px;
+            display: none;
+        }
+        #player-fist { background-color: #ff0000; right: -30px; }
+        #enemy-fist { background-color: #ffffff; left: -30px; }
+
+        /* 噴血粒子 */
+        .blood {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #ff0000;
+            pointer-events: none;
+        }
+
+        /* 蓋板畫面 */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #ff0033;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>UNDERGROUND FIGHT CLUB</h2>
+    <p>如果無法移動，請先點擊遊戲畫面一下</p>
+
+    <div id="game-container">
+        <div id="start-screen" class="screen">
+            <h3 style="font-size:2rem; margin-bottom:15px;">點擊按鈕開始點對決</h3>
+            <button onclick="startGame()">點擊進入格鬥場</button>
+        </div>
+
+        <div id="over-screen" class="screen" style="display:none;">
+            <h3 style="font-size:2rem; color:#ff0033; margin-bottom:15px;">K.O. 你倒下了</h3>
+            <button onclick="resetGame()">重新挑戰</button>
+        </div>
+
+        <div id="p-box" class="hp-container"><div id="player-hp" class="hp-bar"></div></div>
+        <div id="score-board">擊倒: <span id="score-val">0</span></div>
+        <div id="e-box" class="hp-container"><div id="enemy-hp" class="hp-bar"></div></div>
+
+        <div id="player" class="char">
+            <div id="player-fist" class="fist"></div>
+        </div>
+        <div id="enemy" class="char">
+            <div id="enemy-fist" class="fist"></div>
+        </div>
+
+        <div id="ground"></div>
+    </div>
+
+    <p style="margin-top:15px;">操作說明：鍵盤 <strong>A</strong> / <strong>D</strong> 移動，<strong>J</strong> 鍵出拳攻擊！</p>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const player = document.getElementById('player');
+        const enemy = document.getElementById('enemy');
+        const playerFist = document.getElementById('player-fist');
+        const enemyFist = document.getElementById('enemy-fist');
+        const playerHp = document.getElementById('player-hp');
+        const enemyHp = document.getElementById('enemy-hp');
+        const scoreVal = document.getElementById('score-val');
+        
+        const startScreen = document.getElementById('start-screen');
+        const overScreen = document.getElementById('over-screen');
+
+        let game = {
+            pX: 150, pHp: 100, pAttacking: false,
+            eX: 600, eHp: 100, eAttacking: false,
+            score: 0,
+            active: false,
+            keys: { a: false, d: false }
+        };
+
+        // 鍵盤事件
+        window.addEventListener('keydown', (e) => {
+            if (!game.active) return;
+            if (e.key.toLowerCase() === 'a') game.keys.a = true;
+            if (e.key.toLowerCase() === 'd') game.keys.d = true;
+            if (e.key.toLowerCase() === 'j') {
+                e.preventDefault(); // 防止網頁捲動
+                pAttack();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key.toLowerCase() === 'a') game.keys.a = false;
+            if (e.key.toLowerCase() === 'd') game.keys.d = false;
+        });
+
+        function startGame() {
+            game.active = true;
+            startScreen.style.display = 'none';
+            window.focus(); // 強制聚焦
+        }
+
+        // 玩家（白人）揮拳
+        function pAttack() {
+            if (game.pAttacking) return;
+            game.pAttacking = true;
+
+            // 調整拳頭方向（看敵人在哪一邊）
+            if (game.pX < game.eX) {
+                playerFist.style.left = '50px';
+                playerFist.style.right = 'auto';
+            } else {
+                playerFist.style.right = '50px';
+                playerFist.style.left = 'auto';
+            }
+            playerFist.style.display = 'block';
+
+            // 傷害判定
+            let dist = Math.abs(game.pX - game.eX);
+            if (dist < 85) {
+                game.eHp -= 20;
+                spawnBlood(game.eX + 25);
+                if (game.eHp <= 0) {
+                    game.score++;
+                    scoreVal.innerText = game.score;
+                    // 敵人死亡復活
+                    game.eHp = 100;
+                    game.eX = Math.random() > 0.5 ? 50 : 700;
+                }
+            }
+
+            setTimeout(() => {
+                playerFist.style.display = 'none';
+                game.pAttacking = false;
+            }, 100);
+        }
+
+        // 敵人 AI 邏輯
+        function enemyAI() {
+            if (game.eX < game.pX - 45) {
+                game.eX += 3;
+            } else if (game.eX > game.pX + 45) {
+                game.eX -= 3;
+            } else {
+                if (!game.eAttacking && Math.random() < 0.1) {
+                    eAttack();
+                }
+            }
+        }
+
+        // 敵人（黑人）揮拳
+        function eAttack() {
+            game.eAttacking = true;
+            
+            if (game.eX > game.pX) {
+                enemyFist.style.left = '-30px';
+                enemyFist.style.right = 'auto';
+            } else {
+                enemyFist.style.right = '-30px';
+                enemyFist.style.left = 'auto';
+            }
+            enemyFist.style.display = 'block';
+
+            let dist = Math.abs(game.pX - game.eX);
+            if (dist < 85) {
+                game.pHp -= 10;
+                spawnBlood(game.pX + 25);
+                if (game.pHp <= 0) {
+                    game.pHp = 0;
+                    game.active = false;
+                    overScreen.style.display = 'flex';
+                }
+            }
+
+            setTimeout(() => {
+                enemyFist.style.display = 'none';
+                game.eAttacking = false;
+            }, 100);
+        }
+
+        // 簡易噴血效果
+        function spawnBlood(x) {
+            for (let i = 0; i < 5; i++) {
+                const b = document.createElement('div');
+                b.classList.add('blood');
+                b.style.left = x + 'px';
+                b.style.top = '320px';
+                container.appendChild(b);
+
+                let sx = (Math.random() - 0.5) * 6;
+                let sy = (Math.random() - 0.7) * 8;
+                let cx = x;
+                let cy = 320;
+
+                let bLoop = setInterval(() => {
+                    sy += 0.5;
+                    cx += sx;
+                    cy += sy;
+                    b.style.left = cx + 'px';
+                    b.style.top = cy + 'px';
+                    if (cy > 390) {
+                        b.remove();
+                        clearInterval(bLoop);
+                    }
+                }, 20);
+            }
+        }
+
+        function resetGame() {
+            game.pHp = 100;
+            game.pX = 150;
+            game.eHp = 100;
+            game.eX = 600;
+            game.score = 0;
+            scoreVal.innerText = "0";
+            overScreen.style.display = 'none';
+            game.active = true;
+        }
+
+        // 主迴圈
+        function loop() {
+            if (game.active) {
+                if (game.keys.a && game.pX > 0) game.pX -= 4;
+                if (game.keys.d && game.pX < 750) game.pX += 4;
+
+                enemyAI();
+
+                // 更新位置
+                player.style.left = game.pX + 'px';
+                enemy.style.left = game.eX + 'px';
+
+                // 更新血量
+                playerHp.style.width = game.pHp + '%';
+                enemyHpBar.style.width = game.eHp + '%';
+            }
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>ML2Scratch 學生實作單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --cream:#F5F0FC; --paper:#FFFFFF; --paper2:#EDE4FA; --ink:#4A4258; --ink2:#867B99; --line:#DCCDF3;
+  --grape:#A77BDB; --grape-d:#8759BE; --pink:#FF8FAB; --mint:#5FC9A4; --butter:#FFC86B; --sky:#6FB7E4;
+  --block:#0FBD8C; --block-d:#0BA277; --block-op:#4C97FF; --block-op-d:#3373CC;
+  --ok:#3FAE86; --no:#E8607D;
+  --l1:#FF8FAB; --l2:#6FB7E4; --l3:#FFC86B;
+  --shadow:0 10px 24px rgba(167,123,219,.2); --shadow-s:0 4px 12px rgba(167,123,219,.16);
+  --f-round:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --f-num:'Nunito','M PLUS Rounded 1c',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cream:#231E2E; --paper:#2D2739; --paper2:#383048; --ink:#F0EAF9; --ink2:#BCB0CE; --line:#4C4160;
+  --grape:#C49DEE; --grape-d:#D6B8F7; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --cream:#231E2E; --paper:#2D2739; --paper2:#383048; --ink:#F0EAF9; --ink2:#BCB0CE; --line:#4C4160;
+  --grape:#C49DEE; --grape-d:#D6B8F7; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-round);font-size:16px;line-height:1.85;
+  background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:24px 24px}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px;padding-block:0 64px}
+h1,h2,h3{text-wrap:balance;line-height:1.4;margin:0}
+a{color:var(--grape-d)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in srgb,var(--cream) 84%,transparent);border-bottom:3px dotted var(--line)}
+nav .inner{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--paper);border:2px solid var(--line);
+  border-radius:50px;padding:5px 15px;font-size:.88rem;font-weight:700;transition:transform .18s,background .18s}
+nav a:hover{transform:translateY(-2px) scale(1.05);background:var(--paper2)}
+header.hero{padding-block:42px 26px;text-align:center}
+.badge{display:inline-block;background:var(--butter);color:#4A3530;font-weight:800;font-size:.82rem;padding:5px 16px;
+  border-radius:50px;border:2px solid var(--paper);box-shadow:var(--shadow-s)}
+header.hero h1{font-size:clamp(1.9rem,5.6vw,3rem);font-weight:800;margin:16px 0 6px}
+header.hero p{color:var(--ink2);margin:0 auto;max-width:32em}
+section{margin-top:44px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-head .dot{width:16px;height:16px;border-radius:50%;background:var(--grape);flex:0 0 auto;box-shadow:0 0 0 5px color-mix(in srgb,var(--grape) 22%,transparent)}
+.sec-head h2{font-size:clamp(1.3rem,3.6vw,1.7rem);font-weight:800}
+.card{background:var(--paper);border:3px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:22px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.check{display:grid;gap:12px}
+.check .it{display:grid;grid-template-columns:38px 1fr 44px;gap:12px;align-items:start;background:var(--paper);
+  border:3px solid var(--line);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow-s);transition:border-color .2s,background .2s}
+.check .it.done{border-color:var(--ok);background:color-mix(in srgb,var(--mint) 12%,var(--paper))}
+.check .it .n{width:34px;height:34px;border-radius:50%;background:var(--grape);color:#fff;font-family:var(--f-num);font-weight:800;display:grid;place-items:center}
+.check .it.done .n{background:var(--ok)}
+.check .it b{display:block;font-weight:800}
+.check .it span.d{color:var(--ink2);font-size:.93rem}
+.check .it button{background:var(--paper2);border:3px solid var(--line);border-radius:50%;width:42px;height:42px;
+  font-size:1.2rem;cursor:pointer;color:var(--ink2);transition:transform .18s}
+.check .it button:hover{transform:scale(1.12)}
+.check .it.done button{background:var(--ok);border-color:var(--ok);color:#fff}
+.bar{height:16px;border-radius:50px;background:var(--paper2);border:3px solid var(--line);overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grape),var(--pink));width:0;transition:width .35s}
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.flow button{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:16px 14px;cursor:pointer;
+  font-family:var(--f-round);color:var(--ink);text-align:center;box-shadow:var(--shadow-s);transition:transform .18s,border-color .2s}
+.flow button:hover{transform:translateY(-3px)}
+.flow button.on{border-color:var(--grape);background:var(--paper2)}
+.flow button .ic{font-size:1.9rem;line-height:1.2}
+.flow button b{display:block;font-weight:800;margin-top:4px}
+.flow button span{font-size:.82rem;color:var(--ink2)}
+.flowbody{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:18px;margin-top:14px;box-shadow:var(--shadow-s)}
+.flowbody h3{font-size:1.05rem;margin-bottom:6px}
+.flowbody p{margin:6px 0;font-size:.95rem}
+/* knn lab */
+.lab{display:grid;grid-template-columns:minmax(260px,1.1fr) minmax(250px,.9fr);gap:18px;align-items:start}
+@media(max-width:760px){.lab{grid-template-columns:1fr}}
+.labbox{background:var(--paper);border:3px solid var(--line);border-radius:26px;padding:12px;box-shadow:var(--shadow)}
+svg.knn{width:100%;height:auto;display:block;background:var(--paper2);border-radius:18px;cursor:crosshair;touch-action:manipulation}
+svg.knn .axis{stroke:var(--line);stroke-width:2}
+svg.knn .axlab{font-family:var(--f-round);font-size:11px;font-weight:700;fill:var(--ink2)}
+svg.knn .link{stroke:var(--ink2);stroke-width:2;stroke-dasharray:4 4;opacity:.75}
+svg.knn .pt{stroke:var(--paper);stroke-width:2.5}
+svg.knn .test{stroke:var(--ink);stroke-width:3}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tool{border:3px solid var(--line);background:var(--paper);border-radius:50px;padding:7px 16px;font-family:var(--f-round);
+  font-weight:800;font-size:.9rem;cursor:pointer;color:var(--ink);transition:transform .18s}
+.tool:hover{transform:scale(1.05)}
+.tool.on{color:#fff;border-color:transparent}
+.tool.t1.on{background:var(--l1)}.tool.t2.on{background:var(--l2)}.tool.t3.on{background:var(--l3);color:#4A3530}
+.tool.tt.on{background:var(--grape)}
+.verdict{background:var(--paper2);border:3px solid var(--line);border-radius:22px;padding:16px}
+.verdict .big{font-size:1.25rem;font-weight:800}
+.verdict .sub{font-size:.92rem;color:var(--ink2)}
+.tallies{display:grid;gap:6px;margin-top:10px}
+.tally{display:grid;grid-template-columns:70px 1fr 42px;gap:8px;align-items:center;font-size:.86rem;font-weight:700}
+.tally .track{height:12px;border-radius:50px;background:var(--paper);border:2px solid var(--line);overflow:hidden}
+.tally .track i{display:block;height:100%;width:0;transition:width .3s}
+/* blocks */
+.blk{display:inline-flex;align-items:center;gap:6px;background:var(--block);color:#fff;font-weight:700;font-size:.93rem;
+  padding:7px 14px;border-radius:10px;box-shadow:0 3px 0 var(--block-d);margin:3px 0;line-height:1.5}
+.blk.hat{border-radius:16px 16px 10px 10px}
+.blk.rep{border-radius:50px}
+.blk.ctl{background:var(--butter);box-shadow:0 3px 0 #E0A63F;color:#4A3530}
+.blk.mot{background:var(--block-op);box-shadow:0 3px 0 var(--block-op-d)}
+.blk.op{background:#59C059;box-shadow:0 3px 0 #389438}
+.blk .drop{background:rgba(0,0,0,.18);border-radius:50px;padding:1px 10px}
+.blk .num{background:#fff;color:#4A3530;border-radius:50px;padding:0 10px;font-family:var(--f-num);font-weight:800}
+.blkcard{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:16px 18px;box-shadow:var(--shadow-s)}
+.blkcard h3{font-size:1rem;margin-bottom:6px}
+.blkcard p{margin:6px 0 0;font-size:.92rem}
+.blkcard .grp{display:inline-block;font-size:.74rem;font-weight:800;border-radius:50px;padding:2px 10px;background:var(--paper2);border:2px solid var(--line);color:var(--ink2);margin-bottom:6px}
+.code{background:var(--paper2);border:2px dashed var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:2px;margin-top:8px}
+.code .ind1{margin-left:18px}.code .ind2{margin-left:36px}
+.note{background:color-mix(in srgb,var(--butter) 26%,var(--paper));border:3px solid color-mix(in srgb,var(--butter) 55%,var(--line));
+  border-radius:20px;padding:12px 16px;font-size:.94rem}
+.warn{background:color-mix(in srgb,var(--pink) 20%,var(--paper));border:3px solid color-mix(in srgb,var(--pink) 45%,var(--line));
+  border-radius:20px;padding:12px 16px;font-size:.94rem}
+details{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:4px 16px;box-shadow:var(--shadow-s)}
+details+details{margin-top:10px}
+details summary{cursor:pointer;font-weight:800;padding:10px 0;list-style:none;display:flex;gap:8px;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'？';color:var(--grape-d);font-weight:800}
+details[open] summary::before{content:'！'}
+details .body{padding:0 0 12px;font-size:.94rem}
+ul.tidy{margin:8px 0 0;padding-left:1.2em}ul.tidy li{margin:3px 0}
+.tips{display:grid;gap:8px}
+.tips label{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:3px solid var(--line);
+  border-radius:18px;padding:10px 14px;cursor:pointer;font-size:.94rem;transition:border-color .2s,background .2s}
+.tips input{margin-top:6px;width:18px;height:18px;accent-color:var(--grape);flex:0 0 auto}
+.tips label:has(input:checked){border-color:var(--grape);background:var(--paper2)}
+.mission{display:grid;gap:10px}
+.mission .m{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--paper);
+  border:3px solid var(--line);border-radius:20px;padding:12px 16px}
+footer{margin-top:50px;text-align:center;color:var(--ink2);font-size:.86rem}
+:focus-visible{outline:3px solid var(--grape-d);outline-offset:3px;border-radius:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<nav><div class="inner">
+  <a href="#start">① 準備</a>
+  <a href="#how">② AI 怎麼學</a>
+  <a href="#lab">③ KNN 小實驗室</a>
+  <a href="#blocks">④ 積木</a>
+  <a href="#make">⑤ 動手做</a>
+  <a href="#tips">⑥ 變聰明的秘訣</a>
+  <a href="#help">求救區</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">🔮 學生實作單</span>
+  <h1>教電腦看懂你的動作</h1>
+  <p>前面兩個擴充功能，電腦本來就「會」看手和臉。這次不一樣 —— <b>ML2Scratch</b> 什麼都不會，要<b>你親自教它</b>！你教得好，它就聰明；你教得馬虎，它就常常猜錯。</p>
+</header>
+
+<section id="start">
+  <div class="sec-head"><span class="dot"></span><h2>① 準備工作（做完打勾）</h2></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="check" id="check">
+    <div class="it"><div class="n">1</div><div><b>用 Chrome 打開 stretch3</b><span class="d">網址：stretch3.github.io</span></div><button aria-label="完成">✓</button></div>
+    <div class="it"><div class="n">2</div><div><b>點左下角「添加擴展」→ ML2Scratch</b><span class="d">圖示是一個小方塊，點下去等它載入。</span></div><button aria-label="完成">✓</button></div>
+    <div class="it"><div class="n">3</div><div><b>按「允許」使用攝影機</b><span class="d">舞台上出現自己的畫面就成功了。</span></div><button aria-label="完成">✓</button></div>
+    <div class="it"><div class="n">4</div><div><b>把「標籤」積木打勾</b><span class="d">勾選 <span class="blk rep">標籤</span> 左邊的小框框，舞台左上角就會一直顯示 AI 現在的判斷結果。</span></div><button aria-label="完成">✓</button></div>
+  </div>
+  <div class="note" style="margin-top:14px">💡 一開始 AI 什麼都還沒學，所以「標籤」會是空白的，這是正常的！</div>
+</section>
+
+<section id="how">
+  <div class="sec-head"><span class="dot" style="background:var(--mint);box-shadow:0 0 0 5px color-mix(in srgb,var(--mint) 22%,transparent)"></span><h2>② AI 是怎麼學會的？</h2></div>
+  <p style="margin:0 0 14px;color:var(--ink2)">機器學習就像教小朋友認東西，只有 <b>4 個步驟</b>。點點看每一步，看看要用哪些積木。</p>
+  <div class="flow" id="flow">
+    <button data-k="0" class="on"><div class="ic">📸</div><b>1. 蒐集</b><span>拍很多張照片</span></button>
+    <button data-k="1"><div class="ic">🏷️</div><b>2. 貼標籤</b><span>告訴它這是什麼</span></button>
+    <button data-k="2"><div class="ic">🧠</div><b>3. 學習</b><span>它自己找規律</span></button>
+    <button data-k="3"><div class="ic">✨</div><b>4. 判斷</b><span>看到新的就猜</span></button>
+  </div>
+  <div class="flowbody" id="flowbody"></div>
+  <div class="warn" style="margin-top:14px">⚠️ 在 ML2Scratch 裡，<b>「蒐集」和「貼標籤」是同一個動作</b>：你擺好姿勢，然後按「學習標籤1」，它就把現在看到的畫面存成「標籤1」的範例。按一次存一張，要按大約 <b>20 次</b>才夠！</div>
+</section>
+
+<section id="lab">
+  <div class="sec-head"><span class="dot" style="background:var(--sky);box-shadow:0 0 0 5px color-mix(in srgb,var(--sky) 22%,transparent)"></span><h2>③ KNN 小實驗室：AI 是怎麼「猜」的</h2></div>
+  <p style="margin:0 0 14px;color:var(--ink2)">ML2Scratch 用的方法叫 <b>KNN</b>，意思是「<b>看最靠近的幾個鄰居</b>」。KNN（K 個最近鄰居，<span style="font-family:var(--f-num)">K-Nearest Neighbors</span>）是機器學習中最簡單且直觀的<b>監督式學習</b>（<span style="font-family:var(--f-num)">Supervised Learning</span>）演算法之一，核心概念就是「<b>近朱者赤，近墨者黑</b>」或「<b>物以類聚</b>」。下面這個實驗室把照片簡化成平面上的點，<b>點一下白色區域</b>就可以放資料點，親自試試看 AI 是怎麼判斷的！</p>
+  <div class="lab">
+    <div>
+      <div class="labbox">
+        <svg class="knn" id="knn" viewBox="0 0 400 300" role="img" aria-label="KNN 判斷示範圖，可點擊放置資料點">
+          <line class="axis" x1="34" y1="266" x2="384" y2="266"></line>
+          <line class="axis" x1="34" y1="16" x2="34" y2="266"></line>
+          <text class="axlab" x="210" y="284" text-anchor="middle">特徵 1（例如：顏色）</text>
+          <text class="axlab" x="16" y="140" text-anchor="middle" transform="rotate(-90 16 140)">特徵 2（例如：形狀）</text>
+          <g id="links"></g><g id="dots"></g><g id="testg"></g>
+        </svg>
+      </div>
+      <div class="tools">
+        <button class="tool t1 on" data-m="1">🔴 放標籤1</button>
+        <button class="tool t2" data-m="2">🔵 放標籤2</button>
+        <button class="tool t3" data-m="3">🟡 放標籤3</button>
+        <button class="tool tt" data-m="t">⭐ 放「要判斷的新照片」</button>
+        <button class="tool" id="clear">🗑️ 全部清除</button>
+      </div>
+    </div>
+    <div>
+      <div class="verdict">
+        <div class="big" id="v-big">先放一些資料點吧！</div>
+        <div class="sub" id="v-sub">選好顏色，然後在左邊的格子裡點一點，每點一下就是「一張照片」。放好之後，再放一顆 ⭐ 星星當作「新照片」。</div>
+        <div class="tallies" id="tallies"></div>
+      </div>
+      <div class="note" style="margin-top:12px">🔍 星星會和<b>最近的 3 個鄰居</b>連線，哪個顏色的鄰居最多，就判斷成那個標籤。<b>試試看：</b>把標籤1 的點全部放在角落，再把星星放到中間，看看會發生什麼事？</div>
+      <div class="note" style="margin-top:10px">🍰 真實的照片不是 2 個特徵，而是 <b>1000 多個數字</b>。原理一模一樣，只是電腦在很多很多維度裡找鄰居。</div>
+    </div>
+  </div>
+</section>
+
+<section id="blocks">
+  <div class="sec-head"><span class="dot" style="background:var(--butter);box-shadow:0 0 0 5px color-mix(in srgb,var(--butter) 30%,transparent)"></span><h2>④ 你會用到的積木</h2></div>
+  <div class="grid2">
+    <div class="blkcard">
+      <span class="grp">🧠 教它｜最重要</span>
+      <h3><span class="blk">學習標籤1</span> <span class="blk">學習標籤2</span> <span class="blk">學習標籤3</span></h3>
+      <p>👉 按一下，就把<b>現在攝影機看到的畫面</b>存成那個標籤的一張範例。標籤 1、2、3 有專屬積木，第 4～10 個要用下面那塊。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">🧠 教它</span>
+      <h3><span class="blk">學習標籤 <span class="drop">4 ▾</span></span></h3>
+      <p>👉 要教第 4 到第 10 個標籤時用這一塊，先選編號再按。旁邊還有一塊 <span class="blk">學習標籤 <span class="num">11</span></span>，可以直接打字輸入編號。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">✨ 用它｜最重要</span>
+      <h3><span class="blk rep">標籤</span></h3>
+      <p>👉 AI 現在的判斷結果（1、2、3…）。把它左邊的框框打勾，舞台上就會一直顯示。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">✨ 用它｜最重要</span>
+      <h3><span class="blk hat">接收到類別 <span class="drop">任何 ▾</span> 時</span></h3>
+      <p>👉 AI 判斷成這個類別時，下面的積木就會執行。下拉可以選「任何」或 1～10。<b>做作品幾乎都靠這一塊！</b></p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">📊 檢查</span>
+      <h3><span class="blk rep">標籤數量1</span> … <span class="blk rep">標籤數量10</span></h3>
+      <p>👉 這個標籤已經學了幾張照片。標籤 1～10 各有一塊，打勾顯示在舞台上，就能確認每個標籤是不是都有 20 張。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">🗑️ 重來</span>
+      <h3><span class="blk">重置 <span class="drop">所有量 ▾</span></span></h3>
+      <p>👉 教錯了就重來！下拉選「所有量」會全部清空，也可以只選某一個標籤編號清掉。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">💾 存檔｜超級重要</span>
+      <h3><span class="blk">下載學習資料</span> <span class="blk">上傳學習資料</span></h3>
+      <p>👉 把辛苦教的成果存成一個檔案，下次用「上傳學習資料」載回來就不用重教。<b>不做這個，下課就全部不見了！</b></p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">⚙️ 設定</span>
+      <h3><span class="blk">每隔 <span class="drop">1 ▾</span> 秒標記一次</span></h3>
+      <p>👉 AI 多久猜一次（「標記」就是判斷的意思）。想反應快一點就改成 0.2 或 0.1 秒，但電腦會比較累。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">⚙️ 設定</span>
+      <h3><span class="blk"><span class="drop">關閉 ▾</span> 分類</span></h3>
+      <p>👉 這塊就是「暫停／開始判斷」的開關（下拉選 <b>關閉</b> 或 <b>開啟</b>）。教新標籤的時候先關掉，舞台上的答案才不會一直跳。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">⚙️ 設定</span>
+      <h3><span class="blk">學習/分類 <span class="drop">網路攝影機 ▾</span> 影像</span></h3>
+      <p>👉 可以把「網路攝影機」改成「舞台」，變成讓 AI 看<b>你在舞台上畫的圖</b>，不用攝影機也能玩！</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">⚙️ 設定</span>
+      <h3><span class="blk">視訊設為 <span class="drop">開啟 ▾</span></span> <span class="blk">視訊透明度設為 <span class="num">50</span></span></h3>
+      <p>👉 和前面兩個擴充功能一樣：控制攝影機畫面的顯示與清楚程度（這裡叫「視訊」）。</p>
+    </div>
+    <div class="blkcard">
+      <span class="grp">⚙️ 設定</span>
+      <h3><span class="blk">網路攝影機切換到 <span class="drop">… ▾</span></span></h3>
+      <p>👉 電腦有兩支以上的攝影機時，可以切換要用哪一支。</p>
+    </div>
+  </div>
+</section>
+
+<section id="make">
+  <div class="sec-head"><span class="dot" style="background:var(--pink);box-shadow:0 0 0 5px color-mix(in srgb,var(--pink) 22%,transparent)"></span><h2>⑤ 動手做做看</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>✌️ 作品 1：猜拳辨識機</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">第一個作品：教 AI 認出石頭、剪刀、布。</p>
+      <ol style="font-size:.93rem;padding-left:1.2em">
+        <li>出「石頭」對著鏡頭，按 <span class="blk">學習標籤1</span> 約 20 次（手要稍微移動、轉一下角度）。</li>
+        <li>出「剪刀」，按 <span class="blk">學習標籤2</span> 約 20 次。</li>
+        <li>出「布」，按 <span class="blk">學習標籤3</span> 約 20 次。</li>
+        <li>把手放下，試試看舞台上的「標籤」有沒有跟著變！</li>
+      </ol>
+      <div class="code">
+        <div><span class="blk hat">接收到類別 <span class="drop">1 ▾</span> 時</span></div>
+        <div class="ind1"><span class="blk ctl">說出「你出石頭！」</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🗑️ 作品 2：垃圾分類小幫手</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">拿真的物品來教：標籤1＝紙類、標籤2＝塑膠、標籤3＝鐵鋁罐。</p>
+      <div class="code">
+        <div><span class="blk hat">接收到類別 <span class="drop">2 ▾</span> 時</span></div>
+        <div class="ind1"><span class="blk ctl">切換造型到「塑膠桶」</span></div>
+        <div class="ind1"><span class="blk ctl">說出「請丟塑膠類！」</span></div>
+        <div class="ind1"><span class="blk ctl">播放音效「叮」</span></div>
+      </div>
+      <p style="font-size:.92rem">💡 記得多教一個 <b>標籤4＝什麼都沒有</b>（空背景），AI 才不會沒東西也亂猜！</p>
+    </div>
+    <div class="card">
+      <h3>🎮 作品 3：用動作控制角色</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">標籤1＝手舉左邊、標籤2＝手舉右邊、標籤3＝不動。</p>
+      <div class="code">
+        <div><span class="blk hat">接收到類別 <span class="drop">1 ▾</span> 時</span></div>
+        <div class="ind1"><span class="blk mot">面向 -90 度</span></div>
+        <div class="ind1"><span class="blk mot">移動 <span class="num">10</span> 點</span></div>
+      </div>
+      <p style="font-size:.92rem">把「每隔幾秒標記一次」改成 <b>0.2 秒</b>，操作起來會順很多。</p>
+    </div>
+    <div class="card">
+      <h3>💾 作品 4：把 AI 存起來</h3>
+      <p style="font-size:.93rem;color:var(--ink2)">下課前一定要做這件事！</p>
+      <ol style="font-size:.93rem;padding-left:1.2em">
+        <li>按 <span class="blk">下載學習資料</span>，會得到一個檔案（記得存到自己的資料夾）。</li>
+        <li>另外用「檔案 → 儲存到你的電腦」存 .sb3 程式檔。</li>
+        <li>下次打開 .sb3 之後，再按 <span class="blk">上傳學習資料</span> 把 AI 的記憶載回來。</li>
+      </ol>
+      <div class="warn" style="margin-top:8px">⚠️ .sb3 <b>不會</b>存 AI 學過的照片！兩個檔案都要存才完整。</div>
+    </div>
+  </div>
+</section>
+
+<section id="tips">
+  <div class="sec-head"><span class="dot" style="background:var(--mint);box-shadow:0 0 0 5px color-mix(in srgb,var(--mint) 22%,transparent)"></span><h2>⑥ 讓 AI 變聰明的 6 個秘訣</h2></div>
+  <div class="tips">
+    <label><input type="checkbox"><span><b>每個標籤至少 20 張。</b>太少的話 AI 沒看過幾次，一定猜不準。</span></label>
+    <label><input type="checkbox"><span><b>每個標籤張數要差不多。</b>如果標籤1 有 50 張、標籤2 只有 5 張，AI 會偏心，什麼都猜標籤1。</span></label>
+    <label><input type="checkbox"><span><b>拍照時要「變化」。</b>手稍微移動、轉角度、離鏡頭遠一點近一點，AI 才學得會「重點是手勢，不是位置」。</span></label>
+    <label><input type="checkbox"><span><b>多教一個「什麼都沒有」。</b>拍空白背景當一個標籤，AI 才知道「現在沒東西」。</span></label>
+    <label><input type="checkbox"><span><b>背景不要一直換。</b>如果標籤1 都在窗戶前拍、標籤2 都在牆前拍，AI 可能是在認「背景」不是認「你的手」！</span></label>
+    <label><input type="checkbox"><span><b>教錯了就重設。</b>不小心拍到模糊或錯的畫面，用「重設標籤」清掉重來，比硬撐有效。</span></label>
+  </div>
+  <div class="note" style="margin-top:14px">🤔 <b>想一想：</b>如果你只用自己的手教 AI，換成老師的手（比較大）它還認得出來嗎？這就是 AI 的「<b>偏見</b>」—— 它只認得它看過的東西。</div>
+</section>
+
+<section id="help">
+  <div class="sec-head"><span class="dot"></span><h2>求救區</h2></div>
+  <details open><summary>「標籤」一直是空白</summary><div class="body">AI 還沒學過任何東西，或是「分類」開關被關掉了。先確認每個標籤都有張數，再檢查 <span class="blk"><span class="drop">開啟 ▾</span> 分類</span>。</div></details>
+  <details><summary>不管做什麼動作，答案都一樣</summary><div class="body">通常是<b>張數不平均</b>，或兩個標籤的畫面太像。先用「標籤數量N」看看是不是差太多，把少的補到一樣多；或把兩個動作做得更不一樣。</div></details>
+  <details><summary>剛剛還很準，現在都猜錯</summary><div class="body">可能是<b>光線或背景變了</b>，或你換了位置。解法：在新環境再補教幾張，AI 就會適應。</div></details>
+  <details><summary>重新整理後 AI 就忘光了</summary><div class="body">對，AI 的記憶不會自動儲存。每次做完都要按 <span class="blk">下載學習資料</span>，下次再 <span class="blk">上傳學習資料</span>。</div></details>
+  <details><summary>電腦很卡</summary><div class="body">把「每隔幾秒標記一次」改成 1 秒、關掉其他分頁，會順很多。教完之後也可以先把「分類」開關關掉。</div></details>
+</section>
+
+<footer>🔮 ML2Scratch 學生實作單　·　AI 有多聰明，取決於你教得多好！</footer>
+</div>
+
+<script>
+/* ---------- checklist ---------- */
+var items=[].slice.call(document.querySelectorAll('#check .it')),bar=document.getElementById('bar');
+items.forEach(function(it){
+  it.querySelector('button').addEventListener('click',function(){
+    it.classList.toggle('done');
+    var d=items.filter(function(i){return i.classList.contains('done');}).length;
+    bar.style.width=(d/items.length*100)+'%';
+  });
+});
+/* ---------- flow ---------- */
+var FLOW=[
+ ['📸 蒐集資料','想教 AI 認出幾種東西，就要幫每一種<b>拍很多張照片</b>。照片越多、變化越多，AI 學得越好。在 ML2Scratch 裡，你按一次「學習標籤1」，就等於拍一張照片存進去。','要準備：攝影機、想教的東西（手勢、物品、表情都可以）'],
+ ['🏷️ 貼上標籤','光有照片不夠，還要告訴 AI「這張是什麼」。<b>標籤就是答案</b>：標籤1＝石頭、標籤2＝剪刀……這個叫做「<b>監督式學習</b>」，就像有老師在旁邊改答案。','用到的積木：學習標籤1 / 學習標籤2 / 學習標籤3 / 學習標籤 (4▾)'],
+ ['🧠 讓它學習','ML2Scratch 會自動把每張照片變成一串數字（<b>特徵</b>），記在腦袋裡。你按下學習的那一刻，它就記住了，不用等。','可以用「標籤數量N」確認它到底記了幾張'],
+ ['✨ 開始判斷','看到新畫面時，AI 會把它也變成數字，然後找<b>最像的幾張舊照片</b>，看它們大多是哪個標籤，就回答那個標籤。這就是下一段的 KNN！','用到的積木：標籤 / 接收到類別 (1▾) 時']
+];
+var fb=document.getElementById('flowbody');
+function showFlow(k){
+  var f=FLOW[k];
+  fb.innerHTML='<h3>'+f[0]+'</h3><p>'+f[1]+'</p><p style="color:var(--ink2);font-size:.88rem">'+f[2]+'</p>';
+  var bs=document.querySelectorAll('#flow button');
+  for(var i=0;i<bs.length;i++){bs[i].classList.toggle('on',i===k);}
+}
+[].slice.call(document.querySelectorAll('#flow button')).forEach(function(b){
+  b.addEventListener('click',function(){showFlow(parseInt(b.dataset.k,10));});
+});
+showFlow(0);
+/* ---------- KNN lab ---------- */
+var LC={1:'var(--l1)',2:'var(--l2)',3:'var(--l3)'};
+var LN={1:'標籤1',2:'標籤2',3:'標籤3'};
+var NS='http://www.w3.org/2000/svg';
+function at(el,o){for(var k in o){el.setAttribute(k,o[k]);}return el;}
+var svg=document.getElementById('knn'),dotsG=document.getElementById('dots'),
+    linksG=document.getElementById('links'),testG=document.getElementById('testg');
+var pts=[],test=null,mode='1',K=3;
+function svgXY(evt){
+  var r=svg.getBoundingClientRect();
+  var x=(evt.clientX-r.left)/r.width*400, y=(evt.clientY-r.top)/r.height*300;
+  return {x:Math.max(42,Math.min(376,x)),y:Math.max(14,Math.min(258,y))};
+}
+svg.addEventListener('click',function(e){
+  var p=svgXY(e);
+  if(mode==='t'){test={x:p.x,y:p.y};}
+  else{pts.push({x:p.x,y:p.y,l:parseInt(mode,10)});}
+  draw();
+});
+document.getElementById('clear').addEventListener('click',function(){pts=[];test=null;draw();});
+[].slice.call(document.querySelectorAll('.tool[data-m]')).forEach(function(b){
+  b.addEventListener('click',function(){
+    mode=b.dataset.m;
+    [].slice.call(document.querySelectorAll('.tool[data-m]')).forEach(function(o){o.classList.toggle('on',o===b);});
+  });
+});
+function draw(){
+  dotsG.textContent='';linksG.textContent='';testG.textContent='';
+  pts.forEach(function(p){
+    dotsG.appendChild(at(document.createElementNS(NS,'circle'),{cx:p.x,cy:p.y,r:7,fill:LC[p.l],'class':'pt'}));
+  });
+  var big=document.getElementById('v-big'),sub=document.getElementById('v-sub'),tal=document.getElementById('tallies');
+  tal.textContent='';
+  if(!test){
+    big.textContent=pts.length?('目前有 '+pts.length+' 筆資料'):'先放一些資料點吧！';
+    sub.textContent=pts.length?'接下來選 ⭐ 放一顆星星，看看 AI 會怎麼判斷。':'選好顏色，然後在左邊的格子裡點一點，每點一下就是「一張照片」。';
+    return;
+  }
+  var star='M '+test.x+' '+(test.y-13)+' l 3.8 8.6 l 9.4 1 l -7 6.3 l 2 9.2 l -8.2 -4.7 l -8.2 4.7 l 2 -9.2 l -7 -6.3 l 9.4 -1 z';
+  testG.appendChild(at(document.createElementNS(NS,'path'),{d:star,fill:'var(--grape)','class':'test'}));
+  if(pts.length===0){
+    big.textContent='AI 說：我不知道 🤷';
+    sub.textContent='一筆資料都沒有，AI 當然沒辦法判斷 —— 就像沒上過課就考試。';
+    return;
+  }
+  var arr=pts.map(function(p){
+    var dx=p.x-test.x,dy=p.y-test.y;
+    return {p:p,d:Math.sqrt(dx*dx+dy*dy)};
+  }).sort(function(a,b){return a.d-b.d;});
+  var k=Math.min(K,arr.length),vote={1:0,2:0,3:0};
+  for(var i=0;i<k;i++){
+    vote[arr[i].p.l]++;
+    linksG.appendChild(at(document.createElementNS(NS,'line'),
+      {x1:test.x,y1:test.y,x2:arr[i].p.x,y2:arr[i].p.y,'class':'link'}));
+    dotsG.appendChild(at(document.createElementNS(NS,'circle'),
+      {cx:arr[i].p.x,cy:arr[i].p.y,r:12,fill:'none',stroke:LC[arr[i].p.l],'stroke-width':3,opacity:.85}));
+  }
+  var best=1;
+  for(var l=2;l<=3;l++){if(vote[l]>vote[best])best=l;}
+  var tie=[1,2,3].filter(function(l){return vote[l]===vote[best];}).length>1;
+  big.innerHTML='AI 判斷：<span style="color:'+LC[best]+'">'+LN[best]+'</span>'+(tie?'（平手，勉強選一個）':'');
+  sub.textContent='最靠近的 '+k+' 個鄰居裡，有 '+vote[best]+' 個是'+LN[best]+'，所以它就這樣回答。';
+  [1,2,3].forEach(function(l){
+    if(vote[l]===0 && !pts.some(function(p){return p.l===l;}))return;
+    var row=document.createElement('div');row.className='tally';
+    row.innerHTML='<span style="color:'+LC[l]+'">'+LN[l]+'</span>'+
+      '<span class="track"><i style="width:'+(vote[l]/k*100)+'%;background:'+LC[l]+'"></i></span>'+
+      '<span style="font-family:var(--f-num)">'+vote[l]+'/'+k+'</span>';
+    tal.appendChild(row);
+  });
+}
+draw();
+</script>
+
+</body>
+</html>

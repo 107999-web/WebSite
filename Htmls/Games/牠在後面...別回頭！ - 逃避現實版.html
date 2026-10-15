@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>牠在後面...別回頭！ - 逃避現實版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #020000;
+            color: #ff0033;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* 恐怖手電筒與深淵邊緣效果 */
+        .vignette {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 20%, rgba(0, 0, 0, 0.95) 80%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        h1 {
+            position: absolute;
+            top: 20px;
+            font-size: 24px;
+            text-shadow: 0 0 10px #ff0000;
+            animation: flicker 4s infinite;
+            letter-spacing: 5px;
+            z-index: 5;
+            text-align: center;
+        }
+
+        /* 遊戲畫布固定顯示範圍 */
+        #gameCanvas {
+            background-color: #0b0202;
+            border: 4px solid #440000;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.3);
+            display: block;
+        }
+
+        /* UI 資訊 */
+        #ui {
+            position: absolute;
+            top: 70px;
+            display: flex;
+            justify-content: space-between;
+            width: 900px;
+            padding: 0 20px;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 5;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .lives {
+            color: #ff0033;
+            letter-spacing: 3px;
+        }
+
+        /* 狀態效果提示 */
+        #statusEffects {
+            position: absolute;
+            bottom: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+            font-weight: bold;
+        }
+        .effect-badge {
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            display: none;
+            animation: flicker 1s infinite;
+        }
+        .effect-speed { background: #00ff66; color: #000; box-shadow: 0 0 10px #00ff66; }
+        .effect-shield { background: #00ccff; color: #000; box-shadow: 0 0 10px #00ccff; }
+
+        /* 結束畫面 */
+        #gameOverScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        #gameOverScreen.show {
+            opacity: 1;
+            pointer-events: auto;
+            animation: shake 0.5s infinite;
+        }
+
+        #gameOverScreen h2 {
+            font-size: 64px;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000;
+            margin-bottom: 20px;
+        }
+
+        #gameOverScreen p {
+            font-size: 20px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        #restartBtn {
+            background: #220000;
+            color: #ff0033;
+            border: 2px solid #ff0033;
+            padding: 10px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        #restartBtn:hover {
+            background: #ff0033;
+            color: #000;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.3; }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px); }
+            20% { transform: translate(-2px, 0px); }
+            40% { transform: translate(1px, -1px); }
+            60% { transform: translate(-1px, 2px); }
+            80% { transform: translate(-1px, -1px); }
+            100% { transform: translate(2px, 1px); }
+        }
+
+        .hurt { animation: shake 0.3s, flashRed 0.3s; }
+        @keyframes flashRed { 0%, 100% { background-color: #020000; } 50% { background-color: #440000; } }
+    </style>
+</head>
+<body>
+
+    <div class="vignette"></div>
+    <h1>廣 闊 的 迷 宮 裡 . . . 牠 正 在 狩 獵 你</h1>
+
+    <div id="ui">
+        <div class="score">生存時間: <span id="scoreVal">0</span> 秒</div>
+        <div class="lives">生命值: <span id="livesVal">❤️❤️❤️</span></div>
+    </div>
+
+    <div id="statusEffects">
+        <div id="speedBadge" class="effect-badge effect-speed">🏃 腎上腺素激發中！</div>
+        <div id="shieldBadge" class="effect-badge effect-shield">🛡️ 聖光護盾保護中！</div>
+    </div>
+
+    <canvas id="gameCanvas" width="900" height="550"></canvas>
+
+    <div id="gameOverScreen">
+        <h2>你逃不掉的...</h2>
+        <p>你在黑暗深淵中掙扎了 <span id="finalScore">0</span> 秒</p>
+        <button id="restartBtn">再次墜入噩夢</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreVal = document.getElementById('scoreVal');
+        const livesVal = document.getElementById('livesVal');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScore = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+        const speedBadge = document.getElementById('speedBadge');
+        const shieldBadge = document.getElementById('shieldBadge');
+
+        // --- 遊戲世界地圖大小 (大場地) ---
+        const WORLD = { width: 2400, height: 1500 };
+        
+        // 攝影機視鏡 (Camera)
+        const camera = { x: 0, y: 0, width: canvas.width, height: canvas.height };
+
+        let gameActive = true;
+        let score = 0;
+        let maxLives = 3;
+        let lives = maxLives;
+        let scoreInterval;
+
+        const keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, s: false, a: false, d: false };
+
+        // --- 擬人化玩家設定 ---
+        const player = {
+            x: WORLD.width / 2,
+            y: WORLD.height / 2,
+            radius: 14,
+            baseSpeed: 4.5,
+            speed: 4.5,
+            dirX: 1, // 用於眼睛朝向
+            hasShield: false,
+            isBuffed: false
+        };
+
+        // --- 擬人化怪物設定 ---
+        const monster = {
+            x: 100,
+            y: 100,
+            radius: 22,
+            speed: 2.8,
+            maxSpeed: 7.0,
+            acceleration: 0.0007
+        };
+
+        // 道具與環境裝飾
+        let items = [];
+        let bloodSpots = [];
+        let mapObstacles = []; // 增添一些老舊牆壁殘骸豐富大場地
+
+        // 初始化環境
+        function initWorldElements() {
+            // 隨機血跡
+            bloodSpots = [];
+            for(let i=0; i<60; i++) {
+                bloodSpots.push({
+                    x: Math.random() * WORLD.width,
+                    y: Math.random() * WORLD.height,
+                    radius: Math.random() * 40 + 10,
+                    opacity: Math.random() * 0.25 + 0.05
+                });
+            }
+
+            // 隨機牆壁柱子
+            mapObstacles = [];
+            for(let i=0; i<25; i++) {
+                mapObstacles.push({
+                    x: Math.random() * (WORLD.width - 200) + 100,
+                    y: Math.random() * (WORLD.height - 200) + 100,
+                    width: Math.random() * 80 + 40,
+                    height: Math.random() * 80 + 40
+                });
+            }
+            items = []; // 清空道具
+        }
+
+        // 隨機生成道具
+        function spawnItem() {
+            if (!gameActive) return;
+            const types = ['speed', 'shield'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            items.push({
+                x: Math.random() * (WORLD.width - 60) + 30,
+                y: Math.random() * (WORLD.height - 60) + 30,
+                type: type,
+                radius: 12,
+                pulse: 0
+            });
+        }
+
+        // 道具生成循環
+        let itemSpawner = setInterval(spawnItem, 5000); // 每 5 秒地圖隨機多一個道具
+
+        window.addEventListener('keydown', (e) => { if (e.key in keys) keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { if (e.key in keys) keys[e.key] = false; });
+
+        function startTimer() {
+            scoreInterval = setInterval(() => {
+                if (gameActive) {
+                    score++;
+                    scoreVal.innerText = score;
+                    monster.speed += 0.12; // 怪物隨時間變快
+                }
+            }, 1000);
+        }
+
+        // 碰撞與事件
+        function checkCollisions() {
+            // 1. 玩家與怪物碰撞
+            const dx = player.x - monster.x;
+            const dy = player.y - monster.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < (player.radius + monster.radius)) {
+                if (player.hasShield) {
+                    // 有護盾：彈開怪物，不扣血
+                    player.hasShield = false;
+                    shieldBadge.style.display = 'none';
+                    // 把怪物反方向推走
+                    monster.x -= Math.cos(Math.atan2(dy, dx)) * 250;
+                    monster.y -= Math.sin(Math.atan2(dy, dx)) * 250;
+                } else {
+                    // 沒護盾：扣血
+                    lives--;
+                    document.body.classList.add('hurt');
+                    setTimeout(() => document.body.classList.remove('hurt'), 300);
+                    livesVal.innerText = '❤️'.repeat(lives);
+
+                    if (lives <= 0) endGame();
+                    else resetMonsterPosition();
+                }
+            }
+
+            // 2. 玩家與道具碰撞
+            for (let i = items.length - 1; i >= 0; i--) {
+                const itemDist = Math.hypot(player.x - items[i].x, player.y - items[i].y);
+                if (itemDist < (player.radius + items[i].radius)) {
+                    applyBuff(items[i].type);
+                    items.splice(i, 1); // 吃掉道具
+                }
+            }
+        }
+
+        function applyBuff(type) {
+            if (type === 'speed') {
+                player.speed = player.baseSpeed * 1.6; // 速度 1.6 倍
+                speedBadge.style.display = 'block';
+                player.isBuffed = true;
+                
+                // 5秒後失效
+                clearTimeout(player.speedTimeout);
+                player.speedTimeout = setTimeout(() => {
+                    player.speed = player.baseSpeed;
+                    speedBadge.style.display = 'none';
+                    player.isBuffed = false;
+                }, 5000);
+            } else if (type === 'shield') {
+                player.hasShield = true;
+                shieldBadge.style.display = 'block';
+
+                // 6秒後護盾自動消失
+                clearTimeout(player.shieldTimeout);
+                player.shieldTimeout = setTimeout(() => {
+                    player.hasShield = false;
+                    shieldBadge.style.display = 'none';
+                }, 6000);
+            }
+        }
+
+        function resetMonsterPosition() {
+            let targetX, targetY;
+            do {
+                targetX = Math.random() * WORLD.width;
+                targetY = Math.random() * WORLD.height;
+            } while (Math.hypot(targetX - player.x, targetY - player.y) < 500); // 至少離 500 像素遠
+            monster.x = targetX;
+            monster.y = targetY;
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(scoreInterval);
+            finalScore.innerText = score;
+            gameOverScreen.classList.add('show');
+        }
+
+        function restartGame() {
+            score = 0; lives = maxLives; gameActive = true;
+            monster.speed = 2.8;
+            player.speed = player.baseSpeed;
+            player.hasShield = false; player.isBuffed = false;
+            
+            speedBadge.style.display = 'none';
+            shieldBadge.style.display = 'none';
+            scoreVal.innerText = score;
+            livesVal.innerText = '❤️'.repeat(lives);
+            
+            player.x = WORLD.width / 2;
+            player.y = WORLD.height / 2;
+            
+            initWorldElements();
+            resetMonsterPosition();
+            gameOverScreen.classList.remove('show');
+            startTimer();
+            update();
+        }
+
+        restartBtn.addEventListener('click', restartGame);
+
+        // 主物理與繪製循環
+        function update() {
+            if (!gameActive) return;
+
+            // --- 1. 玩家移動與視線朝向 ---
+            let moveX = 0; let moveY = 0;
+            if (keys.ArrowUp || keys.w) moveY -= player.speed;
+            if (keys.ArrowDown || keys.s) moveY += player.speed;
+            if (keys.ArrowLeft || keys.a) { moveX -= player.speed; player.dirX = -1; }
+            if (keys.ArrowRight || keys.d) { moveX += player.speed; player.dirX = 1; }
+
+            player.x += moveX;
+            player.y += moveY;
+
+            // 世界地圖邊界限制
+            if (player.x < player.radius) player.x = player.radius;
+            if (player.x > WORLD.width - player.radius) player.x = WORLD.width - player.radius;
+            if (player.y < player.radius) player.y = player.radius;
+            if (player.y > WORLD.height - player.radius) player.y = WORLD.height - player.radius;
+
+            // --- 2. 障礙物碰撞阻擋 (簡單的外推法) ---
+            mapObstacles.forEach(obs => {
+                if (player.x + player.radius > obs.x && player.x - player.radius < obs.x + obs.width &&
+                    player.y + player.radius > obs.y && player.y - player.radius < obs.y + obs.height) {
+                    // 撞到障礙物，退回移動
+                    player.x -= moveX;
+                    player.y -= moveY;
+                }
+            });
+
+            // --- 3. 追殺者 AI ---
+            const mDx = player.x - monster.x;
+            const mDy = player.y - monster.y;
+            const angle = Math.atan2(mDy, mDx);
+
+            if (monster.speed < monster.maxSpeed) monster.speed += monster.acceleration;
+            monster.x += Math.cos(angle) * monster.speed;
+            monster.y += Math.sin(angle) * monster.speed;
+
+            checkCollisions();
+
+            // --- 4. 攝影機跟隨玩家鏡頭計算 ---
+            camera.x = player.x - canvas.width / 2;
+            camera.y = player.y - canvas.height / 2;
+            // 攝影機不超出大世界邊界
+            if (camera.x < 0) camera.x = 0;
+            if (camera.y < 0) camera.y = 0;
+            if (camera.x > WORLD.width - canvas.width) camera.x = WORLD.width - canvas.width;
+            if (camera.y > WORLD.height - canvas.height) camera.y = WORLD.height - canvas.height;
+
+            // --- 5. 開始渲染 (所有物體座標都要扣掉相機坐標 camera.x/y) ---
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y); // 將畫布世界平移
+
+            // A. 繪製世界地圖邊界線 (提醒玩家這是死路)
+            ctx.strokeStyle = '#220000';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(0, 0, WORLD.width, WORLD.height);
+
+            // B. 繪製血跡
+            bloodSpots.forEach(spot => {
+                ctx.fillStyle = `rgba(80, 0, 0, ${spot.opacity})`;
+                ctx.beginPath(); ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2); ctx.fill();
+            });
+
+            // C. 繪製廢墟障礙物
+            ctx.fillStyle = '#1c0808';
+            ctx.strokeStyle = '#3a0f0f';
+            ctx.lineWidth = 3;
+            mapObstacles.forEach(obs => {
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+            });
+
+            // D. 繪製道具
+            items.forEach(item => {
+                item.pulse += 0.1;
+                let pulseRadius = item.radius + Math.sin(item.pulse) * 3;
+                ctx.save();
+                ctx.shadowBlur = 15;
+                if(item.type === 'speed') {
+                    ctx.fillStyle = '#00ff66'; ctx.shadowColor = '#00ff66';
+                } else {
+                    ctx.fillStyle = '#00ccff'; ctx.shadowColor = '#00ccff';
+                }
+                ctx.beginPath(); ctx.arc(item.x, item.y, pulseRadius, 0, Math.PI * 2); ctx.fill();
+                // 道具中央小白點
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(item.x, item.y, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            });
+
+            // E. 繪製【擬人化玩家】
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            // 護盾光圈特效
+            if(player.hasShield) {
+                ctx.strokeStyle = 'rgba(0, 204, 255, 0.6)';
+                ctx.lineWidth = 4; ctx.shadowBlur = 15; ctx.shadowColor = '#00ccff';
+                ctx.beginPath(); ctx.arc(0, 0, player.radius + 10, 0, Math.PI * 2); ctx.stroke();
+            }
+
+            // 身體 (穿藍色衣服的小人身體)
+            ctx.shadowBlur = player.isBuffed ? 20 : 5;
+            ctx.shadowColor = player.isBuffed ? '#00ff66' : '#000';
+            ctx.fillStyle = '#2255ff'; // 藍色衣服
+            ctx.fillRect(-player.radius, -player.radius/4, player.radius*2, player.radius*1.2); 
+            
+            // 頭部 (黃色皮膚)
+            ctx.fillStyle = '#ffe0aa';
+            ctx.beginPath(); ctx.arc(0, -player.radius/2 - 2, player.radius * 0.7, 0, Math.PI*2); ctx.fill();
+
+            // 驚恐的眼睛 (會跟隨走動方向)
+            ctx.fillStyle = '#ffffff'; // 眼白
+            let eyeOffset = player.dirX * 3;
+            ctx.beginPath(); ctx.arc(-3 + eyeOffset, -player.radius/2 - 3, 3, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(4 + eyeOffset, -player.radius/2 - 3, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#000000'; // 瞳孔
+            ctx.beginPath(); ctx.arc(-3 + eyeOffset + player.dirX, -player.radius/2 - 3, 1.2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(4 + eyeOffset + player.dirX, -player.radius/2 - 3, 1.2, 0, Math.PI*2); ctx.fill();
+
+            // 驚恐的小嘴巴
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(eyeOffset, -player.radius/2 + 2, 2, 0, Math.PI); ctx.stroke();
+            ctx.restore();
+
+
+            // F. 繪製【擬人化怪物（怨靈連帽殺手）】
+            ctx.save();
+            ctx.translate(monster.x, monster.y);
+            ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20;
+
+            // 漆黑的連帽斗篷主體
+            ctx.fillStyle = '#0a0101';
+            ctx.beginPath();
+            ctx.arc(0, -5, monster.radius, Math.PI, 0, false); // 巨大的兜帽頭部
+            ctx.lineTo(monster.radius, monster.radius*1.5);
+            // 底部撕裂狀衣服陰影
+            for(let j = 0; j < 4; j++) {
+                ctx.lineTo(monster.radius - (j*15), monster.radius + (j%2 === 0 ? 5 : 20));
+            }
+            ctx.lineTo(-monster.radius, monster.radius*1.5);
+            ctx.closePath(); ctx.fill();
+
+            // 兜帽內部的陰暗面部 (純黑)
+            ctx.fillStyle = '#000000';
+            ctx.beginPath(); ctx.arc(0, -2, monster.radius * 0.7, 0, Math.PI * 2); ctx.fill();
+
+            // 恐怖的大血紅發光雙眼
+            ctx.fillStyle = '#ff0033'; ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.ellipse(-7, -4, 5, 3, Math.PI/6, 0, Math.PI * 2);
+            ctx.ellipse(7, -4, 5, 3, -Math.PI/6, 0, Math.PI * 2);
+            ctx.fill();
+            // 細長邪惡的黑色瞳孔
+            ctx.fillStyle = '#000';
+            ctx.fillRect(-8, -5, 2, 3);
+            ctx.fillRect(6, -5, 2, 3);
+
+            // 猙獰的尖銳鋸齒嘴巴
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-10, 6); ctx.lineTo(-6, 9); ctx.lineTo(-2, 6); ctx.lineTo(2, 9); ctx.lineTo(6, 6); ctx.lineTo(10, 9);
+            ctx.stroke();
+
+            ctx.restore();
+
+            ctx.restore(); // 恢復畫布平移
+
+            requestAnimationFrame(update);
+        }
+
+        // 初始化與執行
+        initWorldElements();
+        resetMonsterPosition();
+        startTimer();
+        update();
+    </script>
+</body>
+</html>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D 跳棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050201;overflow:hidden;font-family:'Microsoft JhengHei',sans-serif;color:#e8d5a0}
+#c{display:block;width:100vw;height:100vh}
+
+/* ── START DIALOG ── */
+#start-dlg{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;z-index:100}
+.dlg-box{background:linear-gradient(160deg,#1a0a02,#2c1305);border:2px solid #7c3c18;border-radius:16px;padding:38px 48px;text-align:center;min-width:320px}
+.dlg-box h2{font-size:2.2rem;color:#f0a840;margin-bottom:8px;letter-spacing:.06em}
+.dlg-box p{font-size:.9rem;color:#a06838;margin-bottom:28px}
+.dlg-btn{display:block;width:100%;padding:14px;margin:10px 0;background:linear-gradient(135deg,#4a1c06,#6a2c0c);border:1px solid #9a5018;border-radius:10px;color:#f0a840;font-size:1.1rem;cursor:pointer;transition:background .2s}
+.dlg-btn:hover{background:linear-gradient(135deg,#6a2c0c,#9a4010)}
+
+/* ── HUD ── */
+#hud{position:fixed;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:20px;align-items:center;background:rgba(12,5,0,.78);padding:10px 24px;border-radius:30px;border:1px solid #5a2c0c;z-index:50;pointer-events:none}
+#turn-badge{font-size:.95rem;color:#d4924a;letter-spacing:.04em}
+#jump-badge{font-size:.85rem;color:#ffcc44;font-weight:bold;display:none}
+.top-btn{pointer-events:all;background:none;border:1px solid #5a2c0c;color:#a07040;padding:6px 14px;border-radius:16px;cursor:pointer;font-size:.8rem}
+.top-btn:hover{border-color:#9a5018;color:#f0a840}
+
+/* ── WIN OVERLAY ── */
+#win-dlg{position:fixed;inset:0;background:rgba(0,0,0,.80);display:none;align-items:center;justify-content:center;z-index:200}
+#win-dlg.show{display:flex}
+.win-box{background:linear-gradient(160deg,#1a0a02,#2c1a08);border:2px solid #9a5018;border-radius:18px;padding:44px 60px;text-align:center}
+.win-box h2{font-size:2.6rem;color:#f0a840;margin-bottom:12px}
+.win-box p{color:#b07040;margin-bottom:28px}
+.win-box button{padding:12px 32px;background:#5a2c0c;border:1px solid #9a5018;border-radius:10px;color:#f0a840;font-size:1.1rem;cursor:pointer}
+.win-box button:hover{background:#7a4018}
+
+/* ── TIP ── */
+#tip{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:#6a3a18;font-size:.75rem;pointer-events:none}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+<canvas id="c"></canvas>
+
+<div id="start-dlg">
+  <div class="dlg-box">
+    <h2>♟ 3D 跳棋</h2>
+    <p>American Draughts · 必吃 · 連跳 · 升王</p>
+    <button class="dlg-btn" onclick="startGame('pvp')">🎮 雙人對戰</button>
+    <button class="dlg-btn" onclick="startGame('ai')">🤖 人機對戰（你執紅棋）</button>
+  </div>
+</div>
+
+<div id="hud" style="display:none">
+  <span id="turn-badge">紅方回合</span>
+  <span id="jump-badge">⚡ 連跳中！</span>
+  <button class="top-btn" onclick="restartGame()">重新開始</button>
+  <button class="top-btn" onclick="resetView()">重設視角</button>
+</div>
+
+<div id="win-dlg">
+  <div class="win-box">
+    <h2 id="win-title">勝利！</h2>
+    <p id="win-msg"></p>
+    <button onclick="restartGame()">再來一局</button>
+  </div>
+</div>
+
+<div id="tip">拖曳旋轉 · 滾輪縮放 · 點選棋子移動 · 必吃規則</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════
+   CHECKERS LOGIC
+═══════════════════════════════════════════════════════ */
+const R='r', BK='b';
+function opp(s){return s===R?BK:R;}
+function inB8(r,c){return r>=0&&r<8&&c>=0&&c<8;}
+function isDark(r,c){return(r+c)%2===1;}
+function cloneBd(b){return b.map(r=>r.map(p=>p?{...p}:null));}
+
+function initBd(){
+  const b=Array(8).fill(0).map(()=>Array(8).fill(null));
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(!isDark(r,c))continue;
+    if(r<3) b[r][c]={c:BK,king:false};
+    if(r>4) b[r][c]={c:R,king:false};
+  }
+  return b;
+}
+
+function getDirs(p){
+  if(p.king)return[[-1,-1],[-1,1],[1,-1],[1,1]];
+  return p.c===R?[[-1,-1],[-1,1]]:[[1,-1],[1,1]];
+}
+
+/* Returns {moves:[{nr,nc}], jumps:[{nr,nc,cr,cc}]} for piece at r,c */
+function getPieceMoves(b,r,c){
+  const p=b[r][c];if(!p)return{moves:[],jumps:[]};
+  const s=p.c,dirs=getDirs(p);
+  const moves=[],jumps=[];
+  for(const[dr,dc]of dirs){
+    const nr=r+dr,nc=c+dc;
+    if(!inB8(nr,nc))continue;
+    if(!b[nr][nc])moves.push({nr,nc});
+    else if(b[nr][nc].c!==s){
+      const jr=r+2*dr,jc=c+2*dc;
+      if(inB8(jr,jc)&&!b[jr][jc])jumps.push({nr:jr,nc:jc,cr:nr,cc:nc});
+    }
+  }
+  return{moves,jumps};
+}
+
+/* Check if any piece of side s can jump */
+function anyJumps(b,s){
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(b[r][c]?.c===s&&getPieceMoves(b,r,c).jumps.length>0)return true;
+  }
+  return false;
+}
+
+/* Steps available for selected piece (respects mandatory jump) */
+function getSteps(b,r,c,jumpsOnly=false){
+  const{moves,jumps}=getPieceMoves(b,r,c);
+  if(jumpsOnly||jumps.length>0)return jumps;
+  return moves;
+}
+
+/* Recursive jump chain generation for AI */
+function getJumpChains(b,r,c,captured=[]){
+  const p=b[r][c];if(!p)return[];
+  const s=p.c,dirs=getDirs(p);
+  const chains=[];
+  for(const[dr,dc]of dirs){
+    const cr=r+dr,cc=c+dc,jr=r+2*dr,jc=c+2*dc;
+    if(!inB8(jr,jc))continue;
+    if(!b[cr][cc]||b[cr][cc].c===s)continue;
+    const key=cr+','+cc;
+    if(captured.includes(key))continue;
+    if(b[jr][jc])continue;
+    const step={nr:jr,nc:jc,cr,cc};
+    const nb=cloneBd(b);
+    nb[jr][jc]={...p};nb[r][c]=null;nb[cr][cc]=null;
+    // Kinging ends the sequence
+    const kinged=!p.king&&((s===R&&jr===0)||(s===BK&&jr===7));
+    if(kinged){chains.push([step]);continue;}
+    const cont=getJumpChains(nb,jr,jc,[...captured,key]);
+    if(cont.length===0)chains.push([step]);
+    else cont.forEach(c=>chains.push([step,...c]));
+  }
+  return chains;
+}
+
+/* All moves for AI (returns complete jump chains OR simple moves) */
+function getAllMoves(b,s){
+  const jumps=[],moves=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(!b[r][c]||b[r][c].c!==s)continue;
+    const chains=getJumpChains(b,r,c);
+    if(chains.length>0){
+      chains.forEach(ch=>jumps.push({r,c,chain:ch}));
+    }else{
+      const p=b[r][c];
+      getDirs(p).forEach(([dr,dc])=>{
+        const nr=r+dr,nc=c+dc;
+        if(inB8(nr,nc)&&!b[nr][nc])moves.push({r,c,chain:[{nr,nc,cr:-1,cc:-1}]});
+      });
+    }
+  }
+  return jumps.length>0?jumps:moves;
+}
+
+/* Apply complete move (chain) to board */
+function applyMove(b,r,c,chain){
+  const nb=cloneBd(b);
+  let p={...nb[r][c]};nb[r][c]=null;
+  for(const step of chain){
+    if(step.cr>=0)nb[step.cr][step.cc]=null;
+    nb[step.nr][step.nc]={...p};
+  }
+  const last=chain[chain.length-1];
+  const fp=nb[last.nr][last.nc];
+  if(!fp.king&&((fp.c===R&&last.nr===0)||(fp.c===BK&&last.nr===7)))
+    nb[last.nr][last.nc]={...fp,king:true};
+  return nb;
+}
+
+/* Count pieces */
+function countPcs(b,s){
+  let cnt=0;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]?.c===s)cnt++;
+  return cnt;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AI — MINIMAX α-β DEPTH 7
+═══════════════════════════════════════════════════════ */
+function evalBd(b){
+  let sc=0;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const p=b[r][c];if(!p)continue;
+    const sign=p.c===R?1:-1;
+    let v=p.king?3.2:1;
+    if(!p.king){
+      const adv=p.c===R?(7-r):r;
+      v+=adv*0.06;
+      if((p.c===R&&r===7)||(p.c===BK&&r===0))v+=0.4; // back row
+      // Center bonus
+      if(c>=2&&c<=5)v+=0.08;
+    }
+    sc+=sign*v;
+  }
+  return sc;
+}
+
+function minimax(b,depth,alpha,beta,maxR,s){
+  const mvs=getAllMoves(b,s);
+  if(mvs.length===0)return{sc:maxR?-50:50};
+  if(depth===0)return{sc:evalBd(b)};
+  let best=maxR?{sc:-Infinity}:{sc:Infinity};
+  for(const m of mvs){
+    const nb=applyMove(b,m.r,m.c,m.chain);
+    const ch=minimax(nb,depth-1,alpha,beta,!maxR,opp(s));
+    if(maxR){if(ch.sc>best.sc){best={sc:ch.sc,mv:m};alpha=Math.max(alpha,ch.sc);}}
+    else{if(ch.sc<best.sc){best={sc:ch.sc,mv:m};beta=Math.min(beta,ch.sc);}}
+    if(beta<=alpha)break;
+  }
+  return best;
+}
+
+/* ═══════════════════════════════════════════════════════
+   THREE.JS SCENE
+═══════════════════════════════════════════════════════ */
+const SP=1.15;
+function colX(c){return(c-3.5)*SP;}
+function rowZ(r){return(r-3.5)*SP;}
+
+let renderer,scene,camera;
+let pcGroup,hiGroup,chkGroup;
+let hitBoxes=[];
+let camR=14,camTheta=0,camPhi=0.70;
+let dragSt=null;
+
+function initScene(){
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.05;
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x050201);
+  scene.fog=new THREE.Fog(0x050201,30,60);
+  camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,100);
+  updateCam();
+  // Lights
+  const amb=new THREE.AmbientLight(0xffe0c0,0.5);scene.add(amb);
+  const sun=new THREE.DirectionalLight(0xfff5e8,1.1);
+  sun.position.set(4,14,8);sun.castShadow=true;
+  sun.shadow.mapSize.width=2048;sun.shadow.mapSize.height=2048;
+  sun.shadow.camera.near=0.5;sun.shadow.camera.far=60;
+  sun.shadow.camera.left=-11;sun.shadow.camera.right=11;
+  sun.shadow.camera.top=11;sun.shadow.camera.bottom=-11;
+  scene.add(sun);
+  const fill=new THREE.DirectionalLight(0x400818,0.4);fill.position.set(-5,8,-4);scene.add(fill);
+  pcGroup=new THREE.Group();scene.add(pcGroup);
+  hiGroup=new THREE.Group();scene.add(hiGroup);
+  chkGroup=new THREE.Group();scene.add(chkGroup);
+  buildBoard();buildHitBoxes();
+  window.addEventListener('resize',onResize);
+  renderer.setAnimationLoop(renderLoop);
+}
+
+function updateCam(){
+  camPhi=Math.max(0.25,Math.min(1.4,camPhi));
+  camR=Math.max(7,Math.min(24,camR));
+  camera.position.set(
+    camR*Math.sin(camPhi)*Math.sin(camTheta),
+    camR*Math.cos(camPhi),
+    camR*Math.sin(camPhi)*Math.cos(camTheta)
+  );camera.lookAt(0,0,0);
+}
+function resetView(){camR=14;camTheta=0;camPhi=0.70;updateCam();}
+function onResize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+
+/* ── BOARD ── */
+function buildBoard(){
+  const lMat=new THREE.MeshPhongMaterial({color:0xC8A060,shininess:15});
+  const dMat=new THREE.MeshPhongMaterial({color:0x3A1808,shininess:10});
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const sq=new THREE.Mesh(new THREE.PlaneGeometry(SP-0.02,SP-0.02),isDark(r,c)?dMat:lMat);
+    sq.rotation.x=-Math.PI/2;sq.position.set(colX(c),0.001,rowZ(r));
+    sq.receiveShadow=true;sq.userData={r,c};scene.add(sq);
+  }
+  // Frame
+  const fw=8*SP+0.6;
+  const fMat=new THREE.MeshPhongMaterial({color:0x2A1005,shininess:12});
+  const base=new THREE.Mesh(new THREE.BoxGeometry(fw,0.22,fw),fMat);
+  base.position.y=-0.11;base.receiveShadow=true;scene.add(base);
+  const bMat=new THREE.MeshPhongMaterial({color:0x4A1C08,shininess:8});
+  [[fw,0.05,0.3,0,0.01,(fw+0.3)/2],[fw,0.05,0.3,0,0.01,-(fw+0.3)/2],
+   [0.3,0.05,fw,(fw+0.3)/2,0.01,0],[0.3,0.05,fw,-(fw+0.3)/2,0.01,0]].forEach(
+    ([w,h,d,x,y,z])=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),bMat);m.position.set(x,y,z);scene.add(m);}
+  );
+  // Corner pieces
+  const cMat=new THREE.MeshPhongMaterial({color:0x6a2c10,shininess:40});
+  for(const sx of[-1,1])for(const sz of[-1,1]){
+    const s=new THREE.Mesh(new THREE.SphereGeometry(0.18,12,10),cMat);
+    s.position.set(sx*fw/2,0.05,sz*fw/2);scene.add(s);
+  }
+  // Ground
+  const gnd=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.ShadowMaterial({opacity:0.4}));
+  gnd.rotation.x=-Math.PI/2;gnd.position.y=-0.22;gnd.receiveShadow=true;scene.add(gnd);
+  // Labels
+  addBoardLabels();
+}
+
+function addBoardLabels(){
+  const files='abcdefgh',ranks='87654321';
+  const fw=8*SP+0.6;
+  for(let c=0;c<8;c++){
+    const sp=txtSprite(files[c],'#c8803a');
+    sp.position.set(colX(c),-0.05,fw/2+0.22);sp.scale.set(0.65,0.65,1);scene.add(sp);
+  }
+  for(let r=0;r<8;r++){
+    const sp=txtSprite(ranks[r],'#c8803a');
+    sp.position.set(-fw/2-0.22,-0.05,rowZ(r));sp.scale.set(0.65,0.65,1);scene.add(sp);
+  }
+}
+function txtSprite(t,col){
+  const cv=document.createElement('canvas');cv.width=64;cv.height=64;
+  const cx=cv.getContext('2d');cx.fillStyle=col;cx.font='bold 44px Arial';
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText(t,32,32);
+  return new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true}));
+}
+
+function buildHitBoxes(){
+  const hMat=new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide});
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const hb=new THREE.Mesh(new THREE.PlaneGeometry(SP,SP),hMat);
+    hb.rotation.x=-Math.PI/2;hb.position.set(colX(c),0.005,rowZ(r));
+    hb.userData={r,c};scene.add(hb);hitBoxes.push(hb);
+  }
+}
+
+/* ── CHECKER PIECE ── */
+function mkChecker(isRed,isKing){
+  const col=isRed?0xCC2200:0x1A1A1A;
+  const specCol=isRed?new THREE.Color(0.35,0.1,0.05):new THREE.Color(0.12,0.12,0.12);
+  const mat=new THREE.MeshPhongMaterial({color:col,shininess:isRed?90:70,specular:specCol});
+  const rimCol=isRed?0xFF4422:0x333333;
+  const rimMat=new THREE.MeshPhongMaterial({color:rimCol,shininess:120,specular:new THREE.Color(0.5,0.5,0.5)});
+  const G=new THREE.Group();
+  function disc(r,h,y,m){const d=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,28),m);d.position.y=y;d.castShadow=true;G.add(d);return d;}
+  function ring(r,t,y){const m=new THREE.Mesh(new THREE.TorusGeometry(r,t,10,28),rimMat);m.rotation.x=Math.PI/2;m.position.y=y;m.castShadow=true;G.add(m);}
+  // Main disc
+  disc(0.36,0.115,0.058,mat);
+  // Top face (slightly lighter)
+  const topMat=new THREE.MeshPhongMaterial({color:isRed?0xEE2800:0x2A2A2A,shininess:isRed?110:85,specular:specCol});
+  const top=new THREE.Mesh(new THREE.CircleGeometry(0.33,28),topMat);
+  top.rotation.x=-Math.PI/2;top.position.y=0.118;top.castShadow=true;G.add(top);
+  // Rim ring
+  ring(0.345,0.022,0.115);
+  // Inner ring decorations
+  ring(0.22,0.015,0.116);
+  if(isKing){
+    // Second disc (smaller)
+    disc(0.28,0.095,0.215,mat);
+    const top2=new THREE.Mesh(new THREE.CircleGeometry(0.25,28),topMat);
+    top2.rotation.x=-Math.PI/2;top2.position.y=0.265;top2.castShadow=true;G.add(top2);
+    ring(0.265,0.018,0.262);
+    // Gold crown star
+    const crownMat=new THREE.MeshPhongMaterial({color:0xFFCC00,shininess:150,specular:new THREE.Color(0.7,0.6,0)});
+    // Crown base ring
+    const cr=new THREE.Mesh(new THREE.TorusGeometry(0.12,0.022,8,16),crownMat);
+    cr.rotation.x=Math.PI/2;cr.position.y=0.32;G.add(cr);
+    // 5 points of crown
+    for(let i=0;i<5;i++){
+      const a=i/5*Math.PI*2;
+      const pt=new THREE.Mesh(new THREE.ConeGeometry(0.04,0.09,8),crownMat);
+      pt.position.set(Math.cos(a)*0.12,0.38,Math.sin(a)*0.12);
+      pt.castShadow=true;G.add(pt);
+    }
+  }
+  return G;
+}
+
+/* ── PIECE SYNC ── */
+function syncPcs(){
+  while(pcGroup.children.length)pcGroup.remove(pcGroup.children[0]);
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const p=gBoard[r][c];if(!p)continue;
+    const grp=mkChecker(p.c===R,p.king);
+    grp.position.set(colX(c),0,rowZ(r));
+    grp.userData={r,c};
+    grp.traverse(ch=>{if(ch.isMesh||ch.isLine)ch.userData=grp.userData;});
+    pcGroup.add(grp);
+  }
+}
+
+function findPcGrp(r,c){
+  let found=null;
+  pcGroup.traverse(ch=>{if(ch.userData&&ch.userData.r===r&&ch.userData.c===c&&ch.parent===pcGroup)found=ch;});
+  return found;
+}
+function removePcGrp(r,c){const g=findPcGrp(r,c);if(g)pcGroup.remove(g);}
+
+/* ── HIGHLIGHTS ── */
+function clearHi(){while(hiGroup.children.length)hiGroup.remove(hiGroup.children[0]);}
+
+function addHiRing(r,c,col,r1=0.44,r2=0.54){
+  const m=new THREE.Mesh(new THREE.RingGeometry(r1,r2,32),
+    new THREE.MeshBasicMaterial({color:col,side:THREE.DoubleSide,transparent:true,opacity:.85}));
+  m.rotation.x=-Math.PI/2;m.position.set(colX(c),0.012,rowZ(r));hiGroup.add(m);
+}
+function addHiDot(r,c){
+  const m=new THREE.Mesh(new THREE.CircleGeometry(0.17,24),
+    new THREE.MeshBasicMaterial({color:0x44dd66,side:THREE.DoubleSide,transparent:true,opacity:.75}));
+  m.rotation.x=-Math.PI/2;m.position.set(colX(c),0.012,rowZ(r));hiGroup.add(m);
+}
+function showHi(r,c,steps){
+  clearHi();
+  addHiRing(r,c,0xFFD700,0.44,0.54); // gold for selected
+  for(const s of steps){
+    const isJump=s.cr>=0||s.cc>=0; // jump if has captured pos
+    if(isJump)addHiRing(s.nr,s.nc,0xFF4400);
+    else addHiDot(s.nr,s.nc);
+  }
+}
+
+/* ── ANIMATION ── */
+let animQ=[];
+let gBusy=false;
+function animMove(grp,toX,toZ,onDone,arc=1.4,steps=22){
+  const fx=grp.position.x,fz=grp.position.z;
+  let step=0;
+  animQ.push(()=>{
+    step++;const t=step/steps;
+    grp.position.x=fx+(toX-fx)*t;
+    grp.position.z=fz+(toZ-fz)*t;
+    grp.position.y=arc*Math.sin(Math.PI*t);
+    if(step>=steps){grp.position.y=0;if(onDone)onDone();return true;}
+    return false;
+  });
+}
+
+/* ── RENDER LOOP ── */
+function renderLoop(t){
+  if(animQ.length>0){const done=animQ[0]();if(done)animQ.shift();if(animQ.length===0)gBusy=false;}
+  // Pulse jumping indicator
+  if(chkGroup.children.length>0){
+    chkGroup.children[0].material.opacity=0.55+0.3*Math.sin(t*0.007);
+  }
+  renderer.render(scene,camera);
+}
+
+/* ═══════════════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════════════ */
+let gBoard,gTurn,gMode,gOver,gSel,gSteps,gJumping;
+
+function startGame(mode){
+  gMode=mode;gOver=false;gSel=null;gSteps=[];gJumping=null;
+  gBoard=initBd();gTurn=R;
+  document.getElementById('start-dlg').style.display='none';
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('win-dlg').className='';
+  syncPcs();clearHi();clearJmpIndicator();updHUD();
+}
+function restartGame(){
+  if(gMode)startGame(gMode);
+  else{document.getElementById('start-dlg').style.display='flex';document.getElementById('hud').style.display='none';}
+}
+
+/* ── HUD ── */
+function updHUD(){
+  const tb=document.getElementById('turn-badge');
+  const jb=document.getElementById('jump-badge');
+  if(gOver){tb.textContent='';jb.style.display='none';return;}
+  const nm=gTurn===R?'紅方':'黑方';
+  const ai=gMode==='ai'&&gTurn===BK;
+  tb.textContent=ai?`${nm} (AI 思考中...)`:`${nm} 回合`;
+  jb.style.display=gJumping?'inline':'none';
+}
+
+/* Jumping king indicator */
+function clearJmpIndicator(){while(chkGroup.children.length)chkGroup.remove(chkGroup.children[0]);}
+function showJmpIndicator(r,c){
+  clearJmpIndicator();
+  const m=new THREE.Mesh(new THREE.RingGeometry(0.44,0.58,32),
+    new THREE.MeshBasicMaterial({color:0xFFCC00,side:THREE.DoubleSide,transparent:true,opacity:.85}));
+  m.rotation.x=-Math.PI/2;m.position.set(colX(c),0.014,rowZ(r));chkGroup.add(m);
+}
+
+/* ── CLICK LOGIC ── */
+function onSquare(r,c){
+  if(gOver||gBusy)return;
+  if(gMode==='ai'&&gTurn===BK&&!gJumping)return;
+  const hasJumps=anyJumps(gBoard,gTurn);
+
+  if(gJumping){
+    // Mid multi-jump: only valid jump destinations
+    if(r===gJumping[0]&&c===gJumping[1])return; // same piece
+    const st=gSteps.find(s=>s.nr===r&&s.nc===c);
+    if(st)executeStep(gJumping[0],gJumping[1],st);
+    return;
+  }
+
+  if(gSel){
+    const st=gSteps.find(s=>s.nr===r&&s.nc===c);
+    if(st){executeStep(gSel[0],gSel[1],st);return;}
+    // Reselect another own piece
+    if(gBoard[r]?.[c]?.c===gTurn){
+      const ms=getSteps(gBoard,r,c,hasJumps);
+      if(ms.length>0){gSel=[r,c];gSteps=ms;showHi(r,c,ms);return;}
+    }
+    gSel=null;gSteps=[];clearHi();
+  }else{
+    if(gBoard[r]?.[c]?.c===gTurn){
+      const ms=getSteps(gBoard,r,c,hasJumps);
+      if(ms.length>0){gSel=[r,c];gSteps=ms;showHi(r,c,ms);}
+    }
+  }
+}
+
+function executeStep(r,c,step){
+  const isJump=step.cr>=0;
+  gSel=null;gSteps=[];clearHi();gBusy=true;
+
+  // Remove captured piece mesh immediately
+  if(isJump)removePcGrp(step.cr,step.cc);
+
+  // Update board
+  const nb=cloneBd(gBoard);
+  const p={...nb[r][c]};
+  nb[r][c]=null;
+  if(isJump)nb[step.cr][step.cc]=null;
+  nb[step.nr][step.nc]={...p};
+  // Check kinging
+  let kinged=false;
+  if(!p.king&&((p.c===R&&step.nr===0)||(p.c===BK&&step.nr===7))){
+    nb[step.nr][step.nc]={...p,king:true};kinged=true;
+  }
+  gBoard=nb;
+
+  // Find and animate piece mesh
+  let grp=findPcGrp(r,c);
+  if(!grp){syncPcs();grp=findPcGrp(step.nr,step.nc);}
+  if(grp){
+    grp.userData.r=step.nr;grp.userData.c=step.nc;
+    grp.traverse(ch=>{if(ch.isMesh||ch.isLine){ch.userData.r=step.nr;ch.userData.c=step.nc;}});
+    animMove(grp,colX(step.nc),rowZ(step.nr),()=>{
+      // After animation: check multi-jump
+      if(isJump&&!kinged){
+        const moreJumps=getSteps(gBoard,step.nr,step.nc,true);
+        if(moreJumps.length>0){
+          // Continue jumping
+          syncPcs(); // refresh visual (kinging etc.)
+          gJumping=[step.nr,step.nc];
+          gSel=[step.nr,step.nc];
+          gSteps=moreJumps;
+          showHi(step.nr,step.nc,moreJumps);
+          showJmpIndicator(step.nr,step.nc);
+          gBusy=false;updHUD();
+          return;
+        }
+      }
+      gJumping=null;
+      syncPcs();
+      endTurn();
+    });
+  }else{
+    gJumping=null;syncPcs();endTurn();
+  }
+}
+
+function endTurn(){
+  gJumping=null;clearJmpIndicator();
+  gTurn=opp(gTurn);gBusy=false;
+  // Check end conditions
+  const mvs=getAllMoves(gBoard,gTurn);
+  if(mvs.length===0||countPcs(gBoard,gTurn)===0){
+    const winner=opp(gTurn);
+    showWin(winner===R?'紅方勝利！':'黑方勝利！',
+      mvs.length===0?`${gTurn===R?'紅方':'黑方'}無法移動`:`${gTurn===R?'紅方':'黑方'}棋子全被吃光`);
+    return;
+  }
+  updHUD();
+  if(gMode==='ai'&&gTurn===BK)setTimeout(doAI,200);
+}
+
+function showWin(title,msg){
+  gOver=true;
+  document.getElementById('win-title').textContent=title;
+  document.getElementById('win-msg').textContent=msg;
+  document.getElementById('win-dlg').className='show';
+  document.getElementById('turn-badge').textContent='';
+}
+
+/* ── AI ── */
+function doAI(){
+  if(gOver||gTurn!==BK)return;
+  const res=minimax(gBoard,7,-Infinity,Infinity,false,BK);
+  if(!res.mv){showWin('紅方勝利！','黑方無合法著法');return;}
+  const m=res.mv;
+  gBusy=true;
+  // Execute AI chain step by step
+  executeAIChain(m.r,m.c,m.chain,0);
+}
+
+function executeAIChain(r,c,chain,idx){
+  if(idx>=chain.length){
+    gJumping=null;clearJmpIndicator();
+    syncPcs();endTurn();return;
+  }
+  const step=chain[idx];
+  const isJump=step.cr>=0;
+  // Remove captured mesh immediately
+  if(isJump)removePcGrp(step.cr,step.cc);
+  // Update board
+  const nb=cloneBd(gBoard);
+  const p={...nb[r][c]};nb[r][c]=null;
+  if(isJump)nb[step.cr][step.cc]=null;
+  nb[step.nr][step.nc]={...p};
+  if(!p.king&&((p.c===R&&step.nr===0)||(p.c===BK&&step.nr===7)))
+    nb[step.nr][step.nc]={...p,king:true};
+  gBoard=nb;
+  // Animate
+  let grp=findPcGrp(r,c);
+  if(!grp){syncPcs();grp=findPcGrp(step.nr,step.nc);}
+  if(grp){
+    grp.userData.r=step.nr;grp.userData.c=step.nc;
+    grp.traverse(ch=>{if(ch.isMesh||ch.isLine){ch.userData.r=step.nr;ch.userData.c=step.nc;}});
+    animMove(grp,colX(step.nc),rowZ(step.nr),()=>{
+      executeAIChain(step.nr,step.nc,chain,idx+1);
+    },1.1,18);
+  }else{
+    executeAIChain(step.nr,step.nc,chain,idx+1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   INPUT HANDLING
+═══════════════════════════════════════════════════════ */
+function hitTest(mx,my){
+  const ray=new THREE.Raycaster();
+  const mouse=new THREE.Vector2(
+    (mx/renderer.domElement.clientWidth)*2-1,
+    -(my/renderer.domElement.clientHeight)*2+1
+  );
+  ray.setFromCamera(mouse,camera);
+  const pcMeshes=[];
+  pcGroup.traverse(c=>{if(c.isMesh)pcMeshes.push(c);});
+  const ph=ray.intersectObjects(pcMeshes);
+  if(ph.length>0){const ud=ph[0].object.userData;if(ud&&ud.r!==undefined)return[ud.r,ud.c];}
+  const bh=ray.intersectObjects(hitBoxes);
+  if(bh.length>0){const ud=bh[0].object.userData;if(ud&&ud.r!==undefined)return[ud.r,ud.c];}
+  return null;
+}
+
+const canvas=document.getElementById('c');
+canvas.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  const r=renderer.domElement.getBoundingClientRect();
+  dragSt={x:e.clientX-r.left,y:e.clientY-r.top,moved:false,theta:camTheta,phi:camPhi};
+});
+canvas.addEventListener('mousemove',e=>{
+  if(!dragSt)return;
+  const r=renderer.domElement.getBoundingClientRect();
+  const dx=e.clientX-r.left-dragSt.x,dy=e.clientY-r.top-dragSt.y;
+  if(Math.abs(dx)>3||Math.abs(dy)>3)dragSt.moved=true;
+  if(dragSt.moved){camTheta=dragSt.theta-dx*0.007;camPhi=Math.max(0.25,Math.min(1.38,dragSt.phi+dy*0.007));updateCam();}
+});
+canvas.addEventListener('mouseup',e=>{
+  if(!dragSt)return;
+  if(!dragSt.moved){
+    const r=renderer.domElement.getBoundingClientRect();
+    const sq=hitTest(e.clientX-r.left,e.clientY-r.top);
+    if(sq)onSquare(sq[0],sq[1]);
+  }
+  dragSt=null;
+});
+canvas.addEventListener('mouseleave',()=>{dragSt=null;});
+canvas.addEventListener('wheel',e=>{camR=Math.max(7,Math.min(24,camR+e.deltaY*0.018));updateCam();e.preventDefault();},{passive:false});
+
+let touchSt=null,pinchD0=null;
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const r=renderer.domElement.getBoundingClientRect();
+    touchSt={x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top,moved:false,theta:camTheta,phi:camPhi};
+  }else if(e.touches.length===2){
+    pinchD0=Math.hypot(e.touches[1].clientX-e.touches[0].clientX,e.touches[1].clientY-e.touches[0].clientY);touchSt=null;
+  }
+},{passive:false});
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1&&touchSt){
+    const r=renderer.domElement.getBoundingClientRect();
+    const dx=e.touches[0].clientX-r.left-touchSt.x,dy=e.touches[0].clientY-r.top-touchSt.y;
+    if(Math.abs(dx)>4||Math.abs(dy)>4)touchSt.moved=true;
+    if(touchSt.moved){camTheta=touchSt.theta-dx*0.007;camPhi=Math.max(0.25,Math.min(1.38,touchSt.phi+dy*0.007));updateCam();}
+  }else if(e.touches.length===2&&pinchD0!=null){
+    const d=Math.hypot(e.touches[1].clientX-e.touches[0].clientX,e.touches[1].clientY-e.touches[0].clientY);
+    camR=Math.max(7,Math.min(24,camR*(pinchD0/d)));pinchD0=d;updateCam();
+  }
+},{passive:false});
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  if(touchSt&&!touchSt.moved){
+    const r=renderer.domElement.getBoundingClientRect();
+    const sq=hitTest(e.changedTouches[0].clientX-r.left,e.changedTouches[0].clientY-r.top);
+    if(sq)onSquare(sq[0],sq[1]);
+  }
+  touchSt=null;pinchD0=null;
+},{passive:false});
+
+/* ── INIT ── */
+initScene();
+</script>
+</body>
+</html>

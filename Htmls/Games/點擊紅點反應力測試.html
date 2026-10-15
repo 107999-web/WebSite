@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>點擊紅點小遊戲</title>
+    <style>
+        /* 這裡是 CSS：負責遊戲的排版與外觀 */
+        body { 
+            text-align: center; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f4f9; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        #game-board { 
+            width: 400px; 
+            height: 400px; 
+            background-color: white; 
+            border: 3px dashed #ccc; 
+            position: relative; 
+            margin: 20px auto; 
+            overflow: hidden; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #target { 
+            width: 40px; 
+            height: 40px; 
+            background-color: #ff4757; 
+            position: absolute; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            /* 加上一點過渡動畫讓移動看起來比較滑順 */
+            transition: top 0.1s, left 0.1s; 
+        }
+        h1 { color: #2f3542; }
+        .score-board { font-size: 24px; font-weight: bold; color: #1e90ff; }
+    </style>
+</head>
+<body>
+
+    <h1>🔴 點擊紅點反應力測試</h1>
+    <div class="score-board">目前分數: <span id="score">0</span></div>
+    
+    <div id="game-board">
+        <div id="target"></div>
+    </div>
+
+    <script>
+        // 這裡是 JavaScript：負責遊戲的邏輯與互動
+        let score = 0;
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const gameBoard = document.getElementById('game-board');
+
+        // 移動紅點到隨機位置的函數
+        function moveTarget() {
+            // 計算紅點可以移動的最大範圍 (遊戲板寬/高 減去 紅點本身的寬/高)
+            const maxX = gameBoard.clientWidth - target.clientWidth;
+            const maxY = gameBoard.clientHeight - target.clientHeight;
+            
+            // 產生隨機座標
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            // 設定紅點的新位置
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        // 當玩家點擊紅點時觸發的事件
+        target.addEventListener('click', function() {
+            score++; // 分數加 1
+            scoreDisplay.textContent = score; // 更新畫面上的分數
+            moveTarget(); // 移動紅點
+        });
+
+        // 遊戲一開始先隨機放置一次紅點
+        moveTarget();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>複賽架構練習</title>
+<style>
+:root{
+  --bg:#FFF8EE; --paper:#FFFFFF; --ink:#3B3226; --ink2:#7A6A58; --line:#EADBC6;
+  --accent:#2F5FA8; --accent2:#E8743B; --good:#3FAE6A; --warn:#E8A33A; --bad:#D9534F;
+  --new:#FFE36E; --chg:#BFE3FF;
+  --c-motion:#4C97FF;  --c-motion-d:#3373CC; --c-looks:#9966FF; --c-looks-d:#774DCB;
+  --c-sound:#CF63CF; --c-sound-d:#BD42BD; --c-events:#FFBF00; --c-events-d:#CC9900;
+  --c-control:#FFAB19; --c-control-d:#CF8B17; --c-sensing:#5CB1D6; --c-sensing-d:#2E8EB8;
+  --c-operators:#59C059; --c-operators-d:#389438; --c-variables:#FF8C1A; --c-variables-d:#DB6E00;
+  --c-myblocks:#FF6680; --c-myblocks-d:#FF3355; --c-ext:#0FBD8C; --c-ext-d:#0B8E69;
+  --f:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.6}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:20;background:#2F5FA8;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.topin{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topin h1{font-size:1.15rem;margin:0;white-space:nowrap}
+.topin h1 small{font-weight:400;opacity:.85;margin-left:6px}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs button{font:inherit;font-size:.9rem;border:0;border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
+nav.tabs button.on{background:#fff;color:#2F5FA8;font-weight:700}
+nav.tabs button .ok{color:#7CFFA8;margin-left:3px}
+nav.tabs button.on .ok{color:var(--good)}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 80px}
+section.page{display:none}
+section.page.on{display:block}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:16px 18px;margin:0 0 16px}
+.card h2{margin:0 0 8px;font-size:1.2rem}
+.card h3{margin:14px 0 6px;font-size:1.02rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.chant{background:#FFF3C4;border:2px dashed #E8C34A;border-radius:14px;padding:10px 14px;font-weight:700;font-size:1.05rem}
+.pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.82rem;font-weight:700;background:#EEE;color:var(--ink2)}
+.pill.new{background:var(--new);color:#6B5200}.pill.chg{background:var(--chg);color:#174A7A}
+.muted{color:var(--ink2)}
+ol.steps li,ul.list li{margin:4px 0}
+/* 架構圖 */
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flow .node{border:2px solid var(--accent);border-radius:12px;padding:4px 10px;background:#EEF4FF;font-weight:700;cursor:pointer;font-size:.92rem}
+.flow .node.wait{border-color:var(--accent2);background:#FFF0E6}
+.flow .node.end{border-color:var(--good);background:#EAF8EF}
+.flow .node.on{outline:3px solid #FFBF00}
+.flow .arr{color:var(--ink2)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.role{border-radius:14px;padding:10px 12px;border:2px solid var(--line);background:#FFFDF8}
+.role b{font-size:1.02rem}
+.who-tip{min-height:48px;margin-top:10px;padding:8px 12px;border-radius:12px;background:#F4F7FF;border:1px solid #D6E2FA}
+/* 練習卡 */
+.lcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.lcard{border:2px solid var(--line);border-radius:16px;padding:12px;background:#fff;cursor:pointer;position:relative}
+.lcard:hover{border-color:var(--accent)}
+.lcard .num{font-size:.8rem;color:var(--ink2)}
+.lcard .t{font-weight:700;font-size:1.05rem}
+.lcard .done{position:absolute;right:10px;top:8px;color:var(--good);font-weight:700}
+table.sched{border-collapse:collapse;width:100%}
+table.sched td,table.sched th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.bar{height:10px;border-radius:6px;background:var(--accent)}
+/* 排序遊戲 */
+.game{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.game{grid-template-columns:1fr}}
+.pool,.ans{min-height:120px;border:2px dashed var(--line);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:5px;background:#FFFDF8}
+.chip{font:inherit;text-align:left;border:0;border-radius:8px;padding:6px 10px;background:var(--c-events);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 3px 0 var(--c-events-d)}
+.chip.my{background:var(--c-myblocks);box-shadow:0 3px 0 var(--c-myblocks-d)}
+.chip.if{background:var(--c-control);box-shadow:0 3px 0 var(--c-control-d)}
+.chip.var{background:var(--c-variables);box-shadow:0 3px 0 var(--c-variables-d)}
+.chip.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.ans .chip{cursor:default}
+.gbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+button.btn{font:inherit;border:0;border-radius:999px;padding:6px 14px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+button.btn.alt{background:var(--accent2)} button.btn.gray{background:#9A8C7A}
+button.btn.sm{padding:3px 10px;font-size:.85rem}
+/* 練習頁 */
+.lhead{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.lhead .big{font-size:2.2rem}
+.lhead h2{margin:0}
+.diff{display:flex;flex-wrap:wrap;gap:6px}
+.diff span{border-radius:8px;padding:2px 8px;font-size:.88rem}
+.diff .sp{background:#E9E2FF}.diff .va{background:#FFE6CC}.diff .ms{background:#FFF1B8}.diff .bd{background:#DDF2E3}.diff .ex{background:#CFF5EA}
+.checks label{display:flex;gap:8px;align-items:flex-start;margin:5px 0;cursor:pointer}
+.checks input{width:20px;height:20px;margin-top:3px;flex:0 0 auto}
+.oops{display:grid;gap:8px}
+.oops div{background:#FFF0EE;border-left:5px solid var(--bad);border-radius:8px;padding:6px 10px}
+.tip{background:#EAF8EF;border-left:5px solid var(--good);border-radius:8px;padding:8px 12px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px}
+.toolbar label{display:flex;gap:5px;align-items:center;cursor:pointer;background:#F4EEE4;border-radius:999px;padding:3px 10px;font-size:.9rem}
+.seg{display:inline-flex;border:2px solid var(--accent);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;border:0;background:#fff;color:var(--accent);padding:3px 12px;cursor:pointer;font-weight:700}
+.seg button.on{background:var(--accent);color:#fff}
+.who{margin:14px 0 6px;font-weight:700;font-size:1.02rem;display:flex;align-items:center;gap:6px}
+.who .ic{width:26px;height:26px;border-radius:8px;background:#EEF4FF;display:inline-flex;align-items:center;justify-content:center}
+.scr{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;border:2px solid var(--line);border-radius:14px;padding:10px;margin:0 0 10px;background:#FBFBFD;position:relative}
+.scr.st-new{border-color:#E8C34A;background:#FFFDF0}
+.scr.st-changed{border-color:#7DB8EA;background:#F5FAFF}
+.scr .tag{position:absolute;right:10px;top:-11px}
+.scr .code{overflow-x:auto;max-width:100%}
+.scr .note{flex:1 1 220px;min-width:200px;background:#FFF9C9;border:1px solid #EFDD7A;border-radius:8px;padding:6px 10px;font-size:.88rem;white-space:pre-wrap}
+.scr.hide .code{filter:blur(9px);opacity:.5;pointer-events:none;user-select:none}
+.scr.hide::after{content:"默寫模式：自己先在 Scratch 做出來，再點這裡對答案";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--accent);color:#fff;border-radius:999px;padding:4px 14px;font-weight:700;font-size:.88rem;cursor:pointer;white-space:nowrap}
+.dl a{display:inline-block;margin:3px 6px 3px 0;background:#EEF4FF;border:1px solid #CFE0FA;border-radius:999px;padding:3px 12px;text-decoration:none;font-weight:700}
+/* 碼表 */
+.watch{position:fixed;right:14px;bottom:14px;z-index:30;background:#fff;border:2px solid var(--accent);border-radius:16px;padding:8px 12px;box-shadow:0 6px 18px rgba(0,0,0,.15);display:flex;gap:8px;align-items:center}
+.watch .tm{font-family:Consolas,monospace;font-size:1.3rem;font-weight:700;min-width:82px;text-align:center}
+.watch .lb{font-size:.8rem;color:var(--ink2);max-width:110px;line-height:1.2}
+.hist{font-size:.88rem}
+/* 劇本表 */
+.form{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;align-items:center}
+.form label{font-weight:700;font-size:.92rem}
+.form input,.form textarea,.form select{font:inherit;border:2px solid var(--line);border-radius:10px;padding:5px 8px;width:100%}
+.form textarea{min-height:56px}
+.form .sec{grid-column:1/-1;margin-top:8px;font-weight:700;color:var(--accent);border-bottom:2px solid #D6E2FA}
+table.play{border-collapse:collapse;width:100%;margin-top:8px}
+table.play td,table.play th{border:1px solid var(--line);padding:5px 8px;vertical-align:top;text-align:left}
+table.play th{background:#F4EEE4}
+/* 積木（blk.js） */
+.bscript{font-size:.9rem}
+.stk{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.brow{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap}
+.sb{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:7px;color:#fff;font-weight:700;white-space:nowrap}
+.sb.hat{border-radius:16px 16px 7px 7px;padding-top:12px}
+.sb.motion{background:var(--c-motion);box-shadow:0 3px 0 var(--c-motion-d)} .sb.looks{background:var(--c-looks);box-shadow:0 3px 0 var(--c-looks-d)}
+.sb.sound{background:var(--c-sound);box-shadow:0 3px 0 var(--c-sound-d)} .sb.events{background:var(--c-events);box-shadow:0 3px 0 var(--c-events-d)}
+.sb.control{background:var(--c-control);box-shadow:0 3px 0 var(--c-control-d)} .sb.sensing{background:var(--c-sensing);box-shadow:0 3px 0 var(--c-sensing-d)}
+.sb.operators{background:var(--c-operators);box-shadow:0 3px 0 var(--c-operators-d)} .sb.variables{background:var(--c-variables);box-shadow:0 3px 0 var(--c-variables-d)}
+.sb.myblocks{background:var(--c-myblocks);box-shadow:0 3px 0 var(--c-myblocks-d)} .sb.ext{background:var(--c-ext);box-shadow:0 3px 0 var(--c-ext-d)}
+.sb.def{border-radius:18px 18px 7px 7px;padding:14px 12px 9px;background:var(--c-myblocks);box-shadow:0 3px 0 var(--c-myblocks-d)}
+.sb.def .proto{display:inline-flex;align-items:center;gap:6px;background:var(--c-myblocks-d);border-radius:7px;padding:4px 10px}
+.tx{white-space:nowrap}
+.nv{background:#fff;color:#3B4252;border-radius:999px;padding:1px 9px;font-weight:700;min-width:20px;text-align:center;white-space:nowrap}
+.dd{background:rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:1px 9px;font-size:.86rem;white-space:nowrap}
+.dd i{font-style:normal;font-size:.7rem;opacity:.85}
+.rp{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;color:#fff;font-weight:700;border:1px solid rgba(0,0,0,.12);white-space:nowrap}
+.bl{display:inline-flex;align-items:center;gap:5px;padding:2px 14px;color:#fff;font-weight:700;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);white-space:nowrap}
+.bl.empty{min-width:44px;height:22px;background:rgba(0,0,0,.25)}
+.rp.motion,.bl.motion{background:var(--c-motion)} .rp.looks,.bl.looks{background:var(--c-looks)} .rp.sound,.bl.sound{background:var(--c-sound)}
+.rp.events,.bl.events{background:var(--c-events)} .rp.control,.bl.control{background:var(--c-control)} .rp.sensing,.bl.sensing{background:var(--c-sensing)}
+.rp.operators,.bl.operators{background:var(--c-operators-d)} .rp.variables,.bl.variables{background:var(--c-variables)} .rp.myblocks,.bl.myblocks{background:var(--c-myblocks)}
+.rp.ext,.bl.ext{background:var(--c-ext)}
+.rp.operators .rp.operators{background:var(--c-operators)} .bl.operators .bl.operators{background:var(--c-operators)}
+.flagi{color:#4CBF56;background:#fff;border-radius:6px;padding:0 5px;font-size:.9rem;line-height:1.4}
+.cwrap{display:inline-block;vertical-align:top}
+.cwrap.control{--cc:var(--c-control);--ccd:var(--c-control-d)}
+.cwrap .chead,.cwrap .cmid,.cwrap .cfoot{background:var(--cc);color:#fff;font-weight:700;padding:7px 12px;display:flex;align-items:center;gap:6px}
+.cwrap .chead{border-radius:7px 7px 0 0}
+.cwrap .cfoot{border-radius:0 0 7px 7px;height:16px;padding:0 12px;box-shadow:0 3px 0 var(--ccd);font-size:.8rem}
+.cwrap .cbody{border-left:15px solid var(--cc);padding:5px 0 5px 8px;min-height:22px}
+.loopi{font-size:.85rem}
+@media print{header.top,.watch,.noprint{display:none!important}section.page{display:none!important}section.page.print{display:block!important}}
+@media (max-width:600px){.form{grid-template-columns:1fr}.topin h1 small{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <h1 id="hTitle"></h1>
+    <nav class="tabs" id="tabs"></nav>
+  </div>
+</header>
+<main>
+
+<!-- ====================================================== 架構總覽 -->
+<section class="page" id="p-home">
+  <div class="card" id="homeIntro"></div>
+
+  <div class="card">
+    <h2>角色分工</h2>
+    <div class="roles" id="roles"></div>
+  </div>
+
+  <div class="card">
+    <h2 id="flowTitle"></h2>
+    <p class="muted">點一格，看看那一步誰要做什麼、是第幾次練習做的。</p>
+    <div class="flow" id="flow"></div>
+    <div class="who-tip" id="flowTip">← 點上面任何一格</div>
+  </div>
+
+  <div class="card">
+    <h2>8 次練習（循序漸進）</h2>
+    <p class="muted">每次練習都接著上一次做。完成後勾選自我檢查，這裡會打勾。</p>
+    <div class="lcards" id="lcards"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>現場 3 小時怎麼分配</h2>
+      <table class="sched" id="sched"></table>
+      <p class="muted" style="margin-top:8px">先用<b>鍵盤</b>把整個作品做完（保證有作品），最後才換 AI。AI 出問題時，鍵盤還能救急。</p>
+    </div>
+    <div class="card">
+      <h2>每一次練習的做法</h2>
+      <ol class="steps">
+        <li>先看「這次要做什麼」和「要背的一句話」。</li>
+        <li>打開「默寫模式」（積木變模糊），<b>自己在 Scratch 做出來</b>。</li>
+        <li>按右下角碼表計時；做完點模糊的積木對答案。</li>
+        <li>照「自我檢查」測試，全部打勾才算完成。</li>
+        <li>卡住了再下載參考 .sb3 打開看。</li>
+      </ol>
+      <p class="muted">做好的作品用 <a href="https://stretch3.github.io/" target="_blank" rel="noopener">stretch3</a> 開（換成 AI 的那一次要用到擴充功能）。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== 排序遊戲 -->
+<section class="page" id="p-game">
+  <div class="card">
+    <h2>🧩 導演表排排看</h2>
+    <p>把右邊的積木<b>照順序</b>點到左邊。點錯會抖一下，算一次錯誤。目標：<b>0 錯、60 秒內</b>。</p>
+    <div class="gbar">
+      <button class="btn" id="gStart">重新開始</button>
+      <span>時間 <b id="gTime">0.0</b> 秒</span><span>錯誤 <b id="gErr">0</b></span>
+      <span class="muted">最佳：<b id="gBest">—</b></span>
+      <label class="noprint" style="margin-left:auto"><input type="checkbox" id="gHint"> 顯示提示（第幾行）</label>
+    </div>
+    <div class="game">
+      <div><b>我的導演表</b><div class="ans" id="gAns"></div></div>
+      <div><b>積木（打亂）</b><div class="pool" id="gPool"></div></div>
+    </div>
+    <p id="gMsg" style="font-weight:700"></p>
+  </div>
+</section>
+
+<!-- ====================================================== 練習頁（共用一個） -->
+<section class="page" id="p-lesson">
+  <div class="card">
+    <div class="lhead"><span class="big" id="lEmoji"></span>
+      <div><div class="muted" id="lNum"></div><h2 id="lName"></h2></div>
+      <span class="pill" id="lTime"></span>
+    </div>
+    <p id="lGoal" style="margin:10px 0 8px"></p>
+    <div class="chant" id="lChant"></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">這次新增</h3>
+      <div class="diff" id="lDiff"></div>
+      <h3>步驟</h3>
+      <div id="aiSeg" class="seg" style="display:none;margin-bottom:6px"><button data-ai="手" class="on">✋ 手勢版</button><button data-ai="臉" id="aiFace">🙂 臉部版</button></div>
+      <ol class="steps" id="lSteps"></ol>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">自我檢查</h3>
+      <div class="checks" id="lChecks"></div>
+      <h3>常見錯誤</h3>
+      <div class="oops" id="lOops"></div>
+      <h3>小提醒</h3>
+      <div class="tip" id="lTip"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">程式（從參考檔轉出來的，和 .sb3 一模一樣）</h3>
+    <div class="toolbar">
+      <div class="seg" id="showSeg"><button data-show="new" class="on">只看這次新增／修改</button><button data-show="all">看全部程式</button></div>
+      <label><input type="checkbox" id="hideMode"> 默寫模式（積木變模糊）</label>
+      <span class="pill new">新</span><span class="pill chg">改</span>
+    </div>
+    <div id="lCode"></div>
+  </div>
+  <div class="card dl">
+    <h3 style="margin-top:0">下載</h3>
+    <div id="lDl"></div>
+  </div>
+</section>
+
+<!-- ====================================================== 套用到題目 -->
+<section class="page" id="p-plan">
+  <div class="card">
+    <h2>📝 套用到現場題目：劇本表</h2>
+    <p>拿到題目後先花 15 分鐘填這張表。每一格都對應到骨架的一個廣播，<b>填完就知道每一幕要做什麼</b>。（會自動存在這台電腦）</p>
+    <div class="toolbar noprint">
+      <span id="plDemos"></span>
+      <button class="btn sm gray" id="plClear">清空</button>
+      <button class="btn sm" id="plPrint">列印劇本表</button>
+    </div>
+    <div class="form" id="plForm"></div>
+  </div>
+  <div class="card print" id="plOut"></div>
+</section>
+
+<!-- ====================================================== 素材包 -->
+<section class="page" id="p-pack">
+  <div class="card dl">
+    <h2>🎨 素材包</h2>
+    <p>練習時用素材包，省下畫圖的時間，專心練「骨架」。</p>
+    <h3>素材都放好的起始檔（推薦）</h3>
+    <a href="素材包/素材包_起始檔.sb3" download>素材包_起始檔.sb3</a>
+    <span class="muted">— 背景、角色、音效都在，沒有任何程式。</span>
+    <h3>一個一個匯入</h3>
+    <div id="packList"></div>
+  </div>
+  <div class="card">
+    <h2>現場沒有素材包怎麼辦？</h2>
+    <p class="muted">複賽現場可能不能帶檔案。用 Scratch 內建素材代替，骨架完全一樣：</p>
+    <table class="sched" id="subTable"></table>
+  </div>
+</section>
+
+</main>
+
+<div class="watch noprint" id="watch">
+  <div class="lb" id="wLabel">碼表</div>
+  <div class="tm" id="wTime">00:00</div>
+  <button class="btn sm" id="wGo">開始</button>
+  <button class="btn sm gray" id="wSave" title="記錄這次的時間">記錄</button>
+  <button class="btn sm gray" id="wReset">歸零</button>
+</div>
+
+<script src="assets/blk.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/lessons.js"></script>
+<script>
+(function(){
+  var $ = function(s, el){ return (el || document).querySelector(s); };
+  var $$ = function(s, el){ return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var BLOCKS = window[CFG.blocks];
+  var store = {
+    get: function(k, d){ try { var v = localStorage.getItem(CFG.store + '.' + k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+    set: function(k, v){ try { localStorage.setItem(CFG.store + '.' + k, JSON.stringify(v)); } catch(e){} }
+  };
+  var state = { page: 'home', lesson: 1, ai: store.get('ai', '手'), show: 'new' };
+
+  // ------------------------------------------------------------ 分頁
+  function lessonDone(n){
+    var L = LESSONS[n - 1], c = store.get('chk' + n, []);
+    return L.check.every(function(_, i){ return c[i]; });
+  }
+  function drawTabs(){
+    var h = '<button data-p="home">架構總覽</button><button data-p="game">導演表排排看</button>';
+    LESSONS.forEach(function(L){ h += '<button data-p="lesson" data-n="' + L.n + '">' + L.n + ' ' + L.name + (lessonDone(L.n) ? '<span class="ok">✓</span>' : '') + '</button>'; });
+    h += '<button data-p="plan">套用到題目</button><button data-p="pack">素材包</button>';
+    $('#tabs').innerHTML = h;
+    $$('#tabs button').forEach(function(b){
+      var on = b.dataset.p === state.page && (b.dataset.p !== 'lesson' || +b.dataset.n === state.lesson);
+      b.classList.toggle('on', on);
+      b.onclick = function(){ go(b.dataset.p, +b.dataset.n || state.lesson); };
+    });
+  }
+  function go(p, n){
+    state.page = p; if (p === 'lesson') state.lesson = n;
+    $$('section.page').forEach(function(s){ s.classList.remove('on'); });
+    $('#p-' + p).classList.add('on');
+    if (p === 'lesson') drawLesson();
+    if (p === 'home') drawHome();
+    drawTabs(); updateWatchLabel();
+    store.set('page', [p, state.lesson]);
+    window.scrollTo(0, 0);
+  }
+
+  // ------------------------------------------------------------ 總覽
+  var FLOW = CFG.flow;
+  function drawHome(){
+    $('#homeIntro').innerHTML = CFG.intro;
+    $('#roles').innerHTML = CFG.roles.map(function(r){ return '<div class="role">' + r[0] + ' <b>' + esc(r[1]) + '</b><br>' + esc(r[2]) + '</div>'; }).join('');
+    $('#flowTitle').textContent = CFG.flowTitle;
+    var f = '';
+    FLOW.forEach(function(x, i){
+      f += (i ? '<span class="arr">→</span>' : '') + '<span class="node ' + x[3] + '" data-i="' + i + '">' + x[0] + '</span>';
+    });
+    $('#flow').innerHTML = f;
+    $$('#flow .node').forEach(function(nd){
+      nd.onclick = function(){
+        $$('#flow .node').forEach(function(z){ z.classList.remove('on'); }); nd.classList.add('on');
+        var x = FLOW[+nd.dataset.i];
+        $('#flowTip').innerHTML = '<b>' + x[0] + '</b>（第 ' + x[1] + ' 次練習）：' + esc(x[2]) + ' <a href="#" data-n="' + x[1] + '">去練習 ' + x[1] + ' →</a>';
+        $('#flowTip a').onclick = function(e){ e.preventDefault(); go('lesson', x[1]); };
+      };
+    });
+    var c = '';
+    LESSONS.forEach(function(L){
+      var best = store.get('times' + L.n, []).map(function(t){ return t.s; }).sort(function(a, b){ return a - b; })[0];
+      c += '<div class="lcard" data-n="' + L.n + '">' + (lessonDone(L.n) ? '<span class="done">✓ 完成</span>' : '') +
+        '<div class="num">練習 ' + L.n + '　建議 ' + L.time + ' 分鐘' + (best ? '　最佳 ' + fmt(best) : '') + '</div>' +
+        '<div class="t">' + L.emoji + ' ' + L.name + '</div><div class="muted" style="font-size:.9rem">' + esc(L.goal) + '</div></div>';
+    });
+    $('#lcards').innerHTML = c;
+    $$('#lcards .lcard').forEach(function(el){ el.onclick = function(){ go('lesson', +el.dataset.n); }; });
+    var s = '<tr><th>時間</th><th>做什麼</th><th style="width:30%"></th></tr>';
+    SCHEDULE.forEach(function(r){ s += '<tr><td>' + r[0] + '</td><td>' + esc(r[2]) + '<br><span class="muted">' + r[1] + ' 分鐘</span></td><td><div class="bar" style="width:' + (r[1] * 4) + '%"></div></td></tr>'; });
+    $('#sched').innerHTML = s;
+  }
+
+  // ------------------------------------------------------------ 練習頁
+  var WHO_ICON = CFG.whoIcon, WHO_ORDER = Object.keys(CFG.whoIcon);
+  function dataKey(L){ return (L.keyB && state.ai === '臉') ? L.keyB : L.key; }
+  function prevKey(L){
+    if (L.n === 1) return null;
+    var P = LESSONS[L.n - 2];
+    return dataKey(P);
+  }
+  function drawLesson(){
+    var L = LESSONS[state.lesson - 1], D = BLOCKS[dataKey(L)];
+    $('#lEmoji').textContent = L.emoji;
+    $('#lNum').textContent = '練習 ' + L.n + ' / 8';
+    $('#lName').textContent = L.name;
+    $('#lTime').textContent = '建議 ' + L.time + ' 分鐘';
+    $('#lGoal').textContent = L.goal;
+    $('#lChant').textContent = '要背的一句話：' + L.chant;
+    // 新增什麼（和上一次比）
+    var pk = prevKey(L), P = pk ? BLOCKS[pk] : { sprites: [], vars: [], msgs: [], backdrops: [], ext: [] };
+    var nw = function(a, b){ return a.filter(function(x){ return b.indexOf(x) < 0; }); };
+    var d = '';
+    nw(D.backdrops, P.backdrops).forEach(function(x){ d += '<span class="bd">背景 ' + esc(x) + '</span>'; });
+    nw(D.sprites, P.sprites).forEach(function(x){ d += '<span class="sp">角色 ' + esc(x) + '</span>'; });
+    nw(D.vars, P.vars).forEach(function(x){ d += '<span class="va">變數 ' + esc(x) + '</span>'; });
+    nw(D.msgs, P.msgs).forEach(function(x){ d += '<span class="ms">廣播 ' + esc(x) + '</span>'; });
+    nw(D.ext, P.ext).forEach(function(x){ d += '<span class="ex">擴充 ' + esc(x) + '</span>'; });
+    $('#lDiff').innerHTML = d || '<span class="muted">沒有新的角色、變數或廣播，只改程式。</span>';
+    // 步驟
+    $('#aiSeg').style.display = L.keyB ? '' : 'none';
+    $$('#aiSeg button').forEach(function(b){ b.classList.toggle('on', b.dataset.ai === state.ai); });
+    var steps = L.steps.slice();
+    if (L.stepsHand) steps = steps.slice(0, L.aiAt || 2).concat(state.ai === '臉' ? L.stepsFace : L.stepsHand, steps.slice(L.aiAt || 2));
+    $('#lSteps').innerHTML = steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+    // 自我檢查
+    var c = store.get('chk' + L.n, []);
+    $('#lChecks').innerHTML = L.check.map(function(s, i){ return '<label><input type="checkbox" data-i="' + i + '"' + (c[i] ? ' checked' : '') + '> <span>' + esc(s) + '</span></label>'; }).join('');
+    $$('#lChecks input').forEach(function(cb){
+      cb.onchange = function(){ var a = store.get('chk' + L.n, []); a[+cb.dataset.i] = cb.checked; store.set('chk' + L.n, a); drawTabs(); };
+    });
+    $('#lOops').innerHTML = L.oops.map(function(o){ return '<div><b>' + esc(o[0]) + '</b><br>' + esc(o[1]) + '</div>'; }).join('');
+    $('#lTip').textContent = L.tip;
+    drawCode(D);
+    // 下載
+    var dl = '<a href="練習檔/' + D.file + '" download>參考檔：' + esc(D.file) + '</a>';
+    if (L.keyB) {
+      var other = BLOCKS[state.ai === '臉' ? L.key : L.keyB];
+      dl += '<a href="練習檔/' + other.file + '" download>' + esc(other.file) + '</a>';
+    }
+    if (pk) dl += '<br><span class="muted">從上一次接著做：</span><a href="練習檔/' + BLOCKS[pk].file + '" download>' + esc(BLOCKS[pk].file) + '</a>';
+    else dl += '<br><span class="muted">從素材起始檔開始：</span><a href="素材包/素材包_起始檔.sb3" download>素材包_起始檔.sb3</a>';
+    $('#lDl').innerHTML = dl;
+    renderHist();
+  }
+  function drawCode(D){
+    var hide = $('#hideMode').checked, h = '';
+    var groups = {};
+    D.scripts.forEach(function(s){
+      if (state.show === 'new' && s.st === 'same') return;
+      (groups[s.who] = groups[s.who] || []).push(s);
+    });
+    WHO_ORDER.forEach(function(w){
+      if (!groups[w]) return;
+      h += '<div class="who"><span class="ic">' + (WHO_ICON[w] || '•') + '</span>' + esc(w) + '</div>';
+      groups[w].forEach(function(s, i){
+        var tag = s.st === 'new' ? '<span class="pill new tag">新</span>' : s.st === 'changed' ? '<span class="pill chg tag">改</span>' : '';
+        h += '<div class="scr st-' + s.st + (hide ? ' hide' : '') + '">' + tag + '<div class="code" data-w="' + esc(w) + '" data-i="' + i + '"></div>' +
+             (s.note ? '<div class="note">' + esc(s.note) + '</div>' : '') + '</div>';
+      });
+    });
+    $('#lCode').innerHTML = h || '<p class="muted">（沒有程式）</p>';
+    $$('#lCode .code').forEach(function(el){ BLK.render(el, groups[el.dataset.w][+el.dataset.i].blocks); });
+    $$('#lCode .scr').forEach(function(el){ el.onclick = function(){ el.classList.remove('hide'); }; });
+  }
+  $$('#showSeg button').forEach(function(b){
+    b.onclick = function(){ state.show = b.dataset.show; $$('#showSeg button').forEach(function(z){ z.classList.toggle('on', z === b); }); drawCode(BLOCKS[dataKey(LESSONS[state.lesson - 1])]); };
+  });
+  $('#hideMode').onchange = function(){ store.set('hide', this.checked); drawCode(BLOCKS[dataKey(LESSONS[state.lesson - 1])]); };
+  $('#hideMode').checked = store.get('hide', false);
+  $$('#aiSeg button').forEach(function(b){ b.onclick = function(){ state.ai = b.dataset.ai; store.set('ai', state.ai); drawLesson(); }; });
+
+  // ------------------------------------------------------------ 碼表
+  var w = { run: false, t0: 0, acc: 0, timer: null };
+  function fmt(ms){ var s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+  function wNow(){ return w.acc + (w.run ? Date.now() - w.t0 : 0); }
+  function wTick(){ $('#wTime').textContent = fmt(wNow()); }
+  function updateWatchLabel(){ $('#wLabel').textContent = state.page === 'lesson' ? '練習 ' + state.lesson + ' 計時' : '碼表'; }
+  $('#wGo').onclick = function(){
+    if (w.run) { w.acc = wNow(); w.run = false; clearInterval(w.timer); this.textContent = '繼續'; }
+    else { w.t0 = Date.now(); w.run = true; w.timer = setInterval(wTick, 250); this.textContent = '暫停'; }
+  };
+  $('#wReset').onclick = function(){ w.run = false; w.acc = 0; clearInterval(w.timer); $('#wGo').textContent = '開始'; wTick(); };
+  $('#wSave').onclick = function(){
+    if (state.page !== 'lesson' || wNow() < 1000) { $('#wLabel').textContent = '到練習頁計時再記錄'; return; }
+    var a = store.get('times' + state.lesson, []); a.push({ s: wNow(), d: new Date().toLocaleDateString() }); store.set('times' + state.lesson, a);
+    $('#wLabel').textContent = '已記錄 ' + fmt(wNow()); renderHist();
+  };
+  function renderHist(){
+    var a = store.get('times' + state.lesson, []), box = $('#lHist');
+    if (!box) { box = document.createElement('div'); box.id = 'lHist'; box.className = 'hist'; $('#lDl').parentNode.appendChild(box); }
+    box.innerHTML = a.length ? '<h3>我的時間紀錄</h3>' + a.slice(-8).map(function(t){ return '<span class="pill" style="margin:2px">' + t.d + '　' + fmt(t.s) + '</span>'; }).join('') : '';
+  }
+
+  // ------------------------------------------------------------ 排序遊戲
+  var g = { next: 0, err: 0, t0: 0, timer: null, done: false };
+  function chipClass(s){ s = s.trim(); return s === '等玩家動作' ? 'chip my' : (s.indexOf('如果') === 0 || s.indexOf('重複') === 0) ? 'chip if' : s.indexOf('廣播') === 0 ? 'chip' : 'chip var'; }
+  function gStart(){
+    g.next = 0; g.err = 0; g.done = false; g.t0 = Date.now(); clearInterval(g.timer);
+    g.timer = setInterval(function(){ if (!g.done) $('#gTime').textContent = ((Date.now() - g.t0) / 1000).toFixed(1); }, 100);
+    var idx = DIRECTOR_LINES.map(function(_, i){ return i; });
+    for (var i = idx.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+    $('#gPool').innerHTML = idx.map(function(i){ return '<button class="' + chipClass(DIRECTOR_LINES[i]) + '" data-i="' + i + '">' + esc(DIRECTOR_LINES[i]) + '</button>'; }).join('');
+    $('#gAns').innerHTML = '<div class="chip" style="background:#4CBF56;box-shadow:0 3px 0 #389438">' + esc(CFG.gameHead) + '</div>';
+    $('#gErr').textContent = '0'; $('#gMsg').textContent = '';
+    var b = store.get('gameBest', null); $('#gBest').textContent = b ? b.t.toFixed(1) + ' 秒、' + b.e + ' 錯' : '—';
+    $$('#gPool .chip').forEach(function(c){ c.onclick = function(){ gPick(c); }; });
+  }
+  function gPick(c){
+    if (g.done) return;
+    var want = DIRECTOR_LINES[g.next];
+    if (DIRECTOR_LINES[+c.dataset.i].trim() === want.trim()) {      // 縮排不同但字一樣的積木（例如三個「等玩家動作」）都算對
+      var d = document.createElement('div'); d.className = chipClass(want); d.style.marginLeft = '18px';
+      d.textContent = ($('#gHint').checked ? (g.next + 1) + '. ' : '') + want; d.style.whiteSpace = 'pre'; $('#gAns').appendChild(d); c.remove(); g.next++;
+      if (g.next === DIRECTOR_LINES.length) {
+        g.done = true; var t = (Date.now() - g.t0) / 1000; clearInterval(g.timer); $('#gTime').textContent = t.toFixed(1);
+        $('#gMsg').textContent = g.err === 0 && t <= 60 ? '🎉 太棒了！0 錯、' + t.toFixed(1) + ' 秒，導演表背熟了！' : '完成！' + t.toFixed(1) + ' 秒、錯 ' + g.err + ' 次。再挑戰一次：目標 0 錯、60 秒內。';
+        var b = store.get('gameBest', null);
+        if (!b || g.err < b.e || (g.err === b.e && t < b.t)) store.set('gameBest', { t: t, e: g.err });
+      }
+    } else {
+      g.err++; $('#gErr').textContent = g.err; c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    }
+  }
+  $('#gStart').onclick = gStart;
+
+  // ------------------------------------------------------------ 劇本表
+  var PLAN = CFG.plan;
+  function drawPlanForm(){
+    var v = store.get('plan', {}), h = '';
+    PLAN.forEach(function(p){
+      if (p[0] === 'sec') { h += '<div class="sec">' + p[1] + '</div>'; return; }
+      h += '<label for="pl_' + p[0] + '">' + p[1] + '</label>';
+      if (p[2] === 'LR') h += '<select id="pl_' + p[0] + '"><option value="左">左</option><option value="右">右</option></select>';
+      else if (p[2] === 'AI') h += '<select id="pl_' + p[0] + '">' + CFG.aiOptions.map(function(o){ return '<option>' + esc(o) + '</option>'; }).join('') + '</select>';
+      else if (p[2]) h += '<textarea id="pl_' + p[0] + '"></textarea>';
+      else h += '<input id="pl_' + p[0] + '">';
+    });
+    $('#plForm').innerHTML = h;
+    PLAN.forEach(function(p){ if (p[0] !== 'sec') { var el = $('#pl_' + p[0]); if (v[p[0]] != null) el.value = v[p[0]]; el.oninput = el.onchange = savePlan; } });
+    drawPlanOut();
+  }
+  function savePlan(){ var v = {}; PLAN.forEach(function(p){ if (p[0] !== 'sec') v[p[0]] = $('#pl_' + p[0]).value; }); store.set('plan', v); drawPlanOut(); }
+  function drawPlanOut(){
+    var v = store.get('plan', {}), x = function(k){ return esc(v[k] || '') || '<span class="muted">（還沒填）</span>'; };
+    var rows = CFG.planRows(v, x, esc);
+    $('#plOut').innerHTML = '<h2>劇本表：' + x('title') + '</h2><table class="play"><tr><th>廣播（一步）</th><th>誰負責</th><th>要做什麼</th></tr>' +
+      rows.map(function(r){ return '<tr><td><b>' + r[0] + '</b></td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('') + '</table>';
+  }
+  $('#plDemos').innerHTML = CFG.demos.map(function(d, i){ return '<button class="btn sm' + (i ? ' alt' : '') + '" data-i="' + i + '">填入範例：' + esc(d[0]) + '</button> '; }).join('');
+  $$('#plDemos button').forEach(function(b){ b.onclick = function(){ store.set('plan', CFG.demos[+b.dataset.i][1]); drawPlanForm(); }; });
+  $('#plClear').onclick = function(){ store.set('plan', {}); drawPlanForm(); };
+  $('#plPrint').onclick = function(){ $('#plOut').classList.add('print'); $('#p-plan').classList.add('print'); window.print(); };
+
+  // ------------------------------------------------------------ 素材包
+  var PACK = CFG.pack;
+  $('#packList').innerHTML = Object.keys(PACK).map(function(k){
+    return '<p><b>' + k + '</b><br>' + PACK[k].map(function(f){ return '<a href="素材包/' + f + '" download>' + esc(f.split('/')[1]) + '</a>'; }).join('') + '</p>';
+  }).join('');
+  $('#subTable').innerHTML = '<tr><th>素材</th><th>內建代替</th><th>小技巧</th></tr>' + SUBSTITUTE.map(function(r){ return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('');
+
+  // ------------------------------------------------------------ 開始
+  $('#hTitle').innerHTML = CFG.title; document.title = CFG.docTitle; $('#aiFace').textContent = CFG.faceLabel;
+  drawPlanForm(); gStart();
+  var last = store.get('page', ['home', 1]);
+  go(last[0] || 'home', last[1] || 1);
+})();
+</script>
+</body>
+</html>

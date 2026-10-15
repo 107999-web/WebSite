@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🎲 3D 棋類遊戲樂園</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Baloo+2:wght@400..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+html,body{
+  width:100%;min-height:100%;
+  font-family:'ZCOOL KuaiLe','Baloo 2','Noto Sans TC',system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%, #FFE3F0 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, #DFF6FF 0%, transparent 45%),
+    radial-gradient(circle at 85% 88%, #E3FBEA 0%, transparent 45%),
+    radial-gradient(circle at 10% 85%, #FFF8D6 0%, transparent 45%),
+    linear-gradient(160deg,#FFF6FB,#F3FBFF 40%,#F5FFF8 70%,#FFFDF2);
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ── floating decorative blobs ── */
+.blob{position:fixed;border-radius:50%;filter:blur(2px);opacity:.55;z-index:0;pointer-events:none;animation:drift 14s ease-in-out infinite}
+.b1{width:120px;height:120px;background:#FFD1E8;top:8%;left:6%;animation-delay:0s}
+.b2{width:90px;height:90px;background:#B9E8FF;top:14%;right:9%;animation-delay:2s}
+.b3{width:100px;height:100px;background:#BEF2D0;bottom:10%;left:8%;animation-delay:4s}
+.b4{width:80px;height:80px;background:#FFEDA0;bottom:16%;right:7%;animation-delay:6s}
+.b5{width:60px;height:60px;background:#FFD1E8;top:46%;left:2%;animation-delay:1.5s}
+.b6{width:70px;height:70px;background:#B9E8FF;top:50%;right:3%;animation-delay:3.5s}
+@keyframes drift{
+  0%,100%{transform:translateY(0) translateX(0) scale(1)}
+  50%{transform:translateY(-22px) translateX(14px) scale(1.08)}
+}
+
+/* ── header ── */
+header{position:relative;z-index:1;text-align:center;padding:56px 20px 20px}
+h1{
+  font-size:3.2em;color:#5B4A8A;letter-spacing:2px;
+  text-shadow:0 3px 0 rgba(255,255,255,.8), 0 8px 18px rgba(150,120,200,.25);
+}
+header p{margin-top:12px;font-size:1.25em;color:#8A7CB0;letter-spacing:1px}
+
+/* ── grid ── */
+.grid{
+  position:relative;z-index:1;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:34px;
+  max-width:1400px;
+  margin:0 auto;
+  padding:30px 50px 80px;
+}
+
+.card{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-decoration:none;
+  border-radius:38px;
+  padding:38px 20px 30px;
+  min-height:230px;
+  border:5px solid rgba(255,255,255,.85);
+  box-shadow:0 10px 0 rgba(120,100,160,.12), 0 18px 34px rgba(120,100,160,.18);
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .16s ease;
+  cursor:pointer;
+  touch-action:manipulation;
+  opacity:0;
+  animation:pop .5s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.card:hover{transform:translateY(-8px) scale(1.045);box-shadow:0 14px 0 rgba(120,100,160,.12),0 26px 40px rgba(120,100,160,.22)}
+.card:active{transform:scale(.93) translateY(4px);box-shadow:0 4px 0 rgba(120,100,160,.12),0 6px 14px rgba(120,100,160,.18)}
+
+.grid .card:nth-child(1){animation-delay:.03s}
+.grid .card:nth-child(2){animation-delay:.09s}
+.grid .card:nth-child(3){animation-delay:.15s}
+.grid .card:nth-child(4){animation-delay:.21s}
+.grid .card:nth-child(5){animation-delay:.27s}
+.grid .card:nth-child(6){animation-delay:.33s}
+.grid .card:nth-child(7){animation-delay:.39s}
+.grid .card:nth-child(8){animation-delay:.45s}
+@keyframes pop{
+  from{opacity:0;transform:translateY(18px) scale(.85)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.c-pink  {background:linear-gradient(160deg,#FFEEF6,#FFC9E4)}
+.c-blue  {background:linear-gradient(160deg,#EAF9FF,#BCE9FF)}
+.c-green {background:linear-gradient(160deg,#EEFCF2,#C4F3D6)}
+.c-yellow{background:linear-gradient(160deg,#FFFAE0,#FFEDA6)}
+
+.icon{font-size:4.4em;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.12))}
+.title{margin-top:14px;font-size:1.7em;letter-spacing:1px}
+.sub{margin-top:4px;font-size:.85em;opacity:.65;letter-spacing:1px}
+
+.c-pink .title  {color:#D6488A}
+.c-blue .title  {color:#1E88C7}
+.c-green .title {color:#1E9E5A}
+.c-yellow .title{color:#C9930A}
+.c-pink .sub{color:#C25E92}
+.c-blue .sub{color:#3D93BE}
+.c-green .sub{color:#3DA871}
+.c-yellow .sub{color:#B48A2A}
+
+footer{position:relative;z-index:1;text-align:center;padding:10px 20px 40px;color:#A79BC4;font-size:.9em;letter-spacing:1px}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="
+    position:fixed;bottom:16px;left:16px;z-index:99999;
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(255,255,255,0.82);
+    border:2px solid #f9a8d4;
+    box-shadow:0 4px 12px rgba(236,72,153,0.22);
+    display:flex;align-items:center;justify-content:center;
+    text-decoration:none;transition:background 0.2s,box-shadow 0.2s;"
+  onmouseover="this.style.background='#fce7f3';this.style.boxShadow='0 6px 18px rgba(236,72,153,0.38)'"
+  onmouseout="this.style.background='rgba(255,255,255,0.82)';this.style.boxShadow='0 4px 12px rgba(236,72,153,0.22)'">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+       stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+</a>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+<div class="blob b4"></div>
+<div class="blob b5"></div>
+<div class="blob b6"></div>
+
+<header>
+  <h1>🎲 3D 棋類遊戲樂園</h1>
+  <p>點一下卡片，開始一場療癒的對局吧～</p>
+</header>
+
+<div class="grid">
+  <a class="card c-pink" href="中國象棋.html">
+    <div class="icon">🐘</div>
+    <div class="title">中國象棋</div>
+    <div class="sub">Xiangqi</div>
+  </a>
+  <a class="card c-blue" href="中國跳棋.html">
+    <div class="icon">⭐</div>
+    <div class="title">中國跳棋</div>
+    <div class="sub">Chinese Checkers</div>
+  </a>
+  <a class="card c-green" href="五子棋.html">
+    <div class="icon">⚫</div>
+    <div class="title">五子棋</div>
+    <div class="sub">Gomoku</div>
+  </a>
+  <a class="card c-yellow" href="圍棋.html">
+    <div class="icon">⚪</div>
+    <div class="title">圍棋</div>
+    <div class="sub">Go</div>
+  </a>
+  <a class="card c-pink" href="暗棋.html">
+    <div class="icon">🀄</div>
+    <div class="title">暗棋</div>
+    <div class="sub">Banqi</div>
+  </a>
+  <a class="card c-blue" href="西洋棋.html">
+    <div class="icon">♞</div>
+    <div class="title">西洋棋</div>
+    <div class="sub">Chess</div>
+  </a>
+  <a class="card c-green" href="跳棋.html">
+    <div class="icon">🔴</div>
+    <div class="title">跳棋</div>
+    <div class="sub">Checkers</div>
+  </a>
+  <a class="card c-yellow" href="黑白棋.html">
+    <div class="icon">⚫⚪</div>
+    <div class="title">黑白棋</div>
+    <div class="sub">Reversi</div>
+  </a>
+</div>
+
+<footer>3D Board Games · 適合大型觸控螢幕</footer>
+</body>
+
+
+</html>

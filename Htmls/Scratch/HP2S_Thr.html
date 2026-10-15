@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>Handpose2Scratch 教師手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --cream:#F3FAF5; --paper:#FFFFFF; --paper2:#E9F6EE; --ink:#3F4A45; --ink2:#7C8B84; --line:#CFE9DA;
+  --mint:#4FB894; --mint-d:#33997A; --pink:#FF8FAB; --sky:#6FB7E4; --butter:#FFC86B; --lilac:#BFA3E8;
+  --block:#0FBD8C; --block-d:#0BA277; --block-op:#4C97FF; --block-op-d:#3373CC;
+  --shadow:0 10px 24px rgba(79,184,148,.18); --shadow-s:0 4px 12px rgba(79,184,148,.16);
+  --f-round:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --f-num:'Nunito','M PLUS Rounded 1c',sans-serif;
+  --c-thumb:#FF8FAB; --c-index:#FFA94D; --c-middle:#5FC9A4; --c-ring:#6FB7E4; --c-pinky:#BFA3E8; --c-wrist:#A1887F;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cream:#1E2724; --paper:#28332F; --paper2:#31403A; --ink:#E7F3EC; --ink2:#A9BDB3; --line:#3F534A;
+  --mint:#6FD4B0; --mint-d:#8FE3C5; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --cream:#1E2724; --paper:#28332F; --paper2:#31403A; --ink:#E7F3EC; --ink2:#A9BDB3; --line:#3F534A;
+  --mint:#6FD4B0; --mint-d:#8FE3C5; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-round);font-size:16px;line-height:1.82;
+  background-image:radial-gradient(var(--line) 1.3px,transparent 1.3px);background-size:28px 28px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px;padding-block:0 64px}
+h1,h2,h3{text-wrap:balance;line-height:1.4;margin:0}
+a{color:var(--mint-d)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in srgb,var(--cream) 85%,transparent);border-bottom:2px solid var(--line)}
+nav .inner{max-width:1060px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--paper);border:2px solid var(--line);
+  border-radius:50px;padding:5px 15px;font-size:.86rem;font-weight:700;transition:transform .18s,background .18s}
+nav a:hover{transform:translateY(-2px);background:var(--paper2)}
+header.hero{padding-block:40px 24px}
+.badge{display:inline-block;background:var(--mint);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:50px;box-shadow:var(--shadow-s)}
+header.hero h1{font-size:clamp(1.8rem,5vw,2.7rem);font-weight:800;margin:14px 0 8px}
+header.hero p{color:var(--ink2);max-width:46em;margin:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
+.fact{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-s)}
+.fact .k{font-size:.76rem;letter-spacing:.08em;color:var(--ink2);font-weight:700}
+.fact .v{font-weight:800;font-size:1rem}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--pink);color:#fff;text-decoration:none;font-weight:800;
+  border-radius:50px;padding:10px 22px;margin-top:18px;box-shadow:0 5px 14px rgba(255,143,171,.4);transition:transform .18s}
+.cta:hover{transform:scale(1.05);color:#fff}
+section{margin-top:44px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-head .dot{width:14px;height:14px;border-radius:4px;background:var(--mint);flex:0 0 auto;transform:rotate(45deg)}
+.sec-head h2{font-size:clamp(1.25rem,3.2vw,1.6rem);font-weight:800}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tablewrap{overflow-x:auto;border-radius:20px;border:2px solid var(--line);background:var(--paper);box-shadow:var(--shadow-s)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:620px}
+table th{text-align:left;background:var(--paper2);font-size:.8rem;color:var(--ink2);padding:10px 12px;font-weight:800;white-space:nowrap}
+table td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+table td.n{font-family:var(--f-num);font-weight:800;width:2.4em}
+table.lm{min-width:0}
+table.lm tr.row{cursor:pointer}
+table.lm tr.row:hover,table.lm tr.row.on{background:var(--paper2)}
+.hand-layout{display:grid;grid-template-columns:minmax(240px,.85fr) minmax(280px,1.15fr);gap:18px;align-items:start}
+@media(max-width:760px){.hand-layout{grid-template-columns:1fr}}
+.hand-box{background:linear-gradient(170deg,var(--paper2),var(--paper));border:2px solid var(--line);border-radius:22px;padding:10px;box-shadow:var(--shadow)}
+svg.hand{width:100%;height:auto;display:block}
+svg.hand .bone{stroke:var(--line);stroke-width:9;stroke-linecap:round;fill:none}
+svg.hand .palm{fill:color-mix(in srgb,var(--mint) 12%,transparent)}
+svg.hand g.pt{cursor:pointer}
+svg.hand g.pt circle.core{stroke:var(--paper);stroke-width:3.5;transition:r .18s}
+svg.hand g.pt text{font-family:var(--f-num);font-size:11px;font-weight:800;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+svg.hand g.pt:hover circle.core,svg.hand g.pt.on circle.core{r:16}
+svg.hand g.pt.on circle.ring{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:4 5;opacity:.8}
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;padding:0 6px 6px}
+.legend span{font-size:.79rem;font-weight:700;border-radius:50px;padding:3px 11px;color:#3A4540;border:2px solid var(--paper)}
+.info{background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+.info .no{font-family:var(--f-num);font-size:1.8rem;font-weight:800;line-height:1.1}
+.info .zh{font-size:1.1rem;font-weight:800}
+.info .meta{color:var(--ink2);font-size:.86rem}
+.scroll{max-height:400px;overflow:auto}
+.blk{display:inline-flex;align-items:center;gap:6px;background:var(--block);color:#fff;font-weight:700;font-size:.92rem;
+  padding:6px 13px;border-radius:9px;box-shadow:0 3px 0 var(--block-d);margin:2px 0;line-height:1.5}
+.blk.rep{border-radius:50px}
+.blk.ctl{background:var(--butter);box-shadow:0 3px 0 #E0A63F;color:#4A3530}
+.blk.mot{background:var(--block-op);box-shadow:0 3px 0 var(--block-op-d)}
+.blk.op{background:#59C059;box-shadow:0 3px 0 #389438}
+.blk .drop{background:rgba(0,0,0,.18);border-radius:50px;padding:1px 9px}
+.blk .num{background:#fff;color:#4A3530;border-radius:50px;padding:0 9px;font-family:var(--f-num);font-weight:800}
+.code{background:var(--paper2);border:2px dashed var(--line);border-radius:16px;padding:11px 13px;display:grid;gap:2px;margin-top:8px}
+.code .ind1{margin-left:18px}.code .ind2{margin-left:36px}
+.formula{background:var(--paper2);border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-family:var(--f-num);font-weight:700}
+.note{background:color-mix(in srgb,var(--butter) 24%,var(--paper));border:2px solid color-mix(in srgb,var(--butter) 55%,var(--line));
+  border-radius:18px;padding:12px 16px;font-size:.93rem}
+.warn{background:color-mix(in srgb,var(--pink) 18%,var(--paper));border:2px solid color-mix(in srgb,var(--pink) 45%,var(--line));
+  border-radius:18px;padding:12px 16px;font-size:.93rem}
+.lesson{display:grid;gap:10px}
+.lesson .row{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;background:var(--paper);
+  border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-s)}
+.lesson .t{font-family:var(--f-num);font-weight:800;background:var(--paper2);border-radius:12px;text-align:center;padding:4px;font-size:.84rem}
+details{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:2px 16px;box-shadow:var(--shadow-s)}
+details+details{margin-top:9px}
+details summary{cursor:pointer;font-weight:800;padding:10px 0;list-style:none;display:flex;gap:8px;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'▸';color:var(--mint-d);font-weight:800}
+details[open] summary::before{content:'▾'}
+details .body{padding:0 0 12px;font-size:.93rem}
+ul.tidy{margin:8px 0 0;padding-left:1.2em}ul.tidy li{margin:3px 0}
+.chk{display:grid;gap:8px}
+.chk label{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:2px solid var(--line);
+  border-radius:16px;padding:10px 14px;cursor:pointer;font-size:.94rem;transition:border-color .2s,background .2s}
+.chk input{margin-top:6px;width:18px;height:18px;accent-color:var(--mint);flex:0 0 auto}
+.chk label:has(input:checked){border-color:var(--mint);background:var(--paper2)}
+footer{margin-top:50px;text-align:center;color:var(--ink2);font-size:.85rem}
+:focus-visible{outline:3px solid var(--mint-d);outline-offset:3px;border-radius:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media print{nav,.cta{display:none}body{background:#fff}.card,.fact,.tablewrap,details{box-shadow:none}}
+</style>
+
+<nav><div class="inner">
+  <a href="#about">教材定位</a>
+  <a href="#spec">積木規格</a>
+  <a href="#hand">21 點對照</a>
+  <a href="#coord">座標原理</a>
+  <a href="#flow">教學流程</a>
+  <a href="#demo">範例與易錯點</a>
+  <a href="#ready">課前檢查</a>
+  <a href="#faq">問題排除</a>
+  <a href="#assess">評量與延伸</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">教師手冊</span>
+  <h1>Handpose2Scratch 教師手冊</h1>
+  <p>本手冊整理 Handpose2Scratch 擴充功能的完整技術規格、21 個關節點對照、兩節課教學流程、學生易錯點與問題排除，供備課與課堂即時查閱使用。搭配的學生版實作單可直接發給學生自學。</p>
+  <div class="facts">
+    <div class="fact"><div class="k">適用年段</div><div class="v">國小高年級 ～ 國中</div></div>
+    <div class="fact"><div class="k">建議時數</div><div class="v">2 節（各 40 分鐘）</div></div>
+    <div class="fact"><div class="k">環境需求</div><div class="v">Chrome + 網路攝影機</div></div>
+    <div class="fact"><div class="k">積木總數</div><div class="v">6 個（無事件積木）</div></div>
+  </div>
+  <a class="cta" href="https://claude.ai/artifact/6AHtLhAcjVg3kvsGwzUY3n">👉 開啟學生版實作單</a>
+  <span style="font-size:.84rem;color:var(--ink2);margin-left:8px">（本機檔案版：<a href="student.html">student.html</a>）</span>
+</header>
+
+<section id="about">
+  <div class="sec-head"><span class="dot"></span><h2>一、教材定位與技術原理</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>這是什麼</h3>
+      <p style="font-size:.94rem">Handpose2Scratch 是 Junya Ishihara（champierre）開發的開源 Scratch 3 擴充功能，使用 <b>TensorFlow.js 的 handpose 模型</b>（源自 MediaPipe）進行手部關鍵點偵測。只需一支網路攝影機，不需任何額外感測器。</p>
+      <ul class="tidy" style="font-size:.93rem">
+        <li>使用平台：<b>stretch3.github.io</b>（Scratch 3 擴充版），非 Scratch 官方網站。</li>
+        <li>模型在<b>瀏覽器本機執行</b>，攝影機影像不會上傳伺服器 —— 這是很好的 AI 倫理討論切入點。</li>
+        <li>授權：AGPL-3.0，可用於教學。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>三個必須先知道的限制</h3>
+      <ul class="tidy" style="font-size:.93rem">
+        <li><b>只有 6 個積木、沒有事件積木。</b>沒有「當偵測到…時」，所有判斷都要放在「重複無限次」裡。</li>
+        <li><b>實質上只追蹤一隻手。</b>畫面同時出現兩隻手時數值會跳動，務必要求學生只伸一隻手。</li>
+        <li><b>偵測不到時回傳空字串（""），不是 0。</b>這是課堂上最常見的 bug 來源。</li>
+      </ul>
+      <div class="warn" style="margin-top:12px">⚠️ 作品<b>無法</b>上傳至 Scratch 官方網站執行。請指導學生「檔案 → 儲存到你的電腦」存成 .sb3，下次仍以 stretch3 開啟。</div>
+    </div>
+  </div>
+</section>
+
+<section id="spec">
+  <div class="sec-head"><span class="dot"></span><h2>二、六個積木完整規格</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>積木</th><th>類型</th><th>回傳／參數</th><th>教學提醒</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="blk rep">(部位) 的 x 座標</span></td><td>數值（圓形）</td>
+          <td>舞台左右座標<br><b>約 −240 ～ 240</b></td>
+          <td>可直接接「定位到 x:」。偵測不到時回傳空白。</td>
+        </tr>
+        <tr>
+          <td><span class="blk rep">(部位) 的 y 座標</span></td><td>數值（圓形）</td>
+          <td>舞台上下座標<br><b>約 −180 ～ 180</b></td>
+          <td>手舉高 y 變大。比較兩點 y 值即可判斷手指彎曲。</td>
+        </tr>
+        <tr>
+          <td><span class="blk rep">(部位) 的 z 座標</span></td><td>數值（圓形）</td>
+          <td>相對深度<br><b>越小＝越靠近鏡頭</b></td>
+          <td>模型的相對值，<b>不受倍率影響</b>、沒有單位、穩定度較低，建議高年級再用。</td>
+        </tr>
+        <tr>
+          <td><span class="blk">將攝影機 <span class="drop">鏡像開啟 ▾</span></span></td><td>執行</td>
+          <td>關閉／開啟／鏡像開啟<br><b>預設：鏡像開啟</b></td>
+          <td>「開啟」不翻轉，學生會覺得左右相反；「關閉」會停止偵測。</td>
+        </tr>
+        <tr>
+          <td><span class="blk">將攝影機的透明度設為 <span class="num">50</span></span></td><td>執行</td>
+          <td>0（清楚）～ 100（全透明）</td>
+          <td>除錯階段設 0～30 讓學生確認入鏡；做遊戲時設 70～100。透明度不影響效能。</td>
+        </tr>
+        <tr>
+          <td><span class="blk">將倍率設為 <span class="drop">0.75 ▾</span></span></td><td>執行</td>
+          <td>0.5／0.75／1／1.5／2.0<br><b>預設：0.75</b></td>
+          <td>0.75 剛好把 640×480 的攝影機座標換算成 480×360 的舞台。調大＝小動作大反應。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="hand">
+  <div class="sec-head"><span class="dot"></span><h2>三、21 個關節點對照</h2></div>
+  <p style="margin:0 0 14px;color:var(--ink2)">下拉選單的編號規則：<b>手腕 (1) 起算，每根手指由手掌往指尖數</b>（第三關節 → 第二關節 → 第一關節 → 指尖）。點選圖上圓點或右側表格可查看細節。</p>
+  <div class="hand-layout">
+    <div>
+      <div class="hand-box">
+        <svg class="hand" viewBox="0 0 380 500" role="img" aria-label="手部 21 個關節點位置圖">
+          <polygon class="palm" points="190,448 148,408 150,276 190,266 228,272 264,292"></polygon>
+          <g id="bones"></g><g id="points"></g>
+        </svg>
+        <div class="legend">
+          <span style="background:var(--c-wrist)">手腕</span>
+          <span style="background:var(--c-thumb)">拇指 2–5</span>
+          <span style="background:var(--c-index)">食指 6–9</span>
+          <span style="background:var(--c-middle)">中指 10–13</span>
+          <span style="background:var(--c-ring)">無名指 14–17</span>
+          <span style="background:var(--c-pinky)">小指 18–21</span>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px">📌 課堂最常用：<b>食指尖 (9)</b>＝游標／畫筆、<b>拇指尖 (5)</b>＋食指尖＝捏合、<b>手腕 (1)</b>＝整手基準、<b>中指尖 (13)</b>＝手掌開合。</div>
+    </div>
+    <div>
+      <div class="info">
+        <div class="no" id="i-no">9</div>
+        <div class="zh" id="i-zh">食指尖</div>
+        <div class="meta" id="i-en">index finger</div>
+        <div class="meta" id="i-mp"></div>
+        <div class="meta" id="i-desc">食指最前端，最常拿來當「滑鼠游標」或畫筆。</div>
+      </div>
+      <div class="tablewrap scroll">
+        <table class="lm">
+          <thead><tr><th>編號</th><th>中文名稱</th><th>英文名稱</th><th>MediaPipe</th></tr></thead>
+          <tbody id="lm-body"></tbody>
+        </table>
+      </div>
+      <p style="font-size:.84rem;color:var(--ink2);margin-top:8px">※ MediaPipe 索引＝積木編號 − 1，查閱原始文件時會用到。</p>
+    </div>
+  </div>
+</section>
+
+<section id="coord">
+  <div class="sec-head"><span class="dot"></span><h2>四、座標換算原理</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>換算公式</h3>
+      <p style="font-size:.93rem">模型先在 640×480 的攝影機影像上取得像素座標，再換算為舞台座標：</p>
+      <div class="formula">
+        x = 240 −（像素 x × 倍率）　<span style="opacity:.7">鏡像開啟時</span><br>
+        x = −(240 −（像素 x × 倍率))　<span style="opacity:.7">一般開啟時</span><br>
+        y = 180 −（像素 y × 倍率）
+      </div>
+      <p style="font-size:.93rem;margin-top:10px">倍率 0.75 時：640 × 0.75 = 480、480 × 0.75 = 360，恰為舞台尺寸，因此手移到畫面邊緣時座標也剛好在舞台邊緣。z 座標則<b>直接回傳模型原始值</b>，不套用倍率。</p>
+    </div>
+    <div class="card">
+      <h3>空白值的正確處理</h3>
+      <p style="font-size:.93rem">偵測失敗時積木回傳空字串。若直接運算，Scratch 會把它當成 0，角色便會跳到舞台中心或邊緣。建議一律加上守門判斷：</p>
+      <div class="code">
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">(食指尖的 x 座標) &gt; −250</span> 那麼</span></div>
+        <div class="ind2"><span class="blk mot">定位到 x: <span class="num">食指尖 x</span> y: <span class="num">食指尖 y</span></span></div>
+      </div>
+      <p style="font-size:.9rem;margin-top:8px">原理：空字串在比較運算中不會大於 −250，因此可濾掉未偵測狀態。也可改用「＝空白」的反向判斷。</p>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="sec-head"><span class="dot"></span><h2>五、兩節課教學流程</h2></div>
+  <div class="lesson">
+    <div class="row"><div class="t">第 1 節<br>0–10′</div><div><b>引起動機</b>：現場示範手勢控制，提問「電腦怎麼知道我的手在哪裡？」引出「關鍵點偵測」概念，說明 AI 是在找 21 個特徵點，而不是「看懂」手。</div></div>
+    <div class="row"><div class="t">10–20′</div><div><b>環境設定</b>：全班同步開 stretch3 → 添加擴展 → 允許攝影機 → 拖出「食指尖的 x 座標」點擊驗證。<span style="color:var(--ink2)">（此段最容易卡關，預留緩衝時間，可先指定已完成的學生擔任小老師。）</span></div></div>
+    <div class="row"><div class="t">20–40′</div><div><b>完成範例 1</b>：角色跟著食指尖移動。提早完成者調整「倍率」與「透明度」觀察差異，並嘗試換成其他部位。</div></div>
+    <div class="row"><div class="t">第 2 節<br>0–10′</div><div><b>複習 21 點</b>：使用學生版的「關節點小測驗」進行搶答，或老師報編號、學生說部位。</div></div>
+    <div class="row"><div class="t">10–30′</div><div><b>完成範例 2 或 3</b>：導入「兩點距離」或「關節高低比較」的判斷邏輯，連結數學的座標與正負數概念。</div></div>
+    <div class="row"><div class="t">30–40′</div><div><b>分享與省思</b>：作品展示，並討論「攝影機影像會不會被傳到網路上？」（本擴充在本機運算）帶入 AI 倫理與個人隱私。</div></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="sec-head"><span class="dot"></span><h2>六、範例程式與學生易錯點</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>🐱 範例 1：角色跟著食指尖</h3>
+      <div class="code">
+        <div><span class="blk ctl">當 🏳 被點擊</span></div>
+        <div><span class="blk">將攝影機的透明度設為 <span class="num">60</span></span></div>
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk mot">定位到 x: <span class="num">食指尖 x</span> y: <span class="num">食指尖 y</span></span></div>
+      </div>
+      <p style="font-size:.92rem"><b>易錯點：</b>忘記加「重複無限次」，角色只動一次就停住。</p>
+    </div>
+    <div class="card">
+      <h3>✏️ 範例 2：捏合畫畫</h3>
+      <div class="code">
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk mot">定位到 x: <span class="num">食指尖 x</span> y: <span class="num">食指尖 y</span></span></div>
+        <div class="ind1"><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">兩點距離 &lt; 40</span> 那麼 <span class="blk" style="background:#0FBD8C">下筆</span> 否則 <span class="blk" style="background:#0FBD8C">停筆</span></span></div>
+      </div>
+      <p style="font-size:.92rem"><b>教學重點：</b>距離公式 √((x₁−x₂)²+(y₁−y₂)²)。中年級可簡化為「只比較 x 差」或「絕對值相加」。<b>易錯點：</b>閾值 40 需視倍率調整，倍率 2.0 時要放大到 80 以上。</p>
+    </div>
+    <div class="card">
+      <h3>👍 範例 3：比讚偵測</h3>
+      <div class="code">
+        <div><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">拇指尖 y &gt; 食指尖 y</span> 而且 <span class="blk op" style="box-shadow:none;padding:2px 10px">食指尖 y &lt; 食指第三關節 y</span> 那麼</span></div>
+        <div class="ind1"><span class="blk" style="background:var(--pink);box-shadow:0 3px 0 #EE5E84">說出「讚！」</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>教學重點：</b>用「相對關係」而非絕對數值判斷手勢，手靠近或遠離鏡頭都仍成立。<b>易錯點：</b>學生常寫成固定數值（如 y &gt; 100），一換位置就失效。</p>
+    </div>
+    <div class="card">
+      <h3>✊ 範例 4：手掌開合控制</h3>
+      <div class="code">
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk ctl">將 [開合] 設為（中指尖 y − 手腕 y）</span></div>
+        <div class="ind1"><span class="blk mot">將尺寸設為 <span class="num">開合</span> %</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>延伸：</b>可將「開合」對應到音量、速度、亮度等連續量，討論類比控制的概念。</p>
+    </div>
+  </div>
+</section>
+
+<section id="ready">
+  <div class="sec-head"><span class="dot"></span><h2>七、課前環境檢查清單</h2></div>
+  <div class="chk">
+    <label><input type="checkbox"><span>所有電腦皆安裝 <b>Chrome</b>（或 Chromium 核心的 Edge），並可正常連外。</span></label>
+    <label><input type="checkbox"><span>攝影機驅動正常，且未被其他程式（Meet、Teams、錄影軟體）占用。</span></label>
+    <label><input type="checkbox"><span>瀏覽器攝影機權限未被學校群組原則封鎖（先用一台測試到底）。</span></label>
+    <label><input type="checkbox"><span>教室光線由前方照向學生，避免背光；電腦背景盡量單純。</span></label>
+    <label><input type="checkbox"><span>已先在教師機完成一次完整流程，確認模型載入時間可接受。</span></label>
+    <label><input type="checkbox"><span>已取得攝影機使用的家長同意（依校內規定），並提醒學生不錄影他人。</span></label>
+    <label><input type="checkbox"><span>準備好 .sb3 範例檔備援，避免部分電腦無法偵測時無事可做。</span></label>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="sec-head"><span class="dot"></span><h2>八、常見問題排除</h2></div>
+  <details open><summary>舞台上沒有攝影機畫面</summary><div class="body">① 檢查網址列的攝影機圖示是否被封鎖，改為允許後重新整理；② 確認沒有其他程式占用攝影機；③ 確認積木設為「開啟」或「鏡像開啟」；④ 部分學校電腦以群組原則停用攝影機，需請資訊組協助解除。</div></details>
+  <details><summary>有畫面但數值一直空白</summary><div class="body">模型未偵測到手。檢查：整隻手是否完整入鏡、手掌是否面向鏡頭、光線是否充足、是否同時出現兩隻手、距離是否約 40～80 公分。模型剛載入的前幾秒屬正常延遲。</div></details>
+  <details><summary>角色突然跳到角落或原點</summary><div class="body">空字串被當成 0 所致。請學生加上守門判斷（見第四節），或在偵測不到時維持上一個位置。</div></details>
+  <details><summary>執行很卡、畫面延遲</summary><div class="body">手部偵測對 CPU／GPU 負擔較重。建議關閉其他分頁與程式、減少同時執行的重複無限次迴圈數量、避免過多角色複製。老舊機型可採兩人一組共用。</div></details>
+  <details><summary>兩個學生的手都入鏡，數值亂跳</summary><div class="body">程式只會保留最後偵測到的一隻手。請安排座位間距，或以隔板／背景布幕區隔，並提醒一次只伸一隻手。</div></details>
+  <details><summary>作品在 Scratch 官網打不開</summary><div class="body">stretch3 的擴充積木非官方積木，官網會顯示「無法辨識的積木」。請務必存成 .sb3 並以 stretch3 開啟。若要繳交作品，建議同時錄製操作影片。</div></details>
+  <details><summary>學生用 Safari／手機平板可以嗎？</summary><div class="body">不建議。Safari 常有 WebGL 與攝影機相容問題，平板效能亦不足。請統一使用桌機／筆電版 Chrome。</div></details>
+</section>
+
+<section id="assess">
+  <div class="sec-head"><span class="dot"></span><h2>九、評量指標與跨域延伸</h2></div>
+  <div class="grid3">
+    <div class="card"><h3>📝 評量指標</h3><ul class="tidy" style="font-size:.92rem">
+      <li><b>知識</b>：能說出至少 5 個關節點的編號與名稱。</li>
+      <li><b>理解</b>：能說明偵測不到時回傳空白，以及對應的處理方式。</li>
+      <li><b>技能</b>：作品能穩定運作 30 秒以上不出錯。</li>
+      <li><b>態度</b>：能說明影像在本機運算的隱私意義。</li>
+    </ul></div>
+    <div class="card"><h3>🔗 跨域連結</h3><ul class="tidy" style="font-size:.92rem">
+      <li><b>數學</b>：直角座標、正負數、兩點距離。</li>
+      <li><b>健體</b>：手部關節構造與名稱。</li>
+      <li><b>自然</b>：感測、訊號與資料轉換。</li>
+      <li><b>資訊倫理</b>：影像辨識與個人隱私。</li>
+    </ul></div>
+    <div class="card"><h3>🚀 延伸主題</h3><ul class="tidy" style="font-size:.92rem">
+      <li>隔空彈鋼琴（五指尖對應五個音）。</li>
+      <li>手勢猜拳機（以伸直手指數判斷）。</li>
+      <li>無接觸互動展板（結合班級成果展）。</li>
+      <li>比較 TM2Scratch／PoseNet2Scratch 的差異。</li>
+    </ul></div>
+  </div>
+</section>
+
+<footer>
+  <p>教材整理　·　Handpose2Scratch by Junya Ishihara（champierre），AGPL-3.0　·　模型：TensorFlow.js handpose（MediaPipe）</p>
+  <p><a href="https://github.com/champierre/handpose2scratch">GitHub 原始碼</a>　·　<a href="https://stretch3.github.io/">stretch3 線上編輯器</a></p>
+</footer>
+</div>
+
+<script>
+const F={w:'var(--c-wrist)',t:'var(--c-thumb)',i:'var(--c-index)',m:'var(--c-middle)',r:'var(--c-ring)',p:'var(--c-pinky)'};
+const LM=[
+ [1,'手腕','wrist',190,448,'w','整隻手的基準點，位於手掌下緣中央。判斷「整隻手的位置」時最穩定。'],
+ [2,'拇指根部','base of thumb',148,408,'t','拇指與手掌相連的關節（CMC）。'],
+ [3,'拇指第二關節','2nd joint of thumb',110,372,'t','拇指從手掌往外數的第二個關節（MCP）。'],
+ [4,'拇指第一關節','1st joint of thumb',86,336,'t','最靠近拇指尖的關節（IP）。'],
+ [5,'拇指尖','thumb',66,300,'t','拇指最前端，常與食指尖搭配做捏合手勢。'],
+ [6,'食指第三關節','3rd joint of index finger',150,276,'i','食指與手掌相連的掌指關節（MCP）。'],
+ [7,'食指第二關節','2nd joint of index finger',141,214,'i','食指近端指間關節（PIP），判斷彎曲的關鍵點。'],
+ [8,'食指第一關節','1st joint of index finger',136,176,'i','食指遠端指間關節（DIP）。'],
+ [9,'食指尖','index finger',132,138,'i','食指最前端，最常拿來當「滑鼠游標」或畫筆。'],
+ [10,'中指第三關節','3rd joint of middle finger',190,266,'m','中指掌指關節，位置接近手掌正中央。'],
+ [11,'中指第二關節','2nd joint of middle finger',189,198,'m','中指近端指間關節。'],
+ [12,'中指第一關節','1st joint of middle finger',188,156,'m','中指遠端指間關節。'],
+ [13,'中指尖','middle finger',187,114,'m','中指最前端，通常是全手最高點，適合判斷手掌開合。'],
+ [14,'無名指第三關節','3rd joint of ring finger',228,272,'r','無名指掌指關節。'],
+ [15,'無名指第二關節','2nd joint of ring finger',234,208,'r','無名指近端指間關節。'],
+ [16,'無名指第一關節','1st joint of ring finger',237,168,'r','無名指遠端指間關節。'],
+ [17,'無名指尖','ring finger',239,130,'r','無名指最前端。'],
+ [18,'小指第三關節','3rd joint of little finger',264,292,'p','小指掌指關節，位於手掌外側邊緣。'],
+ [19,'小指第二關節','2nd joint of little finger',278,244,'p','小指近端指間關節。'],
+ [20,'小指第一關節','1st joint of little finger',284,212,'p','小指遠端指間關節。'],
+ [21,'小指尖','little finger',288,180,'p','小指最前端，21 個點中的最後一個。']
+];
+const MP=['WRIST','THUMB_CMC','THUMB_MCP','THUMB_IP','THUMB_TIP','INDEX_FINGER_MCP','INDEX_FINGER_PIP','INDEX_FINGER_DIP','INDEX_FINGER_TIP','MIDDLE_FINGER_MCP','MIDDLE_FINGER_PIP','MIDDLE_FINGER_DIP','MIDDLE_FINGER_TIP','RING_FINGER_MCP','RING_FINGER_PIP','RING_FINGER_DIP','RING_FINGER_TIP','PINKY_MCP','PINKY_PIP','PINKY_DIP','PINKY_TIP'];
+const BONES=[[1,2],[2,3],[3,4],[4,5],[1,6],[6,7],[7,8],[8,9],[6,10],[10,11],[11,12],[12,13],[10,14],[14,15],[15,16],[16,17],[14,18],[18,19],[19,20],[20,21],[1,18]];
+const NS='http://www.w3.org/2000/svg';
+const at=(el,o)=>{for(const k in o)el.setAttribute(k,o[k]);return el};
+const bg=document.getElementById('bones'),pg=document.getElementById('points'),tb=document.getElementById('lm-body');
+BONES.forEach(([a,b])=>{const A=LM[a-1],B=LM[b-1];
+  bg.appendChild(at(document.createElementNS(NS,'line'),{x1:A[3],y1:A[4],x2:B[3],y2:B[4],class:'bone'}))});
+LM.forEach(d=>{
+  const g=at(document.createElementNS(NS,'g'),{class:'pt',tabindex:'0',role:'button','aria-label':d[0]+' '+d[1],'data-n':d[0]});
+  g.appendChild(at(document.createElementNS(NS,'circle'),{class:'ring',cx:d[3],cy:d[4],r:22}));
+  g.appendChild(at(document.createElementNS(NS,'circle'),{class:'core',cx:d[3],cy:d[4],r:13,fill:F[d[5]]}));
+  const t=document.createElementNS(NS,'text');at(t,{x:d[3],y:d[4]+.5});t.textContent=d[0];g.appendChild(t);
+  ['click','mouseenter','focus'].forEach(ev=>g.addEventListener(ev,()=>pick(d[0])));
+  pg.appendChild(g);
+  const tr=document.createElement('tr');tr.className='row';tr.dataset.n=d[0];
+  tr.innerHTML='<td class="n" style="color:'+F[d[5]]+'">'+d[0]+'</td><td><b>'+d[1]+'</b></td><td style="color:var(--ink2);font-size:.82rem">'+d[2]+'</td><td style="color:var(--ink2);font-size:.78rem;font-family:var(--f-num)">'+(d[0]-1)+'</td>';
+  ['click','mouseenter'].forEach(ev=>tr.addEventListener(ev,()=>pick(d[0])));
+  tb.appendChild(tr)});
+function pick(n){const d=LM[n-1];
+  document.querySelectorAll('.pt.on,.row.on').forEach(e=>e.classList.remove('on'));
+  document.querySelector('.pt[data-n="'+n+'"]').classList.add('on');
+  document.querySelector('.row[data-n="'+n+'"]').classList.add('on');
+  const no=document.getElementById('i-no');no.textContent=n;no.style.color=F[d[5]];
+  document.getElementById('i-zh').textContent=d[1];
+  document.getElementById('i-en').textContent=d[2];
+  document.getElementById('i-mp').textContent='MediaPipe 索引：'+(n-1)+'（'+MP[n-1]+'）';
+  document.getElementById('i-desc').textContent=d[6]}
+pick(9);
+</script>
+
+</body>
+</html>

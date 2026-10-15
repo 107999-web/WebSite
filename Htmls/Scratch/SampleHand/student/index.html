@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>手勢模組教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/hand.css">
+<link rel="stylesheet" href="assets/mod.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🧩 手勢模組教室 <em>Handpose2Scratch × 自訂積木</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="#map">🗺️ 模組地圖</a>
+      <a href="#toolbox">🧰 工具箱</a>
+      <a href="sb3/手勢模組工具箱.sb3" download>⬇ 工具箱 .sb3</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>把手勢辨識拆成 10 個「函式積木」</h1>
+    <p>一次看完一整個手勢遊戲的程式，很容易就昏頭了。這份教材把它拆成 <b>10 個模組</b>，
+      每個模組都是一塊<b>自訂積木（函式）</b>：<b>給它輸入，它算出輸出</b>。
+      一次學一塊，最後把它們組起來，就能做出比數字、猜拳、自訂手勢、用手指按按鈕的作品。</p>
+    <div class="note" style="max-width:52em;margin-top:12px">每個模組都有：<b>函式卡</b>（輸入／輸出）、
+      <b>積木圖</b>（和 .sb3 裡的一模一樣）、<b>互動實驗</b>、<b>範例 .sb3</b>、<b>用攝影機試玩</b>的網頁版，以及<b>動手改</b>的任務。</div>
+  </section>
+
+  <div class="layout">
+    <nav class="toc" aria-label="目錄">
+      <h3>目錄</h3>
+      <a href="#intro">0　開始之前：函式與 21 個點</a>
+      <a href="#map">　模組地圖</a>
+      <a href="#m1">1　偵測手</a>
+      <a href="#m2">2　量尺寸</a>
+      <a href="#m3">3　判斷手指</a>
+      <a href="#m4">4　判斷拇指</a>
+      <a href="#m5">5　數手指</a>
+      <a href="#m6">6　穩定判斷（比數字）</a>
+      <a href="#m7">7　認猜拳</a>
+      <a href="#m8">8　比對手勢</a>
+      <a href="#m9">9　猜拳勝負</a>
+      <a href="#m10">10　手指游標</a>
+      <a href="#toolbox">🧰 工具箱：做自己的作品</a>
+      <div class="prog">自我檢核 <span id="ptxt"></span></div>
+      <div class="pbar"><i id="pbar"></i></div>
+    </nav>
+
+    <main>
+
+<!-- ======================= 0 ======================= -->
+<section class="chap" id="intro">
+  <div class="ch"><span class="cn" style="background:#3F4A56">第 0 章</span><h2>開始之前：函式與 21 個點</h2></div>
+  <p class="lead">先弄懂兩件事：「函式」是什麼，以及電腦眼中的手長什麼樣子。</p>
+
+  <div class="topic">
+    <h3>🧩 函式 ＝ 有輸入、有輸出的小機器</h3>
+    <p>在 Scratch 裡，「函式積木」分類中的<b>自訂積木</b>就是函式。例如模組 3 的：</p>
+    <div class="keyrule"><span class="sb myblocks">判斷手指 <span class="nv">9</span> <span class="nv">7</span> <span class="rp variables">食指</span></span>
+      <span class="sub">輸入：指尖是第 9 點、關節是第 7 點、食指現在的狀態　→　輸出：<b>手指結果</b>（1 ＝ 伸直，0 ＝ 彎著）</span></div>
+    <p>換成 <code>判斷手指 13 11 中指</code>，同一塊積木就能判斷中指。<b>寫一次、用很多次</b>，這就是函式的好處。</p>
+    <div class="why"><b class="t">Scratch 的自訂積木沒辦法直接「回傳」答案</b>　所以這份教材有個約定：
+      <b>函式把答案寫進一個變數</b>（叫做「輸出變數」），呼叫完再去讀那個變數。例如呼叫「判斷手指」之後，答案就在「手指結果」裡。</div>
+  </div>
+
+  <div class="topic">
+    <h3>🏗️ 這份教材的三個約定</h3>
+    <ol>
+      <li><b>所有函式都放在「手勢模組」角色裡</b>：它是「大腦」，負責偵測和計算。（自訂積木只能在<b>同一個角色</b>裡呼叫。）</li>
+      <li><b>輸出變數都設成「適用於所有角色」</b>：這樣別的角色才讀得到。</li>
+      <li><b>其他角色只「看」變數</b>：手指燈、數字卡、猜拳手……只讀變數來換造型，自己不偵測。要換畫面，不用動到大腦。</li>
+    </ol>
+    <p class="sm">每塊自訂積木都有勾「<b>執行時不重新整理畫面</b>」：整塊積木會在一瞬間算完，不會算到一半畫面就先動了。</p>
+  </div>
+
+  <div class="lab">
+    <div class="lh">✋ 實驗 0：Handpose2Scratch 的 21 個點 <span class="tag">點一點</span></div>
+    <div id="lab0"></div>
+  </div>
+
+  <div class="topic">
+    <h3>🛠️ 上課前的準備</h3>
+    <ul>
+      <li>用 <b>stretch3.github.io</b> 開啟 .sb3（檔案 → 從你的電腦挑選），第一次會要求使用攝影機，請按允許。</li>
+      <li>範例檔已經加好 <b>Handpose2Scratch</b> 擴充功能，按綠旗就會開攝影機。</li>
+      <li>每個模組也有<b>網頁版</b>（「用攝影機試玩」），不用開 Scratch 就能玩，離線也可以。</li>
+      <li><b>沒有攝影機？</b>模組 6 以後按 <kbd>K</kbd> 切換成<b>鍵盤模式</b>：按住數字鍵就等於比出手勢；模組 10 用滑鼠代替手指。</li>
+      <li>按 <kbd>D</kbd> 可以開關骨架點（看電腦抓到了哪幾個點）。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chap" id="map">
+  <div class="ch"><span class="cn" style="background:#3F4A56">地圖</span><h2>🗺️ 模組地圖</h2></div>
+  <p class="lead">箭頭 ＝「會用到」。例如「數手指」會呼叫「判斷手指」和「判斷拇指」。點一個模組就跳到那一章。</p>
+  <div id="modmap"></div>
+  <div class="tablewrap" style="margin-top:12px"><table class="pattab api">
+    <tr><th>#</th><th>自訂積木</th><th>輸入</th><th>輸出（變數）</th><th>範例檔</th></tr>
+    <tr><td>1</td><td>偵測手</td><td>—</td><td>看得到手</td><td><a href="sb3/模組01_偵測手.sb3" download>模組01</a></td></tr>
+    <tr><td>2</td><td>量尺寸</td><td>—</td><td>手長、手寬</td><td><a href="sb3/模組02_量尺寸.sb3" download>模組02</a></td></tr>
+    <tr><td>3</td><td>判斷手指 (指尖)(關節)(目前)</td><td>3 個</td><td>手指結果</td><td><a href="sb3/模組03_判斷手指.sb3" download>模組03</a></td></tr>
+    <tr><td>4</td><td>判斷拇指</td><td>—</td><td>拇指</td><td><a href="sb3/模組04_判斷拇指.sb3" download>模組04</a></td></tr>
+    <tr><td>5</td><td>數手指</td><td>—</td><td>拇指～小指、手指數、指型、四指型</td><td><a href="sb3/模組05_數手指.sb3" download>模組05</a></td></tr>
+    <tr><td>6</td><td>穩定判斷、沒手處理</td><td>—</td><td>確定手指數、確定指型、確定四指型</td><td><a href="sb3/模組06_穩定判斷.sb3" download>模組06</a></td></tr>
+    <tr><td>7</td><td>認猜拳</td><td>—</td><td>猜拳號</td><td><a href="sb3/模組07_認猜拳.sb3" download>模組07</a></td></tr>
+    <tr><td>8</td><td>比對手勢 (目標)、認手勢</td><td>1 個</td><td>符合、認出手勢</td><td><a href="sb3/模組08_比對手勢.sb3" download>模組08</a></td></tr>
+    <tr><td>9</td><td>猜拳勝負 (我)(對方)</td><td>2 個</td><td>勝負</td><td><a href="sb3/模組09_猜拳勝負.sb3" download>模組09</a></td></tr>
+    <tr><td>10</td><td>手指游標</td><td>—</td><td>游標x、游標y、捏合、捏的次數＋廣播「捏一下」</td><td><a href="sb3/模組10_手指游標.sb3" download>模組10</a></td></tr>
+  </table></div>
+  <p class="sm">每個模組檔都包含「這個模組 ＋ 它用到的前面模組 ＋ 一個小示範」。所以打開模組 5，裡面也有模組 1～4。</p>
+</section>
+
+<!-- ======================= 1 ======================= -->
+<section class="chap" id="m1" style="--mc:#4C97FF">
+  <div class="ch"><span class="cn" style="background:#4C97FF">模組 1</span><h2>偵測手：看得到手嗎？</h2></div>
+  <p class="lead">所有判斷之前的第一道關卡。偵測不到手的時候，後面的程式一律不要做。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">偵測手</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span><b>輸出</b><span><span class="pill">看得到手</span> 1 ＝ 看得到，0 ＝ 看不到</span>
+      <b>用到</b><span>第 1 點（手腕）、第 10 點（中指第三關節）</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組01_偵測手.sb3" download>⬇ 模組01 .sb3</a><a class="btn ghost" href="play/模組01_偵測手/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>自訂積木</h4><div data-sb="1|手勢模組|def:偵測手"></div></div>
+    <div class="bwrap"><h4>主迴圈：一直呼叫它</h4><div data-sb="1|手勢模組|flag"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 1：兩道守門 <span class="tag">切換情況</span></div><div id="lab1"></div></div>
+  <div class="warn"><b class="t">空白的陷阱</b>　偵測不到手時，座標積木回傳的是<b>空白</b>，不是 0。
+    空白拿去「比大小」結果是不成立（所以守門有效）；但空白拿去「定位到 x: y:」會被當成 0，角色就會突然跳到舞台正中央。
+    <b>所以一定要先守門，再使用座標。</b></div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組01，按綠旗，把手放到鏡頭前再移開，看「看得到手」怎麼變。</li>
+    <li>把手倒過來（手指朝下），為什麼「看得到手」變成 0？
+      <details class="ans"><summary>看答案</summary>守門 ②：中指第三關節 (10) 的 y 要比手腕 (1) 高。手倒過來時它比手腕低。</details></li>
+    <li>挑戰：新增一個角色，<b>只在看得到手的時候</b>說「嗨！」。（提示：讀「看得到手」這個變數就好，不用自己偵測。）</li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k1a"> 我知道「看得到手」是偵測手的<b>輸出</b></label>
+    <label><input type="checkbox" id="k1b"> 我能說出兩道守門各在擋什麼</label>
+  </div>
+</section>
+
+<!-- ======================= 2 ======================= -->
+<section class="chap" id="m2" style="--mc:#9966FF">
+  <div class="ch"><span class="cn" style="background:#9966FF">模組 2</span><h2>量尺寸：手長與手寬</h2></div>
+  <p class="lead">手離鏡頭近，座標之間的距離就大；離得遠就小。所以門檻不能寫死，要用「手的大小」當尺。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">量尺寸</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span><b>輸出</b><span><span class="pill">手長</span> 直向的尺（手腕 1 → 中指掌根 10）<br>
+      <span class="pill">手寬</span> 橫向的尺（食指掌根 6 ↔ 小指掌根 18）</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組02_量尺寸.sb3" download>⬇ 模組02 .sb3</a><a class="btn ghost" href="play/模組02_量尺寸/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bwrap"><h4>自訂積木</h4><div data-sb="2|手勢模組|def:量尺寸"></div></div>
+  <div class="lab"><div class="lh">🔬 實驗 2：手離遠一點會怎樣？ <span class="tag">拉拉桿</span></div><div id="lab2"></div></div>
+  <div class="why"><b class="t">為什麼手寬要加「絕對值」？</b>　左手和右手、鏡像開或關，食指和小指誰在左邊會相反，
+    相減可能是負的。取絕對值以後只剩「距離」，左右都一樣。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組02，手慢慢往後退，看「手長」「手寬」怎麼變。量尺小幫手說「太近了」的門檻是多少？</li>
+    <li>把手從正面轉成側面，哪一把尺變化比較大？為什麼？
+      <details class="ans"><summary>看答案</summary>手寬。側面時食指和小指的掌根疊在一起，橫向距離變得很小。所以本教材都要求「手掌面對鏡頭」。</details></li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k2a"> 我知道為什麼門檻要寫成「手長 × 比例」而不是固定數字</label>
+  </div>
+</section>
+
+<!-- ======================= 3 ======================= -->
+<section class="chap" id="m3" style="--mc:#FF8C1A">
+  <div class="ch"><span class="cn" style="background:#FF8C1A">模組 3</span><h2>判斷手指：一根手指伸直了嗎？</h2></div>
+  <p class="lead">第一塊<b>有輸入</b>的函式。同一塊積木，給不同的點號，就能判斷四根不同的手指。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">判斷手指 <span class="rp myblocks">指尖</span> <span class="rp myblocks">關節</span> <span class="rp myblocks">目前</span></span></div>
+    <div class="io"><b>輸入</b><span><span class="pill a">指尖</span> 指尖的點號　<span class="pill a">關節</span> 第二關節的點號　<span class="pill a">目前</span> 這根手指現在的狀態</span>
+      <b>輸出</b><span><span class="pill">手指結果</span> 1 ＝ 伸直，0 ＝ 彎著</span>
+      <b>用到</b><span>模組 2 的<span class="pill">手長</span>（算餘裕）</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組03_判斷手指.sb3" download>⬇ 模組03 .sb3</a><a class="btn ghost" href="play/模組03_判斷手指/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="keyrule"><b>核心規則</b><br><span class="k">指尖的 y　＞　同一根手指第二關節的 y</span>　→　伸直
+    <span class="sub">手指內部自己比，所以手的高低、遠近、左右都不影響。</span></div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>自訂積木</h4><div data-sb="3|手勢模組|def:判斷手指"></div></div>
+    <div class="bwrap"><h4>怎麼呼叫：判斷食指，再把答案存起來</h4><div data-sb="3|手勢模組|flag"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 3：灰色帶子（餘裕）<span class="tag">拉拉桿</span></div><div id="lab3"></div></div>
+  <div class="why"><b class="t">參數可以放進點號選單裡</b>　Handpose2Scratch 的「<i>第幾點</i> 的 y 座標」下拉選單，可以把<b>參數</b>（粉紅色的「指尖」）拖進去。
+    這就是為什麼一塊積木可以判斷所有手指。</div>
+  <div class="why"><b class="t">為什麼要輸入「目前」？</b>　因為規則有「餘裕」：在灰色帶子裡要<b>維持原狀</b>。
+    函式自己不記得每根手指原本的狀態，所以要由呼叫的人告訴它。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組03，只有食指燈。仿照主迴圈裡的兩塊積木，加上<b>中指</b>（13、11）：呼叫「判斷手指」，再把「手指結果」存進「中指」。</li>
+    <li>把「餘裕比例」從 0.08 改成 0，再慢慢彎食指，燈會怎樣？
+      <details class="ans"><summary>看答案</summary>在「彎一半」的地方燈會一直閃，因為雜訊讓指尖在關節上下跳。</details></li>
+  </ol></div>
+  <div class="qz"><div class="qq">判斷<b>小指</b>要怎麼呼叫？</div><div class="ops">
+    <button>判斷手指 (19) (21) (小指)</button><button data-r>判斷手指 (21) (19) (小指)</button><button>判斷手指 (18) (21) (小指)</button></div>
+    <div class="ex">第一個輸入是<b>指尖</b>（21），第二個是<b>第二關節</b>（19）。順序錯了，伸直和彎曲就會整個相反。</div></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k3a"> 我會用不同的輸入呼叫同一塊自訂積木</label>
+    <label><input type="checkbox" id="k3b"> 我能說出「餘裕（遲滯）」是在防什麼</label>
+  </div>
+</section>
+
+<!-- ======================= 4 ======================= -->
+<section class="chap" id="m4" style="--mc:#FF6680">
+  <div class="ch"><span class="cn" style="background:#FF6680">模組 4</span><h2>判斷拇指：換一把尺</h2></div>
+  <p class="lead">拇指是往「旁邊」伸的，伸直時 y 幾乎不變，模組 3 的規則不適用。<b>換個方向，就要換一把尺。</b></p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">判斷拇指</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span><b>輸出</b><span><span class="pill">拇指</span> 1 ＝ 張開，0 ＝ 收起</span>
+      <b>用到</b><span>模組 2 的<span class="pill">手寬</span>、第 5 點（拇指尖）、第 18 點（小指掌根）</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組04_判斷拇指.sb3" download>⬇ 模組04 .sb3</a><a class="btn ghost" href="play/模組04_判斷拇指/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="keyrule"><b>拇指規則</b><br><span class="k">｜拇指尖 x − 小指掌根 x｜　＞　手寬 × 1.35</span>　→　張開
+    <span class="sub">量的是<b>橫向</b>距離，所以尺也用<b>橫向</b>的手寬。</span></div>
+  <div class="bwrap"><h4>自訂積木</h4><div data-sb="4|手勢模組|def:判斷拇指"></div></div>
+  <div class="lab"><div class="lh">🔬 實驗 4：量到哪裡才對？ <span class="tag">比較兩種量法</span></div><div id="lab4"></div></div>
+  <div class="warn"><b class="t">真實發生過的 bug</b>　參考專案的舊版量的是「拇指尖到<b>食指</b>掌根」。
+    拇指收起來時常常整個<b>橫過手掌</b>，這時它離食指掌根反而更遠，於是比「3」時常被判成「4」。
+    改成量到手掌<b>另一側</b>的小指掌根，收起來就一定變近。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組04，監看器有「拇指跨距」和「拇指門檻」。張開、收起拇指各看一次數字，你覺得 1.35 合適嗎？</li>
+    <li>挑戰：在你自己的手上找出「剛好在門檻」的姿勢，再把「拇指比例」改成 1.2 和 1.5 比較看看。</li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k4a"> 我能說明拇指為什麼要用橫向的尺</label>
+    <label><input type="checkbox" id="k4b"> 我知道為什麼要量到「小指」掌根</label>
+  </div>
+</section>
+
+<!-- ======================= 5 ======================= -->
+<section class="chap" id="m5" style="--mc:#3FAE6A">
+  <div class="ch"><span class="cn" style="background:#3FAE6A">模組 5</span><h2>數手指：把函式組起來</h2></div>
+  <p class="lead">一個函式裡面可以呼叫別的函式。「數手指」呼叫 1 次判斷拇指、4 次判斷手指，再整理成三種輸出。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">數手指</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span>
+      <b>輸出</b><span><span class="pill">拇指</span><span class="pill">食指</span><span class="pill">中指</span><span class="pill">無名指</span><span class="pill">小指</span>（各 0／1）<br>
+      <span class="pill">手指數</span> 0～5　<span class="pill">指型</span> 五位密碼，例如 01100　<span class="pill">四指型</span> 不含拇指，例如 1100</span>
+      <b>用到</b><span>模組 3、模組 4</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組05_數手指.sb3" download>⬇ 模組05 .sb3</a><a class="btn ghost" href="play/模組05_數手指/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>自訂積木</h4><div data-sb="5|手勢模組|def:數手指"></div></div>
+    <div class="bwrap"><h4>手指燈（只讀變數）</h4><div data-sb="5|手指燈|clone"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 5：點手指 <span class="tag">點一點</span></div><div id="lab5"></div></div>
+  <div class="why"><b class="t">為什麼存成 0／1，不存成「真／假」？</b>　0／1 可以<b>直接相加</b>（手指數），
+    也可以<b>直接接成字串</b>（指型）。一種存法，兩種用法。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組05，比 0～5，看手指燈和「指型」。哪幾個數字的比法，指型不只一種？</li>
+    <li>挑戰：新增變數「三指型」，只接中指、無名指、小指三位。它可以拿來做什麼？</li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k5a"> 我知道「數手指」裡面呼叫了哪些函式</label>
+    <label><input type="checkbox" id="k5b"> 我分得出手指數和指型的差別</label>
+  </div>
+</section>
+
+<!-- ======================= 6 ======================= -->
+<section class="chap" id="m6" style="--mc:#0FBD8C">
+  <div class="ch"><span class="cn" style="background:#0FBD8C">模組 6</span><h2>穩定判斷：比出數字 0～5</h2></div>
+  <p class="lead">攝影機一秒拍 30 張，每張都會有一點雜訊。遊戲要用的是「<b>確定</b>」的手勢，而不是每一張的結果。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">穩定判斷</span> <span class="sb myblocks">沒手處理</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span>
+      <b>輸出</b><span><span class="pill">確定手指數</span> −1 ＝ 沒有手　<span class="pill">確定指型</span>　<span class="pill">確定四指型</span></span>
+      <b>可調</b><span><span class="pill">穩定門檻</span> 0.15 秒　<span class="pill">掉格容忍</span> 0.4 秒</span>
+      <b>用到</b><span>模組 5</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組06_穩定判斷.sb3" download>⬇ 模組06 .sb3</a><a class="btn ghost" href="play/模組06_穩定判斷/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>看得到手時呼叫</h4><div data-sb="6|手勢模組|def:穩定判斷"></div></div>
+    <div class="bwrap"><h4>看不到手時呼叫</h4><div data-sb="6|手勢模組|def:沒手處理"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 6：時間軸 <span class="tag">換情況、拉拉桿</span></div><div id="lab6"></div></div>
+  <div class="warn"><b class="t">防抖動要用計時器，不能用次數</b>　「重複無限次」裡如果只有變數運算，Scratch 一個畫面會跑<b>好幾百次</b>。
+    「連續 5 次都一樣才算」其實 0.01 秒就達成了，等於沒防到。要用「<b>維持超過 0.15 秒</b>」。</div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>數字卡：造型要用「字串組合」</h4><div data-sb="6|數字卡|flag"></div></div>
+    <div class="bwrap"><h4>鍵盤模式（按 K）</h4><div data-sb="6|手勢模組|def:鍵盤模擬"></div></div>
+  </div>
+  <div class="warn"><b class="t">造型換成（數字）的陷阱</b>　寫成「造型換成 (確定手指數)」時，Scratch 會把數字當成「<b>第幾個</b>造型」，
+    所以比 3 會顯示成第 3 個造型「數2」—— 畫面上的數字永遠少 1。用「字串組合 數 (確定手指數)」變成文字「數3」就對了。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組06，比 0～5，數字卡會跟著變。把「穩定門檻」改成 0.5，感覺有什麼不同？</li>
+    <li>把「掉格容忍」改成 0，手在鏡頭前慢慢移動，數字卡會怎樣？</li>
+    <li>挑戰：做一個「比出 3 就播放音效」的角色（提示：當「確定手指數」＝ 3）。</li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k6a"> 我知道遊戲為什麼要讀「確定」開頭的變數</label>
+    <label><input type="checkbox" id="k6b"> 我會用鍵盤模式測試（K，再按數字鍵）</label>
+  </div>
+</section>
+
+<!-- ======================= 7 ======================= -->
+<section class="chap" id="m7" style="--mc:#E6A000">
+  <div class="ch"><span class="cn" style="background:#E6A000">模組 7</span><h2>認猜拳：剪刀、石頭、布</h2></div>
+  <p class="lead">「數字 2」和「剪刀」都是兩根手指，只數數量分不出來 —— 要看<b>是哪幾根</b>。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">認猜拳</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span>
+      <b>輸出</b><span><span class="pill">猜拳號</span> 1 石頭、2 剪刀、3 布、0 看不懂</span>
+      <b>用到</b><span>模組 6 的<span class="pill">確定四指型</span></span></div>
+    <div class="acts"><a class="btn" href="sb3/模組07_認猜拳.sb3" download>⬇ 模組07 .sb3</a><a class="btn ghost" href="play/模組07_認猜拳/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>自訂積木</h4><div data-sb="7|手勢模組|def:認猜拳"></div></div>
+    <div class="bwrap"><h4>我的手（只讀變數）</h4><div data-sb="7|我的手|flag"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 7：拇指要不要看？ <span class="tag">點一點</span></div><div id="lab7"></div></div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組07，用攝影機比剪刀，拇指收起來和翹起來都試試看。</li>
+    <li>挑戰：加一種「<b>比 3 也算布</b>」的寬鬆規則。要改哪一行？會有什麼缺點？</li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k7a"> 我能說明猜拳為什麼要用「四指型」</label>
+  </div>
+</section>
+
+<!-- ======================= 8 ======================= -->
+<section class="chap" id="m8" style="--mc:#8E6BE0">
+  <div class="ch"><span class="cn" style="background:#8E6BE0">模組 8</span><h2>比對手勢：自訂手勢密碼</h2></div>
+  <p class="lead">把「認猜拳」變成萬用工具：給它一組密碼，它告訴你符不符合。想加新手勢，只要在清單上加一行。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">比對手勢 <span class="rp myblocks">目標</span></span> <span class="sb myblocks">認手勢</span></div>
+    <div class="io"><b>輸入</b><span><span class="pill a">目標</span> 五位密碼，<b>?</b> ＝ 這根手指不管</span>
+      <b>輸出</b><span><span class="pill">符合</span> 1／0　<span class="pill">認出手勢</span> 手勢名稱</span>
+      <b>清單</b><span><span class="pill m">手勢名稱</span><span class="pill m">手勢密碼</span>（同一個位置是一組）</span>
+      <b>用到</b><span>模組 6 的<span class="pill">確定指型</span></span></div>
+    <div class="acts"><a class="btn" href="sb3/模組08_比對手勢.sb3" download>⬇ 模組08 .sb3</a><a class="btn ghost" href="play/模組08_比對手勢/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>比對一組密碼</h4><div data-sb="8|手勢模組|def:比對手勢"></div></div>
+    <div class="bwrap"><h4>把整張清單比一遍</h4><div data-sb="8|手勢模組|def:認手勢"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 8：一個字一個字比 <span class="tag">改密碼、加手勢</span></div><div id="lab8"></div></div>
+  <div class="warn"><b class="t">為什麼不直接寫「確定指型 ＝ 目標」？</b>　兩個原因：
+    <br>① 這樣沒辦法用 <b>?</b>。
+    <br>② Scratch 的「＝」遇到兩邊都像數字時，會<b>當成數字來比</b>：<code>01100 ＝ 1100</code> 會成立（兩個都是一千一百）！
+    少打一個 0 就認錯手勢。一個字一個字比，就沒有這個問題。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組08，比「我愛你」（拇指、食指、小指）、「搖滾」（食指、小指）。沒有攝影機就按 K，再按 6、7。</li>
+    <li>在「手勢名稱」和「手勢密碼」清單的<b>最後</b>各加一項，做一個你自己的手勢。程式要改嗎？
+      <details class="ans"><summary>看答案</summary>不用改。「認手勢」會把清單從頭比到尾，所以清單就是設定檔。</details></li>
+    <li>「剪刀」是 <code>?1100</code>、「比一」是 <code>01000</code>。如果把「剪刀」寫成 <code>01100</code>，誰會認不出來？
+      <details class="ans"><summary>看答案</summary>拇指翹起來比剪刀的人（指型 11100）。第一位寫 ? 就兩種都認得。</details></li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k8a"> 我會在清單上新增一個自己的手勢</label>
+    <label><input type="checkbox" id="k8b"> 我知道 ? 的用法</label>
+  </div>
+</section>
+
+<!-- ======================= 9 ======================= -->
+<section class="chap" id="m9" style="--mc:#E8544B">
+  <div class="ch"><span class="cn" style="background:#E8544B">模組 9</span><h2>猜拳勝負：誰贏了？</h2></div>
+  <p class="lead">兩個輸入的函式。用一條「餘數」算式，取代「石頭贏剪刀、剪刀贏布、布贏石頭」三條規則。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">猜拳勝負 <span class="rp myblocks">我</span> <span class="rp myblocks">對方</span></span></div>
+    <div class="io"><b>輸入</b><span><span class="pill a">我</span><span class="pill a">對方</span> 兩個猜拳號（1 石頭、2 剪刀、3 布）</span>
+      <b>輸出</b><span><span class="pill">勝負</span> 贏／輸／平手</span>
+      <b>用到</b><span>示範裡用模組 7 的<span class="pill">猜拳號</span>當「我」</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組09_猜拳勝負.sb3" download>⬇ 模組09 .sb3</a><a class="btn ghost" href="play/模組09_猜拳勝負/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="keyrule"><b>勝負算式</b><br><span class="k">（我 ÷ 3 的餘數）＋ 1　＝　對方</span>　→　我贏
+    <span class="sub">1 → 2 石頭贏剪刀　2 → 3 剪刀贏布　3 → 1 布贏石頭</span></div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>自訂積木</h4><div data-sb="9|手勢模組|def:猜拳勝負"></div></div>
+    <div class="bwrap"><h4>按空白鍵玩一局</h4><div data-sb="9|手勢模組|key:space"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 9：算算看 <span class="tag">選拳</span></div><div id="lab9"></div></div>
+  <div class="why"><b class="t">為什麼玩一局的程式也放在「手勢模組」裡？</b>　因為它要呼叫「猜拳勝負」，而自訂積木只能在同一個角色裡呼叫。
+    結果卡、我的手、電腦手都只讀變數（勝負、我出拳、電腦出拳）。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組09，比好手勢按空白鍵。玩 5 局，看「贏的次數」。</li>
+    <li>挑戰：做一個「<b>電腦一定輸</b>」的作弊模式。電腦出拳要怎麼從「我出拳」算出來？
+      <details class="ans"><summary>看答案</summary>電腦出拳 ＝（我出拳 ÷ 3 的餘數）＋ 1。這正是「我贏」的條件。</details></li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k9a"> 我會用兩個輸入呼叫自訂積木</label>
+    <label><input type="checkbox" id="k9b"> 我能用算式驗算三種贏法</label>
+  </div>
+</section>
+
+<!-- ======================= 10 ======================= -->
+<section class="chap" id="m10" style="--mc:#2BA5C9">
+  <div class="ch"><span class="cn" style="background:#2BA5C9">模組 10</span><h2>手指游標：食指當滑鼠、捏一下</h2></div>
+  <p class="lead">不看幾根手指，改看「位置」：食指尖當游標，拇指和食指捏一下就等於按一下滑鼠。</p>
+  <div class="fcard">
+    <div class="fname"><span class="sb myblocks">手指游標</span></div>
+    <div class="io"><b>輸入</b><span>（無）</span>
+      <b>輸出</b><span><span class="pill">游標x</span><span class="pill">游標y</span>（食指尖 9）　<span class="pill">捏合</span> 1／0　<span class="pill">捏的次數</span><br>
+      捏下去的那一瞬間：<span class="pill m">廣播 捏一下</span></span>
+      <b>可調</b><span><span class="pill">捏合比例</span> 0.25　<span class="pill">放開比例</span> 0.4</span>
+      <b>用到</b><span>模組 1、模組 2 的<span class="pill">手長</span>（不需要模組 3～9）</span></div>
+    <div class="acts"><a class="btn" href="sb3/模組10_手指游標.sb3" download>⬇ 模組10 .sb3</a><a class="btn ghost" href="play/模組10_手指游標/index.html" target="_blank">🎥 用攝影機試玩</a></div>
+  </div>
+  <div class="bgrid">
+    <div class="bwrap"><h4>自訂積木</h4><div data-sb="10|手勢模組|def:手指游標"></div></div>
+    <div class="bwrap"><h4>氣球：用手指按的按鈕</h4><div data-sb="10|氣球|msg:捏一下"></div></div>
+  </div>
+  <div class="lab"><div class="lh">🔬 實驗 10：捏一下 <span class="tag">拖動圓點</span></div><div id="lab10"></div></div>
+  <div class="why"><b class="t">距離為什麼不用平方根？</b>　「橫的距離＋直的距離」就夠判斷「靠得近不近」了，而且國小就會算。
+    代價是等距離的點排成<b>菱形</b>而不是圓形 —— 對「捏一下」來說完全沒差。</div>
+  <div class="why"><b class="t">為什麼要廣播？</b>　「捏合」是一個<b>狀態</b>（捏著的時候一直是 1）；「捏一下」是一個<b>事件</b>（只在捏下去那一瞬間發生一次）。
+    做按鈕要的是事件，不然捏著不放，按鈕會被按好幾百次。</div>
+  <div class="work"><h3>✏️ 動手改</h3><ol>
+    <li>打開模組10，食指對準氣球捏一下。沒有攝影機就按 K，用滑鼠點。</li>
+    <li>把「放開比例」改成和「捏合比例」一樣是 0.25，捏的時候手指輕輕抖，「捏的次數」會怎樣？</li>
+    <li>挑戰：做一個「用手指按的開始按鈕」—— 當收到「捏一下」，如果碰到游標，就廣播「開始遊戲」。</li>
+  </ol></div>
+  <div class="chklist">
+    <label><input type="checkbox" id="k10a"> 我分得出「狀態」和「事件」</label>
+    <label><input type="checkbox" id="k10b"> 我會用「捏一下」做一個按鈕</label>
+  </div>
+</section>
+
+<!-- ======================= 工具箱 ======================= -->
+<section class="chap" id="toolbox">
+  <div class="ch"><span class="cn" style="background:#3F4A56">工具箱</span><h2>🧰 用模組做自己的作品</h2></div>
+  <p class="lead">「手勢模組工具箱」把 10 個模組全部裝好了。拿它當起點，你只要做「顯示用的角色」就好。</p>
+  <div class="dl"><span class="fi">🧰</span><div><b>手勢模組工具箱.sb3</b><small>10 個模組、鍵盤模式、骨架點、手指燈、游標</small></div>
+    <a class="btn ghost" href="play/手勢模組工具箱/index.html" target="_blank">🎥 試玩</a>
+    <a class="btn" href="sb3/手勢模組工具箱.sb3" download>⬇ 下載</a></div>
+
+  <div class="topic">
+    <h3>四個步驟</h3>
+    <ol>
+      <li>用 stretch3 打開<b>手勢模組工具箱.sb3</b>，先「另存到你的電腦」，換一個新檔名。</li>
+      <li><b>不要改「手勢模組」角色</b>（除非你要調門檻）。它會一直更新下面這張表的變數。</li>
+      <li>新增你自己的角色，用「如果 ＿ 那麼」讀這些變數，或是「當收到訊息 捏一下」。</li>
+      <li>不需要的東西（手指燈、骨架點）可以刪掉；主迴圈裡用不到的模組也可以拿掉，會跑得更快。</li>
+    </ol>
+  </div>
+
+  <div class="bwrap"><h4>工具箱的主迴圈：模組是這樣串起來的</h4><div data-sb="0|手勢模組|flag"></div></div>
+
+  <div class="tablewrap" style="margin-top:12px"><table class="pattab api">
+    <tr><th>變數（全部角色適用）</th><th>值</th><th>誰算的</th></tr>
+    <tr><td>看得到手</td><td>1／0</td><td>模組 1</td></tr>
+    <tr><td>手長、手寬</td><td>數字（像素）</td><td>模組 2</td></tr>
+    <tr><td>拇指、食指、中指、無名指、小指</td><td>各 1／0（每一格的結果，會抖）</td><td>模組 3、4、5</td></tr>
+    <tr><td>手指數、指型、四指型</td><td>0～5、01100、1100（會抖）</td><td>模組 5</td></tr>
+    <tr><td><b>確定手指數</b>、<b>確定指型</b>、<b>確定四指型</b></td><td>同上，但穩定；沒有手時 −1、-----、----</td><td>模組 6（遊戲請用這些）</td></tr>
+    <tr><td>猜拳號</td><td>1 石頭、2 剪刀、3 布、0 看不懂</td><td>模組 7</td></tr>
+    <tr><td>認出手勢</td><td>手勢名稱或「（沒有）」</td><td>模組 8</td></tr>
+    <tr><td>勝負</td><td>贏／輸／平手（呼叫「猜拳勝負」後）</td><td>模組 9</td></tr>
+    <tr><td>游標x、游標y、捏合、捏的次數</td><td>食指尖座標、1／0、次數</td><td>模組 10（另有廣播「捏一下」）</td></tr>
+    <tr><td>鍵盤模式、顯示骨架</td><td>1／0（按 K、D 切換）</td><td>主迴圈</td></tr>
+  </table></div>
+
+  <div class="topic">
+    <h3>💡 作品點子</h3>
+    <ul>
+      <li><b>手指算術</b>：題目「3 ＋ 1 ＝ ？」，比出答案（模組 6）。</li>
+      <li><b>手勢密碼鎖</b>：依序比出 我愛你 → 搖滾 → 比一 才能開門（模組 8，用清單記住順序）。</li>
+      <li><b>三戰兩勝猜拳</b>：記錄比分，先贏兩局的獲勝（模組 7、9）。</li>
+      <li><b>隔空畫畫</b>：捏住時用畫筆跟著游標畫線，放開就停（模組 10）。</li>
+      <li><b>手勢遙控</b>：比 1 往左、比 2 往右、握拳跳躍，控制角色走迷宮（模組 6）。</li>
+    </ul>
+  </div>
+
+  <div class="qz"><div class="qq">你要做「比出 5 就過關」，應該讀哪個變數？</div><div class="ops">
+    <button>手指數</button><button data-r>確定手指數</button><button>指型</button></div>
+    <div class="ex">「確定手指數」經過穩定判斷，不會因為一格雜訊就誤判過關。「手指數」每一格都會變。</div></div>
+
+  <div class="chklist">
+    <label><input type="checkbox" id="k11a"> 我用工具箱做出了一個自己的小作品</label>
+    <label><input type="checkbox" id="k11b"> 我能向同學說明我的作品用了哪幾個模組、讀了哪些變數</label>
+  </div>
+</section>
+
+    </main>
+  </div>
+  <footer>範例檔與教學網頁皆可自由修改。積木圖由 .sb3 自動轉出，改了 .sb3 請重新執行 tools/export_blocks.py。</footer>
+</div>
+
+<script src="assets/blk.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/lessons.js"></script>
+</body>
+</html>

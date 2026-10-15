@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>複賽架構練習</title>
+<style>
+:root{--bg:#FFF8EE;--ink:#3B3226;--ink2:#7A6A58;--line:#EADBC6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft JhengHei","PingFang TC",sans-serif;line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:32px 16px}
+h1{margin:0 0 6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:20px}
+a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:2px solid var(--line);border-radius:20px;padding:20px}
+a.card:hover{border-color:#2F5FA8}
+.card .e{font-size:2.4rem}
+.card h2{margin:6px 0}
+.off{opacity:.55;pointer-events:none}
+.muted{color:var(--ink2)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Scratch 貓咪盃・複賽架構練習</h1>
+  <p class="muted">通過初賽後，用 8 次練習把「作品骨架」背起來，複賽現場從空白專案直接做出對應組別的架構。</p>
+  <div class="cards">
+    <a class="card" href="動畫組/index.html">
+      <div class="e">🎬</div><h2>動畫組</h2>
+      <p>標題 → 片頭故事說明 → 情境 → 互動選擇 → 依選擇出現不同結局（至少兩種）→ 再玩一次。<br>範例故事《小貓送信記》，手勢／轉頭兩種 AI。</p>
+    </a>
+    <a class="card" href="遊戲組/index.html">
+      <div class="e">🎮</div><h2>遊戲組</h2>
+      <p>遊戲標題 → 片頭情境說明 → 遊戲選單（兩個關卡＋隱藏關）→ 分數計算與結果 → 重新挑戰。<br>範例遊戲《小企鵝接魚》（接魚、躲冰塊、極光隱藏關），手勢／臉兩種 AI。</p>
+    </a>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>手勢辨識大挑戰 製作教學</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/hand.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">✋ 手勢辨識大挑戰 <em>數手指 0～5 ＋ 剪刀石頭布</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="doc.html">📄 程式說明文件</a>
+      <a href="#ch9">🎮 試玩台</a>
+      <a href="手勢辨識大挑戰.sb3" download>⬇ 範例 .sb3</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge" style="display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:999px;margin-bottom:10px">Handpose2Scratch ｜ 兩種手勢判斷</span>
+    <h1>手勢辨識大挑戰</h1>
+    <p>同一套偵測，做出兩種不同的判斷：<br>
+      <b>① 數字關</b>　比出 <b>0（拳頭）～5</b>，程式只要<b>數幾根手指伸直</b>。<br>
+      <b>② 猜拳關</b>　比出 <b>剪刀、石頭、布</b>，程式還要看<b>是哪幾根</b>伸直。</p>
+    <p>五根手指不是用同一種方式判斷：<b>食指～小指往「上」伸，比直向</b>；
+      <b>拇指往「旁邊」伸，比橫向</b>。</p>
+    <div class="warn" style="max-width:48em"><b class="t">整份教材只用兩種數學　</b>
+      <b>比大小</b>（指尖的 y 比關節的 y 大嗎？）和<b>加法</b>（四根加起來是幾？）。
+      沒有平方根、也沒有角度。第 5 章會加上四道保險，讓它在真的攝影機前面也穩定——
+      那一章有實測數字。第 9 章有可以直接玩的<b>試玩台</b>。</div>
+  </section>
+
+  <div class="layout">
+    <nav class="toc" id="toc" aria-label="目錄">
+      <h3>目錄</h3>
+      <a href="#ch0">0　兩種判斷，一套偵測</a>
+      <a href="#ch1">1　準備：擴充功能與 21 個點</a>
+      <a href="#ch2">2　一根手指怎麼算「伸直」</a>
+      <a href="#ch3">3　數手指：四根加起來</a>
+      <a href="#ch4">4　猜拳：還要看「哪幾根」</a>
+      <a href="#ch5">5　四道保險：真的能用</a>
+      <a href="#ch6">6　變數、清單與角色</a>
+      <a href="#ch7">7　數字關的流程</a>
+      <a href="#ch8">8　猜拳關與勝負算式</a>
+      <a href="#ch9">9　🎮 試玩台</a>
+      <a href="#ch10">10　測試、挑戰與檢核</a>
+      <a class="sub" href="doc.html">📄 程式說明文件</a>
+      <div class="prog">自我檢核進度</div>
+      <div class="pbar"><i id="pbar"></i></div>
+    </nav>
+
+    <main>
+
+<!-- ============ 0 ============ -->
+<section class="chap" id="ch0">
+  <div class="ch"><span class="cn" style="background:#BFE3FF">第 0 章</span><h2>兩種判斷，一套偵測</h2></div>
+  <p class="lead">兩個關卡共用同一段偵測程式，差別只在「拿偵測結果去問什麼問題」。</p>
+
+  <div class="cards">
+    <div class="card"><h3>① 數字關（0～5）</h3>
+      <p>問的問題是：<b>幾根手指伸直？</b><br>把五根手指的 0／1 <b>加起來</b>就好，不必管是哪幾根。</p>
+      <p class="sm">拳頭＝0　…　四指張開＝4　五指全開＝5</p></div>
+    <div class="card"><h3>② 猜拳關</h3>
+      <p>問的問題是：<b>是哪幾根手指伸直？</b><br>因為「數字 2」和「剪刀」都是兩根，只數數量會分不出來。</p>
+      <p class="sm">用不含拇指的「四指型」：石頭＝0000　剪刀＝1100　布＝1111</p></div>
+    <div class="card"><h3>共用的偵測</h3>
+      <p>一個 <b>數手指</b> 自訂積木，算出五個變數（拇指／食指／中指／無名指／小指）、
+        <b>手指數</b>、<b>指型</b>（五位）和 <b>四指型</b>（四位）。兩個關卡都從這裡拿資料。</p></div>
+  </div>
+
+  <div class="note"><b>拇指要另外處理</b>　其他四根手指是<b>往上</b>伸，彎下來時指尖會掉到關節下面，
+    所以「比 y 座標」就分得出來。拇指是<b>往旁邊</b>伸的，伸直時 y 幾乎不變，用同一套規則會一直誤判。
+    第 3 章會用<b>橫向距離</b>把它解決掉 —— 這也是整份教材裡最值得跟學生討論的一段：
+    <b>同一個問題，換個方向就要換一把尺</b>。</div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="ch1">
+  <div class="ch"><span class="cn" style="background:#FFD9B3">第 1 章</span><h2>準備：擴充功能與 21 個點</h2></div>
+  <p class="lead">用 <b>stretch3</b>（stretch3.github.io）開啟 Scratch，左下角「添加擴展」選 <b>Handpose2Scratch</b>。</p>
+
+  <div class="cols">
+    <div>
+      <h3>攝影機三件事，開場設定一次就好</h3>
+      <div data-blk="setup"></div>
+    </div>
+    <div>
+      <h3>會用到的點</h3>
+      <p>Handpose2Scratch 會在手上找出 <b>21 個點</b>，下拉選單裡是 1～21。這個專案只用到 10 個：</p>
+      <div class="tablewrap"><table class="pattab">
+        <tr><th>用途</th><th>第二關節</th><th>指尖</th></tr>
+        <tr><td>食指</td><td>7</td><td>9</td></tr>
+        <tr><td>中指</td><td>11</td><td>13</td></tr>
+        <tr><td>無名指</td><td>15</td><td>17</td></tr>
+        <tr><td>小指</td><td>19</td><td>21</td></tr>
+        <tr><td colspan="3">另外用 <b>1 手腕</b> 和 <b>10 中指第三關節</b> 當守門</td></tr>
+        <tr><td>拇指</td><td colspan="2"><b>5 拇指尖</b>　＋　<b>6 食指第三關節</b>、<b>18 小指第三關節</b></td></tr>
+      </table></div>
+      <p class="sm">規律很好記：食指～小指都是「第二關節」和「指尖」<b>差 2</b>。
+        拇指用的是另外三個點，第 3 章說明。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="ch2">
+  <div class="ch"><span class="cn" style="background:#C9F0D8">第 2 章</span><h2>一根手指怎麼算「伸直」</h2></div>
+  <p class="lead">這是整個專案唯一的核心觀念，先玩懂它，後面都只是重複四次。</p>
+
+  <p>手掌立起來、手指朝上時：手指<b>伸直</b>，指尖會跑到第二關節的<b>上面</b>；
+     手指<b>彎下來</b>，指尖會掉到關節的<b>下面</b>。Scratch 的 y 座標越上面越大，所以——</p>
+
+  <div class="keyrule"><b>判斷規則</b><br>
+    <span class="k">指尖 (9) 的 y　＞　第二關節 (7) 的 y</span>　→　這根手指伸直了</div>
+
+  <h3>動手玩：把食指伸直、彎下來</h3>
+  <div id="fLab"></div>
+
+  <div class="note"><b>為什麼不用別的方法？</b>
+    <ul>
+      <li><b>看絕對座標</b>（例如「指尖 y &gt; 50」）：手舉高舉低、人靠近靠遠，數字全部跟著變，每個教室都要重調。</li>
+      <li><b>算指尖到手腕的距離</b>：要用到平方和平方根，而且手離鏡頭遠近會讓距離整體縮放。</li>
+      <li><b>算手指角度</b>：需要三角函數，遠超過國小範圍。</li>
+    </ul>
+    「指尖 y 和<b>同一根手指</b>的關節 y 比大小」是手指<b>內部</b>的比較，手的高低、遠近、左右鏡像都影響不到它。</div>
+
+  <div class="warn"><b class="t">但光是這樣還不夠　</b>
+    這個規則在「手指明顯伸直或明顯彎下來」時完全正確。問題出在<b>中間地帶</b>：
+    彎曲的手指指尖常常只比關節低幾個像素，攝影機的雜訊一來就會在 0 和 1 之間跳個不停。
+    第 5 章會加上兩道保險把它壓下來——但核心規則本身不用改。</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="ch3">
+  <div class="ch"><span class="cn" style="background:#FFE0EC">第 3 章</span><h2>數手指：四根加起來</h2></div>
+  <p class="lead">把第 2 章的規則重複四次，每根手指存成 0 或 1，再加起來。</p>
+
+  <div class="cols" style="grid-template-columns:1fr">
+    <div>
+      <h3>兩個輸出</h3>
+      <p><b>手指數</b>　五個 0／1 相加 → 0～5，<b>數字關</b>直接用它。</p>
+      <p><b>指型</b>　五位密碼（順序是 <b>拇 食 中 無 小</b>），例如 <code>01100</code>。</p>
+      <p><b>四指型</b>　把拇指拿掉的四位密碼，例如 <code>1100</code>，<b>猜拳關</b>用這個。</p>
+      <p class="sm">為什麼要存成 0／1，而不是「真／假」？因為 0／1 可以<b>直接相加</b>，也可以<b>直接接成字串</b>——
+        一份資料同時解決兩個關卡。</p>
+      <div class="note"><b>自訂積木記得勾「執行時不重新整理畫面」</b>（右鍵 → 編輯 → 勾選）。
+        不勾的話每一行積木都會重畫一次畫面，四根手指會在不同時間點被讀到，偶爾會抓到半彎的狀態。</div>
+
+      <h3>拇指：換個方向，就要換一把尺</h3>
+      <p>拇指伸出來的方向是<b>橫的</b>，所以它的 y 幾乎不會變 —— 直向的規則完全不適用。
+        改成量<b>橫向距離</b>：</p>
+      <div class="keyrule">
+        <span class="k">手寬　＝　｜食指第三關節 (6) 的 x　−　小指第三關節 (18) 的 x｜<br>
+        拇指跨距　＝　｜拇指尖 (5) 的 x　−　<u>小指第三關節 (18)</u> 的 x｜<br><br>
+        拇指跨距　＞　手寬 × 1.35　→　拇指伸直</span>
+        <span class="sub">直向的比較用直向的尺（手長），橫向的比較用橫向的尺（手寬）。
+          用<b>絕對值</b>是因為「距離」不分左右，這樣左手、右手、鏡不鏡像都不用管。</span></div>
+
+      <div class="warn"><b class="t">為什麼要量到「小指」那一側？　</b>
+        直覺上會想量「拇指尖離<b>食指</b>掌根多遠」—— 這樣寫會出錯。<br>
+        因為拇指收起來的時候，常常會<b>整個橫過手掌</b>（壓在彎曲的手指上），
+        這時它離食指掌根<b>反而更遠</b>，就被誤判成張開了。<br>
+        改成量到<b>手掌的另一邊</b>（小指掌根），收起來就一定變近、張開就一定變遠，
+        兩種情況再也不會搞混。這叫「<b>選對量測的起點</b>」。</div>
+
+      <p class="sm">實測：拇指從「整個橫過手掌」慢慢張開到「完全張開」，跨距是
+        <b>0.17 → 0.44 → 0.72 → 1.00 → 1.28 → 1.56 → 1.83 → 1.97 倍手寬</b>，
+        一路單調變大，所以 1.35 這個門檻切在中間很安全。
+        而且因為是「比例」，手縮小到原來的 ⅓ 或放大 1.6 倍，判斷結果完全一樣。</p>
+
+      <h3>積木裡多出來的「餘裕」是什麼？</h3>
+      <p>如果照第 2 章直接寫「指尖 y ＞ 關節 y」，手指停在半彎的位置時，判斷會一直跳。
+        所以實際的積木改成<b>要超過一點點才算數</b>：</p>
+      <div class="keyrule"><span class="k">本來彎著 → 指尖 y ＞ 關節 y ＋ 餘裕　才改成伸直<br>
+        本來伸直 → 指尖 y ＜ 關節 y − 餘裕　才改成彎曲</span>
+        <span class="sub">中間那一小段維持原狀，就不會抖。這招叫「遲滯」，冷氣機的溫度控制也是這樣做的
+        ——設 26 度不會在 26.0 度一直開開關關。</span></div>
+      <p><b>餘裕 ＝ 手長 × 0.08</b>，手長是「中指第三關節 (10) 的 y − 手腕 (1) 的 y」。
+        用手長去算而不是給一個固定數字，手靠近鏡頭、離遠鏡頭都適用。<br>
+        拇指也一樣有餘裕，只是它的尺是<b>手寬</b>：<b>拇指餘裕 ＝ 手寬 × 0.08</b>。</p>
+    </div>
+    <div data-blk="count"></div>
+  </div>
+
+  <h3>動手玩：點手指，看三個變數怎麼變</h3>
+  <div id="hLab"></div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="ch4">
+  <div class="ch"><span class="cn" style="background:#E6DCFF">第 4 章</span><h2>猜拳：還要看「哪幾根」</h2></div>
+  <p class="lead">這一章要讓學生自己發現：<b>數量不夠用</b>。</p>
+
+  <div class="keyrule">上面那隻手，請比出「食指＋中指」和「中指＋無名指」。
+    <span class="sub">兩種的「手指數」都是 2，但只有第一種是剪刀——所以猜拳不能只看數量。</span></div>
+
+  <p>解法：把手指當成一組<b>密碼</b>，直接比對整串。猜拳用的是<b>四指型</b>（食、中、無、小），
+    <b>故意不看拇指</b>——因為比剪刀的時候，有人拇指收著、有人拇指翹著，算進去反而常常判成「看不懂」。</p>
+
+  <div class="cols" style="grid-template-columns:1fr">
+    <div data-blk="rps"></div>
+    <div>
+      <div class="tablewrap"><table class="pattab">
+        <tr><th>四指型</th><th>猜拳號</th><th>是什麼</th></tr>
+        <tr class="yes"><td class="code">0000</td><td>1</td><td>石頭（拇指翹著也算）</td></tr>
+        <tr class="yes"><td class="code">1100</td><td>2</td><td>剪刀（拇指收、翹都算）</td></tr>
+        <tr class="yes"><td class="code">1111</td><td>3</td><td>布（拇指開、收都算）</td></tr>
+        <tr class="no"><td class="code">0110</td><td>0</td><td>看不懂（也是兩根！）</td></tr>
+        <tr class="no"><td class="code">1000</td><td>0</td><td>看不懂（但數字關是 1）</td></tr>
+      </table></div>
+      <p class="sm">猜拳號用 <b>1 石頭、2 剪刀、3 布</b>，<b>0 代表看不懂</b>。第 8 章會看到這個編號順序不是隨便排的。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="ch5">
+  <div class="ch"><span class="cn" style="background:#FFF0B3">第 5 章</span><h2>四道保險：讓它在教室裡真的能用</h2></div>
+  <p class="lead">判斷規則本身很簡單，難的是「在真的攝影機前面也穩」。這一章的四件事，少任何一件都會變成
+    「手指燈明明是對的，遊戲就是不認」。</p>
+
+  <div class="cards">
+    <div class="card"><h3>① 真的有看到手</h3>
+      <p>偵測不到手的時候，座標積木回傳的是<b>空白字串</b>，不是 0。直接拿去比大小會得到亂七八糟的結果。</p>
+      <p><b>手腕 (1) 的 x 座標 &gt; −250</b> 就能擋掉（有偵測到時，x 一定落在 −240～240 之間）。</p></div>
+    <div class="card"><h3>② 手有立起來</h3>
+      <p>手橫著放的時候，「指尖在關節上面」這件事就不成立了。</p>
+      <p><b>中指第三關節 (10) 的 y &gt; 手腕 (1) 的 y</b>，意思是「手指在手腕的上方」，也就是手有立起來。</p></div>
+    <div class="card"><h3>③ 每根手指的餘裕</h3>
+      <p>第 3 章講的<b>遲滯</b>：要變伸直得高出餘裕，要變彎曲也得低過餘裕，中間維持原狀。</p>
+      <p>這一道處理的是<b>單根手指在邊界抖動</b>。</p></div>
+    <div class="card"><h3>④ 整組手勢維持夠久</h3>
+      <p>同一個<b>指型</b>維持超過 <b>0.15 秒</b>，才寫進「確定」開頭的變數。遊戲只看「確定」的值。</p>
+      <p>這一道處理的是<b>四根手指沒有同時就位</b>的短暫過渡狀態。</p></div>
+  </div>
+
+  <div class="warn" style="margin-top:16px"><b class="t">⑤ 最容易漏掉的一道：抓不到手時不要馬上清空　</b>
+    攝影機每隔幾格就會有一格抓不到手（光線、手速、手指互相遮住都會）。
+    如果一抓不到就把「確定手指數」清成 −1、又把穩定計時歸零，
+    玩家會覺得<b>怎麼比都沒反應</b>——而手指燈因為還顯示著上一格的結果，看起來卻是正確的。
+    正確做法是記一個<b>沒手起點</b>，連續 <b>0.4 秒</b>都抓不到，才當作手真的離開鏡頭。</div>
+
+  <h3 style="margin-top:18px">實測數字</h3>
+  <p>用假的手部座標加上雜訊與掉格，實際跑範例檔量出來的結果（比「1」，量 6 秒）：</p>
+  <div class="tablewrap"><table class="pattab">
+    <tr><th>情況</th><th>沒有 ③④⑤ 時<br>「確定手指數」正確的比例</th><th>加上之後</th></tr>
+    <tr><td>乾淨畫面，完全不掉格</td><td>100%</td><td class="code">100%</td></tr>
+    <tr><td>每 20 格掉 1 格</td><td>61～64%</td><td class="code">100%</td></tr>
+    <tr><td>彎曲手指指尖只低於關節 4px、雜訊 ±5px</td><td>17%</td><td class="code">100%</td></tr>
+    <tr><td>上面兩種同時發生</td><td>0%</td><td class="code">100%</td></tr>
+    <tr><td>換手勢的反應時間</td><td>—</td><td class="code">約 0.19 秒</td></tr>
+  </table></div>
+  <p class="sm">第三列就是「手指燈都亮著、遊戲卻一直說時間到」的真正原因：指型每秒跳 19 次，
+    0.15 秒的穩定窗永遠湊不滿。</p>
+
+  <div class="cols" style="grid-template-columns:1fr;margin-top:18px">
+    <div><h3>穩定判斷</h3><div data-blk="stable"></div></div>
+    <div><h3>清空手勢</h3><div data-blk="clear"></div></div>
+    <div><h3>主偵測迴圈（把五道保險串起來）</h3><div data-blk="main"></div></div>
+  </div>
+
+  <h3>動手玩：兩根滑桿，看四種組合的差別</h3>
+  <div id="jLab"></div>
+
+  <div class="note"><b>為什麼穩定判斷要用「維持 0.15 秒」而不是「連續 5 次」？</b>
+    Scratch 的「重複無限次」如果裡面只有變數運算，一個畫面更新內會跑<b>好幾百次</b>，
+    「連續 5 次」其實 0.01 秒就達成了，等於沒有防到。用<b>計時器</b>來算才是真的在算時間。</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="ch6">
+  <div class="ch"><span class="cn" style="background:#D7F0FF">第 6 章</span><h2>變數、清單與角色</h2></div>
+
+  <div class="cols">
+    <div>
+      <h3>變數</h3>
+      <div class="tablewrap"><table class="pattab">
+        <tr><th>名稱</th><th>做什麼</th></tr>
+        <tr><td>拇指／食指／中指／無名指／小指</td><td>這根伸直＝1，彎著＝0</td></tr>
+        <tr><td>手指數</td><td>五根相加，0～5（看不到手時 −1）</td></tr>
+        <tr><td>指型</td><td>五位密碼（拇食中無小），例如 01100</td></tr>
+        <tr><td>四指型</td><td>不含拇指的四位密碼，猜拳用</td></tr>
+        <tr><td>猜拳號</td><td>1 石頭　2 剪刀　3 布　0 看不懂</td></tr>
+        <tr><td>確定手指數／確定指型／確定猜拳號</td><td>撐過 0.2 秒的版本，<b>遊戲只看這三個</b></td></tr>
+        <tr><td>上次指型／穩定起點／穩定門檻</td><td>整組手勢的穩定判斷</td></tr>
+        <tr><td>手長／餘裕／餘裕比例</td><td>四指的遲滯（餘裕 ＝ 手長 × 0.08）</td></tr>
+        <tr><td>手寬／拇指跨距／拇指門檻／拇指餘裕／拇指比例</td><td>拇指的橫向判斷（門檻 ＝ 手寬 × 1.35）</td></tr>
+        <tr><td>沒手起點／掉格容忍</td><td>抓不到手時的容忍時間（0.4 秒）</td></tr>
+        <tr><td>看得到手</td><td>守門結果</td></tr>
+        <tr><td>模式／分數／題號／題目／上一題／計時起點</td><td>數字關</td></tr>
+        <tr><td>回合／玩家號／電腦號／結果／空手次數</td><td>猜拳關</td></tr>
+        <tr><td>顯示骨架／鍵盤模式</td><td>D 鍵、K 鍵切換</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <h3>清單</h3>
+      <div class="tablewrap"><table class="pattab">
+        <tr><th>名稱</th><th>內容</th></tr>
+        <tr><td>指名</td><td>拇、食、中、無、小</td></tr>
+        <tr><td>指狀態</td><td>五根的 0／1，給手指燈看</td></tr>
+        <tr><td>拳名</td><td>石頭、剪刀、布</td></tr>
+        <tr><td>點x／點y／點色</td><td>12 個骨架點的位置與造型</td></tr>
+      </table></div>
+    </div>
+  </div>
+  <h3>手指燈：用清單省掉一堆 if</h3>
+  <div class="cols" style="grid-template-columns:1fr">
+    <div data-blk="lamp"></div>
+    <div>
+      <p class="sm">造型取名成「拇0、拇1、食0、食1…」，就可以用<b>字串組合</b>直接算出造型名稱，
+        五個分身共用一段程式。骨架的 12 個分身也一樣，直接從「點色」清單取造型名稱。</p>
+    </div>
+  </div>
+
+  <div class="note"><b>沒有攝影機也能上課：鍵盤模式</b>　按 <b>K</b> 切換，之後按 <b>0～5</b> 就等於比出手勢。
+    投影示範、或攝影機臨時壞掉的時候很好用。
+    <div data-blk="keyboard" style="margin-top:10px"></div></div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="ch7">
+  <div class="ch"><span class="cn" style="background:#BFE3FF">第 7 章</span><h2>數字關的流程</h2></div>
+  <p class="lead">8 題，每題 8 秒，答對加 1 分。</p>
+  <div class="cols" style="grid-template-columns:1fr">
+    <div>
+      <h3>三個容易踩到的坑</h3>
+      <div class="note"><b>坑 1　一出題就自動答對</b><br>
+        如果出題只避開「上一題」，玩家手還停在上一個手勢時，新題目剛好等於它，就會瞬間過關。
+        所以出題時<b>也要避開玩家現在比的數字</b>。</div>
+      <div class="note"><b>坑 2　用「等待直到」會卡死</b><br>
+        只寫「等待直到 確定手指數 ＝ 題目」，玩家比不出來就永遠卡住。
+        要用<b>重複直到（比對了 <u>或</u> 超過 8 秒）</b>，跳出來以後再判斷是答對還是時間到。</div>
+      <div class="warn"><b class="t">坑 3　「造型換成 (題目)」會顯示錯的數字　</b>
+        題目卡有五個造型，如果照直覺寫 <b>造型換成 (題目)</b>，畫面上的數字會<b>永遠少 1</b>。<br>
+        原因是：這個積木的輸入如果是<b>數字</b>，Scratch 會把它當成「<b>第幾個造型</b>」，
+        不是造型的名稱。題目是 3 → 換到第 3 個造型 → 那是造型「2」。<br>
+        （題目是 0 更誇張，會跑到最後一個造型「4」。）<br>
+        解法：用<b>字串組合</b>把它變成文字。造型也刻意取名成 <b>數0～數4</b>，避開純數字的名稱。</div>
+
+      <h3>計時的寫法</h3>
+      <p>出題時記下 <b>計時起點 ← 計時器</b>，之後比對 <b>計時器 &gt; 計時起點 ＋ 8</b>。
+        這樣不用重置計時器，也不會影響其他程式。</p>
+
+      <h3>題目卡的程式</h3>
+      <div data-blk="cardBlk"></div>
+
+      <div class="note"><b>這個坑為什麼特別可怕？</b>
+        因為<b>看起來完全像是偵測壞掉</b>：手指燈是對的、確定手指數也是對的，
+        玩家照畫面比卻永遠不過關。其實程式的判斷從頭到尾都正確，
+        只是<b>畫面顯示的題目</b>跟<b>程式裡的題目</b>不是同一個數字。<br>
+        除錯心法：把「電腦以為的」和「玩家看到的」<b>分開驗證</b>。
+        這個專案就是靠一支機器人「照卡片上的數字比手勢」才抓到的
+        —— 原本的測試都是直接讀變數，永遠測不出來。</div>
+    </div>
+    <div data-blk="numGame"></div>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="ch8">
+  <div class="ch"><span class="cn" style="background:#FFE0EC">第 8 章</span><h2>猜拳關與勝負算式</h2></div>
+  <p class="lead">5 回合。喊完「剪刀　石頭　布　出拳！」才抓玩家的手勢，再跟電腦的亂數比。</p>
+
+  <h3>勝負可以只用一個算式</h3>
+  <p>把三種拳編號成 <b>1 石頭、2 剪刀、3 布</b>——這個順序是故意排的，因為<b>每一個都贏下一個</b>：
+    石頭(1) 贏 剪刀(2)、剪刀(2) 贏 布(3)、布(3) 贏 石頭(1)（繞回來）。所以：</p>
+
+  <div class="keyrule"><span class="k">（我的編號 ÷ 3 的餘數）＋ 1　＝　對方的編號　→　我贏</span>
+    <span class="sub">1→2 ✓　2→3 ✓　3→1 ✓（3 ÷ 3 餘 0，0 ＋ 1 ＝ 1，剛好繞回石頭）</span></div>
+
+  <h3>動手玩：兩邊各選一種，看算式怎麼跑</h3>
+  <div id="rLab"></div>
+
+  <div class="cols" style="margin-top:18px;grid-template-columns:1fr">
+    <div>
+      <h3>為什麼要等喊完才抓？</h3>
+      <p>如果一直即時判斷，玩家會看著電腦的拳再改手勢。喊完「出拳！」<b>那一瞬間</b>才讀
+        <b>確定猜拳號</b>，而電腦的亂數是在那之後才抽，兩邊都公平。</p>
+      <h3>看不懂的手勢怎麼辦？</h3>
+      <p>玩家號 ＝ 0 時<b>不算這一回合</b>，顯示提示請他再比一次。
+        但也不能無限重來——連續 6 次抓不到就自動回選單，並提示檢查攝影機。</p>
+      <p class="sm">「看不懂」和「找不到手」是兩種不同的狀況，用<b>看得到手</b>分開，
+        提示才講得出重點（是手勢不標準？還是根本沒進鏡頭？）。</p>
+      <div class="note">如果覺得太容易出現「看不懂」，可以放寬猜拳的認定：
+        例如把 <code>1110</code>（三根）也算成布。改完記得寫進<a href="doc.html">程式說明文件</a>。</div>
+    </div>
+    <div data-blk="rpsGame"></div>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="ch9">
+  <div class="ch"><span class="cn" style="background:#C9F0D8">第 9 章</span><h2>🎮 試玩台</h2></div>
+  <p class="lead">規則和範例 .sb3 完全一樣。下面那隻手就是「攝影機看到的你」——用<b>點的</b>代替比手勢。
+    先在網頁上玩懂規則，回 Scratch 拼積木會快很多。</p>
+  <div id="play"></div>
+  <div class="note" style="margin-top:14px"><b>玩的時候注意這幾件事</b>
+    <ul>
+      <li>數字關：題目 0～5，<b>5 要把拇指也張開</b>。</li>
+      <li>數字關：題目不會跟你<b>現在</b>比的數字一樣，所以一定要動手改。</li>
+      <li>猜拳關：故意比「中指＋無名指」試試看，會出現「看不懂」。</li>
+      <li>猜拳關：故意連續比六次看不懂的手勢，會自動回選單。</li>
+    </ul></div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="chap" id="ch10">
+  <div class="ch"><span class="cn" style="background:#FFD9B3">第 10 章</span><h2>測試、挑戰與檢核</h2></div>
+
+  <h3>一定要測的六件事</h3>
+  <div class="tablewrap"><table class="pattab">
+    <tr><th>測什麼</th><th>怎麼測</th><th>正確結果</th></tr>
+    <tr><td>看不到手</td><td>手移出鏡頭</td><td>手指數 ＝ −1，遊戲不會亂動</td></tr>
+    <tr><td>手橫放</td><td>手掌平放、手指朝側邊</td><td>看得到手 ＝ 0</td></tr>
+    <tr><td>遠近</td><td>同一手勢，手伸遠、再靠近</td><td>指型都一樣</td></tr>
+    <tr><td>三十二種組合</td><td>00000 一路比到 11111</td><td>手指數和指型都對得上</td></tr>
+    <tr><td><b>拇指</b></td><td>四指張開，拇指開→收→開</td><td>手指數在 4 和 5 之間切換</td></tr>
+    <tr><td><b>拇指收法</b></td><td>比 3，拇指分別靠在食指旁、壓中指、橫過手掌</td><td>三種都要是 3，不能變成 4</td></tr>
+    <tr><td><b>猜拳不看拇指</b></td><td>比剪刀時拇指收一次、翹一次</td><td>兩次都判成剪刀</td></tr>
+    <tr><td>抖動</td><td>手指在半彎的位置晃</td><td>指型會跳，確定指型不跳</td></tr>
+    <tr><td>掉格</td><td>手快速晃一下讓偵測短暫中斷</td><td>確定手指數 不會被清成 −1</td></tr>
+    <tr><td>猜拳誤判</td><td>比「中指＋無名指」</td><td>顯示「看不懂」，不算回合</td></tr>
+    <tr><td><b>題目卡顯示</b></td><td>看畫面上的數字，數一數有幾筆畫</td><td>要跟「題目」變數一樣，不能少 1</td></tr>
+  </table></div>
+
+  <h3>可以挑戰的延伸</h3>
+  <div class="cards">
+    <div class="card"><h3>比到 10</h3><p>Handpose2Scratch 一次只抓一隻手，所以要改成<b>兩隻手輪流</b>：
+      先比左手記下來，再比右手加上去。用變數記住第一隻手的數字就行。</p></div>
+    <div class="card"><h3>雙手猜拳</h3><p>Handpose2Scratch 一次只抓一隻手，所以要改成<b>兩個人輪流出拳</b>，
+      用變數記住第一個人出了什麼。</p></div>
+    <div class="card"><h3>手勢密碼鎖</h3><p>要求玩家<b>照順序</b>比出 3 個手勢（例如 1 → 剪刀 → 布），
+      用清單記下比過的順序再比對。</p></div>
+  </div>
+
+  <h3>自我檢核</h3>
+  <div class="self">
+    <label><input type="checkbox"> 我知道「指尖 y &gt; 第二關節 y」代表這根手指伸直</label>
+    <label><input type="checkbox"> 我能說出為什麼拇指要改用橫向距離，還要換一把尺（手寬）</label>
+    <label><input type="checkbox"> 我能說出為什麼拇指跨距要量到「小指掌根」而不是食指掌根</label>
+    <label><input type="checkbox"> 我的程式會把五根手指存成 0／1，再加起來</label>
+    <label><input type="checkbox"> 我知道「指型」「四指型」「手指數」分別給哪一關用</label>
+    <label><input type="checkbox"> 我能舉出一個「手指數一樣但不是剪刀」的例子</label>
+    <label><input type="checkbox"> 我的程式有擋掉「偵測不到手」和「手沒立起來」</label>
+    <label><input type="checkbox"> 我知道「餘裕」是做什麼用的，也知道為什麼要用手長去算</label>
+    <label><input type="checkbox"> 我知道抓不到手時不能馬上清空「確定」變數</label>
+    <label><input type="checkbox"> 我知道防抖動要用計時器，不能用次數</label>
+    <label><input type="checkbox"> 數字關出題會避開玩家現在比的數字</label>
+    <label><input type="checkbox"> 我知道「造型換成 (數字變數)」會被當成造型編號，要用字串組合</label>
+    <label><input type="checkbox"> 我能用餘數算式說明猜拳誰贏</label>
+    <label><input type="checkbox"> 我把改過的數值寫進程式說明文件了</label>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="foot">手勢辨識大挑戰 ｜ Handpose2Scratch 教學 ｜ 範例檔請用 stretch3.github.io 開啟</footer>
+</div>
+
+<script src="assets/blk.js"></script>
+<script src="assets/lesson.js"></script>
+</body>
+</html>

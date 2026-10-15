@@ -1,0 +1,119 @@
+/* ===== 部落樂舞・火堆旁的節奏：本教材專用樣式 ===== */
+:root{--c-ext:#0FBD8C;--c-list:#FF661A}
+.sb.ext{background:var(--c-ext);box-shadow:0 3px 0 #0B9A72}
+.rp.ext,.bl.ext{background:var(--c-ext)}
+.rp.listtone,.bl.listtone{background:var(--c-list)}
+
+code.v{background:var(--c-variables);color:#fff;border-radius:999px;padding:0 8px;font-size:.85em;font-family:inherit;font-weight:700;white-space:nowrap}
+code.l{background:var(--c-list);color:#fff;border-radius:6px;padding:0 8px;font-size:.85em;font-family:inherit;font-weight:700;white-space:nowrap}
+code.m{background:var(--c-events);color:#5a4200;border-radius:6px;padding:0 8px;font-size:.85em;font-family:inherit;font-weight:700;white-space:nowrap}
+
+table.tbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:.9rem}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.tbl th{background:var(--paper2)}
+.tblwrap{overflow-x:auto}
+
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
+.cards3 div{background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
+.cards3 div b{display:block;color:var(--accent-d)}
+.cards3 div span{font-size:.88rem}
+
+.flow2{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.flow2 .st{background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:8px 12px;font-weight:800;font-size:.9rem;text-align:center}
+.flow2 .st small{display:block;font-weight:500;color:var(--ink2);font-size:.76rem}
+.flow2 .ar{color:var(--ink2);font-weight:800}
+.flow2 .st.a{border-color:#8AC6F0}.flow2 .st.b{border-color:#F0B86E}.flow2 .st.c{border-color:#7FCB9B}.flow2 .st.d{border-color:#E8909B}
+
+/* 頭部動作實驗室 */
+.hlab{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:16px;margin-top:12px;align-items:start}
+@media(max-width:760px){.hlab{grid-template-columns:minmax(0,1fr)}}
+.hstage{position:relative;width:100%;aspect-ratio:4/3;background:#25303F;border-radius:16px;overflow:hidden;touch-action:none;border:3px solid var(--line)}
+.hstage .zone{position:absolute;left:0;right:0;border-top:2px dashed #7C8FA6;color:#AFC0D2;font-size:.72rem;padding-left:6px}
+.hstage .hand{position:absolute;width:44px;height:44px;border-radius:50%;background:#FFC83D;border:3px solid #fff;transform:translate(-50%,-50%);cursor:grab;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#3B2A00}
+.hstage .lab{position:absolute;left:8px;top:8px;background:#ffffffdd;border-radius:10px;padding:2px 10px;font-weight:800;font-size:.85rem}
+.readout2{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.readout2 div{background:var(--paper2);border:2px solid var(--line);border-radius:12px;padding:6px 10px}
+.readout2 .k{font-size:.76rem;color:var(--ink2)}
+.readout2 .v{font-family:var(--f-num);font-weight:800;font-size:1.05rem}
+.steps3{margin:10px 0 0;padding:0;list-style:none}
+.steps3 li{border:2px solid var(--line);border-radius:12px;padding:6px 10px;margin-top:6px;font-size:.88rem;opacity:.45;transition:opacity .2s}
+.steps3 li.on{opacity:1;border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.bigres{font-size:1.4rem;font-weight:900;margin-top:8px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+/* 預備姿勢模擬 */
+.armlog{margin-top:10px;background:var(--paper2);border:2px solid var(--line);border-radius:12px;padding:8px 12px;min-height:80px;font-size:.88rem;max-height:190px;overflow:auto}
+.armlog div{border-bottom:1px dashed var(--line);padding:2px 0}
+.armlog .fire{color:var(--ok);font-weight:800}
+.armlog .no{color:var(--ink2)}
+.gun{display:inline-flex;align-items:center;gap:6px;font-weight:800;padding:4px 12px;border-radius:999px;background:var(--paper2);border:2px solid var(--line)}
+.gun.on{background:#DFF4E6;border-color:var(--ok)}
+
+/* 節奏試玩台 */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:16px;margin-top:12px;align-items:start}
+@media(max-width:820px){.sim{grid-template-columns:minmax(0,1fr)}}
+.simscene{width:100%;aspect-ratio:4/3;border-radius:16px;border:3px solid var(--line);overflow:hidden;background:#BFE8F5}
+.simscene svg{width:100%;height:100%;display:block}
+.bars div.bar{margin-top:8px}
+.bars .lab{display:flex;justify-content:space-between;font-size:.85rem;font-weight:700}
+.bars .track{height:14px;border-radius:999px;background:var(--paper2);border:2px solid var(--line);overflow:hidden;margin-top:2px}
+.bars .track i{display:block;height:100%;transition:width .35s}
+.bars .q i{background:linear-gradient(90deg,#8FD3E8,#2E9BD6)}
+.bars .t i{background:#D98A4E}
+.bars .s i{background:#5FAE58}
+.simend{margin-top:10px;border-radius:14px;padding:8px 12px;font-weight:800;border:3px solid var(--line);background:var(--paper2)}
+.simend.good{border-color:var(--ok);color:var(--ok)}
+.simend.bad{border-color:var(--no);color:var(--no)}
+.simend.mid{border-color:#C98A2E;color:#C98A2E}
+.simlog{margin-top:8px;font-size:.84rem;color:var(--ink2);max-height:120px;overflow:auto}
+.simlog div{border-bottom:1px dashed var(--line);padding:1px 0}
+
+/* 結局判定器 */
+.endlab{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.endcard{border:3px solid var(--line);border-radius:16px;padding:10px 12px;background:var(--paper2);opacity:.45}
+.endcard.on{opacity:1;box-shadow:var(--shadow-s)}
+.endcard h4{margin:0 0 4px}
+.endcard.g{border-color:var(--ok)}.endcard.m{border-color:#C98A2E}.endcard.b{border-color:var(--no)}
+
+.dlcard{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--paper);border:3px solid var(--line);border-radius:18px;padding:12px 16px;margin-top:12px}
+.dlcard .ic{font-size:2.2rem}
+.dlcard b{display:block}
+.dlcard small{color:var(--ink2)}
+.dlcard .btn{margin-left:auto}
+.kbd{display:inline-block;border:2px solid var(--line);border-bottom-width:4px;border-radius:8px;padding:0 7px;font-family:var(--f-num);font-weight:800;background:var(--paper)}
+
+
+/* ===== 本教材新增 ===== */
+:root{--fire:#E8612A;--fire2:#FFB347;--night:#2A3358}
+.facestage{position:relative;width:100%;aspect-ratio:4/3;background:#212B44;border-radius:16px;overflow:hidden;border:3px solid var(--line);touch-action:none}
+.facestage svg{width:100%;height:100%;display:block}
+.facestage .lab{position:absolute;left:8px;top:8px;background:#ffffffdd;border-radius:10px;padding:2px 10px;font-weight:800;font-size:.85rem}
+
+/* 節奏格子 */
+.seqrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.seqrow .cell{width:54px;height:54px;border-radius:14px;border:3px solid var(--line);display:grid;place-items:center;font-size:1.5rem;background:var(--paper2);transition:transform .12s,box-shadow .12s,background .12s}
+.seqrow .cell.on{transform:translateY(-4px) scale(1.06);box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.seqrow .cell.a{background:#DCEBFF;border-color:#4C97FF}
+.seqrow .cell.b{background:#DFF4E6;border-color:#3FAE6A}
+.seqrow .cell.c{background:#F0E4FA;border-color:#B05CD6}
+.seqrow .cell.ghost{background:var(--paper2);border-style:dashed;opacity:.5}
+.seqrow .cell.ok{outline:3px solid var(--ok)}
+.seqrow .cell.bad{outline:3px solid var(--bad)}
+
+/* 試玩台 */
+.play{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,290px);gap:16px;margin-top:12px;align-items:start}
+@media(max-width:820px){.play{grid-template-columns:minmax(0,1fr)}}
+.stagebox{position:relative;width:100%;aspect-ratio:4/3;border-radius:16px;border:3px solid var(--line);overflow:hidden;background:var(--night)}
+.stagebox svg{width:100%;height:100%;display:block}
+.stagebox .msg{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#fff;border:3px solid var(--line);border-radius:14px;padding:4px 16px;font-weight:800;white-space:nowrap}
+.hud{display:flex;flex-wrap:wrap;gap:8px}
+.hud .box{flex:1 1 84px;background:var(--paper2);border:2px solid var(--line);border-radius:12px;padding:6px 10px}
+.hud .k{font-size:.74rem;color:var(--ink2)}
+.hud .v{font-family:var(--f-num);font-weight:800;font-size:1.1rem}
+.keyhint{font-size:.82rem;color:var(--ink2);margin-top:8px}
+.keyhint kbd{background:var(--paper2);border:2px solid var(--line);border-bottom-width:3px;border-radius:7px;padding:1px 7px;font-weight:700;font-family:inherit}
+
+/* 計分試算 */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+.calc .cbox{background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
+.calc .big{font-family:var(--f-num);font-weight:900;font-size:1.6rem;color:var(--fire)}

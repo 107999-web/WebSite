@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>手勢模組教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+:root{color-scheme:light dark;--cream:#EAF6FA;--paper:#fff;--ink:#3F4A56;--ink2:#7E8B99;--line:#CDE7F0;
+  --blue:#2BA5C9;--pink:#FF6680;--green:#3FAE6A;--f:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cream:#1C232A;--paper:#27313B;--ink:#E7EEF6;--ink2:#A8B6C4;--line:#3B4B58}}
+:root[data-theme="dark"]{--cream:#1C232A;--paper:#27313B;--ink:#E7EEF6;--ink2:#A8B6C4;--line:#3B4B58}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f);line-height:1.8;
+  background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:26px 26px;min-height:100vh;
+  display:grid;place-items:center;padding:32px 16px}
+.box{max-width:900px;width:100%;text-align:center}
+.badge{display:inline-block;background:var(--blue);color:#fff;font-weight:800;font-size:.82rem;padding:5px 16px;border-radius:50px}
+h1{font-size:clamp(1.7rem,5vw,2.5rem);font-weight:800;margin:14px 0 6px}
+p.sub{color:var(--ink2);margin:0 auto 20px;max-width:40em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 auto 24px;max-width:46em}
+.chips span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:2px 12px;font-size:.86rem;font-weight:700}
+.chips b{color:var(--blue)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+a.card{display:block;text-decoration:none;color:var(--ink);background:var(--paper);border:3px solid var(--line);border-radius:26px;padding:22px 18px;transition:transform .2s}
+a.card:hover{transform:translateY(-4px) scale(1.02)}
+a.card .ico{font-size:2.3rem;line-height:1}
+a.card b{display:block;font-size:1.12rem;font-weight:800;margin:8px 0 4px}
+a.card span{font-size:.86rem;color:var(--ink2)}
+a.s{border-color:var(--blue)}a.d{border-color:var(--pink)}a.f{border-color:var(--green)}
+footer{margin-top:26px;font-size:.82rem;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="badge">Handpose2Scratch ｜ 自訂積木（函式）</span>
+  <h1>🧩 手勢模組教室</h1>
+  <p class="sub">把手勢辨識拆成 10 塊「有輸入、有輸出」的自訂積木，一次學一塊。
+    每個模組都有互動實驗、範例 .sb3，以及可以直接用攝影機玩的網頁版。</p>
+  <div class="chips">
+    <span><b>1</b> 偵測手</span><span><b>2</b> 量尺寸</span><span><b>3</b> 判斷手指</span><span><b>4</b> 判斷拇指</span>
+    <span><b>5</b> 數手指</span><span><b>6</b> 穩定判斷</span><span><b>7</b> 認猜拳</span><span><b>8</b> 比對手勢</span>
+    <span><b>9</b> 猜拳勝負</span><span><b>10</b> 手指游標</span>
+  </div>
+  <div class="cards">
+    <a class="card s" href="student/index.html"><div class="ico">📘</div><b>模組教學</b><span>10 個模組、11 個互動實驗、動手改任務與自我檢核</span></a>
+    <a class="card d" href="student/index.html#map"><div class="ico">🗺️</div><b>模組地圖</b><span>哪個模組用到哪個，以及所有輸入／輸出一覽</span></a>
+    <a class="card f" href="student/play/手勢模組工具箱/index.html"><div class="ico">🎥</div><b>用攝影機試玩</b><span>工具箱網頁版，離線也能用；沒有攝影機按 K</span></a>
+    <a class="card f" href="student/sb3/手勢模組工具箱.sb3" download><div class="ico">🧰</div><b>工具箱 .sb3</b><span>10 個模組全裝好，拿來做自己的作品（用 stretch3 開啟）</span></a>
+  </div>
+  <footer>各模組的 .sb3 在 student/sb3/，網頁版在 student/play/。參考專案：20260924_手勢辨識_數字與猜拳_Web。</footer>
+</div>
+</body>
+</html>

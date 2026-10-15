@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>308 點名單</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI','Microsoft JhengHei',sans-serif; background:#fce4ec; min-height:100vh; padding:20px; }
+h1 { text-align:center; color:#c2185b; margin-bottom:8px; font-size:1.4rem; }
+.date-row { text-align:center; color:#888; font-size:.85rem; margin-bottom:14px; }
+.toolbar { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:14px; }
+button { padding:7px 14px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; transition:opacity .2s; }
+button:hover { opacity:.82; }
+.stats { text-align:center; font-size:.88rem; color:#666; margin-bottom:14px; }
+.stats span { margin:0 8px; }
+.classroom-wrap { background:#fff9fb; border-radius:18px; padding:18px 24px; max-width:900px; margin:0 auto; box-shadow:0 4px 18px rgba(194,24,91,.1); }
+.board-label { text-align:center; background:#ce93d8; color:#fff; border-radius:12px; padding:8px 0; font-size:1rem; font-weight:bold; margin-bottom:12px; letter-spacing:.1em; }
+.bulletin-label { text-align:center; background:#f8bbd0; color:#c2185b; border-radius:12px; padding:6px 0; font-size:.9rem; font-weight:bold; margin-bottom:12px; letter-spacing:.1em; }
+.seat-area { display:flex; align-items:stretch; gap:8px; }
+.side-label { writing-mode:vertical-rl; text-orientation:upright; background:#ffe082; color:#795548; border-radius:10px; padding:10px 6px; font-size:.85rem; font-weight:bold; display:flex; align-items:center; justify-content:center; min-width:32px; }
+.grid { flex:1; display:grid; gap:8px; }
+.seat { background:#fff; border:2px dashed #e0e0e0; border-radius:12px; min-height:72px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; position:relative; transition:border-color .2s,background .2s; padding:6px; user-select:none; }
+.seat.empty-slot { color:#ccc; font-size:.9rem; border-color:#eee; }
+.seat.occupied { border:2px solid #f48fb1; background:#fff0f5; }
+.seat.present { background:#e8f5e9; border-color:#81c784; }
+.seat.absent  { background:#ffeaea; border-color:#ef9a9a; }
+.seat.late    { background:#fff8e1; border-color:#ffd54f; }
+.seat.leave   { background:#e3f2fd; border-color:#90caf9; }
+.seat-name { font-size:.85rem; font-weight:bold; color:#555; text-align:center; line-height:1.3; }
+.seat-num { position:absolute; top:4px; left:7px; font-size:.65rem; color:#bbb; }
+.seat-note { font-size:.62rem; color:#5e35b1; background:#ede7f6; border-radius:6px; padding:1px 6px; margin-top:2px; max-width:96%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.seat-merit { font-size:.62rem; border-radius:6px; padding:1px 5px; margin-top:2px; display:inline-block; }
+.seat-merit.good { color:#2e7d32; background:#c8e6c9; }
+.seat-merit.bad { color:#c62828; background:#ffcdd2; margin-left:3px; }
+.seat-merit.tot { background:#ede7f6; color:#4527a0; margin-left:3px; }
+.seat-merit.tot.bad { background:#fbe9e7; color:#bf360c; }
+.seat-status { font-size:.72rem; margin-top:3px; border-radius:6px; padding:1px 6px; font-weight:bold; }
+.present .seat-status { color:#388e3c; background:#c8e6c9; }
+.absent  .seat-status { color:#c62828; background:#ffcdd2; }
+.late    .seat-status { color:#f57f17; background:#fff9c4; }
+.leave   .seat-status { color:#1565c0; background:#bbdefb; }
+.popup-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.25); z-index:100; align-items:center; justify-content:center; }
+.popup-overlay.show { display:flex; }
+.popup { background:#fff; border-radius:16px; padding:24px 30px; min-width:240px; box-shadow:0 8px 32px rgba(0,0,0,.18); text-align:center; }
+.popup h3 { color:#c2185b; margin-bottom:16px; font-size:1.1rem; }
+.popup-btns { display:flex; flex-direction:column; gap:10px; }
+.popup-btns button { font-size:.95rem; padding:9px; }
+.btn-present { background:#a5d6a7; color:#2e7d32; }
+.btn-absent  { background:#ef9a9a; color:#b71c1c; }
+.btn-late    { background:#ffe082; color:#f57f17; }
+.btn-leave   { background:#90caf9; color:#1565c0; }
+.btn-unset   { background:#e0e0e0; color:#555; }
+.btn-swap    { background:#ce93d8; color:#6a1b9a; }
+.btn-cancel  { background:#f5f5f5; color:#555; margin-top:4px; }
+@media print {
+  body { background:#fff; padding:0; }
+  .toolbar, .stats { display:none; }
+  .classroom-wrap { box-shadow:none; max-width:100%; }
+  .seat { min-height:60px; }
+}
+</style>
+</head>
+<body>
+<h1>📋 308 點名單</h1>
+<div class="date-row" id="dateRow"></div>
+<div class="toolbar">
+  <button style="background:#ef9a9a;color:#fff" onclick="clearAllStatus()">🧹 清除出缺席</button>
+  <button style="background:#a5d6a7;color:#fff" onclick="setAll('present')">✅ 全部到課</button>
+  <button style="background:#90caf9;color:#fff" onclick="printPage()" title="列印／另存 PDF 時，檔名會自動帶入「日期-班級」">🖨️ 列印 / 存PDF</button>
+  <button style="background:#ffcc80;color:#555" onclick="exportCSV()">📊 匯出 CSV</button>
+  <button style="background:#9fa8da;color:#fff" onclick="exportConfig()">⚙️ 匯出設定檔</button>
+  <button style="background:#4db6ac;color:#fff" onclick="appendRecords()">📒 累加點名紀錄</button>
+  <button style="background:#9ccc65;color:#fff" onclick="openMeritList()">⭐ 本日優缺點</button>
+  <button style="background:#9575cd;color:#fff" onclick="loadMeritHistory()">📥 載入優缺點累計</button>
+  <button style="background:#ffb74d;color:#fff" onclick="openRecordQuery()">🔍 查詢紀錄</button>
+</div>
+<div class="stats">
+  <span>👥 總人數：<b id="statPlaced">0</b></span>
+  <span>✅ 到課：<b id="statPresent">0</b></span>
+  <span>❌ 缺席：<b id="statAbsent">0</b></span>
+  <span>⏰ 遲到：<b id="statLate">0</b></span>
+  <span>📝 請假：<b id="statLeave">0</b></span>
+</div>
+<div class="classroom-wrap">
+  <div class="bulletin-label">教室後方 ／ 布告欄</div>
+  <div class="seat-area">
+    <div class="side-label">後門</div>
+    <div class="grid" id="seatGrid"></div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="board-label" style="margin-top:12px">講台 ／ 黑板</div>
+</div>
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup">
+    <h3 id="popupTitle">座位操作</h3>
+    <div class="popup-btns" id="popupBtns"></div>
+  </div>
+</div>
+<script>
+var rows = 8, cols = 4;
+var seats = [{"name":"30808李想(113076)","status":""},{"name":"30816陳郁穎(113086)","status":""},{"name":"30824李旼臻(113046)","status":""},{"name":"","status":""},{"name":"30807林宇威(113008)","status":""},{"name":"30815曾姵螢(113181)","status":""},{"name":"30823何妍恩(113023)","status":""},{"name":"","status":""},{"name":"30806吳承禧(113169)","status":""},{"name":"30814丁履翾(113130)","status":""},{"name":"30822朱美菁(113163)","status":""},{"name":"","status":""},{"name":"30805林子胤(113207)","status":""},{"name":"30813阮嘉玲(113082)","status":""},{"name":"30821朱玥恆(113020)","status":""},{"name":"","status":""},{"name":"30804黃星綸(113099)","status":""},{"name":"30812余定睿(113128)","status":""},{"name":"30820陳宥心(113117)","status":""},{"name":"","status":""},{"name":"30803宋玴綸(113123)","status":""},{"name":"30811尤鈞弘(113127)","status":""},{"name":"30819曾愉芯(113195)","status":""},{"name":"","status":""},{"name":"30802沈翊峰(113025)","status":""},{"name":"30810梁禾諺(113202)","status":""},{"name":"30818陳瑞伶(113062)","status":""},{"name":"","status":""},{"name":"30801陳羿樺(113095)","status":""},{"name":"30809蘇易暄(113029)","status":""},{"name":"30817劉伝紜(113090)","status":""},{"name":"30825洪彥熙(113226)","status":""}];
+var ALL_NAMES = ["30801陳羿樺(113095)","30802沈翊峰(113025)","30803宋玴綸(113123)","30804黃星綸(113099)","30805林子胤(113207)","30806吳承禧(113169)","30807林宇威(113008)","30808李想(113076)","30809蘇易暄(113029)","30810梁禾諺(113202)","30811尤鈞弘(113127)","30812余定睿(113128)","30813阮嘉玲(113082)","30814丁履翾(113130)","30815曾姵螢(113181)","30816陳郁穎(113086)","30817劉伝紜(113090)","30818陳瑞伶(113062)","30819曾愉芯(113195)","30820陳宥心(113117)","30821朱玥恆(113020)","30822朱美菁(113163)","30823何妍恩(113023)","30824李旼臻(113046)","30825洪彥熙(113226)"];
+var NOTE_MAP = {"30810梁禾諺(113202)":"小老師","30813阮嘉玲(113082)":"班長"};
+var ID_MAP = {"30801陳羿樺(113095)":"113095","30802沈翊峰(113025)":"113025","30803宋玴綸(113123)":"113123","30804黃星綸(113099)":"113099","30805林子胤(113207)":"113207","30806吳承禧(113169)":"113169","30807林宇威(113008)":"113008","30808李想(113076)":"113076","30809蘇易暄(113029)":"113029","30810梁禾諺(113202)":"113202","30811尤鈞弘(113127)":"113127","30812余定睿(113128)":"113128","30813阮嘉玲(113082)":"113082","30814丁履翾(113130)":"113130","30815曾姵螢(113181)":"113181","30816陳郁穎(113086)":"113086","30817劉伝紜(113090)":"113090","30818陳瑞伶(113062)":"113062","30819曾愉芯(113195)":"113195","30820陳宥心(113117)":"113117","30821朱玥恆(113020)":"113020","30822朱美菁(113163)":"113163","30823何妍恩(113023)":"113023","30824李旼臻(113046)":"113046","30825洪彥熙(113226)":"113226"};
+function noteOf(n) { return (n && NOTE_MAP[n]) ? NOTE_MAP[n] : ''; }
+function idOf(n) { return (n && ID_MAP[n]) ? ID_MAP[n] : ''; }
+function escH(v) { return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function csvQ(v) { v = (v===null||v===undefined)?'':String(v); return /[",\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+function ymd() { var d=new Date(); function p(n){return (n<10?'0':'')+n;} return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function clsPart() { var c=(CLASS_NAME||'').replace(/[\\/:*?"<>|]/g,'_').replace(/^\s+|\s+$/g,''); return c ? c+'_' : ''; }
+var CLASS_NAME = "308";
+var swapPending = -1;
+
+document.getElementById('dateRow').textContent = '日期：' + new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+function statusLabel(s) {
+  return {present:'✅ 到課',absent:'❌ 缺席',late:'⏰ 遲到',leave:'📝 請假','':'－'}[s]||'－';
+}
+function renderGrid() {
+  var grid = document.getElementById('seatGrid');
+  grid.style.gridTemplateColumns = 'repeat('+cols+', 1fr)';
+  grid.innerHTML = '';
+  seats.forEach(function(s, i) {
+    var div = document.createElement('div');
+    div.className = 'seat' + (s.name ? ' occupied ' + s.status : ' empty-slot');
+    div.dataset.idx = i;
+    div.innerHTML = '<span class="seat-num">'+(i+1)+'</span>'
+      + (s.name
+        ? '<span class="seat-name">'+escH(s.name)+'</span>'
+          + (noteOf(s.name) ? '<span class="seat-note">'+escH(noteOf(s.name))+'</span>' : '')
+          + '<span class="seat-status">'+statusLabel(s.status)+'</span>'
+          + (window.meritBadge ? window.meritBadge(s.name) : '')
+        : '<span style="font-size:1.1rem;color:#ddd">空</span>');
+    div.addEventListener('click', function(){ onSeatClick(i); });
+    grid.appendChild(div);
+  });
+  updateStats();
+}
+function onSeatClick(idx) {
+  if (swapPending !== -1) { doSwap(swapPending, idx); swapPending = -1; renderGrid(); return; }
+  if (!seats[idx].name) return;
+  var s = seats[idx];
+  document.getElementById('popupTitle').textContent = '座位'+(idx+1)+'：'+s.name
+    + (noteOf(s.name) ? '（'+noteOf(s.name)+'）' : '');
+  document.getElementById('popupBtns').innerHTML =
+    '<button class="btn-present" onclick="setStatus('+idx+',\'present\')">✅ 到課</button>'+
+    '<button class="btn-absent"  onclick="setStatus('+idx+',\'absent\')">❌ 缺席</button>'+
+    '<button class="btn-late"    onclick="setStatus('+idx+',\'late\')">⏰ 遲到</button>'+
+    '<button class="btn-leave"   onclick="setStatus('+idx+',\'leave\')">📝 請假</button>'+
+    '<button class="btn-unset"   onclick="setStatus('+idx+',\'\')">－ 清除狀態</button>'+
+    '<button style="background:#80cbc4;color:#004d40" onclick="closePopup();openMeritForm('+idx+')">⭐ 優缺點紀錄</button>'+
+    '<button class="btn-swap"    onclick="startSwap('+idx+')">🔀 交換座位</button>'+
+    '<button class="btn-cancel"  onclick="closePopup()">取消</button>';
+  document.getElementById('popupOverlay').classList.add('show');
+}
+function setStatus(idx, st) { seats[idx].status = st; closePopup(); renderGrid(); }
+function startSwap(idx) { swapPending = idx; closePopup(); alert('已選取「'+seats[idx].name+'」，請點選目標座位'); }
+function doSwap(a, b) { var t = seats[a]; seats[a] = seats[b]; seats[b] = t; }
+function closePopup() { document.getElementById('popupOverlay').classList.remove('show'); }
+function clearAllStatus() { seats.forEach(function(s){ s.status=''; }); renderGrid(); }
+function setAll(st) { seats.forEach(function(s){ if(s.name) s.status=st; }); renderGrid(); }
+function updateStats() {
+  var placed=0,present=0,absent=0,late=0,leave=0;
+  seats.forEach(function(s){
+    if(s.name){ placed++;
+      if(s.status==='present') present++;
+      else if(s.status==='absent') absent++;
+      else if(s.status==='late') late++;
+      else if(s.status==='leave') leave++;
+    }
+  });
+  document.getElementById('statPlaced').textContent=placed;
+  document.getElementById('statPresent').textContent=present;
+  document.getElementById('statAbsent').textContent=absent;
+  document.getElementById('statLate').textContent=late;
+  document.getElementById('statLeave').textContent=leave;
+}
+function exportCSV() {
+  var header='座位,學號,姓名,備註,狀態\n';
+  var body=seats.map(function(s,i){ return (i+1)+','+csvQ(idOf(s.name))+','+csvQ(s.name||'(空)')+','+csvQ(noteOf(s.name))+','+statusLabel(s.status); }).join('\n');
+  var blob=new Blob(['\uFEFF'+header+body],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='點名_'+clsPart()+ymd()+'.csv'; a.click();
+}
+function printFileName() {
+  var d = new Date();
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  var dateStr = '' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
+  var cls = (CLASS_NAME || '').replace(/[\\/:*?"<>|]/g, '_').replace(/^\s+|\s+$/g, '');
+  return dateStr + '-' + (cls || '點名單');
+}
+function printPage() {
+  var prevTitle = document.title;
+  document.title = printFileName();
+  function restore() {
+    document.title = prevTitle;
+    window.removeEventListener('afterprint', restore);
+  }
+  window.addEventListener('afterprint', restore);
+  window.print();
+  setTimeout(restore, 5000);
+}
+function exportConfig() {
+  var seated = seats.filter(function(s){ return s.name; }).map(function(s){ return s.name; });
+  var nameList = (ALL_NAMES && ALL_NAMES.length) ? ALL_NAMES.slice() : seated;
+  seated.forEach(function(n){ if (nameList.indexOf(n) === -1) nameList.push(n); });
+  var cfg = {
+    type: 'seat-attendance-config',
+    version: 1,
+    className: CLASS_NAME,
+    rows: rows,
+    cols: cols,
+    names: nameList,
+    notes: NOTE_MAP,
+    ids: ID_MAP,
+    seats: seats.map(function(s){ return { name: s.name || '' }; }),
+    savedAt: new Date().toISOString()
+  };
+  var blob = new Blob([JSON.stringify(cfg, null, 2)], {type:'application/json;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  var dateStr = ymd();
+  var safeName = (CLASS_NAME || '座位設定').replace(/[\\/:*?"<>|]/g, '_');
+  a.download = safeName + '_設定_' + dateStr + '.json';
+  a.click();
+  alert('設定檔已下載，可用「座位點名紀錄表產生器」的「📥 載入設定」開啟並修改座位。');
+}
+function attendanceRecordsModule() {
+  // ══════════ 常數 ══════════
+  var HEADER = ['日期', '班級', '座位', '學號', '姓名', '備註', '狀態'];
+  var ST_TEXT = { present: '到課', absent: '缺席', late: '遲到', leave: '請假', '': '未點名' };
+  var ABNORMAL = ['缺席', '遲到', '請假'];
+  var FSA = !!(window.showOpenFilePicker && window.showSaveFilePicker);
+  var fileHandle = null;      // File System Access 的檔案控制代碼
+  var fileName = '';          // 顯示用檔名
+  var queryRows = [];         // 查詢用資料（點名）
+  var meritRows = [];         // 查詢用資料（優缺點）
+  var queryTab = 'stat';
+  var sortKey = 'absent', sortDesc = true;
+
+  // ══════════ CSV 工具 ══════════
+  function csvCell(v) {
+    v = (v === null || v === undefined) ? '' : String(v);
+    return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  }
+  function toCSV(rows) {
+    return rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+  }
+  function parseCSV(text) {
+    text = text.replace(/^﻿/, '');
+    var rows = [], row = [], cell = '', q = false, i = 0;
+    while (i < text.length) {
+      var ch = text[i];
+      if (q) {
+        if (ch === '"') {
+          if (text[i + 1] === '"') { cell += '"'; i += 2; continue; }
+          q = false; i++; continue;
+        }
+        cell += ch; i++; continue;
+      }
+      if (ch === '"') { q = true; i++; continue; }
+      if (ch === ',') { row.push(cell); cell = ''; i++; continue; }
+      if (ch === '\r') { i++; continue; }
+      if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; i++; continue; }
+      cell += ch; i++;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter(function (r) { return r.some(function (c) { return c.trim() !== ''; }); });
+  }
+  function colIdx(head, label) {
+    for (var i = 0; i < head.length; i++) {
+      if ((head[i] || '').trim() === label) return i;
+    }
+    return -1;
+  }
+  function pick(r, i) { return i >= 0 && r[i] !== undefined ? String(r[i]).trim() : ''; }
+
+  function rowsToObjs(rows) {
+    if (!rows.length) return [];
+    var head = rows[0].map(function (c) { return (c || '').trim(); });
+    var hasHead = head.indexOf('日期') !== -1;
+    var body = hasHead ? rows.slice(1) : rows;
+    var ix = hasHead
+      ? { date: colIdx(head, '日期'), cls: colIdx(head, '班級'), seat: colIdx(head, '座位'),
+          sid: colIdx(head, '學號'), name: colIdx(head, '姓名'),
+          note: colIdx(head, '備註'), status: colIdx(head, '狀態') }
+      : { date: 0, cls: 1, seat: 2, sid: -1, name: 3, note: 5, status: 4 };  // 舊版位置
+    return body.map(function (r) {
+      return { date: pick(r, ix.date), cls: pick(r, ix.cls), seat: pick(r, ix.seat),
+               sid: pick(r, ix.sid), name: pick(r, ix.name),
+               note: pick(r, ix.note), status: pick(r, ix.status) };
+    }).filter(function (o) { return o.date && o.name; });
+  }
+  function objsToRows(objs) {
+    return [HEADER].concat(objs.map(function (o) {
+      return [o.date, o.cls, o.seat, o.sid || '', o.name, o.note || '', o.status];
+    }));
+  }
+
+  // ══════════ 目前畫面的點名資料 ══════════
+  function todayStr() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  function ctx() { return window.__recordContext(); }
+  function currentObjs(cls) {
+    var c = ctx(), d = todayStr(), out = [];
+    c.seats.forEach(function (s, i) {
+      if (!s.name) return;
+      out.push({ date: d, cls: cls, seat: String(i + 1), name: s.name,
+                 sid: (c.idOf ? (c.idOf(s.name) || '') : ''),
+                 status: ST_TEXT[s.status] || '未點名',
+                 note: (c.noteOf ? c.noteOf(s.name) : '') });
+    });
+    return out;
+  }
+
+  // ══════════ 累加寫入紀錄檔 ══════════
+  function askClass() {
+    var c = ctx();
+    var cls = (c.className || '').trim();
+    if (cls) return cls;
+    var input = prompt('請輸入班級名稱（紀錄檔以班級欄位區分）：', '');
+    if (input === null) return null;
+    cls = input.trim();
+    if (!cls) { alert('班級名稱不可空白。'); return null; }
+    if (c.setClassName) c.setClassName(cls);
+    return cls;
+  }
+
+  function mergeObjs(oldObjs, newObjs, date, cls) {
+    var dup = oldObjs.filter(function (o) { return o.date === date && o.cls === cls; });
+    if (dup.length) {
+      if (!confirm('紀錄檔中已有「' + date + '　' + cls + '」的 ' + dup.length +
+                   ' 筆資料。\n按「確定」以本次點名覆蓋，按「取消」放棄寫入。')) return null;
+      oldObjs = oldObjs.filter(function (o) { return !(o.date === date && o.cls === cls); });
+    }
+    return oldObjs.concat(newObjs).sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      if (a.cls !== b.cls) return a.cls < b.cls ? -1 : 1;
+      return (parseInt(a.seat, 10) || 0) - (parseInt(b.seat, 10) || 0);
+    });
+  }
+
+  // 檔案選擇器必須緊接在使用者點擊之後，中間不可插入 alert / confirm / prompt
+  async function pickFile(suggested) {
+    return await window.showSaveFilePicker({
+      suggestedName: suggested,
+      types: [{ description: 'CSV 紀錄檔', accept: { 'text/csv': ['.csv'] } }]
+    });
+  }
+  function gestureMsg(err) {
+    return (err && /user gesture|user activation|NotAllowedError/i.test(String(err.message || err)))
+      ? '瀏覽器要求「選擇檔案」必須緊接在點擊之後。\n請再按一次按鈕，並直接在檔案視窗中選檔。'
+      : (err && err.message ? err.message : String(err));
+  }
+
+  async function appendRecords() {
+    var c = ctx();
+    if (!c.seats.some(function (s) { return s.name; })) { alert('目前沒有任何座位資料。'); return; }
+
+    // ① 先開檔案視窗（保住使用者手勢），之後才詢問班級
+    if (FSA && !fileHandle) {
+      try {
+        fileHandle = await pickFile('點名紀錄.csv');
+        fileName = fileHandle.name;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+        alert('無法開啟檔案視窗：' + gestureMsg(e));
+        return;
+      }
+    }
+
+    var cls = askClass();
+    if (cls === null) return;
+    var newObjs = currentObjs(cls);
+    var date = todayStr();
+
+    if (!FSA) { fallbackAppend(newObjs, date, cls); return; }
+
+    try {
+      var oldObjs = [];
+      try {
+        var f = await fileHandle.getFile();
+        var txt = await f.text();
+        if (txt.trim()) oldObjs = rowsToObjs(parseCSV(txt));
+      } catch (e) { oldObjs = []; }
+
+      var merged = mergeObjs(oldObjs, newObjs, date, cls);
+      if (merged === null) return;
+
+      var w = await fileHandle.createWritable();
+      await w.write('﻿' + toCSV(objsToRows(merged)));
+      await w.close();
+
+      alert('✅ 已寫入「' + fileName + '」\n' +
+            '本次新增：' + newObjs.length + ' 筆（' + date + '　' + cls + '）\n' +
+            '檔案目前共：' + merged.length + ' 筆紀錄');
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+      fileHandle = null;
+      alert('寫入失敗：' + gestureMsg(err) + '\n將改用「下載合併檔」的方式。');
+      fallbackAppend(newObjs, date, cls);
+    }
+  }
+
+  function fallbackAppend(newObjs, date, cls) {
+    var go = confirm('此瀏覽器不支援直接寫回檔案。\n\n「確定」＝先選既有紀錄檔，合併後下載新的 CSV（再覆蓋原檔）\n「取消」＝只下載本次點名的 CSV');
+    if (!go) { downloadObjs(newObjs, '點名紀錄_' + date + '_' + cls + '.csv'); return; }
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.csv,text/csv';
+    inp.onchange = function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var rd = new FileReader();
+      rd.onload = function (ev) {
+        var oldObjs = rowsToObjs(parseCSV(ev.target.result));
+        var merged = mergeObjs(oldObjs, newObjs, date, cls);
+        if (merged === null) return;
+        downloadObjs(merged, file.name || '點名紀錄.csv');
+        alert('✅ 已合併並下載\n本次新增：' + newObjs.length + ' 筆\n合併後共：' + merged.length + ' 筆\n請用下載的檔案覆蓋原本的紀錄檔。');
+      };
+      rd.readAsText(file, 'UTF-8');
+    };
+    inp.click();
+  }
+
+  function downloadObjs(objs, name) {
+    var blob = new Blob(['﻿' + toCSV(objsToRows(objs))], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+  }
+
+  // ══════════ 查詢介面 ══════════
+  function injectStyle() {
+    if (document.getElementById('rqStyle')) return;
+    var st = document.createElement('style');
+    st.id = 'rqStyle';
+    st.textContent = [
+      '.rq-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}',
+      '.rq-box{background:#fff;border-radius:18px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.2);overflow:hidden;font-family:inherit;}',
+      '.rq-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fce4ec;}',
+      '.rq-head h3{color:#c2185b;font-size:1.05rem;margin:0;}',
+      '.rq-head button{background:#f48fb1;color:#fff;border:none;border-radius:8px;padding:5px 11px;cursor:pointer;font-weight:bold;}',
+      '.rq-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid #f5f5f5;font-size:.85rem;color:#555;}',
+      '.rq-bar select,.rq-bar input[type=text]{padding:4px 8px;border:1px solid #f48fb1;border-radius:8px;font-size:.85rem;}',
+      '.rq-bar button{background:#ce93d8;color:#fff;border:none;border-radius:8px;padding:5px 11px;cursor:pointer;font-weight:bold;font-size:.82rem;}',
+      '.rq-tabs{display:flex;gap:8px;padding:10px 18px 0;}',
+      '.rq-tabs button{background:#f5f5f5;color:#888;border:none;border-radius:10px 10px 0 0;padding:7px 16px;cursor:pointer;font-weight:bold;font-size:.88rem;}',
+      '.rq-tabs button.on{background:#f8bbd0;color:#880e4f;}',
+      '.rq-body{flex:1;overflow:auto;padding:12px 18px 18px;}',
+      '.rq-body table{width:100%;border-collapse:collapse;font-size:.84rem;}',
+      '.rq-body th{background:#fce4ec;color:#c2185b;padding:7px 8px;position:sticky;top:0;cursor:pointer;white-space:nowrap;}',
+      '.rq-body td{padding:6px 8px;border-bottom:1px solid #f5f5f5;text-align:center;}',
+      '.rq-body tr:hover td{background:#fff9fb;}',
+      '.rq-empty{color:#aaa;text-align:center;padding:30px;font-size:.9rem;}',
+      '.rq-sum{font-size:.85rem;color:#666;margin-bottom:8px;}',
+      '.s-到課{color:#388e3c;}.s-缺席{color:#c62828;font-weight:bold;}.s-遲到{color:#f57f17;font-weight:bold;}.s-請假{color:#1565c0;}.s-未點名{color:#bbb;}',
+      '.m-good{color:#2e7d32;font-weight:bold;}.m-bad{color:#c62828;font-weight:bold;}',
+      '.mf-body{padding:14px 18px;}',
+      '.mf-who{font-size:1rem;color:#c2185b;font-weight:bold;margin-bottom:12px;}',
+      '.mf-types{display:flex;gap:10px;margin-bottom:12px;}',
+      '.mf-types button{flex:1;background:#f5f5f5;color:#999;border:2px solid transparent;border-radius:12px;padding:10px;cursor:pointer;font-weight:bold;font-size:.95rem;}',
+      '#mfGood.on{background:#e8f5e9;color:#2e7d32;border-color:#81c784;}',
+      '#mfBad.on{background:#ffeaea;color:#c62828;border-color:#ef9a9a;}',
+      '.mf-label{font-size:.82rem;color:#888;margin:10px 0 5px;}',
+      '.mf-score{display:flex;align-items:center;gap:8px;}',
+      '.mf-score button{width:36px;height:36px;border:none;border-radius:10px;background:#f8bbd0;color:#880e4f;font-size:1.1rem;cursor:pointer;font-weight:bold;}',
+      '.mf-score input{width:70px;padding:7px;border:1px solid #f48fb1;border-radius:8px;text-align:center;font-size:.95rem;}',
+      '.mf-score b{font-size:1.15rem;margin-left:6px;}',
+      '.mf-score b.good{color:#2e7d32;}.mf-score b.bad{color:#c62828;}',
+      '.mf-body input[type=text]{width:100%;padding:8px 10px;border:1px solid #f48fb1;border-radius:8px;font-size:.9rem;font-family:inherit;}',
+      '.mf-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}',
+      '.mf-chip{border-radius:20px;padding:4px 11px;font-size:.8rem;cursor:pointer;}',
+      '.mf-chip.g{background:#e8f5e9;color:#2e7d32;}.mf-chip.g:hover{background:#c8e6c9;}',
+      '.mf-chip.b{background:#ffeaea;color:#c62828;}.mf-chip.b:hover{background:#ffcdd2;}',
+      '.mf-foot{display:flex;gap:8px;padding:4px 18px 16px;}',
+      '.mf-ok{flex:1;background:#4db6ac;color:#fff;border:none;border-radius:10px;padding:10px;font-weight:bold;cursor:pointer;font-size:.95rem;}',
+      '.mf-no{background:#f5f5f5;color:#666;border:none;border-radius:10px;padding:10px 18px;font-weight:bold;cursor:pointer;}',
+      '.ml-del{background:#ffccbc;color:#bf360c;border:none;border-radius:6px;padding:2px 7px;cursor:pointer;}',
+      '.seat-merit.tot{background:#ede7f6;color:#4527a0;}',
+      '.seat-merit.tot.bad{background:#fbe9e7;color:#bf360c;}'
+    ].join('\n');
+    document.head.appendChild(st);
+  }
+
+  function openQuery() {
+    injectStyle();
+    var old = document.getElementById('rqMask');
+    if (old) old.remove();
+    var mask = document.createElement('div');
+    mask.className = 'rq-mask';
+    mask.id = 'rqMask';
+    mask.innerHTML =
+      '<div class="rq-box">' +
+        '<div class="rq-head"><h3>🔍 點名紀錄查詢</h3><button id="rqClose">✕ 關閉</button></div>' +
+        '<div class="rq-bar">📋 點名紀錄：<b id="rqFile">尚未載入</b>' +
+          '<button id="rqPick">選擇 CSV</button>' +
+          '<span style="margin-left:10px">⭐ 優缺點：</span><b id="rqMFile">尚未載入</b>' +
+          '<button id="rqMPick">選擇 CSV</button></div>' +
+        '<div class="rq-bar">' +
+          '班級 <select id="rqCls"></select>' +
+          '日期 <select id="rqDate"></select>' +
+          '姓名 <input type="text" id="rqName" placeholder="姓名 / 學號關鍵字" style="width:150px">' +
+          '<label><input type="checkbox" id="rqAbn"> 只看異常（缺席/遲到/請假）</label>' +
+          '<button id="rqExp">⬇️ 匯出目前結果</button>' +
+        '</div>' +
+        '<div class="rq-tabs"><button data-tab="stat" class="on">📊 出缺次數統計</button>' +
+          '<button data-tab="detail">📋 明細紀錄</button>' +
+          '<button data-tab="merit">⭐ 優缺點紀錄</button></div>' +
+        '<div class="rq-body" id="rqBody"><div class="rq-empty">請先選擇點名紀錄 CSV 檔案</div></div>' +
+      '</div>';
+    document.body.appendChild(mask);
+
+    mask.addEventListener('click', function (e) { if (e.target === mask) mask.remove(); });
+    document.getElementById('rqClose').onclick = function () { mask.remove(); };
+    document.getElementById('rqPick').onclick = pickQueryFile;
+    document.getElementById('rqMPick').onclick = pickMeritFile;
+    document.getElementById('rqExp').onclick = exportFiltered;
+    ['rqCls', 'rqDate', 'rqName', 'rqAbn'].forEach(function (id) {
+      document.getElementById(id).oninput = render;
+      document.getElementById(id).onchange = render;
+    });
+    Array.prototype.forEach.call(mask.querySelectorAll('.rq-tabs button'), function (b) {
+      b.onclick = function () {
+        queryTab = b.dataset.tab;
+        Array.prototype.forEach.call(mask.querySelectorAll('.rq-tabs button'), function (x) {
+          x.classList.toggle('on', x === b);
+        });
+        render();
+      };
+    });
+
+    if (queryRows.length || meritRows.length) { fillFilters(); render(); }
+    if (meritRows.length) {
+      document.getElementById('rqMFile').textContent = meritFileName || ('已載入 ' + meritRows.length + ' 筆');
+    }
+  }
+
+  function pickQueryFile() {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.csv,text/csv';
+    inp.onchange = function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var rd = new FileReader();
+      rd.onload = function (ev) {
+        queryRows = rowsToObjs(parseCSV(ev.target.result));
+        document.getElementById('rqFile').textContent = file.name + '（' + queryRows.length + ' 筆）';
+        fillFilters();
+        render();
+      };
+      rd.readAsText(file, 'UTF-8');
+    };
+    inp.click();
+  }
+
+  function pickMeritFile() {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.csv,text/csv';
+    inp.onchange = function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var rd = new FileReader();
+      rd.onload = function (ev) {
+        meritRows = mRowsToObjs(parseCSV(ev.target.result));
+        document.getElementById('rqMFile').textContent = file.name + '（' + meritRows.length + ' 筆）';
+        fillFilters();
+        queryTab = 'merit';
+        var mask = document.getElementById('rqMask');
+        Array.prototype.forEach.call(mask.querySelectorAll('.rq-tabs button'), function (x) {
+          x.classList.toggle('on', x.dataset.tab === 'merit');
+        });
+        render();
+      };
+      rd.readAsText(file, 'UTF-8');
+    };
+    inp.click();
+  }
+
+  function uniq(arr) {
+    return arr.filter(function (v, i, a) { return v && a.indexOf(v) === i; }).sort();
+  }
+  function fillFilters() {
+    var cs = document.getElementById('rqCls'), ds = document.getElementById('rqDate');
+    var all = queryRows.concat(meritRows);
+    var kc = cs.value, kd = ds.value;
+    cs.innerHTML = '<option value="">全部班級</option>' +
+      uniq(all.map(function (o) { return o.cls; })).map(function (c) {
+        return '<option>' + c + '</option>'; }).join('');
+    ds.innerHTML = '<option value="">全部日期</option>' +
+      uniq(all.map(function (o) { return o.date; })).reverse().map(function (d) {
+        return '<option>' + d + '</option>'; }).join('');
+    cs.value = kc; ds.value = kd;
+  }
+
+  function filtered() {
+    var cls = document.getElementById('rqCls').value;
+    var date = document.getElementById('rqDate').value;
+    var kw = document.getElementById('rqName').value.trim();
+    var abn = document.getElementById('rqAbn').checked;
+    return queryRows.filter(function (o) {
+      if (cls && o.cls !== cls) return false;
+      if (date && o.date !== date) return false;
+      if (kw && o.name.indexOf(kw) === -1 && (o.sid || '').indexOf(kw) === -1) return false;
+      if (abn && ABNORMAL.indexOf(o.status) === -1) return false;
+      return true;
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function filteredMerits() {
+    var cls = document.getElementById('rqCls').value;
+    var date = document.getElementById('rqDate').value;
+    var kw = document.getElementById('rqName').value.trim();
+    return meritRows.filter(function (o) {
+      if (cls && o.cls !== cls) return false;
+      if (date && o.date !== date) return false;
+      if (kw && o.name.indexOf(kw) === -1 && (o.sid || '').indexOf(kw) === -1) return false;
+      return true;
+    });
+  }
+
+  function meritHTML(rows) {
+    var map = {};
+    rows.forEach(function (o) {
+      var k = keyOf(o);
+      if (!map[k]) map[k] = { cls: o.cls, name: o.name, sid: o.sid || '', good: 0, bad: 0, score: 0 };
+      if (o.name) map[k].name = o.name;
+      if (o.sid) map[k].sid = o.sid;
+      if (o.points >= 0) map[k].good++; else map[k].bad++;
+      map[k].score += o.points;
+    });
+    var list = Object.keys(map).map(function (k) { return map[k]; })
+      .sort(function (a, b) { return b.score - a.score; });
+    var totalGood = 0, totalBad = 0;
+    rows.forEach(function (o) { if (o.points >= 0) totalGood++; else totalBad++; });
+    var detail = rows.slice().sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return a.time < b.time ? 1 : -1;
+    });
+    return '<div class="rq-sum">共 ' + rows.length + ' 筆　⭐ 優點 ' + totalGood +
+        ' 次　⚠️ 缺點 ' + totalBad + ' 次</div>' +
+      '<table><thead><tr><th>學號</th><th>姓名</th><th>班級</th><th>優點次數</th><th>缺點次數</th><th>總分</th></tr></thead><tbody>' +
+      list.map(function (m) {
+        return '<tr><td style="color:#888">' + esc(m.sid || '') + '</td>' +
+          '<td style="text-align:left">' + esc(m.name) + '</td><td>' + esc(m.cls) + '</td>' +
+          '<td class="m-good">' + m.good + '</td><td class="m-bad">' + m.bad + '</td>' +
+          '<td class="' + (m.score >= 0 ? 'm-good' : 'm-bad') + '">' + (m.score > 0 ? '+' : '') + m.score + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<div class="rq-sum" style="margin-top:16px">📝 事由明細</div>' +
+      '<table><thead><tr><th>日期</th><th>時間</th><th>班級</th><th>姓名</th><th>類型</th><th>分數</th><th>事由</th></tr></thead><tbody>' +
+      detail.map(function (o) {
+        var c = o.points >= 0 ? 'm-good' : 'm-bad';
+        return '<tr><td>' + esc(o.date) + '</td><td>' + esc(o.time) + '</td><td>' + esc(o.cls) + '</td>' +
+          '<td style="text-align:left">' + esc(o.name) + '</td>' +
+          '<td class="' + c + '">' + esc(o.type) + '</td>' +
+          '<td class="' + c + '">' + (o.points > 0 ? '+' : '') + o.points + '</td>' +
+          '<td style="text-align:left">' + esc(o.reason) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function render() {
+    var body = document.getElementById('rqBody');
+    if (!body) return;
+    if (queryTab === 'merit') {
+      if (!meritRows.length) {
+        body.innerHTML = '<div class="rq-empty">請先用上方「⭐ 優缺點：選擇 CSV」載入優缺點紀錄檔</div>';
+        return;
+      }
+      var mr = filteredMerits();
+      body.innerHTML = mr.length ? meritHTML(mr) : '<div class="rq-empty">沒有符合條件的優缺點紀錄</div>';
+      return;
+    }
+    if (!queryRows.length) {
+      body.innerHTML = '<div class="rq-empty">請先選擇點名紀錄 CSV 檔案</div>';
+      return;
+    }
+    var rows = filtered();
+    if (!rows.length) {
+      body.innerHTML = '<div class="rq-empty">沒有符合條件的紀錄</div>';
+      return;
+    }
+    body.innerHTML = queryTab === 'stat' ? statHTML(rows) : detailHTML(rows);
+    if (queryTab === 'stat') {
+      Array.prototype.forEach.call(body.querySelectorAll('th[data-k]'), function (th) {
+        th.onclick = function () {
+          var k = th.dataset.k;
+          if (sortKey === k) sortDesc = !sortDesc; else { sortKey = k; sortDesc = true; }
+          render();
+        };
+      });
+    }
+  }
+
+  function statHTML(rows) {
+    var map = {};
+    rows.forEach(function (o) {
+      var key = keyOf(o);
+      if (!map[key]) map[key] = { cls: o.cls, name: o.name, sid: o.sid || '', note: '', 到課: 0, 缺席: 0, 遲到: 0, 請假: 0, 未點名: 0, total: 0 };
+      var m = map[key];
+      if (o.note) m.note = o.note;
+      if (o.name) m.name = o.name;         // 顯示最新的姓名寫法
+      if (o.sid) m.sid = o.sid;
+      if (m[o.status] === undefined) m[o.status] = 0;
+      m[o.status]++; m.total++;
+    });
+    var list = Object.keys(map).map(function (k) { return map[k]; });
+    var kmap = { absent: '缺席', late: '遲到', leave: '請假', present: '到課', total: 'total', name: 'name' };
+    var sk = kmap[sortKey] || '缺席';
+    list.sort(function (a, b) {
+      if (sk === 'name') return sortDesc ? (a.name < b.name ? 1 : -1) : (a.name < b.name ? -1 : 1);
+      var d = (b[sk] || 0) - (a[sk] || 0);
+      return sortDesc ? d : -d;
+    });
+    var arrow = function (k) { return sortKey === k ? (sortDesc ? ' ▼' : ' ▲') : ''; };
+    var sum = { 到課: 0, 缺席: 0, 遲到: 0, 請假: 0 };
+    rows.forEach(function (o) { if (sum[o.status] !== undefined) sum[o.status]++; });
+    return '<div class="rq-sum">共 ' + list.length + ' 位學生、' + rows.length + ' 筆紀錄　|　' +
+      '到課 ' + sum.到課 + '　缺席 ' + sum.缺席 + '　遲到 ' + sum.遲到 + '　請假 ' + sum.請假 +
+      '　<span style="color:#aaa">（點欄位標題可排序）</span></div>' +
+      '<table><thead><tr>' +
+      '<th>學號</th><th data-k="name">姓名' + arrow('name') + '</th><th>備註</th><th>班級</th>' +
+      '<th data-k="present">到課' + arrow('present') + '</th>' +
+      '<th data-k="absent">缺席' + arrow('absent') + '</th>' +
+      '<th data-k="late">遲到' + arrow('late') + '</th>' +
+      '<th data-k="leave">請假' + arrow('leave') + '</th>' +
+      '<th data-k="total">點名次數' + arrow('total') + '</th>' +
+      '<th title="出席率 =（到課 + 遲到）÷ 點名次數">出席率</th>' +
+      '</tr></thead><tbody>' +
+      list.map(function (m) {
+        var rate = m.total ? Math.round((m.到課 + m.遲到) / m.total * 100) : 0;
+        return '<tr><td style="color:#888">' + esc(m.sid || '') + '</td>' +
+          '<td style="text-align:left">' + esc(m.name) + '</td>' +
+          '<td style="color:#5e35b1">' + esc(m.note || '') + '</td><td>' + esc(m.cls) + '</td>' +
+          '<td class="s-到課">' + m.到課 + '</td><td class="s-缺席">' + m.缺席 + '</td>' +
+          '<td class="s-遲到">' + m.遲到 + '</td><td class="s-請假">' + m.請假 + '</td>' +
+          '<td>' + m.total + '</td><td>' + rate + '%</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function detailHTML(rows) {
+    var sorted = rows.slice().sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      if (a.cls !== b.cls) return a.cls < b.cls ? -1 : 1;
+      return (parseInt(a.seat, 10) || 0) - (parseInt(b.seat, 10) || 0);
+    });
+    return '<div class="rq-sum">共 ' + sorted.length + ' 筆紀錄</div>' +
+      '<table><thead><tr><th>日期</th><th>班級</th><th>座位</th><th>學號</th><th>姓名</th><th>備註</th><th>狀態</th></tr></thead><tbody>' +
+      sorted.map(function (o) {
+        return '<tr><td>' + esc(o.date) + '</td><td>' + esc(o.cls) + '</td><td>' + esc(o.seat) +
+          '</td><td style="color:#888">' + esc(o.sid || '') + '</td>' +
+          '<td style="text-align:left">' + esc(o.name) + '</td>' +
+          '<td style="color:#5e35b1">' + esc(o.note || '') + '</td>' +
+          '<td class="s-' + esc(o.status) + '">' + esc(o.status) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function exportFiltered() {
+    if (queryTab === 'merit') {
+      var mr = filteredMerits();
+      if (!mr.length) { alert('目前沒有可匯出的優缺點紀錄。'); return; }
+      var blob = new Blob(['\uFEFF' + toCSV(mObjsToRows(mr))], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '優缺點查詢結果_' + todayStr() + '.csv';
+      a.click();
+      return;
+    }
+    if (!queryRows.length) { alert('請先載入紀錄檔。'); return; }
+    var rows = filtered();
+    if (!rows.length) { alert('目前沒有可匯出的紀錄。'); return; }
+    downloadObjs(rows, '點名查詢結果_' + todayStr() + '.csv');
+  }
+
+  // ══════════════════ 優缺點紀錄 ══════════════════
+  var MHEADER = ['日期', '時間', '班級', '座位', '學號', '姓名', '類型', '分數', '事由'];
+  var MERIT_PRESETS = {
+    '優點': ['主動幫忙', '作業優良', '踴躍發言', '熱心助人', '進步很多', '整潔認真', '服務同學', '遵守秩序'],
+    '缺點': ['未交作業', '上課講話', '影響他人', '未帶用品', '嬉鬧追逐', '不聽勸導', '遲到', '未打掃']
+  };
+  var meritHandle = null, meritFileName = '';
+  var meritHistory = [], historyLoaded = false, historyFileName = '';
+  var meritsToday = [];     // 本次開啟頁面後記錄的資料
+  var mfType = '優點', mfSeatIdx = -1;
+
+  function nowTime() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function mObjsToRows(objs) {
+    return [MHEADER].concat(objs.map(function (o) {
+      return [o.date, o.time, o.cls, o.seat, o.sid || '', o.name, o.type, String(o.points), o.reason];
+    }));
+  }
+  function mRowsToObjs(rows) {
+    if (!rows.length) return [];
+    var head = rows[0].map(function (c) { return (c || '').trim(); });
+    var hasHead = head.indexOf('日期') !== -1;
+    var body = hasHead ? rows.slice(1) : rows;
+    var ix = hasHead
+      ? { date: colIdx(head, '日期'), time: colIdx(head, '時間'), cls: colIdx(head, '班級'),
+          seat: colIdx(head, '座位'), sid: colIdx(head, '學號'), name: colIdx(head, '姓名'),
+          type: colIdx(head, '類型'), points: colIdx(head, '分數'), reason: colIdx(head, '事由') }
+      : { date: 0, time: 1, cls: 2, seat: 3, sid: -1, name: 4, type: 5, points: 6, reason: 7 };
+    return body.map(function (r) {
+      return { date: pick(r, ix.date), time: pick(r, ix.time), cls: pick(r, ix.cls),
+               seat: pick(r, ix.seat), sid: pick(r, ix.sid), name: pick(r, ix.name),
+               type: pick(r, ix.type), points: parseInt(pick(r, ix.points), 10) || 0,
+               reason: pick(r, ix.reason) };
+    }).filter(function (o) { return o.date && o.name; });
+  }
+
+  // 身分識別：優先用學號，沒有學號才退回「班級｜姓名」
+  function keyOf(o) { return o.sid ? '#' + o.sid : (o.cls + '｜' + o.name); }
+  function sidOf(name) {
+    var c = ctx();
+    return (c && c.idOf) ? (c.idOf(name) || '') : '';
+  }
+  function isSame(o, name, sid) {
+    if (sid && o.sid) return o.sid === sid;
+    return o.name === name;
+  }
+
+  function sameMerit(a, b) {
+    return a.date === b.date && a.time === b.time && a.name === b.name &&
+           a.type === b.type && a.points === b.points && a.reason === b.reason;
+  }
+
+  // 歷史 + 本日的累計總分（自動避開重複計算已寫入檔案的今日紀錄）
+  function meritTotal(name, sid) {
+    var t = 0, n = 0;
+    meritHistory.forEach(function (o) {
+      if (!isSame(o, name, sid)) return;
+      if (meritsToday.some(function (m) { return sameMerit(m, o); })) return;
+      t += o.points; n++;
+    });
+    meritsToday.forEach(function (m) { if (isSame(m, name, sid)) { t += m.points; n++; } });
+    return { score: t, count: n };
+  }
+
+  // 載入優缺點 CSV，讓座位卡顯示歷史累計
+  function loadMeritHistory() {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.csv,text/csv';
+    inp.onchange = function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var rd = new FileReader();
+      rd.onload = function (ev) {
+        meritHistory = mRowsToObjs(parseCSV(ev.target.result));
+        historyLoaded = true;
+        historyFileName = file.name;
+        meritRows = meritHistory.slice();   // 查詢視窗也一併可用
+        refreshPage();
+        var people = {};
+        meritHistory.forEach(function (o) { people[keyOf(o)] = 1; });
+        alert('✅ 已載入「' + file.name + '」\n' + meritHistory.length + ' 筆紀錄、' +
+              Object.keys(people).length + ' 位學生\n座位卡現在會顯示累計總分。');
+      };
+      rd.readAsText(file, 'UTF-8');
+    };
+    inp.click();
+  }
+
+  // 座位徽章：本日 + 累計
+  function meritBadge(name) {
+    if (!name) return '';
+    var d = todayStr(), sid = sidOf(name), plus = 0, minus = 0;
+    meritsToday.forEach(function (m) {
+      if (m.date !== d || !isSame(m, name, sid)) return;
+      if (m.points >= 0) plus += m.points; else minus += m.points;
+    });
+    var out = '';
+    if (plus) out += '<span class="seat-merit good">⭐+' + plus + '</span>';
+    if (minus) out += '<span class="seat-merit bad">⚠️' + minus + '</span>';
+    if (historyLoaded) {
+      var r = meritTotal(name, sid);
+      if (r.count > 0) {
+        out += '<span class="seat-merit tot ' + (r.score < 0 ? 'bad' : '') + '">累計' +
+               (r.score > 0 ? '+' : '') + r.score + '（' + r.count + '筆）</span>';
+      }
+    }
+    return out;
+  }
+
+  function refreshPage() {
+    var c = ctx();
+    if (c && typeof c.refresh === 'function') c.refresh();
+  }
+
+  // ── 記錄表單 ──
+  function openMeritForm(idx) {
+    var c = ctx(), s = c.seats[idx];
+    if (!s || !s.name) { alert('這個座位沒有學生。'); return; }
+    injectStyle();
+    var old = document.getElementById('mfMask');
+    if (old) old.remove();
+    mfSeatIdx = idx; mfType = '優點';
+
+    var mask = document.createElement('div');
+    mask.className = 'rq-mask'; mask.id = 'mfMask';
+    mask.innerHTML =
+      '<div class="rq-box" style="max-width:440px">' +
+        '<div class="rq-head"><h3>⭐ 新增優缺點紀錄</h3><button id="mfClose">✕ 關閉</button></div>' +
+        '<div class="mf-body">' +
+          '<div class="mf-who">座位 ' + (idx + 1) + '　' + esc(s.name) +
+            (c.noteOf && c.noteOf(s.name) ? '（' + esc(c.noteOf(s.name)) + '）' : '') + '</div>' +
+          '<div class="mf-types"><button id="mfGood" class="on">⭐ 優點</button>' +
+            '<button id="mfBad">⚠️ 缺點</button></div>' +
+          '<div class="mf-label">分數</div>' +
+          '<div class="mf-score"><button id="mfMinus">−</button>' +
+            '<input type="number" id="mfPoints" value="1" min="1" max="99">' +
+            '<button id="mfPlus">＋</button><b id="mfPreview">+1</b></div>' +
+          '<div class="mf-label">事由說明（必填，之後查詢才知道當天發生什麼）</div>' +
+          '<input type="text" id="mfReason" placeholder="例如：主動幫忙搬教具">' +
+          '<div class="mf-chips" id="mfChips"></div>' +
+        '</div>' +
+        '<div class="mf-foot"><button id="mfSave" class="mf-ok">💾 儲存紀錄</button>' +
+          '<button id="mfCancel" class="mf-no">取消</button></div>' +
+      '</div>';
+    document.body.appendChild(mask);
+
+    function close() { mask.remove(); mfSeatIdx = -1; }
+    mask.addEventListener('click', function (e) { if (e.target === mask) close(); });
+    document.getElementById('mfClose').onclick = close;
+    document.getElementById('mfCancel').onclick = close;
+    document.getElementById('mfGood').onclick = function () { setType('優點'); };
+    document.getElementById('mfBad').onclick = function () { setType('缺點'); };
+    document.getElementById('mfMinus').onclick = function () { bump(-1); };
+    document.getElementById('mfPlus').onclick = function () { bump(1); };
+    document.getElementById('mfPoints').oninput = preview;
+    document.getElementById('mfReason').onkeydown = function (e) { if (e.key === 'Enter') save(); };
+    document.getElementById('mfSave').onclick = save;
+    setType('優點');
+    setTimeout(function () {
+      var el = document.getElementById('mfReason');
+      if (el) el.focus();
+    }, 60);
+
+    function setType(t) {
+      mfType = t;
+      document.getElementById('mfGood').classList.toggle('on', t === '優點');
+      document.getElementById('mfBad').classList.toggle('on', t === '缺點');
+      document.getElementById('mfChips').innerHTML = MERIT_PRESETS[t].map(function (r) {
+        return '<span class="mf-chip ' + (t === '優點' ? 'g' : 'b') + '">' + r + '</span>';
+      }).join('');
+      Array.prototype.forEach.call(document.querySelectorAll('#mfChips .mf-chip'), function (el) {
+        el.onclick = function () { document.getElementById('mfReason').value = el.textContent; };
+      });
+      preview();
+    }
+    function bump(d) {
+      var el = document.getElementById('mfPoints');
+      el.value = Math.min(99, Math.max(1, (parseInt(el.value, 10) || 1) + d));
+      preview();
+    }
+    function preview() {
+      var v = Math.abs(parseInt(document.getElementById('mfPoints').value, 10) || 1);
+      var el = document.getElementById('mfPreview');
+      el.textContent = (mfType === '優點' ? '+' : '-') + v;
+      el.className = mfType === '優點' ? 'good' : 'bad';
+    }
+    async function save() {
+      var reason = document.getElementById('mfReason').value.trim();
+      if (!reason) { alert('請填寫事由說明。'); document.getElementById('mfReason').focus(); return; }
+      var v = Math.abs(parseInt(document.getElementById('mfPoints').value, 10) || 1);
+
+      // ① 先開檔案視窗（保住使用者手勢），之後才詢問班級
+      if (FSA && !meritHandle) {
+        try { await ensureMeritFile(); }
+        catch (e) {
+          if (e && e.name === 'AbortError') return;
+          alert('無法開啟檔案視窗：' + gestureMsg(e));
+          return;
+        }
+      }
+
+      var cls = askClass();
+      if (cls === null) return;
+      var obj = { date: todayStr(), time: nowTime(), cls: cls, seat: String(idx + 1),
+                  sid: sidOf(s.name), name: s.name, type: mfType,
+                  points: mfType === '優點' ? v : -v, reason: reason };
+      close();
+      await saveMerit(obj);
+    }
+  }
+
+  async function saveMerit(obj) {
+    meritsToday.push(obj);
+    refreshPage();
+    if (!FSA) {
+      alert('已記錄（暫存於本頁）：\n' + obj.name + '　' + obj.type + ' ' +
+            (obj.points > 0 ? '+' : '') + obj.points + '　' + obj.reason +
+            '\n\n此瀏覽器無法直接寫檔，請按「⭐ 本日優缺點」→「下載紀錄」保存。');
+      return;
+    }
+    try {
+      await ensureMeritFile();
+      await writeMerits(await readMeritFile().then(function (list) { return list.concat([obj]); }));
+      alert('✅ 已寫入「' + meritFileName + '」\n' + obj.name + '　' + obj.type + ' ' +
+            (obj.points > 0 ? '+' : '') + obj.points + '\n事由：' + obj.reason);
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        alert('已記錄於本頁，但尚未寫入檔案。\n可按「⭐ 本日優缺點」再次儲存或下載。');
+        return;
+      }
+      meritHandle = null;
+      alert('寫入失敗：' + gestureMsg(err) +
+            '\n資料仍保留在本頁，可從「⭐ 本日優缺點」重新儲存或下載。');
+    }
+  }
+
+  async function ensureMeritFile() {
+    if (meritHandle) return;
+    meritHandle = await pickFile('優缺點紀錄.csv');
+    meritFileName = meritHandle.name;
+  }
+
+  async function readMeritFile() {
+    try {
+      var f = await meritHandle.getFile();
+      var txt = await f.text();
+      return txt.trim() ? mRowsToObjs(parseCSV(txt)) : [];
+    } catch (e) { return []; }
+  }
+
+  async function writeMerits(list) {
+    list.sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      return a.time < b.time ? -1 : 1;
+    });
+    var w = await meritHandle.createWritable();
+    await w.write('﻿' + toCSV(mObjsToRows(list)));
+    await w.close();
+  }
+
+  function downloadMerits() {
+    if (!meritsToday.length) { alert('本頁尚未有優缺點紀錄。'); return; }
+    var blob = new Blob(['﻿' + toCSV(mObjsToRows(meritsToday))], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '優缺點紀錄_' + todayStr() + '.csv';
+    a.click();
+  }
+
+  // ── 本日紀錄清單 ──
+  function openMeritList() {
+    injectStyle();
+    var old = document.getElementById('mlMask');
+    if (old) old.remove();
+    var mask = document.createElement('div');
+    mask.className = 'rq-mask'; mask.id = 'mlMask';
+    mask.innerHTML =
+      '<div class="rq-box" style="max-width:640px">' +
+        '<div class="rq-head"><h3>⭐ 本日優缺點紀錄</h3><button id="mlClose">✕ 關閉</button></div>' +
+        '<div class="rq-bar"><button id="mlDown">⬇️ 下載本頁紀錄</button>' +
+          '<button id="mlSaveAll">💾 全部寫入紀錄檔</button>' +
+          '<span style="color:#aaa">刪除只會移除紀錄檔中的同一筆資料</span></div>' +
+        '<div class="rq-body" id="mlBody"></div>' +
+      '</div>';
+    document.body.appendChild(mask);
+    mask.addEventListener('click', function (e) { if (e.target === mask) mask.remove(); });
+    document.getElementById('mlClose').onclick = function () { mask.remove(); };
+    document.getElementById('mlDown').onclick = downloadMerits;
+    document.getElementById('mlSaveAll').onclick = saveAllMerits;
+    renderMeritList();
+  }
+
+  function renderMeritList() {
+    var body = document.getElementById('mlBody');
+    if (!body) return;
+    var d = todayStr();
+    var list = meritsToday.filter(function (m) { return m.date === d; });
+    if (!list.length) {
+      body.innerHTML = '<div class="rq-empty">今天還沒有優缺點紀錄<br>點選座位 →「⭐ 優缺點紀錄」即可新增</div>';
+      return;
+    }
+    var sum = 0;
+    list.forEach(function (m) { sum += m.points; });
+    body.innerHTML = '<div class="rq-sum">共 ' + list.length + ' 筆　總分 ' +
+      (sum > 0 ? '+' : '') + sum + '</div>' +
+      '<table><thead><tr><th>時間</th><th>座位</th><th>姓名</th><th>類型</th><th>分數</th><th>事由</th><th></th></tr></thead><tbody>' +
+      list.map(function (m) {
+        var gi = meritsToday.indexOf(m);
+        return '<tr><td>' + esc(m.time) + '</td><td>' + esc(m.seat) + '</td>' +
+          '<td style="text-align:left">' + esc(m.name) + '</td>' +
+          '<td class="' + (m.points >= 0 ? 'm-good' : 'm-bad') + '">' + esc(m.type) + '</td>' +
+          '<td class="' + (m.points >= 0 ? 'm-good' : 'm-bad') + '">' + (m.points > 0 ? '+' : '') + m.points + '</td>' +
+          '<td style="text-align:left">' + esc(m.reason) + '</td>' +
+          '<td><button class="ml-del" data-i="' + gi + '">🗑</button></td></tr>';
+      }).join('') + '</tbody></table>';
+    Array.prototype.forEach.call(body.querySelectorAll('.ml-del'), function (b) {
+      b.onclick = function () { deleteMerit(parseInt(b.dataset.i, 10)); };
+    });
+  }
+
+  async function deleteMerit(i) {
+    var m = meritsToday[i];
+    if (!m) return;
+    if (!confirm('確定刪除這筆紀錄？\n\n' + m.name + '　' + m.type + ' ' +
+                 (m.points > 0 ? '+' : '') + m.points + '\n' + m.reason)) return;
+    meritsToday.splice(i, 1);
+    refreshPage();
+    renderMeritList();
+    if (FSA && meritHandle) {
+      try {
+        var list = await readMeritFile();
+        var idx = list.findIndex(function (o) {
+          return o.date === m.date && o.time === m.time && o.name === m.name &&
+                 o.type === m.type && o.points === m.points && o.reason === m.reason;
+        });
+        if (idx !== -1) { list.splice(idx, 1); await writeMerits(list); }
+      } catch (e) { alert('已從本頁移除，但更新紀錄檔失敗：' + e.message); }
+    }
+  }
+
+  async function saveAllMerits() {
+    var d = todayStr();
+    var list = meritsToday.filter(function (m) { return m.date === d; });
+    if (!list.length) { alert('今天沒有可儲存的紀錄。'); return; }
+    if (!FSA) { downloadMerits(); return; }
+    try {
+      await ensureMeritFile();
+      var exist = await readMeritFile();
+      var added = 0;
+      list.forEach(function (m) {
+        var dup = exist.some(function (o) {
+          return o.date === m.date && o.time === m.time && o.name === m.name &&
+                 o.type === m.type && o.points === m.points && o.reason === m.reason;
+        });
+        if (!dup) { exist.push(m); added++; }
+      });
+      await writeMerits(exist);
+      alert('✅ 已寫入「' + meritFileName + '」\n新增 ' + added + ' 筆（略過重複 ' +
+            (list.length - added) + ' 筆）\n檔案目前共 ' + exist.length + ' 筆');
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+      alert('寫入失敗：' + gestureMsg(err));
+    }
+  }
+
+  window.appendRecords = appendRecords;
+  window.openRecordQuery = openQuery;
+  window.openMeritForm = openMeritForm;
+  window.loadMeritHistory = loadMeritHistory;
+  window.openMeritList = openMeritList;
+  window.meritBadge = meritBadge;
+}
+window.__recordContext = function () {
+  return {
+    className: CLASS_NAME,
+    seats: seats,
+    noteOf: noteOf,
+    idOf: idOf,
+    refresh: renderGrid,
+    setClassName: function (v) { CLASS_NAME = v; }
+  };
+};
+attendanceRecordsModule();
+document.getElementById('popupOverlay').addEventListener('click', function(e){ if(e.target===this) closePopup(); });
+renderGrid();
+</script>
+</body>
+</html>

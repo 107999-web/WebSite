@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可愛網球小遊戲 🎾</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #FFF0F5; /* 可愛淡粉紅色背景 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Comic Sans MS', 'Microsoft JhengHei', sans-serif;
+            color: #555;
+        }
+
+        h1 {
+            color: #FF8B94;
+            text-shadow: 2px 2px 0px #FFF;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-top: 0;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .game-container {
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 5px solid #FFD3B6;
+        }
+
+        canvas {
+            display: block;
+            background-color: #A8E6CF; /* 可愛薄荷綠網球場 */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎾 可愛網球小遊戲 🎾</h1>
+    <p>滑動滑鼠來控制粉紅色的球拍吧！</p>
+
+    <div class="game-container">
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // 遊戲物件設定
+        const net = {
+            x: canvas.width / 2 - 2,
+            y: 0,
+            width: 4,
+            height: 15,
+            color: "#FFFFFF"
+        };
+
+        const user = {
+            x: 10,
+            y: canvas.height / 2 - 40,
+            width: 12,
+            height: 80,
+            color: "#FF8B94", // 可愛粉紅
+            score: 0
+        };
+
+        const com = {
+            x: canvas.width - 22,
+            y: canvas.height / 2 - 40,
+            width: 12,
+            height: 80,
+            color: "#8BC6EC", // 可愛淡藍
+            score: 0
+        };
+
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speed: 5,
+            velocityX: 5,
+            velocityY: 5,
+            color: "#FFFFB5" // 可愛暖黃色
+        };
+
+        // 畫圓角矩形 (讓球拍看起來圓潤可愛)
+        function drawRoundedRect(x, y, w, h, radius, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // 畫圓形 (網球)
+        function drawCircle(x, y, r, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // 畫文字 (分數)
+        function drawText(text, x, y, color) {
+            ctx.fillStyle = color;
+            ctx.font = "40px 'Comic Sans MS', sans-serif";
+            ctx.fillText(text, x, y);
+        }
+
+        // 畫球網
+        function drawNet() {
+            for (let i = 0; i <= canvas.height; i += 25) {
+                drawRoundedRect(net.x, net.y + i, net.width, net.height, 2, net.color);
+            }
+        }
+
+        // 監聽滑鼠移動來控制玩家球拍
+        canvas.addEventListener("mousemove", getMousePos);
+
+        function getMousePos(evt) {
+            let rect = canvas.getBoundingClientRect();
+            user.y = evt.clientY - rect.top - user.height / 2;
+            
+            // 避免球拍超出邊界
+            if (user.y < 0) user.y = 0;
+            if (user.y + user.height > canvas.height) user.y = canvas.height - user.height;
+        }
+
+        // 重置球的位置
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speed = 5;
+            ball.velocityX = -ball.velocityX; // 換邊發球
+        }
+
+        // 碰撞偵測
+        function collision(b, p) {
+            b.top = b.y - b.radius;
+            b.bottom = b.y + b.radius;
+            b.left = b.x - b.radius;
+            b.right = b.x + b.radius;
+
+            p.top = p.y;
+            p.bottom = p.y + p.height;
+            p.left = p.x;
+            p.right = p.x + p.width;
+
+            return b.right > p.left && b.bottom > p.top && b.left < p.right && b.top < p.bottom;
+        }
+
+        // 遊戲邏輯更新
+        function update() {
+            // 球的移動
+            ball.x += ball.velocityX;
+            ball.y += ball.velocityY;
+
+            // 電腦(AI)的簡單邏輯：讓球拍跟著球的Y軸移動
+            let computerLevel = 0.08; 
+            com.y += (ball.y - (com.y + com.height / 2)) * computerLevel;
+
+            // 避免電腦球拍超出邊界
+            if (com.y < 0) com.y = 0;
+            if (com.y + com.height > canvas.height) com.y = canvas.height - com.height;
+
+            // 球碰到上下牆壁反彈
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.velocityY = -ball.velocityY;
+            }
+
+            // 確認是玩家還是電腦接球
+            let player = (ball.x < canvas.width / 2) ? user : com;
+
+            if (collision(ball, player)) {
+                // 計算擊球點，讓球反彈有不同角度
+                let collidePoint = ball.y - (player.y + player.height / 2);
+                collidePoint = collidePoint / (player.height / 2);
+                
+                // 計算角度 (最大 45 度)
+                let angleRad = collidePoint * Math.PI / 4;
+
+                // 決定反彈方向
+                let direction = (ball.x < canvas.width / 2) ? 1 : -1;
+
+                // 改變速度和方向
+                ball.velocityX = direction * ball.speed * Math.cos(angleRad);
+                ball.velocityY = ball.speed * Math.sin(angleRad);
+
+                // 每次擊球後稍微增加速度，增加刺激感
+                ball.speed += 0.2;
+            }
+
+            // 計算分數
+            if (ball.x - ball.radius < 0) {
+                com.score++;
+                resetBall();
+            } else if (ball.x + ball.radius > canvas.width) {
+                user.score++;
+                resetBall();
+            }
+        }
+
+        // 畫面渲染
+        function render() {
+            // 清除畫布 (畫上背景色)
+            ctx.fillStyle = "#A8E6CF";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 畫分數 (半透明白色，比較可愛)
+            drawText(user.score, canvas.width / 4, canvas.height / 5, "rgba(255, 255, 255, 0.7)");
+            drawText(com.score, 3 * canvas.width / 4, canvas.height / 5, "rgba(255, 255, 255, 0.7)");
+
+            // 畫球網
+            drawNet();
+
+            // 畫玩家跟電腦的球拍 (圓角)
+            drawRoundedRect(user.x, user.y, user.width, user.height, 6, user.color);
+            drawRoundedRect(com.x, com.y, com.width, com.height, 6, com.color);
+
+            // 畫網球
+            drawCircle(ball.x, ball.y, ball.radius, ball.color);
+        }
+
+        // 遊戲迴圈
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 啟動遊戲
+        gameLoop();
+    </script>
+</body>
+</html>

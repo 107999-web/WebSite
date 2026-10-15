@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>五週進度表・貓咪盃 AI 互動組</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/comp.css">
+<style>
+.ddbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.ddbox{background:var(--paper);border:3px solid var(--line);border-radius:18px;padding:11px 14px;text-align:center}
+.ddbox .k{font-size:.78rem;font-weight:700;color:var(--ink2)}
+.ddbox .v{font-family:var(--f-num);font-weight:800;font-size:1.5rem;color:var(--accent-d);line-height:1.25}
+.ddbox .u{font-size:.78rem;color:var(--ink2)}
+.ddbox.hot{border-color:var(--no)} .ddbox.hot .v{color:var(--no)}
+.ddbox.done{border-color:var(--ok)} .ddbox.done .v{color:var(--ok)}
+
+.tl{display:grid;gap:0;margin-top:16px}
+.tlrow{display:grid;grid-template-columns:84px 24px 1fr;gap:0 12px;align-items:start}
+.tlrow .d{font-family:var(--f-num);font-weight:800;font-size:.92rem;color:var(--accent-d);text-align:right;padding-top:9px}
+.tlrow .ln{position:relative;justify-self:center}
+.tlrow .ln::before{content:'';position:absolute;left:50%;top:0;bottom:-2px;width:3px;transform:translateX(-50%);background:var(--line)}
+.tlrow:last-child .ln::before{bottom:auto;height:16px}
+.tlrow .dot{position:relative;z-index:1;display:block;width:15px;height:15px;border-radius:50%;
+  background:var(--paper);border:4px solid var(--accent);margin-top:12px}
+.tlrow.big .dot{border-color:var(--ok);width:19px;height:19px;margin-top:10px}
+.tlrow.end .dot{border-color:var(--no)}
+.tlrow .c{padding:7px 0 13px}
+.tlrow .c b{font-size:.98rem}
+.tlrow .c span{display:block;font-size:.87rem;color:var(--ink2)}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tabs button{border:3px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;
+  padding:8px 18px;font-family:var(--f-round);font-weight:800;font-size:.9rem;cursor:pointer;transition:.18s}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,var(--paper));color:var(--accent-d)}
+
+.wk{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:16px 18px;
+  margin-top:14px;box-shadow:var(--shadow-s)}
+.wk.opt{border-color:var(--c-sensing)}
+.wk.fin{border-color:var(--ok)}
+.wkh{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center}
+.wkh .wn{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;line-height:1.1;
+  background:var(--accent);color:#fff;font-family:var(--f-num);font-weight:800;font-size:1.3rem;text-align:center}
+.wk.opt .wkh .wn{background:var(--c-sensing)} .wk.fin .wkh .wn{background:var(--ok)}
+.wkh .wt{font-weight:800;font-size:1.08rem}
+.wkh .wd{font-size:.86rem;color:var(--ink2)}
+.wkh .pct{font-family:var(--f-num);font-weight:800;font-size:1.05rem;color:var(--ink2);white-space:nowrap}
+.wkgoal{margin-top:11px;background:var(--paper2);border-radius:14px;padding:9px 13px;font-size:.92rem}
+.wkgoal b{color:var(--accent-d)}
+.days{font-size:.85rem;color:var(--ink2);margin-top:8px}
+.days .off{color:var(--no);font-weight:700}
+
+.tasks{display:grid;gap:7px;margin-top:12px}
+.tasks label{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;
+  background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:8px 12px;font-size:.92rem;cursor:pointer}
+.tasks label:has(input:checked){border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.tasks input{width:18px;height:18px;accent-color:var(--ok);margin-top:5px;flex:0 0 auto}
+.tasks .tg{font-size:.72rem;font-weight:800;color:#fff;background:var(--c-sensing);border-radius:999px;
+  padding:2px 9px;white-space:nowrap;margin-top:4px}
+.tasks .tg.g{background:var(--c-operators)}
+.tasks .tg.n{background:var(--ink2)}
+
+.ms{margin-top:12px;border:2px solid var(--ok);background:color-mix(in srgb,var(--ok) 11%,var(--paper));
+  border-radius:16px;padding:9px 14px;font-size:.9rem}
+.ms b{color:var(--ok)}
+.ms.warn2{border-color:var(--no);background:color-mix(in srgb,var(--no) 10%,var(--paper))}
+.ms.warn2 b{color:var(--no)}
+.hw{margin-top:10px;border:2px dashed var(--accent);border-radius:16px;padding:9px 14px;font-size:.88rem;
+  background:color-mix(in srgb,var(--accent) 10%,var(--paper))}
+
+.finalchk{display:grid;gap:8px;margin-top:12px}
+.finalchk label{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:3px solid var(--line);
+  border-radius:16px;padding:9px 14px;font-size:.91rem;cursor:pointer}
+.finalchk label:has(input:checked){border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.finalchk input{margin-top:5px;width:18px;height:18px;accent-color:var(--ok);flex:0 0 auto}
+
+.gsec{margin-top:18px}
+.gsec.hide{display:none}
+.ghead{display:none}
+.savenote{margin-top:10px;font-size:.86rem;color:var(--ink2);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.savenote .dotok{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:0 0 auto}
+.savenote.bad{color:var(--no)} .savenote.bad .dotok{background:var(--no)}
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:14px}
+.btn2{border:3px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;
+  padding:8px 17px;font-family:var(--f-round);font-weight:800;font-size:.88rem;cursor:pointer;transition:.18s}
+.btn2:hover{border-color:var(--accent);color:var(--accent-d)}
+
+@media(max-width:620px){
+  .wkh{grid-template-columns:auto 1fr}
+  .wkh .pct{grid-column:1/-1}
+  .tasks label{grid-template-columns:auto 1fr}
+  .tasks .tg{grid-column:2/-1;justify-self:start;margin-top:2px}
+  .tlrow{grid-template-columns:62px 20px 1fr;gap:0 8px}
+  .tlrow .d{font-size:.82rem}
+}
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:#fff!important;background-image:none!important}
+  .top,.tabs,.toolbar,.noprint,.savenote,footer{display:none!important}
+  /* 列印時兩組都要印出來，不受畫面上的組別切換影響 */
+  .gsec,.gsec.hide{display:block!important}
+  .ghead{display:block!important;break-before:page;page-break-before:always;break-after:avoid;page-break-after:avoid;
+    margin:0 0 6px;font-size:1.15rem;font-weight:800;border-bottom:3px solid #999;padding-bottom:5px}
+  .gsec:first-of-type .ghead{break-before:auto;page-break-before:auto}
+  .wrap{max-width:none;padding:0}
+  .wk,.tlrow{break-inside:avoid;page-break-inside:avoid}
+  .wk{box-shadow:none;border-width:2px}
+  .sec{margin-top:14px}
+  *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🗓️ 五週進度表 <em>貓咪盃 AI 互動組</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="anim.html">動畫組</a>
+      <a href="game.html">遊戲組</a>
+      <a href="ideas.html">情境卡</a>
+      <a class="on" href="plan.html">進度表</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge">臺北市 115 年度貓咪盃・初賽　繳交截止 10/23（五）</span>
+    <h1>從 9/21 到 10/23，五週進度表</h1>
+    <p>這份進度表<b>刻意不把完成日訂在最後一週</b>。作品的功能在<b>第三週結束（10/8）就要全部做完</b>，
+      第四週整整一週拿來優化、實測與寫說明文件，最後一週只做檢查與繳交。<br>
+      比賽作品失分最多的不是做不出來，而是<b>做得出來但現場跑不穩</b>——優化的時間一定要先留好。</p>
+    <div class="ddbar" id="ddbar"></div>
+    <div class="toolbar">
+      <button class="btn2" id="doPrint">🖨️ 列印成 A4（兩組都會印出）</button>
+      <button class="btn2" id="expBtn">💾 匯出進度檔</button>
+      <button class="btn2" id="impBtn">📂 匯入進度檔</button>
+      <button class="btn2" id="clearAll">↺ 清除所有勾選</button>
+      <input type="file" id="impFile" accept=".json,application/json" style="display:none">
+    </div>
+    <div class="savenote" id="saveNote"><span class="dotok"></span><span id="saveMsg">進度會自動儲存在這台電腦的瀏覽器裡。</span></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">1</span>關鍵日期</h2>
+    <p>五個里程碑。只要其中一個落後，就要在當週把它補回來，不要往後推。</p>
+    <div class="tl" id="tl"></div>
+    <div class="note" style="margin-top:14px">
+      <b>這段期間有三個連假，要先算進去。</b>
+      9/25（五）中秋節、9/26～9/27 例假、9/28（一）教師節，共四天；
+      10/9（五）補假、10/10（六）國慶日、10/11（日），共三天。
+      前三週<b>每週實際只有四個上課日</b>，所以連假反而是趕進度的好時機——每個連假我都排了一項回家任務。
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">2</span>每週進度與檢核</h2>
+    <p>選擇你的組別。每一項做完就打勾，卡片右上會顯示本週完成度。<b>勾選會自動存在這台電腦的瀏覽器裡</b>，下次打開同一個頁面就會回到上次的進度。<br>
+      換電腦、或老師要收進度時，用上方的<b>匯出進度檔</b>存成一個小檔案，在另一台電腦按<b>匯入進度檔</b>就能接續。<b>列印時兩組都會印出來</b>，不受這裡的切換影響。</p>
+    <div class="tabs" id="tabs">
+      <button class="on" data-f="anim">🌳 動畫 AI 互動組</button>
+      <button data-f="game">🎵 遊戲 AI 互動組</button>
+    </div>
+    <div id="weeks"></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">3</span>繳交前總檢核</h2>
+    <p>10/21 送出之前，對照題目<b>逐條</b>確認一次。有任何一項打不了勾，就不要送出。動畫組 11 項、遊戲組 14 項，<b>列印時兩組都會印出來</b>。</p>
+    <div class="tabs" id="tabs2">
+      <button class="on" data-f="anim">🌳 動畫組</button>
+      <button data-f="game">🎵 遊戲組</button>
+    </div>
+    <div class="finalchk" id="final"></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">4</span>給自己的三個提醒</h2>
+    <div class="tsec">
+      <h3>一、先做到會動，再做到好看</h3>
+      <p style="font-size:.92rem;margin-top:5px">第二週刻意<b>先用按鈕代替手勢</b>，就是要你先確認邏輯是對的。
+        邏輯和感測一起除錯，會分不清到底是哪裡壞掉。美術與音效請留到第四週再補。</p>
+    </div>
+    <div class="tsec">
+      <h3>二、說明文件邊做邊寫，不要留到最後</h3>
+      <p style="font-size:.92rem;margin-top:5px">每決定一個數字（門檻、分數、關卡數）就順手記下來，
+        第四週只要整理成文件就好。很多隊伍的程式沒問題，卻因為說明文件寫得太簡略而失分。</p>
+    </div>
+    <div class="tsec">
+      <h3>三、最後兩天不要加新功能</h3>
+      <p style="font-size:.92rem;margin-top:5px">10/21 送出後，10/22 與 10/23 只保留給突發狀況（檔案毀損、電腦出問題）。
+        比賽前臨時加的功能，出錯的機率遠高於加分的機率。</p>
+    </div>
+  </section>
+
+  <footer>🗓️ 五週進度表　·　臺北市 115 年度國民中小學 Scratch 貓咪盃競賽 初賽　·　繳交截止 2026/10/23（五）</footer>
+</div>
+<script>
+var DEADLINE='2026-10-23', SUBMIT='2026-10-21', FEATURE='2026-10-08', FREEZE='2026-10-16';
+
+var TL=[
+ {d:'9/21 一',t:'開跑',s:'第一週開始。這一天要把「要做什麼」決定完。',c:''},
+ {d:'9/24 四',t:'素材到齊',s:'角色、背景、擴充功能都就位，開檔就看得到畫面。',c:''},
+ {d:'10/2 五',t:'核心邏輯完成',s:'動畫組：按按鈕森林就會變好變壞。遊戲組：第一關可以完整玩完。',c:''},
+ {d:'10/8 四',t:'v1.0 功能全部完成',s:'題目要求的每一項都做得出來。這是最重要的一個里程碑。',c:'big'},
+ {d:'10/16 五',t:'v2.0 定版',s:'優化與實測完成、說明文件定稿，之後不再改功能。',c:'big'},
+ {d:'10/21 三',t:'繳交',s:'送出作品與說明文件。',c:'end'},
+ {d:'10/23 五',t:'截止日',s:'只保留給突發狀況，不做任何新功能。',c:'end'}
+];
+
+function T(txt,tag){return {x:txt,g:tag||''};}
+
+var WEEKS={
+anim:[
+ {n:'第1週',d:'9/21（一）～9/27（日）',t:'定案與素材',cls:'',
+  days:'上課日 9/21～9/24（四天）｜<span class="off">9/25 中秋節起連放四天</span>',
+  goal:'把「要做什麼」全部決定完。<b>這一週結束後就不要再換題材了</b>——換一次題材，等於少掉一整週。',
+  ts:[T('從十張情境卡挑一張，或自己想一個，寫下故事大綱','任務一'),
+      T('決定<b>三種森林生物</b>與<b>三種環境問題</b>，寫在紙上並拍照存檔','任務一'),
+      T('準備角色造型與背景：每種環境問題至少要有<b>正常</b>與<b>惡化</b>兩個狀態','任務一'),
+      T('決定用手部（Handpose2Scratch）還是頭部（Facemesh2Scratch）','任務二'),
+      T('到 stretch3.github.io 載入擴充功能，確認攝影機出得來、座標讀得到','任務二'),
+      T('開一個新專案，把所有角色與背景匯入並命名清楚',''),
+      T('建立「程式說明文件」檔案，把已經決定的事先寫進去','文件')],
+  ms:'<b>9/24 里程碑　</b>開啟專案就看得到森林場景，角色與背景全部到齊。',
+  hw:'🏮 <b>中秋連假任務（9/25～9/28）</b>：畫一張表，寫下三個變數的名稱與範圍，以及三種生物各自的出現條件（要寫成數字，例如「樹木 ≥ 3」）。這張表下週直接拿來寫程式。'},
+
+ {n:'第2週',d:'9/28（一）～10/4（日）',t:'變數驅動畫面',cls:'',
+  days:'<span class="off">9/28 教師節放假</span>｜上課日 9/29～10/2（四天）',
+  goal:'完成任務三的核心：<b>改變數，畫面就要跟著變</b>。這一週<b>先不要接 AI</b>，用按鈕代替手勢。',
+  ts:[T('建立三個狀態變數並設定初始值（例如 樹木＝1、水質＝25、垃圾＝5）','任務三'),
+      T('每個變數的變化都要對應畫面：造型切換、角色顯示／隱藏、背景更換','任務三'),
+      T('三種生物的出現條件寫成數字判斷（例如「樹木 ≥ 3 就顯示鳥兒」）','任務一'),
+      T('做出<b>會讓數值下降</b>的那一條路（不適當的選擇）','任務三'),
+      T('用鍵盤或畫面上的按鈕測試：每個行動都要看得到對應的畫面變化','任務三'),
+      T('把這一週決定的所有數字補進說明文件','文件')],
+  ms:'<b>10/2 里程碑　</b>用按鈕就能讓森林變好，也能讓森林惡化；動物會依條件出現與消失。'},
+
+ {n:'第3週',d:'10/5（一）～10/11（日）',t:'接上 AI 與故事分支',cls:'fin',
+  days:'上課日 10/5～10/8（四天）｜<span class="off">10/9 補假起連放三天</span>',
+  goal:'<b>功能全數完成</b>。這一週結束時，題目四項任務都要做得出來。',
+  ts:[T('把按鈕換成 AI 動作，至少設計一種頭部或手部互動','任務二'),
+      T('加上保護：<b>偵測不到就不判斷</b>（臉部用「人數 &gt; 0」；手部先存進變數再檢查是否為空白）','任務二'),
+      T('加上<b>旗標變數</b>，避免同一個動作被連續重複觸發','任務二'),
+      T('依數值分出<b>兩種故事發展</b>，各做一個結局畫面與結局文字','任務四'),
+      T('從頭到尾完整跑一次，用手機錄一段影片，自己看有沒有奇怪的地方',''),
+      T('把互動方式與分支條件寫進說明文件','文件')],
+  ms:'<b>10/8 里程碑（最重要）　</b>v1.0 完成——題目四項任務<b>全部做得出來</b>。做不完的話，週末連假一定要補上。',
+  hw:'🇹🇼 <b>國慶連假任務（10/9～10/11）</b>：在家裡的電腦上再跑一次，記下光線不同時會不會誤判。如果 10/8 沒完成，這三天就是補進度的時間。'},
+
+ {n:'第4週',d:'10/12（一）～10/18（日）',t:'優化・實測・說明文件',cls:'opt',
+  days:'上課日 10/12～10/16（完整五天）',
+  goal:'從「做得出來」變成「<b>一定跑得順</b>」。這一週<b>不加新功能</b>，只把已有的做穩、做好看。',
+  ts:[T('門檻實測：在<b>不同光線、不同距離</b>各測三次，把會失敗的情況記下來','優化'),
+      T('把門檻值改成<b>變數</b>，方便到比賽場地現場調整','優化'),
+      T('拉開兩條故事線的差異：背景、角色、音效<b>至少各差一項</b>','任務四'),
+      T('補上音效、轉場與文字提示，提升完成度','優化'),
+      T('找一位沒看過作品的同學實際玩一次，記下他卡住的地方並修正','優化'),
+      T('<b>說明文件定稿</b>：互動方式、門檻數值、故事分支條件都要寫成具體數字','文件')],
+  ms:'<b>10/16 里程碑　</b>v2.0 定版，說明文件完成。<b>從這一天起不再改功能。</b>'},
+
+ {n:'第5週',d:'10/19（一）～10/23（五）',t:'最後檢查與繳交',cls:'',
+  days:'上課日 10/19～10/23｜<b>10/23（五）繳交截止</b>',
+  goal:'只做檢查與繳交。<b>不做新功能</b>。',
+  ts:[T('換一台電腦、換一個座位再完整測一次','檢查'),
+      T('對照下方「繳交前總檢核」逐項打勾','檢查'),
+      T('確認作品檔（.sb3）能正常開啟，檔名與作品資訊正確','檢查'),
+      T('說明文件再讀一次，確認每一項都有寫到','文件'),
+      T('<b>10/21（三）送出</b>——不要拖到 10/23','繳交')],
+  ms:'<b>10/21 里程碑　</b>完成繳交。<span style="color:var(--no);font-weight:700">10/22～10/23 只保留給突發狀況，不做任何新功能。</span>',
+  cls2:'warn2'}
+],
+game:[
+ {n:'第1週',d:'9/21（一）～9/27（日）',t:'定案與素材',cls:'',
+  days:'上課日 9/21～9/24（四天）｜<span class="off">9/25 中秋節起連放四天</span>',
+  goal:'把三個動作與它們的效果決定完。<b>動作要挑容易穩定判斷的</b>，這一步選錯，後面每一週都會很痛苦。',
+  ts:[T('決定<b>三種動作</b>（建議：手舉高、手向左、手向右，最穩定）','任務一'),
+      T('決定每個動作對應的<b>音符／樂器聲音</b>與<b>舞臺動畫</b>','任務二'),
+      T('準備角色、舞臺背景，以及三種動作各自的視覺提示圖','任務二'),
+      T('到 stretch3.github.io 載入擴充功能，確認三個動作的座標<b>分得開</b>','任務一'),
+      T('先做出「按下按鈕就發出對應聲音與動畫」的最小版本','任務二'),
+      T('建立「程式說明文件」檔案','文件')],
+  ms:'<b>9/24 里程碑　</b>三個動作各自觸發都會出聲、有動畫（此時還是用按鈕觸發）。',
+  hw:'🏮 <b>中秋連假任務（9/25～9/28）</b>：把三個動作的<b>判定門檻實際量出來</b>——在鏡頭前做動作，記下每個動作的座標範圍（例如「手舉高：y &gt; 80」）。下週直接拿來寫判定。'},
+
+ {n:'第2週',d:'9/28（一）～10/4（日）',t:'動作判定與第一關',cls:'',
+  days:'<span class="off">9/28 教師節放假</span>｜上課日 9/29～10/2（四天）',
+  goal:'完成任務一與第一關。<b>預備姿勢的判定是這一週的重點</b>，也是題目明文要求的事。',
+  ts:[T('寫出三個動作的判定，用第一週量到的門檻值','任務一'),
+      T('加上<b>旗標變數</b>：觸發後鎖住，偵測到回到預備姿勢才解鎖','任務一'),
+      T('加上保護：<b>偵測不到就不判斷</b>（積木回傳的是空字串，不是 0）','任務一'),
+      T('用<b>清單</b>記錄系統產生的節奏序列','任務三'),
+      T('亂數產生 <b>3～5 個動作</b>，依序播放提示','任務三'),
+      T('玩家輸入比對，完成第一關「節奏記憶」','任務三'),
+      T('把門檻值與預備姿勢的判定方式寫進說明文件','文件')],
+  ms:'<b>10/2 里程碑　</b>第一關可以完整玩完，而且<b>同一個動作不會被重複判定</b>。'},
+
+ {n:'第3週',d:'10/5（一）～10/11（日）',t:'第二關・計分・難度',cls:'fin',
+  days:'上課日 10/5～10/8（四天）｜<span class="off">10/9 補假起連放三天</span>',
+  goal:'<b>功能全數完成</b>。這一週結束時，題目五項任務都要做得出來。',
+  ts:[T('第二關「節奏接龍」：玩家答對後，<b>系統在序列末端加一個動作</b>','任務三'),
+      T('自訂兩關各自的<b>通過條件</b>與<b>遊戲結束條件</b>','任務三'),
+      T('計分：每完成一輪得分','任務四'),
+      T('<b>連續正確要有加分機制</b>；做錯則扣分或重新挑戰該輪','任務四'),
+      T('難度遞增：縮短反應時間、加快節奏或增加動作數量','任務五'),
+      T('從第一關玩到遊戲結束，完整跑一次並錄影',''),
+      T('把亂數產生方法、序列記錄方式、通過與結束條件寫進說明文件','文件')],
+  ms:'<b>10/8 里程碑（最重要）　</b>v1.0 完成——題目五項任務<b>全部做得出來</b>。做不完的話，週末連假一定要補上。',
+  hw:'🇹🇼 <b>國慶連假任務（10/9～10/11）</b>：連續玩 10 輪，記下誤判（沒做卻算你做了）與漏判（做了卻沒算到）各發生幾次。下週依這份紀錄調門檻。'},
+
+ {n:'第4週',d:'10/12（一）～10/18（日）',t:'優化・實測・說明文件',cls:'opt',
+  days:'上課日 10/12～10/16（完整五天）',
+  goal:'從「做得出來」變成「<b>一定跑得順</b>」。這一週<b>不加新功能</b>，專心把判定調穩、把難度調得好玩。',
+  ts:[T('判定穩定度實測：連續玩 10 輪，誤判與漏判各記錄一次','優化'),
+      T('調整動作門檻與<b>預備姿勢的範圍</b>，並把門檻改成變數方便現場調整','優化'),
+      T('難度曲線調整：找同學試玩，確認第一關不會太難、第二關不會太快結束','優化'),
+      T('補上音效細節與舞臺動畫，讓三個動作的差別更明顯','任務二'),
+      T('檢查分數顯示、連續加分、生命或扣分是否都正確','任務四'),
+      T('<b>說明文件定稿</b>：動作判定（含如何避免重複判定）、亂數節奏產生方法、動作序列記錄方式、關卡通過與遊戲結束條件','文件')],
+  ms:'<b>10/16 里程碑　</b>v2.0 定版，說明文件完成。<b>從這一天起不再改功能。</b>'},
+
+ {n:'第5週',d:'10/19（一）～10/23（五）',t:'最後檢查與繳交',cls:'',
+  days:'上課日 10/19～10/23｜<b>10/23（五）繳交截止</b>',
+  goal:'只做檢查與繳交。<b>不做新功能</b>。',
+  ts:[T('換一台電腦、換一個座位，把兩關完整玩到結束','檢查'),
+      T('對照下方「繳交前總檢核」逐項打勾','檢查'),
+      T('確認作品檔（.sb3）能正常開啟，檔名與作品資訊正確','檢查'),
+      T('說明文件再讀一次，四個必寫項目都要有','文件'),
+      T('<b>10/21（三）送出</b>——不要拖到 10/23','繳交')],
+  ms:'<b>10/21 里程碑　</b>完成繳交。<span style="color:var(--no);font-weight:700">10/22～10/23 只保留給突發狀況，不做任何新功能。</span>',
+  cls2:'warn2'}
+]};
+
+var FINAL={
+anim:[
+ '<b>任務一</b>　動畫中出現<b>至少三種森林生物</b>，而且故事有呈現生物與森林的關係。',
+ '<b>任務一</b>　出現<b>三種不同的環境問題</b>，每一種在畫面上都看得出來。',
+ '<b>任務二</b>　設計了<b>至少一種頭部或手部動作</b>的互動方式，觀看者能參與復育行動。',
+ '<b>任務二</b>　偵測不到時<b>不會誤判</b>（角色不會亂飛），同一動作<b>不會被重複觸發</b>。',
+ '<b>任務三</b>　每完成一項行動，森林場景都會<b>產生對應的變化</b>。',
+ '<b>任務三</b>　<b>不適當的選擇會讓環境惡化</b>（這一項最常被漏做）。',
+ '<b>任務四</b>　不同的選擇會形成<b>至少兩種不同的故事發展</b>，而且兩條路的畫面明顯不同。',
+ '<b>說明文件</b>　寫清楚<b>設計的頭部或手部互動方式</b>。',
+ '<b>說明文件</b>　寫清楚<b>故事分支的條件</b>（要用具體數字，不是「做得好就是好結局」）。',
+ '<b>穩定度</b>　換一台電腦、換一個位置測過，都能正常操作。',
+ '<b>檔案</b>　作品檔（.sb3）能正常開啟，檔名與作品資訊正確。'
+],
+game:[
+ '<b>任務一</b>　遊戲使用<b>至少三種</b>手部或頭部動作。',
+ '<b>任務一</b>　每個動作之間都能判斷玩家<b>已回到預備姿勢</b>，同一動作不會被重複判定。',
+ '<b>任務二</b>　三種動作分別對應<b>不同的音符、樂器聲音或舞臺動畫</b>。',
+ '<b>任務三</b>　第一關「節奏記憶」：系統用<b>亂數產生 3～5 個動作</b>，依序播放提示。',
+ '<b>任務三</b>　第二關「節奏接龍」：玩家正確完成後，系統會<b>增加一個新的節奏</b>，序列逐漸變長。',
+ '<b>任務三</b>　兩關各自的<b>通過條件</b>與<b>遊戲結束條件</b>都已訂好，而且玩得出來。',
+ '<b>任務四</b>　每完成一輪<b>可獲得分數</b>，且<b>連續正確有加分機制</b>。',
+ '<b>任務四</b>　動作錯誤會<b>重新挑戰該輪或扣分</b>。',
+ '<b>任務五</b>　難度會<b>隨關卡進行逐漸增加</b>。',
+ '<b>說明文件</b>　寫清楚<b>動作判定方式，含如何避免重複判定</b>。',
+ '<b>說明文件</b>　寫清楚<b>亂數節奏的產生方法</b>與<b>動作序列的記錄方式</b>。',
+ '<b>說明文件</b>　寫清楚<b>關卡通過與遊戲結束條件</b>。',
+ '<b>穩定度</b>　換一台電腦、換一個位置測過，兩關都能完整玩到結束。',
+ '<b>檔案</b>　作品檔（.sb3）能正常開啟，檔名與作品資訊正確。'
+]};
+
+function days(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+
+/* ===== 進度儲存 ===== */
+var KEY='cat2026.plan.v1';
+var STORE={ok:true,data:{}};
+function loadStore(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    STORE.data = raw ? (JSON.parse(raw).done||{}) : {};
+    localStorage.setItem(KEY+'.probe','1'); localStorage.removeItem(KEY+'.probe');
+    STORE.ok=true;
+  }catch(e){ STORE.ok=false; STORE.data={}; }
+}
+function saveStore(){
+  if(!STORE.ok)return;
+  try{
+    localStorage.setItem(KEY,JSON.stringify({v:1,at:Date.now(),done:STORE.data}));
+    note('進度已儲存　'+stamp(new Date()),false);
+  }catch(e){ STORE.ok=false; note('這個瀏覽器不讓網頁自動儲存進度，請用「匯出進度檔」保存。',true); }
+}
+function stamp(d){
+  function z(n){return String(n).padStart(2,'0');}
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+z(d.getHours())+':'+z(d.getMinutes());
+}
+function note(msg,bad){
+  var n=document.getElementById('saveNote');
+  document.getElementById('saveMsg').innerHTML=msg;
+  n.classList.toggle('bad',!!bad);
+}
+function applySaved(root){
+  root.querySelectorAll('input[type=checkbox][data-id]').forEach(function(c){
+    c.checked = !!STORE.data[c.getAttribute('data-id')];
+  });
+}
+function hook(root){
+  root.addEventListener('change',function(e){
+    var c=e.target; if(!c.matches||!c.matches('input[type=checkbox][data-id]'))return;
+    var id=c.getAttribute('data-id');
+    if(c.checked)STORE.data[id]=1; else delete STORE.data[id];
+    saveStore();
+  });
+}
+
+(function(){
+  loadStore();
+  if(!STORE.ok)note('這個瀏覽器不讓網頁自動儲存進度（常見於直接雙擊開啟檔案時）。請改用線上版，或用「匯出進度檔」把進度存成檔案。',true);
+  else note('進度會自動儲存在這台電腦的瀏覽器裡。',false);
+
+  /* 倒數 */
+  var now=new Date();
+  var today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  var items=[['距離繳交截止',DEADLINE,'10/23（五）'],['建議繳交日',SUBMIT,'10/21（三）'],
+             ['功能完成日',FEATURE,'10/8（四）'],['定版日',FREEZE,'10/16（五）']];
+  document.getElementById('ddbar').innerHTML=items.map(function(it){
+    var n=days(today,it[1]);
+    var cls=n<0?'done':(n<=7?'hot':'');
+    var v=n<0?'已過':(n===0?'就是今天':n);
+    var u=n<0?it[2]:(n===0?it[2]:'天　'+it[2]);
+    return '<div class="ddbox '+cls+'"><div class="k">'+it[0]+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>';
+  }).join('');
+
+  document.getElementById('tl').innerHTML=TL.map(function(r){
+    return '<div class="tlrow '+r.c+'"><div class="d">'+r.d+'</div>'+
+      '<div class="ln"><span class="dot"></span></div>'+
+      '<div class="c"><b>'+r.t+'</b><span>'+r.s+'</span></div></div>';
+  }).join('');
+
+  var GNAME={anim:'🌳 動畫 AI 互動組',game:'🎵 遊戲 AI 互動組'};
+
+  /* 兩組都放進 DOM，畫面上用 class 切換；列印時兩組都會印出來 */
+  function weeksHTML(f){
+    var tg=f==='anim'?'':'g';
+    return WEEKS[f].map(function(w,i){
+      return '<div class="wk '+w.cls+'" data-w="'+i+'">'+
+        '<div class="wkh"><div class="wn">'+w.n.replace('第','').replace('週','')+'<br><span style="font-size:.6rem">週</span></div>'+
+        '<div><div class="wt">'+w.n+'　'+w.t+'</div><div class="wd">'+w.d+'</div></div>'+
+        '<div class="pct">0 / '+w.ts.length+'</div></div>'+
+        '<div class="days">📅 '+w.days+'</div>'+
+        '<div class="wkgoal"><b>本週目標　</b>'+w.goal+'</div>'+
+        '<div class="tasks">'+w.ts.map(function(t,j){
+          var cls=(t.g==='文件'||t.g==='優化'||t.g==='檢查'||t.g==='繳交')?'n':tg;
+          return '<label><input type="checkbox" data-id="'+f[0]+'-w'+i+'-t'+j+'"><span>'+t.x+'</span>'+
+                 (t.g?'<span class="tg '+cls+'">'+t.g+'</span>':'')+'</label>';
+        }).join('')+'</div>'+
+        '<div class="ms '+(w.cls2||'')+'">'+w.ms+'</div>'+
+        (w.hw?'<div class="hw">'+w.hw+'</div>':'')+
+      '</div>';
+    }).join('');
+  }
+  var host=document.getElementById('weeks');
+  host.innerHTML=['anim','game'].map(function(f){
+    return '<section class="gsec'+(f==='game'?' hide':'')+'" data-g="'+f+'">'+
+      '<h3 class="ghead">'+GNAME[f]+'　每週進度與檢核</h3>'+weeksHTML(f)+'</section>';
+  }).join('');
+
+  var fhost=document.getElementById('final');
+  fhost.innerHTML=['anim','game'].map(function(f){
+    return '<section class="gsec'+(f==='game'?' hide':'')+'" data-g="'+f+'">'+
+      '<h3 class="ghead">'+GNAME[f]+'　繳交前總檢核</h3>'+
+      '<div class="finalchk">'+FINAL[f].map(function(t,j){
+        return '<label><input type="checkbox" data-id="'+f[0]+'-f'+j+'"><span>'+t+'</span></label>';
+      }).join('')+'</div></section>';
+  }).join('');
+
+  function refreshPct(){
+    document.querySelectorAll('.wk').forEach(function(wk){
+      var all=wk.querySelectorAll('.tasks input').length;
+      var n=wk.querySelectorAll('.tasks input:checked').length;
+      var p=wk.querySelector('.pct');
+      p.textContent=n+' / '+all;
+      p.style.color = (all&&n===all) ? 'var(--ok)' : 'var(--ink2)';
+    });
+  }
+  applySaved(document); refreshPct();
+  hook(host); hook(fhost);
+  host.addEventListener('change',refreshPct);
+
+  function bind(id,sel){
+    var t=document.getElementById(id);
+    t.addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b)return;
+      var f=b.getAttribute('data-f');
+      [].forEach.call(t.children,function(x){x.classList.toggle('on',x===b);});
+      document.querySelectorAll(sel+' > .gsec').forEach(function(s){
+        s.classList.toggle('hide', s.getAttribute('data-g')!==f);
+      });
+    });
+  }
+  bind('tabs','#weeks'); bind('tabs2','#final');
+
+  document.getElementById('doPrint').addEventListener('click',function(){window.print();});
+
+  document.getElementById('clearAll').addEventListener('click',function(){
+    document.querySelectorAll('input[type=checkbox][data-id]').forEach(function(c){c.checked=false;});
+    STORE.data={}; saveStore(); refreshPct();
+    if(STORE.ok)note('已清除所有勾選。',false);
+  });
+
+  /* 匯出／匯入 */
+  document.getElementById('expBtn').addEventListener('click',function(){
+    var d=new Date(), z=function(n){return String(n).padStart(2,'0');};
+    var name='貓咪盃進度_'+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'.json';
+    var blob=new Blob([JSON.stringify({v:1,at:Date.now(),done:STORE.data},null,1)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},0);
+    note('已匯出進度檔 '+name+'　（換電腦時用「匯入進度檔」讀回來）',false);
+  });
+  document.getElementById('impBtn').addEventListener('click',function(){
+    document.getElementById('impFile').click();
+  });
+  document.getElementById('impFile').addEventListener('change',function(e){
+    var f=e.target.files&&e.target.files[0]; if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var o=JSON.parse(r.result);
+        if(!o||typeof o.done!=='object')throw new Error('格式不符');
+        STORE.data=o.done; applySaved(document); refreshPct(); saveStore();
+        note('已匯入進度檔 '+f.name+'　'+Object.keys(STORE.data).length+' 個項目',false);
+      }catch(err){ note('這個檔案讀不出來，請確認是用「匯出進度檔」存下來的檔案。',true); }
+      e.target.value='';
+    };
+    r.readAsText(f);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 7：把程式包起來重複用</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+@media(max-width:860px){.vs{grid-template-columns:1fr}}
+.vs>div{background:var(--paper2);border:2px dashed var(--line);border-radius:18px;padding:12px}
+.vs h4{font-size:.95rem;margin:0 0 6px}
+.steps{display:grid;gap:10px;margin-top:12px}
+.steps>div{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--paper);
+  border:3px solid var(--line);border-radius:20px;padding:12px 16px;font-size:.94rem}
+.steps>div>span{width:30px;height:30px;border-radius:50%;background:var(--c-myblocks);color:#fff;
+  font-family:var(--f-num);font-weight:800;display:grid;place-items:center;font-size:.95rem}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🧩 單元 7 <em>把程式包起來重複用</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a class="on" href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>把程式包起來重複用</h1>
+    <p>寫久了你會發現：同樣的一段積木常常要貼好幾次。這一課要學的是<b>自己做一塊積木</b>——把常用的動作包起來、取個名字，以後叫名字就好。</p>
+    <div class="goals">
+      <div><b>目標 1</b>　知道<b>定義</b>只是取名字，<b>不會自己執行</b>，要等人呼叫。</div>
+      <div><b>目標 2</b>　會定義一塊自訂積木，並在主程式裡重複呼叫它。</div>
+      <div><b>目標 3</b>　知道<b>輸入方塊（參數）</b>可以讓同一塊積木做出不一樣的效果。</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <section class="sec">
+        <h2><span class="n">1</span>為什麼要自己做積木</h2>
+        <p>兩段程式做的事<b>一模一樣</b>：讓角色跳三下。看看哪一段比較好讀、也比較好改。</p>
+        <div class="work">
+          <div class="vs">
+            <div>
+              <h4>😩 沒有自訂積木：同樣的兩塊貼三次</h4>
+              <div id="vsA"></div>
+              <p style="font-size:.88rem;color:var(--ink2);margin:8px 0 0">想把跳的高度從 60 改成 100？<b>六個地方都要改</b>，漏一個就怪怪的。</p>
+            </div>
+            <div>
+              <h4>😎 有自訂積木：定義一次，叫三次</h4>
+              <div id="vsB"></div>
+              <p style="font-size:.88rem;color:var(--ink2);margin:8px 0 0">改高度只要改<b>定義裡的兩個數字</b>，三次跳躍一起變。</p>
+            </div>
+          </div>
+          <div class="note" style="margin-top:14px">
+            這就是程式設計裡很重要的一句話：<b>同樣的事情只寫一次</b>。<br>
+            一段程式如果用到<b>三次以上</b>，就該把它包成自訂積木。
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>三個步驟</h2>
+        <div class="steps">
+          <div><span>1</span><div>在<b>函式積木</b>分類按「<b>建立一個積木</b>」，替它取一個看得懂的名字（例如「跳一下」）。</div></div>
+          <div><span>2</span><div>程式區會出現一塊「<b>定義 跳一下</b>」。把要做的事<b>放進它裡面</b>。</div></div>
+          <div><span>3</span><div>積木清單會多出一塊「<b>跳一下</b>」。想用的時候把它放進主程式就好。</div></div>
+        </div>
+        <div class="note" style="margin-top:12px">
+          ⚠️ 真實的 Scratch 裡「定義」是<b>帽子積木</b>，要做的事<b>接在它下面</b>；<br>
+          這個小舞台把它做成 <b>C 型的凹槽</b>，要做的事<b>包在裡面</b>——這樣才分得出哪些屬於這個定義。意思完全一樣。
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>這一課的積木</h2>
+        <p>只有五塊，但觀念是全套教材裡最接近「真正在寫程式」的一課。</p>
+        <div id="blocksM"></div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">4</span>讓積木可以帶數字</h2>
+        <p>如果每次跳的高度都不一樣呢？在建立積木時按「<b>添加輸入方塊 數字或文字</b>」，積木上就會多一個<b>圓角的白框</b>。</p>
+        <div class="work">
+          <h3>🏃 例子：走幾步</h3>
+          <p style="font-size:.93rem">定義裡的「移動」欄位放進圓形的<b>步數</b>，呼叫時填多少就走多少。同一段程式，三種效果。</p>
+          <div id="arg1"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:8px 0 0">圓角白框裡的「步數」是<b>參數的名字</b>，不是固定數字。它只在<b>這個定義裡面</b>有意義。</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">5</span>跟著做</h2>
+
+        <div class="work">
+          <h3>🦘 作品 1：跳一下</h3>
+          <ol>
+            <li>定義「跳一下」：<b>y 改變 60</b>、等一下、<b>y 改變 -60</b>。</li>
+            <li>主程式呼叫三次，中間各走一小段。</li>
+            <li>試著把定義裡的 60 改成 100，看三次跳躍是不是一起變高。</li>
+          </ol>
+          <div id="demo1"></div>
+        </div>
+
+        <div class="work">
+          <h3>⬜ 作品 2：走正方形</h3>
+          <ol>
+            <li>定義「走正方形」：<b>重複 4 次</b>｛移動 60 點、右轉 90 度｝。</li>
+            <li>主程式只要一塊「走正方形」，角色就會走完整圈回到原點。</li>
+            <li>這就是<b>把迴圈包進自訂積木</b>——主程式變得超級好讀。</li>
+          </ol>
+          <div id="demo2"></div>
+        </div>
+
+        <div class="work">
+          <h3>📏 作品 3：走幾步（帶參數）</h3>
+          <ol>
+            <li>定義「走幾步 (步數)」：移動<b>步數</b>點、等 0.2 秒。</li>
+            <li>主程式依序呼叫 <b>20</b>、<b>60</b>、<b>120</b>。</li>
+            <li>三次用的是<b>同一段程式</b>，只是送進去的數字不同。</li>
+          </ol>
+          <div id="demo3"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">6</span>自己拼拼看</h2>
+        <p>先加一塊<b>定義</b>，把動作放進它的凹槽，再加<b>呼叫</b>的積木。兩者的名字要一樣才叫得動。</p>
+        <div class="quiz fillhost">
+          <div class="q">🧱 動作積木（直接加進腳本）</div>
+          <div class="row" id="palA"></div>
+          <div class="q" style="margin-top:14px">🧩 放進欄位用的積木</div>
+          <div class="row" id="palB"></div>
+          <div class="list" id="mylist" style="max-height:none;margin-top:14px"></div>
+          <div class="runbar">
+            <button class="btn flag" id="run">🏳 執行</button>
+            <button class="btn stopb" id="stop">■ 停止</button>
+            <button class="btn ghost" id="clear">清空</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">7</span>挑戰任務</h2>
+        <div class="mission">
+          <div><span>⭐</span><div>把「走正方形」定義裡的 <b>60</b> 改成 <b>30</b>，看看是不是整個正方形一起變小。</div></div>
+          <div><span>⭐⭐</span><div>做一塊「<b>說哈囉</b>」：定義裡放說話＋換造型，主程式呼叫兩次。</div></div>
+          <div><span>⭐⭐⭐</span><div>用<b>帶參數</b>的積木做出「走 20、走 40、走 60」的階梯效果，只寫一個定義。</div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">8</span>我學會了嗎</h2>
+        <div class="self">
+          <label><input type="checkbox"><span>我知道<b>定義自己不會執行</b>，要有呼叫的積木才會動。</span></label>
+          <label><input type="checkbox"><span>我知道呼叫的積木要和定義<b>同名</b>才叫得動。</span></label>
+          <label><input type="checkbox"><span>我知道改定義裡的內容，<b>所有呼叫的地方都會一起變</b>。</span></label>
+          <label><input type="checkbox"><span>我知道一段程式用到<b>三次以上</b>就該包成自訂積木。</span></label>
+          <label><input type="checkbox"><span>我知道<b>輸入方塊</b>可以讓同一塊積木做出不同效果。</span></label>
+          <label><input type="checkbox"><span>我知道參數的名字<b>只在定義裡面</b>有意義。</span></label>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台</h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">x 座標</div><div class="v" id="rx">0</div></div>
+          <div><div class="k">y 座標</div><div class="v" id="ry">0</div></div>
+          <div><div class="k">方向</div><div class="v" id="rd">90</div></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" id="optGrid"> 座標格線</label>
+          <label style="display:flex;align-items:center;gap:5px">速度
+            <select id="speed" style="border:2px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--paper);color:var(--ink);font-family:var(--f-round);font-weight:700">
+              <option value="480">慢</option><option value="260" selected>中</option><option value="90">快</option>
+            </select>
+          </label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設角色</button>
+        </div>
+        <div class="note" style="font-size:.86rem">執行時，<b>定義裡面</b>的積木也會跟著亮起來，看得出來程式跳進定義又跳回來。</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>🧩 單元 7・把程式包起來重複用　·　上一課：<a href="unit6_student.html">單元 6 一次記住很多件事</a></footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+Stage.init(document.getElementById('stage'));
+UI.bindReadout({x:'rx',y:'ry',dir:'rd'});
+Stage.reset();
+document.getElementById('reset').addEventListener('click',function(){UI.stopAll();Stage.reset();});
+document.getElementById('optGrid').addEventListener('change',function(e){Stage.setGrid(e.target.checked);});
+document.getElementById('speed').addEventListener('change',function(e){UI.setSpeed(Number(e.target.value));});
+
+var JUMP=[{id:'changey',args:{DY:60}},{id:'wait',args:{SECS:0.15}},{id:'changey',args:{DY:-60}}];
+
+/* 1. 對照 */
+UI.script([
+  {id:'gotoxy',args:{X:-120,Y:-40}},{id:'pointdir',args:{DIR:90}}
+].concat(JUMP,[{id:'move',args:{STEPS:60}}],JUMP,[{id:'move',args:{STEPS:60}}],JUMP),
+document.getElementById('vsA'),'▶ 跑跑看');
+
+UI.script([
+  {id:'define',args:{NAME:'跳一下'},body:JUMP.map(function(x){return {id:x.id,args:x.args};})},
+  {id:'gotoxy',args:{X:-120,Y:-40}},{id:'pointdir',args:{DIR:90}},
+  {id:'callmy',args:{NAME:'跳一下'}},{id:'move',args:{STEPS:60}},
+  {id:'callmy',args:{NAME:'跳一下'}},{id:'move',args:{STEPS:60}},
+  {id:'callmy',args:{NAME:'跳一下'}}
+],document.getElementById('vsB'),'▶ 跑跑看');
+
+/* 3. 積木試玩 */
+var hm=document.getElementById('blocksM');
+['define','callmy','defarg','callarg','argval'].forEach(function(id){UI.tryRow(id,hm);});
+
+/* 4. 帶參數 */
+UI.script([
+  {id:'defarg',body:[
+    {id:'move',args:{STEPS:{__b:'argval',args:{}}}},
+    {id:'wait',args:{SECS:0.2}}
+  ]},
+  {id:'gotoxy',args:{X:-200,Y:0}},{id:'pointdir',args:{DIR:90}},
+  {id:'callarg',args:{V:'20'}},
+  {id:'callarg',args:{V:'60'}},
+  {id:'callarg',args:{V:'120'}}
+],document.getElementById('arg1'),'▶ 看示範');
+
+/* 5. 三個作品 */
+UI.script([
+  {id:'whenflag'},
+  {id:'define',args:{NAME:'跳一下'},body:[
+    {id:'changey',args:{DY:60}},{id:'wait',args:{SECS:0.15}},{id:'changey',args:{DY:-60}}
+  ]},
+  {id:'gotoxy',args:{X:-120,Y:-40}},{id:'pointdir',args:{DIR:90}},{id:'rotstyle',args:{STYLE:'左-右'}},
+  {id:'callmy',args:{NAME:'跳一下'}},{id:'move',args:{STEPS:60}},
+  {id:'callmy',args:{NAME:'跳一下'}},{id:'move',args:{STEPS:60}},
+  {id:'callmy',args:{NAME:'跳一下'}},
+  {id:'sayfor',args:{MSG:'跳完三下！',SECS:1.2}}
+],document.getElementById('demo1'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'define',args:{NAME:'走正方形'},body:[
+    {id:'repeat',args:{N:4},body:[
+      {id:'move',args:{STEPS:60}},{id:'turnright',args:{DEG:90}}
+    ]}
+  ]},
+  {id:'gotoxy',args:{X:-30,Y:-30}},{id:'pointdir',args:{DIR:90}},{id:'rotstyle',args:{STYLE:'任意'}},
+  {id:'callmy',args:{NAME:'走正方形'}},
+  {id:'sayfor',args:{MSG:'回到原點了！',SECS:1.2}}
+],document.getElementById('demo2'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'defarg',body:[
+    {id:'move',args:{STEPS:{__b:'argval',args:{}}}},
+    {id:'wait',args:{SECS:0.2}}
+  ]},
+  {id:'gotoxy',args:{X:-200,Y:0}},{id:'pointdir',args:{DIR:90}},{id:'rotstyle',args:{STYLE:'左-右'}},
+  {id:'callarg',args:{V:'20'}},
+  {id:'callarg',args:{V:'60'}},
+  {id:'callarg',args:{V:'120'}},
+  {id:'sayfor',args:{MSG:'一個積木，三種距離',SECS:1.5}}
+],document.getElementById('demo3'),'🏳 執行');
+
+/* 6. 自己拼拼看 */
+var builder=UI.Builder(document.getElementById('mylist'),'先加一塊「定義」，把動作放進它的凹槽裡，再加一塊呼叫的積木。');
+function label(b){
+  return b.parts.map(function(p){
+    if(p.t==='txt'||p.t==='ico')return p.v;
+    if(p.t==='arg')return '('+p.v+')';
+    if(p.t==='bool')return '〈 〉';
+    if(p.k)return '('+(p.v===''||p.v===undefined?'　':p.v)+')';
+    return '';
+  }).join(' ').replace(/\s+/g,' ').trim();
+}
+function defArgs(b){var a={};b.parts.forEach(function(p){if(p.k&&p.t!=='bool')a[p.k]=p.v;});return a;}
+function makePal(hostId,ids,fill){
+  var host=document.getElementById(hostId);
+  ids.forEach(function(id){
+    var b=UI.byId(id); if(!b)return;
+    var btn=document.createElement('button');
+    btn.className='btn ghost sm';
+    btn.textContent=(fill?'⤵ ':'')+label(b);
+    btn.style.borderColor='var(--c-'+b.cat+')';
+    if(fill)btn.style.color='var(--c-'+b.cat+'-d)';
+    btn.addEventListener('click',function(){
+      if(fill)UI.startFill(b,defArgs(b));
+      else builder.add(b,defArgs(b));
+    });
+    host.appendChild(btn);
+  });
+}
+makePal('palA',['whenflag','define','callmy','defarg','callarg','repeat','forever','move','turnright',
+  'changey','gotoxy','sayfor','wait','nextcostume'],false);
+makePal('palB',['argval','oprandom','opadd','varreport'],true);
+
+document.getElementById('run').addEventListener('click',function(){
+  var t=this;t.disabled=true;builder.run(function(){t.disabled=false;});
+});
+document.getElementById('stop').addEventListener('click',function(){
+  builder.stop();document.getElementById('run').disabled=false;
+});
+document.getElementById('clear').addEventListener('click',function(){builder.clear();});
+</script>
+</body>
+</html>

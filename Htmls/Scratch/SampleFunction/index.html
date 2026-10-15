@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+:root{color-scheme:light dark;--cream:#F3EFFF;--paper:#fff;--ink:#3F4A56;--ink2:#7E8B99;--line:#DDD3FA;
+  --violet:#7A5CE0;--pink:#FF6680;--green:#0FBD8C;--f:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cream:#1E1B2A;--paper:#2A2638;--ink:#ECE8F6;--ink2:#ADA6C2;--line:#443D5C}}
+:root[data-theme="dark"]{--cream:#1E1B2A;--paper:#2A2638;--ink:#ECE8F6;--ink2:#ADA6C2;--line:#443D5C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f);line-height:1.8;
+  background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:26px 26px;min-height:100vh;
+  display:grid;place-items:center;padding:32px 16px}
+.box{max-width:900px;width:100%;text-align:center}
+.badge{display:inline-block;background:var(--violet);color:#fff;font-weight:800;font-size:.82rem;padding:5px 16px;border-radius:50px}
+h1{font-size:clamp(1.7rem,5vw,2.5rem);font-weight:800;margin:14px 0 6px}
+p.sub{color:var(--ink2);margin:0 auto 20px;max-width:40em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 auto 24px;max-width:46em}
+.chips a{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:2px 12px;font-size:.86rem;font-weight:700;color:var(--ink);text-decoration:none}
+.chips b{color:var(--violet)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+a.card{display:block;text-decoration:none;color:var(--ink);background:var(--paper);border:3px solid var(--line);border-radius:26px;padding:22px 18px;transition:transform .2s}
+a.card:hover{transform:translateY(-4px) scale(1.02)}
+a.card .ico{font-size:2.3rem;line-height:1}
+a.card b{display:block;font-size:1.12rem;font-weight:800;margin:8px 0 4px}
+a.card span{font-size:.86rem;color:var(--ink2)}
+a.s{border-color:var(--violet)}a.d{border-color:var(--pink)}a.f{border-color:var(--green)}
+footer{margin-top:26px;font-size:.82rem;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="badge">Scratch 內建積木 ｜ 自訂積木（函式）</span>
+  <h1>🧰 Scratch 函式庫</h1>
+  <p class="sub">把 Scratch 作品裡最常寫的技巧做成 51 塊「一塊就能用」的自訂積木：打字機、淡入淡出、抖動、清除分身、倒數計時、洗牌排序、重力跳躍……
+    每個函式都有試玩台、積木圖、範例 .sb3 與網頁版。</p>
+  <div class="chips">
+    <a href="student/c1.html"><b>1</b> 文字與對話</a><a href="student/c2.html"><b>2</b> 出場與退場</a><a href="student/c3.html"><b>3</b> 持續特效</a><a href="student/c4.html"><b>4</b> 角色管理</a>
+    <a href="student/c5.html"><b>5</b> 計時與流程</a><a href="student/c6.html"><b>6</b> 數學小工具</a><a href="student/c7.html"><b>7</b> 清單工具</a><a href="student/c8.html"><b>8</b> 遊戲機制</a>
+  </div>
+  <div class="cards">
+    <a class="card s" href="student/index.html"><div class="ico">📘</div><b>開始學</b><span>第 0 章：函式、A 型與 B 型、怎麼放進自己的作品</span></a>
+    <a class="card d" href="student/index.html#map"><div class="ico">🗺️</div><b>函式地圖</b><span>51 個函式一覽，點一下就跳到說明</span></a>
+    <a class="card f" href="student/play/8_遊戲機制/index.html"><div class="ico">🎮</div><b>網頁版試玩</b><span>不用開 Scratch，離線也能玩</span></a>
+    <a class="card f" href="student/sb3/完整函式庫.sb3" download><div class="ico">🧰</div><b>完整函式庫 .sb3</b><span>51 個函式全裝好，拿來做自己的作品</span></a>
+  </div>
+  <footer>範例 .sb3 在 student/sb3/，可匯入的角色在 student/sprite3/，網頁版在 student/play/。</footer>
+</div>
+</body>
+</html>

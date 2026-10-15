@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>可愛月曆生成器</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffeaf1;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 1200px;
+            border-radius: 20px;
+        }
+
+        h1 {
+            color: #ff69b4;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0px #ffb6c1;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .controls label, .controls select, .controls input, .controls button {
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 2px solid #ffb6c1;
+            background-color: #fff0f5;
+            color: #ff69b4;
+        }
+
+        .controls button, #download {
+            background-color: #ff69b4;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .controls button:hover, #download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+
+        #calendar {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .month {
+            border: 3px solid #ffb6c1;
+            margin: 10px;
+            padding: 10px;
+            background-color: #fff0f5;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+        }
+
+        .month h2 {
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #ffb6c1;
+            color: #ff69b4;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .weekdays, .days {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .weekday, .day {
+            width: calc(100% / 7);
+            padding: 10px 5px;
+            text-align: center;
+            box-sizing: border-box;
+            margin: 2px;
+            border-radius: 10px;
+        }
+
+        .weekday {
+            background-color: #ffb6c1;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .day {
+            border: 2px solid #ffb6c1;
+            height: 80px;
+            position: relative;
+            background-color: #fff;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .day .date {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 16px;
+            color: #ff69b4;
+        }
+
+        #download {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 25px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="bounce">可愛月曆生成器</h1>
+        <div class="controls">
+            <label for="year">年份:</label>
+            <input type="number" id="year">
+            <label for="month">月份:</label>
+            <select id="month">
+                <option value="0">一月</option>
+                <option value="1">二月</option>
+                <option value="2">三月</option>
+                <option value="3">四月</option>
+                <option value="4">五月</option>
+                <option value="5">六月</option>
+                <option value="6">七月</option>
+                <option value="7">八月</option>
+                <option value="8">九月</option>
+                <option value="9">十月</option>
+                <option value="10">十一月</option>
+                <option value="11">十二月</option>
+            </select>
+            <label for="background-color">底色:</label>
+            <input type="color" id="background-color" value="#fff0f5">
+            <label for="header-color">標題色:</label>
+            <input type="color" id="header-color" value="#ffb6c1">
+            <label for="text-color">文字顏色:</label>
+            <input type="color" id="text-color" value="#ff69b4">
+            <button id="generate">生成月曆</button>
+        </div>
+        <div id="calendar"></div>
+    </div>
+
+    <script>
+        document.getElementById('generate').addEventListener('click', generateCalendar);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            document.getElementById('year').value = today.getFullYear();
+            document.getElementById('month').value = today.getMonth();
+            generateCalendar();
+        });
+
+        function generateCalendar() {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            const backgroundColor = document.getElementById('background-color').value;
+            const headerColor = document.getElementById('header-color').value;
+            const textColor = document.getElementById('text-color').value;
+            const calendarContainer = document.getElementById('calendar');
+            calendarContainer.innerHTML = '';
+
+            const monthDiv = document.createElement('div');
+            monthDiv.className = 'month';
+            monthDiv.innerHTML = `<h2>${year}年 ${new Date(year, month).toLocaleString('zh-Hant', { month: 'long' })}</h2>`;
+            monthDiv.style.backgroundColor = backgroundColor;
+            monthDiv.querySelector('h2').style.color = textColor;
+
+            const weekdaysDiv = document.createElement('div');
+            weekdaysDiv.className = 'weekdays';
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            weekdays.forEach((day) => {
+                const weekdayDiv = document.createElement('div');
+                weekdayDiv.className = 'weekday';
+                weekdayDiv.textContent = day;
+                weekdayDiv.style.backgroundColor = headerColor;
+                weekdayDiv.style.color = '#ffffff';
+                weekdaysDiv.appendChild(weekdayDiv);
+            });
+            monthDiv.appendChild(weekdaysDiv);
+
+            let daysDiv = document.createElement('div');
+            daysDiv.className = 'days';
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, parseInt(month) + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'day';
+                daysDiv.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.innerHTML = `<span class="date">${day}</span>`;
+                dayDiv.querySelector('.date').style.color = textColor;
+                daysDiv.appendChild(dayDiv);
+
+                if ((firstDay + day) % 7 === 0) {
+                    monthDiv.appendChild(daysDiv);
+                    daysDiv = document.createElement('div');
+                    daysDiv.className = 'days';
+                }
+            }
+
+            const totalCells = daysDiv.childNodes.length;
+            if (totalCells > 0 && totalCells % 7 !== 0) {
+                for (let i = 0; 7 - (totalCells % 7) > i; i++) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'day';
+                    daysDiv.appendChild(emptyDiv);
+                }
+            }
+
+            if (daysDiv.childNodes.length > 0) {
+                monthDiv.appendChild(daysDiv);
+            }
+
+            calendarContainer.appendChild(monthDiv);
+        }
+    </script>
+</body>
+</html>

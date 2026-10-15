@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 堂｜XOR 閘：兩個不一樣才亮</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="7">
+<main class="wrap">
+
+<section class="hero" style="--u:#64B5F6">
+  <span class="tag">第 7 堂 ／ 單元2　邏輯電路</span>
+  <h1>XOR 閘：兩個不一樣才亮 ⚖️</h1>
+  <p>樓梯上、下各有一個開關，按任何一個都能切換燈——這是生活中的 XOR（互斥或）：兩個開關「不一樣」才亮。今天用比較器的「減法模式」做出來，也做一台會判斷對錯的答題機！</p>
+  <div class="chips"><span class="chip">🧱 紅石比較器、拉桿、紅石粉、紅石燈</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>說得出 XOR 的意思：兩個不一樣才亮。</li><li>知道比較器有「減法模式」：後面的訊號減掉側面的訊號。</li><li>做出雙控開關燈和是非題答題機。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：家裡樓梯燈：樓上樓下都能開關，是怎麼做到的？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：比較器減法模式：15 − 15 = 0、15 − 0 = 15</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：雙控開關燈：網頁觀察 XOR 電路，再照著在遊戲蓋</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：是非題答題機：老師設正確答案，學生扳拉桿作答</div></div>
+<div class="slot" data-min="5" data-label="第2節 大挑戰"><b>5 分</b><div><b>大挑戰</b>：全班比賽：誰的答題機最快蓋好且答對判斷正確</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">⚖️</span><b>紅石比較器</b>前面有 3 個小火把。對它按右鍵，前面的小火把亮起來＝<b>減法模式</b>：輸出 ＝ 後面的訊號 − 側面的訊號。</div><div class="lc"><span class="ic">⚖️</span><b>XOR（互斥或）</b>A、B <b>不一樣</b>才是 1：<br>0,0→0｜1,0→1｜0,1→1｜1,1→0</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>XOR 電路：A 接比較器 1 的後面、B 接它的側面；B 接比較器 2 的後面、A 接它的側面。兩個比較器面對面，中間放燈。</li><li>A、B 都開時，兩邊的訊號強度要<b>一樣強</b>才會剛好減到 0，所以兩條線的長度要對稱。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：雙控開關燈 💡</h3></header>
+  <div class="items">🎒 準備物品：拉桿 ×2、紅石比較器 ×2、紅石粉、紅石燈</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s07a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>照網頁的樣子，在平地上把電路蓋出來（地圖完全一樣，數格子照著放）。</li><li>對兩個比較器按右鍵，切換成<b>減法模式</b>（前面的小火把亮）。</li><li>測試 4 種組合，填好 XOR 真值表。</li><li>把一個拉桿放在樓梯上面、一個放在下面（電路藏在牆裡），就是真正的雙控開關！</li></ol>
+  <div class="tip">💡 遊戲裡的紅石粉在轉彎時才會「指向」比較器的側面；照網頁的轉角位置放就對了。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：在網頁測完真值表，在遊戲照圖蓋出來。</div><div class="lv f"><b>🦊 五、六年級</b>：把比較器換回比較模式，真值表會變成什麼？為什麼？</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：是非題答題機 ✅</h3></header>
+  <div class="items">🎒 準備物品：拉桿 ×2、XOR 電路、紅石燈 ×2、紅石火把</div>
+  
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>用剛剛的 XOR 電路：拉桿 A 是「正確答案」（老師設定，藏在牆後），拉桿 B 是「學生的回答」。</li><li>答案和回答<b>不一樣</b>時 XOR 會亮 → 接一盞<b>紅燈</b>（答錯）。</li><li>紅燈旁邊接一支火把（NOT）再接<b>綠燈</b> → 一樣時綠燈亮（答對）。</li><li>在牆上放告示牌寫題目，例如「紅石粉最多傳 15 格（開＝對、關＝錯）」。</li></ol>
+  <div class="tip">💡 這台機器用到了 XOR 和 NOT，也就是「XNOR」：兩個一樣才亮。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出紅燈（答錯）版本。</div><div class="lv f"><b>🦊 五、六年級</b>：加上綠燈（答對）＋音符盒答對音效。</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：這堂的重點是「比較器的數字」和真值表，在網頁模擬器打開「顯示訊號強度」直接算比較清楚，所以不寫程式。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>樓梯燈為什麼要用 XOR，不能用 OR？</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>XOR 是 20 堂裡最抽象的一課，建議三四年級以「照網頁圖蓋＋填真值表」為目標，不要求理解減法。</li><li>網頁中的 XOR 電路全部在同一層，遊戲裡可照原樣蓋；若兩條線長度不同，比較器減完可能不是 0，記得兩邊對稱。</li><li>答題機可以變成全班遊戲：老師出 5 題，答對的組加分。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s07a": {"title": "⚖️ XOR：兩個不一樣才亮", "desc": "兩個比較器都是「減法模式」，前面共用一盞燈。扳 A、B 看看，打開「顯示訊號強度」算算看為什麼。", "rows": ["L:A - - - - .", ". - . . - .", ". - s> O:L s< -", ". . - . . -", "L:B - - - - -"], "names": {"A": "拉桿A", "B": "拉桿B", "L": "燈"}, "challenges": [{"name": "檢查真值表", "level": "🐣", "demo": true, "steps": [{"set": {"A": false, "B": false}, "expect": {"L": false}}, {"set": {"A": true, "B": false}, "expect": {"L": true}}, {"set": {"A": false, "B": true}, "expect": {"L": true}}, {"set": {"A": true, "B": true}, "expect": {"L": false}}]}]}};
+window.QUIZ = [{"q": "XOR 什麼時候會亮？", "o": ["兩個都開", "兩個不一樣", "兩個都關"], "a": 1, "why": "不一樣才亮；一樣（都開或都關）就不亮。"}, {"q": "比較器減法模式：後面 15、側面 15，輸出是？", "o": ["15", "30", "0"], "a": 2, "why": "15 − 15 = 0。"}, {"q": "A=1、B=1，XOR 的輸出是？", "o": ["0", "1"], "a": 0, "why": "兩個一樣，所以是 0。"}, {"q": "怎麼把比較器切換成減法模式？", "o": ["右鍵點它", "放在水裡", "用拉桿"], "a": 0, "why": "右鍵點一下，前面的小火把亮起來。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

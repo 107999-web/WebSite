@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>爆炸頭節奏大師・試玩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&family=Nunito:wght@700;800&display=swap">
+<style>
+:root{color-scheme:light dark;--bg:#FFF8F0;--paper:#fff;--ink:#4A4038;--ink2:#8C7F73;--line:#F0DFCC;--accent:#FF9E4A;--accent-d:#E07C22;--ok:#2EAD6B;
+  --f:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#231F1B;--paper:#2E2823;--ink:#F6EDE3;--ink2:#C2B3A4;--line:#4E4238;--accent-d:#FFC894}}
+:root[data-theme="dark"]{--bg:#231F1B;--paper:#2E2823;--ink:#F6EDE3;--ink2:#C2B3A4;--line:#4E4238;--accent-d:#FFC894}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.7}
+.wrap{max-width:1000px;margin:0 auto;padding:14px 16px 40px}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{font-size:clamp(1.2rem,3.4vw,1.6rem);margin:0}
+header a{margin-left:auto;color:var(--accent-d);font-weight:700;text-decoration:none}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+button{font-family:var(--f);font-weight:800;font-size:1rem;border:0;border-radius:999px;padding:9px 18px;background:var(--accent);color:#fff;cursor:pointer}
+button.ghost{background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+#status{font-size:.9rem;color:var(--ink2)}
+.stagebox{position:relative;width:100%;max-width:960px;aspect-ratio:4/3;border-radius:18px;overflow:hidden;border:3px solid var(--line);background:#2b1d40}
+canvas{width:100%;height:100%;display:block}
+details{margin-top:12px;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:8px 14px}
+details summary{font-weight:800;cursor:pointer}
+.sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 18px;margin-top:8px}
+.sets label{display:flex;align-items:center;gap:8px;font-size:.9rem}
+.sets input{flex:1}
+.help{font-size:.88rem;color:var(--ink2);margin-top:10px}
+.kbd{display:inline-block;border:2px solid var(--line);border-bottom-width:4px;border-radius:7px;padding:0 6px;font-weight:800;background:var(--paper);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>🎵 爆炸頭節奏大師・試玩</h1><a href="index.html">← 回製作教學</a></header>
+  <div class="bar">
+    <button id="bCam">📷 用攝影機玩</button>
+    <button id="bKey" class="ghost">⌨️ 用鍵盤玩</button>
+    <button id="bStart" class="ghost" disabled>▶ 開始（或握拳）</button>
+    <span id="status">請先選擇玩法。攝影機模式需要網路載入 AI 模型。</span>
+  </div>
+  <div class="stagebox"><canvas id="cv" width="960" height="720" aria-label="遊戲畫面"></canvas></div>
+  <details>
+    <summary>⚙️ 調整設定（和 Scratch 範例的變數同名）</summary>
+    <div class="sets">
+      <label>起始拍長 <input type="range" id="sBeat" min="0.6" max="1.2" step="0.05" value="0.9"><output id="oBeat">0.9</output></label>
+      <label>加速 <input type="range" id="sAcc" min="0" max="0.12" step="0.005" value="0.075"><output id="oAcc">0.075</output></label>
+      <label>容許 <input type="range" id="sTol" min="0.1" max="0.45" step="0.05" value="0.3"><output id="oTol">0.3</output></label>
+      <label>延遲補償 <input type="range" id="sLat" min="0" max="0.4" step="0.05" value="0.15"><output id="oLat">0.15</output></label>
+      <label>門檻 <input type="range" id="sThr" min="0.3" max="0.9" step="0.05" value="0.6"><output id="oThr">0.6</output></label>
+    </div>
+  </details>
+  <p class="help">玩法：看師傅示範 8 拍 → 倒數 3、2、1 → 照同樣的節奏比出方向。每次出招後要<b>握拳</b>才能再出招（每個動作後面都有休息拍，讓你有時間握拳）。一關比一關快，錯 0～1 次過關，爆炸頭變大！<br>
+    鍵盤：<span class="kbd">←</span> <span class="kbd">↑</span> <span class="kbd">→</span> 出招，<span class="kbd">空白鍵</span> 開始（鍵盤模式建議把延遲補償調成 0）。</p>
+</div>
+<script src="assets/sprites.js"></script>
+<script type="module">
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');ctx.scale(2,2);           // 邏輯座標 480×360，和 Scratch 舞台一樣
+const SONGS=['左-右-左-右-','上-上-左-右-','右-左-上-右-','左-上-右-上-','上-右-左-上-'];   // 每個動作後面都有休息拍
+const IMG={};for(const k in SPR){const im=new Image();im.src=SPR[k][0];IMG[k]=im;}
+const HAND={};for(const [k,f] of [['左','left'],['上','up'],['右','right']]){const im=new Image();im.src='assets/img/hand_'+f+'.png';HAND[k]=im;}
+const S={mode:null,phase:'待機',round:0,score:0,start:0,n:0,cur:0,song:'',notes:[],next:0,err:0,gesture:'無',armed:false,
+  judge:null,prompt:null,masterPose:'拳',masterUntil:0,playerPose:'拳',playerUntil:0,afroPop:0,lm:null,
+  beat:.9,base:.9,accel:.075,tol:.3,lat:.15,thr:.6};
+const now=()=>performance.now()/1000;
+for(const [id,key] of [['sBeat','base'],['sTol','tol'],['sLat','lat'],['sThr','thr']]){
+  $(id).addEventListener('input',e=>{S[key]=+e.target.value;$('o'+id.slice(1)).textContent=(+e.target.value).toFixed(2);});
+}
+$('sAcc').addEventListener('input',e=>{S.accel=+e.target.value;$('oAcc').textContent=(+e.target.value).toFixed(3);});
+
+/* ---------- 聲音 ---------- */
+let AC=null;
+function beep(f,d=.08,v=.25,type='sine'){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(AC.destination);
+  const t=AC.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d+.02);}catch(e){}}
+const TONE={'左':180,'上':300,'右':450};
+const sfx={tick:()=>beep(1600,.03,.12),dir:d=>beep(TONE[d],.3,.35),good:()=>{beep(988,.08,.2);setTimeout(()=>beep(1319,.15,.2),80)},
+  bad:()=>beep(140,.22,.18,'square'),win:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16,.25),i*120)),
+  lose:()=>[392,330,262].forEach((f,i)=>setTimeout(()=>beep(f,.2,.25),i*180))};
+
+/* ---------- 手勢辨識（和 Scratch 的「辨識手勢」同一套規則） ---------- */
+function stagePts(lms){ // MediaPipe 0~1 → Handpose2Scratch 的舞台座標（攝影機「開啟」＝鏡像畫面）
+  return lms.map(p=>[240-p.x*640*.75,180-p.y*480*.75]);
+}
+function classify(P){
+  if(!P)return '無';
+  const d=(a,b)=>Math.hypot(P[a-1][0]-P[b-1][0],P[a-1][1]-P[b-1][1]);
+  const palm=d(1,10),idx=d(6,9),mid=d(10,13),dx=P[8][0]-P[5][0],dy=P[8][1]-P[5][1],lim=palm*S.thr;
+  if(mid>lim)return '其他';
+  if(idx<lim)return '拳';
+  if(Math.abs(dx)>Math.abs(dy))return dx>0?'右':'左';
+  return dy>0?'上':'其他';
+}
+function updateGesture(g){
+  S.gesture=g;
+  if(g==='拳')S.armed=true;
+  if(S.armed&&(g==='左'||g==='上'||g==='右')){S.armed=false;fire(g);}
+}
+
+/* ---------- 遊戲流程 ---------- */
+function prompt(text,sec,color){S.prompt={text,until:now()+sec,color};}
+function beginPhase(ph,n){S.phase=ph;S.n=n;S.cur=0;S.start=now();}
+function startGame(){
+  if(S.phase!=='待機'&&S.phase!=='結束')return;
+  S.score=0;S.round=0;nextRound();
+}
+function nextRound(){
+  if(S.round>=SONGS.length){S.phase='結束';prompt('遊戲結束！爆炸頭等級 '+S.score,999,'#FF5C8A');return;}
+  S.song=SONGS[S.round];S.round++;
+  S.beat=Math.round((S.base-(S.round-1)*S.accel)*1000)/1000;   // 一關比一關快
+  S.notes=[];[...S.song].forEach((c,i)=>{if(c!=='-')S.notes.push({b:i+1,d:c});});
+  S.phase='看師傅';S.start=now();prompt('看師傅示範！',1.2,'#9966FF');
+}
+function onBeat(k){
+  sfx.tick();
+  if(S.phase==='示範'){const c=S.song[k-1];if(c!=='-'){S.masterPose=c;S.masterUntil=now()+.4;sfx.dir(c);}}
+  if(S.phase==='倒數'){prompt(k<4?String(4-k):'GO!',.5,k<4?'#FF8C1A':'#2EAD6B');}
+}
+function fire(d){
+  S.playerPose=d;S.playerUntil=now()+.35;sfx.dir(d);
+  if(S.phase!=='玩家')return;
+  const t=now()-S.start-S.lat;let j;
+  if(S.next<S.notes.length&&Math.abs(t-(S.notes[S.next].b-1)*S.beat)<S.tol){
+    if(d===S.notes[S.next].d)j='GOOD';else{j='BAD';S.err++;}
+    S.next++;
+  }else{j='BAD';S.err++;}
+  showJudge(j);
+}
+function showJudge(j){S.judge={text:j,t:now()};if(j==='GOOD')sfx.good();else if(j==='BAD')sfx.bad();}
+function update(){
+  const t=now();
+  if(S.phase==='看師傅'&&t-S.start>1.2)beginPhase('示範',8);
+  else if(S.phase==='換你'&&t-S.start>.8)beginPhase('倒數',4);
+  else if(S.phase==='結果'&&t-S.start>1.6)nextRound();
+  if(S.phase==='示範'||S.phase==='倒數'||S.phase==='玩家'){
+    const k=Math.floor((t-S.start)/S.beat)+1;
+    if(k>S.cur&&k<=S.n){S.cur=k;onBeat(k);}
+    if(S.phase==='玩家'){
+      const tt=t-S.start-S.lat;
+      if(S.next<S.notes.length&&tt>(S.notes[S.next].b-1)*S.beat+S.tol){S.err++;S.next++;showJudge('MISS');}
+    }
+    if(t-S.start>=S.n*S.beat){
+      if(S.phase==='示範'){S.phase='換你';S.start=t;prompt('換你了！',.8,'#2EAD6B');}
+      else if(S.phase==='倒數'){beginPhase('玩家',8);S.next=0;S.err=0;}
+      else{
+        S.err+=Math.max(0,S.notes.length-S.next);S.next=S.notes.length;
+        S.phase='結果';S.start=t;
+        if(S.err<2){S.score++;S.afroPop=t;sfx.win();prompt('過關！爆炸頭變大',1.5,'#2EAD6B');}
+        else{sfx.lose();prompt('差一點點…',1.5,'#E8607D');}
+      }
+    }
+  }
+}
+
+/* ---------- 繪圖 ---------- */
+let video=null;
+function sprite(key,x,y,size){const im=IMG[key],sp=SPR[key];if(!im||!im.complete)return;const s=size/100;
+  ctx.drawImage(im,240+x-sp[1]*s,180-y-sp[2]*s,im.width*s,im.height*s);}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+const BADGE={'無':['看不到手','#9E9E9E'],'拳':['拳 預備','#FF8C1A'],'左':['← 左','#4C97FF'],'上':['↑ 上','#59C059'],'右':['右 →','#CF63CF'],'其他':['其他','#8A776E']};
+function draw(){
+  const t=now();
+  ctx.clearRect(0,0,480,360);
+  if(IMG.bg.complete)ctx.drawImage(IMG.bg,0,0,480,360);
+  if(video&&video.readyState>=2){ctx.save();ctx.globalAlpha=.5;ctx.translate(480,0);ctx.scale(-1,1);ctx.drawImage(video,0,0,480,360);ctx.restore();}
+  // 手部骨架
+  if(S.lm){ctx.fillStyle='#FFE14D';for(const [i,p] of S.lm.entries()){ctx.beginPath();ctx.arc(240+p[0],180-p[1],[0,5,8,9,12].includes(i)?3.5:2,0,7);ctx.fill();}}
+  // 節拍列
+  if(['示範','換你','倒數','玩家','結果'].includes(S.phase)){
+    [...S.song].forEach((c,i)=>{
+      const x=240+(i+1)*55-247.5,y=70,big=S.cur===i+1&&(S.phase==='示範'||S.phase==='玩家');
+      const sz=big?1.4:1;ctx.globalAlpha=big?1:.7;
+      if(c==='-'){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,6*sz,0,7);ctx.fill();}
+      else{const im=HAND[c];if(im.complete){const k=40/Math.max(im.width,im.height)*sz;ctx.drawImage(im,x-im.width*k/2,y-im.height*k/2,im.width*k,im.height*k);}}
+      ctx.globalAlpha=1;
+    });
+  }
+  // 角色
+  const afro=40+S.score*20+(t-S.afroPop<.15?15:0);
+  sprite('afro',130,-10,afro);
+  const bob=(S.phase==='玩家'||S.phase==='倒數')&&((t-S.start)%S.beat)<.1?6:0;
+  sprite('m_'+(t<S.masterUntil?S.masterPose:'拳'),-130,-10+bob,100);
+  let pp='拳';if(t<S.playerUntil)pp=S.playerPose;else if(['左','上','右'].includes(S.gesture))pp=S.gesture;
+  sprite('p_'+pp,130,-10,100);
+  // 判定
+  if(S.judge&&t-S.judge.t<.6){const a=1-(t-S.judge.t)/.6;ctx.globalAlpha=a;ctx.font='900 34px Nunito,sans-serif';ctx.textAlign='center';
+    ctx.lineWidth=5;ctx.strokeStyle='#fff';ctx.strokeText(S.judge.text,370,70-20*(1-a));
+    ctx.fillStyle={GOOD:'#2EAD6B',BAD:'#E8607D',MISS:'#8A8A8A'}[S.judge.text];ctx.fillText(S.judge.text,370,70-20*(1-a));ctx.globalAlpha=1;}
+  // 提示
+  let pr=S.prompt&&t<S.prompt.until?S.prompt:null;
+  if(!pr&&S.phase==='待機')pr={text:S.mode?'握拳（或按空白鍵）開始':'爆炸頭節奏大師',color:'#FF5C8A'};
+  if(pr){ctx.font='800 26px "M PLUS Rounded 1c","Noto Sans TC",sans-serif';ctx.textAlign='center';const w=Math.max(120,ctx.measureText(pr.text).width+44);
+    roundRect(240-w/2,110,w,56,20);ctx.fillStyle='rgba(255,255,255,.93)';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=pr.color;ctx.stroke();
+    ctx.fillStyle=pr.color;ctx.fillText(pr.text,240,147);}
+  // 手勢牌子
+  const b=BADGE[S.gesture]||BADGE['無'];roundRect(240-58,315,116,34,17);ctx.fillStyle=b[1];ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='800 17px "M PLUS Rounded 1c","Noto Sans TC",sans-serif';ctx.textAlign='center';ctx.fillText(b[0]+(S.armed?' ●':''),240,338);
+  // 分數
+  ctx.textAlign='left';ctx.font='800 14px "M PLUS Rounded 1c","Noto Sans TC",sans-serif';
+  roundRect(6,6,150,26,8);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();ctx.fillStyle='#4A4038';
+  ctx.fillText('分數 '+S.score+'　回合 '+Math.max(1,S.round)+'/'+SONGS.length,14,24);
+  if(S.phase==='玩家'){ctx.textAlign='right';roundRect(380,6,94,26,8);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();ctx.fillStyle=S.err<2?'#2EAD6B':'#E8607D';ctx.fillText('錯誤 '+S.err,466,24);}
+}
+
+/* ---------- 攝影機 + MediaPipe ---------- */
+let landmarker=null,lastVT=-1;
+async function startCam(){
+  $('bCam').disabled=true;$('status').textContent='正在開啟攝影機…';
+  try{
+    video=document.createElement('video');video.playsInline=true;video.muted=true;
+    video.srcObject=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480},audio:false});
+    await video.play();
+  }catch(e){$('status').textContent='攝影機無法開啟（'+e.name+'）。請檢查權限，或改用鍵盤玩。';$('bCam').disabled=false;return;}
+  $('status').textContent='正在載入 AI 手部模型（第一次約 5～20 秒）…';
+  try{
+    const V='0.10.21';
+    const {FilesetResolver,HandLandmarker}=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+V+'/vision_bundle.mjs');
+    const fs=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+V+'/wasm');
+    landmarker=await HandLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',delegate:'GPU'},runningMode:'VIDEO',numHands:1});
+  }catch(e){$('status').textContent='AI 模型載入失敗（可能沒有網路）。攝影機畫面仍會顯示，請改用鍵盤玩。';console.warn(e);}
+  if(landmarker)$('status').textContent='準備好了！把手舉到鏡頭前，握拳就開始。';
+  S.mode='cam';$('bStart').disabled=false;
+}
+function detect(){
+  if(landmarker&&video&&video.readyState>=2&&video.currentTime!==lastVT){
+    lastVT=video.currentTime;
+    try{const r=landmarker.detectForVideo(video,performance.now());
+      S.lm=r.landmarks&&r.landmarks[0]?stagePts(r.landmarks[0]):null;
+      const g=classify(S.lm);updateGesture(g);
+      if(g==='拳'&&(S.phase==='待機'||S.phase==='結束')&&S.mode&&!S.fistStart)S.fistStart=now();
+      if(g!=='拳')S.fistStart=0;
+      if(S.fistStart&&now()-S.fistStart>.5&&(S.phase==='待機'||S.phase==='結束')){S.fistStart=0;startGame();}
+    }catch(e){}
+  }
+}
+$('bCam').onclick=startCam;
+$('bKey').onclick=()=>{S.mode='key';S.lat=0;$('sLat').value=0;$('oLat').textContent='0.00';$('bStart').disabled=false;$('status').textContent='鍵盤模式：按空白鍵開始，用 ← ↑ → 出招。';beep(660,.05,.1);};
+$('bStart').onclick=()=>{beep(660,.05,.1);startGame();};
+addEventListener('keydown',e=>{
+  const m={ArrowLeft:'左',ArrowUp:'上',ArrowRight:'右'}[e.key];
+  if(m){e.preventDefault();if(!e.repeat)fire(m);}
+  if(e.key===' '){e.preventDefault();if(S.mode){startGame();}}
+});
+(function loop(){detect();update();draw();requestAnimationFrame(loop);})();
+</script>
+</body>
+</html>

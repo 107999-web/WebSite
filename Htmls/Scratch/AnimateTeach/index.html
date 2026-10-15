@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scratch 動畫製作教學</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&family=Nunito:wght@700;800&display=swap">
+<link rel="stylesheet" href="student/assets/style.css">
+<style>
+body{min-height:100vh;display:grid;place-items:center;padding:34px 18px}
+.box{max-width:900px;width:100%;text-align:center}
+h1{font-size:clamp(1.7rem,5vw,2.5rem);font-weight:800;margin:12px 0 6px}
+p.sub{color:var(--ink2);margin:0 auto;max-width:40em}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:999px}
+.gate{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:26px}
+.gate a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:var(--ink);background:var(--paper);
+  border:3px solid var(--line);border-radius:26px;padding:28px 22px;box-shadow:var(--shadow);transition:transform .2s,border-color .2s}
+.gate a:hover{transform:translateY(-4px);border-color:var(--accent)}
+.gate .ico{font-size:2.8rem;line-height:1}
+.gate b{display:block;font-size:1.22rem;font-weight:800;margin:12px 0 6px}
+.gate span.d{font-size:.9rem;color:var(--ink2);line-height:1.65}
+.src{margin-top:24px;background:var(--paper);border:3px dashed var(--line);border-radius:22px;padding:14px 20px;text-align:left;font-size:.9rem;color:var(--ink2)}
+.src b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="badge">學生作品改編・互動教學</span>
+  <h1>Scratch 動畫製作教學</h1>
+  <p class="sub">讓動畫流暢地切換畫面：從規劃、廣播，到定義積木、圖像效果與 sin 擺動。</p>
+  <div class="gate">
+    <a href="student/index.html"><span class="ico">🎬</span><b>學生互動教學</b>
+      <span class="d">原作 18 頁投影片、6 個章節、12 個可以動手操作的示範，附分鏡表、自我檢核與小測驗。</span></a>
+    <a href="teacher/index.html"><span class="ico">📘</span><b>教師手冊</b>
+      <span class="d">原作對照、2 節課教學流程、原作程式完整解析、8 個討論點、測驗答案與評分規準。</span></a>
+  </div>
+  <div class="src"><b>原作：60319 李昀宸「動畫教學」</b>（Scratch 專案，18 頁投影片＋程式內 9 則註解）。
+    學生版中標示「昀宸說」的內容皆引自原作；其餘說明與互動示範為改編補充。<b>student</b> 資料夾可以單獨拷給學生，裡面沒有教師版的檔案與連結。</div>
+</div>
+</body>
+</html>

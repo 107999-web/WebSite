@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>嘟嘟粉紅賽車 🏎️💨</title>
+    <style>
+        /* 全域可愛風字體與防選取 */
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 遊戲主容器 */
+        #game-wrapper {
+            position: relative;
+            width: 380px;
+            height: 600px;
+            background: #FFF;
+            border: 8px solid #FFB7B2;
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 計分板 */
+        #score-board {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF7B94;
+            z-index: 10;
+            border: 2px solid #FFC6FF;
+        }
+
+        /* 賽道區域 */
+        #track {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            background-color: #A0C4FF; /* 可愛粉藍色馬路 */
+            background-image: 
+                linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.4) 50%),
+                linear-gradient(0deg, #A0C4FF 50%, #90B4EF 50%);
+            background-size: 20px 100%, 100% 60px;
+            /* 預設靜止，遊戲開始後透過 JS 動態控制速度 */
+            animation: drive 0s linear infinite; 
+            overflow: hidden;
+        }
+
+        /* 賽道中心分隔線線條效果 */
+        #track::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            transform: translateX(-50%);
+            background-image: linear-gradient(to bottom, #FFF 60%, transparent 40%);
+            background-size: 10px 40px;
+        }
+
+        @keyframes drive {
+            from { background-position-y: 0px, 0px; }
+            to { background-position-y: 0px, 60px; }
+        }
+
+        /* 主角玩家車子 */
+        #player {
+            position: absolute;
+            bottom: 40px;
+            left: 165px; /* 初始置中 (380/2 - 50/2) */
+            width: 50px;
+            height: 50px;
+            font-size: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            transition: transform 0.1s ease;
+            filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.15));
+        }
+
+        /* 障礙物物體 */
+        .obstacle {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            font-size: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 4;
+            filter: drop-shadow(2px 3px 2px rgba(0,0,0,0.1));
+        }
+
+        /* 手機版控制按鈕區 */
+        #controls {
+            width: 100%;
+            height: 90px;
+            background: #FDFFB6;
+            border-top: 5px solid #FFD166;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .btn {
+            width: 100px;
+            height: 55px;
+            background: #FFADAD;
+            border: 3px solid #FF8B8B;
+            border-radius: 18px;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #FF6B6B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #FF6B6B;
+        }
+
+        /* 覆蓋螢幕（開始與結束畫面） */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .overlay h1 {
+            color: #FF6B6B;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px #FFD166;
+        }
+
+        .overlay p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .start-btn {
+            padding: 12px 35px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: #CAFFBF;
+            border: 3px solid #99CD8F;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #7FB873;
+            animation: bounce 2s infinite;
+        }
+
+        .start-btn:hover {
+            background: #b7faa9;
+        }
+
+        .start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7FB873;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <div id="score-board">分數: <span id="score">0</span></div>
+
+        <div id="track">
+            <div id="player">🚗</div>
+        </div>
+
+        <div id="controls">
+            <button class="btn" id="btn-left">◀</button>
+            <button class="btn" id="btn-right">▶</button>
+        </div>
+
+        <div id="start-screen" class="overlay">
+            <h1>嘟嘟粉紅賽車</h1>
+            <p>歡迎來到極速療癒世界！<br>左右移動躲避隨機出現的小動物與障礙物吧！<br><br>控制方式：<br>⌨️ 鍵盤: A / D 或 左右方向鍵<br>📱 手機: 點擊下方粉紅按鈕</p>
+            <button class="start-btn" onclick="startGame()">開始冒險 🏁</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay hidden">
+            <h1>撞車啦！💥</h1>
+            <p style="font-size: 22px; font-weight: bold; color: #FF7B94;">最終得分: <span id="final-score">0</span></p>
+            <p>沒關係，吸取經驗下次會更好喵～ 🐾</p>
+            <button class="start-btn" onclick="startGame()">再玩一次 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        const track = document.getElementById('track');
+        const player = document.getElementById('player');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('final-score');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+
+        // 障礙物造型池（越可愛越好）
+        const obstacleEmojis = ['🐥', '🐸', '🍌', '🐷', '🦔', '🦖', '📦', '🚧'];
+
+        // 遊戲狀態變數
+        let gameActive = false;
+        let score = 0;
+        let playerX = 165; // 車子當前的 X 座標
+        let playerSpeed = 8; // 玩家移動速度
+        let obstacles = [];
+        let obstacleSpeed = 4; // 障礙物初始下落速度
+        let spawnInterval = 1200; // 產生障礙物間隔時間 (ms)
+        let lastSpawnTime = 0;
+        let animationFrameId;
+
+        // 按鍵監聽狀態
+        let keys = {
+            Left: false,
+            Right: false
+        };
+
+        // --- 事件監聽配置 ---
+        // 1. 鍵盤事件
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = false;
+        });
+
+        // 2. 手機按鈕事件 (支援點擊與長按)
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+
+        const setLeftTrue = (e) => { e.preventDefault(); keys.Left = true; };
+        const setLeftFalse = (e) => { e.preventDefault(); keys.Left = false; };
+        const setRightTrue = (e) => { e.preventDefault(); keys.Right = true; };
+        const setRightFalse = (e) => { e.preventDefault(); keys.Right = false; };
+
+        btnLeft.addEventListener('mousedown', setLeftTrue);
+        btnLeft.addEventListener('mouseup', setLeftFalse);
+        btnLeft.addEventListener('touchstart', setLeftTrue);
+        btnLeft.addEventListener('touchend', setLeftFalse);
+
+        btnRight.addEventListener('mousedown', setRightTrue);
+        btnRight.addEventListener('mouseup', setRightFalse);
+        btnRight.addEventListener('touchstart', setRightTrue);
+        btnRight.addEventListener('touchend', setRightFalse);
+
+
+        // --- 遊戲邏輯控制 ---
+
+        // 初始化/開始遊戲
+        function startGame() {
+            // 清除上一局遺留的障礙物
+            obstacles.forEach(obs => obs.element.remove());
+            obstacles = [];
+
+            // 重置參數
+            score = 0;
+            playerX = 165;
+            obstacleSpeed = 4;
+            spawnInterval = 1200;
+            scoreElement.innerText = score;
+            player.style.left = playerX + 'px';
+            player.style.transform = 'rotate(0deg)';
+
+            // 隱藏覆蓋畫面
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            // 啟動賽道滾動特效
+            track.style.animationDuration = '0.4s'; 
+
+            gameActive = true;
+            lastSpawnTime = performance.now();
+            
+            // 啟動遊戲主迴圈
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // 產生單個隨機障礙物
+        function spawnObstacle() {
+            const obsElement = document.createElement('div');
+            obsElement.classList.add('obstacle');
+            
+            // 隨機抽選造型
+            const randomEmoji = obstacleEmojis[Math.floor(Math.random() * obstacleEmojis.length)];
+            obsElement.innerText = randomEmoji;
+
+            // 隨機 X 位置（限制在賽道範圍內 0 ~ 380 - 45）
+            const randomX = Math.floor(Math.random() * (380 - 45));
+            obsElement.style.left = randomX + 'px';
+            obsElement.style.top = '-50px'; // 從賽道最上方外面滑入
+
+            track.appendChild(obsElement);
+
+            obstacles.push({
+                element: obsElement,
+                x: randomX,
+                y: -50
+            });
+        }
+
+        // 碰撞檢測機制 (使用矩形 AABB 演算法，並縮小判定範圍讓遊戲體驗更精準、友善)
+        function checkCollision(rect1, rect2) {
+            const padding = 6; // 內縮判定框，避免因為 Emoji 透明邊緣導致誤判
+            return (
+                rect1.x + padding < rect2.x + rect2.width - padding &&
+                rect1.x + rect1.width - padding > rect2.x + padding &&
+                rect1.y + padding < rect2.y + rect2.height - padding &&
+                rect1.y + rect1.height - padding > rect2.y + padding
+            );
+        }
+
+        // 遊戲結束處理
+        function gameOver() {
+            gameActive = false;
+            cancelAnimationFrame(animationFrameId);
+            track.style.animationDuration = '0s'; // 停止馬路滾動
+            
+            finalScoreElement.innerText = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // --- 遊戲主迴圈 (Main Game Loop) ---
+        function gameLoop(currentTime) {
+            if (!gameActive) return;
+
+            // 1. 更新玩家位置與微幅傾斜動畫
+            if (keys.Left && playerX > 0) {
+                playerX -= playerSpeed;
+                player.style.transform = 'rotate(-10deg)';
+            } else if (keys.Right && playerX < (380 - 50)) {
+                playerX += playerSpeed;
+                player.style.transform = 'rotate(10deg)';
+            } else {
+                player.style.transform = 'rotate(0deg)';
+            }
+            player.style.left = playerX + 'px';
+
+            // 2. 自動隨時間生成障礙物
+            if (currentTime - lastSpawnTime > spawnInterval) {
+                spawnObstacle();
+                lastSpawnTime = currentTime;
+
+                // 隨著分數變高，稍微加快難度（提高速度、縮短生成間隔）
+                if (obstacleSpeed < 10) {
+                    obstacleSpeed += 0.15;
+                    spawnInterval = Math.max(600, spawnInterval - 20);
+                }
+            }
+
+            // 3. 取得玩家當前碰撞矩形
+            const playerRect = {
+                x: playerX,
+                y: 600 - 40 - 50, // 總高 - bottom - 玩家高度
+                width: 50,
+                height: 50
+            };
+
+            // 4. 更新障礙物位置與碰撞檢測
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.y += obstacleSpeed;
+                obs.element.style.top = obs.y + 'px';
+
+                // 建構障礙物碰撞矩形
+                const obsRect = {
+                    x: obs.x,
+                    y: obs.y,
+                    width: 45,
+                    height: 45
+                };
+
+                // 檢測是否撞擊
+                if (checkCollision(playerRect, obsRect)) {
+                    gameOver();
+                    return;
+                }
+
+                // 超出邊界判定：若移出畫面底部則銷毀並加分
+                if (obs.y > 600) {
+                    obs.element.remove();
+                    obstacles.splice(i, 1);
+                    score += 10;
+                    scoreElement.innerText = score;
+                }
+            }
+
+            // 持續循環
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+</html>

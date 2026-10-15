@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 堂｜OR 閘：只要一個成立</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="5">
+<main class="wrap">
+
+<section class="hero" style="--u:#64B5F6">
+  <span class="tag">第 5 堂 ／ 單元2　邏輯電路</span>
+  <h1>OR 閘：只要一個成立 🔀</h1>
+  <p>兩個開關、一盞燈：只要其中一個打開，燈就亮。這叫 OR（或）。做法很簡單——把兩條線接在一起！今天也要做一個「任何入口有人進來都會響」的警報器。</p>
+  <div class="chips"><span class="chip">🧱 拉桿、壓力板、紅石粉、紅石燈、音符盒、中繼器</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>說得出 OR 的意思：只要有一個開，就會亮。</li><li>會看、會填 OR 的真值表。</li><li>做出多入口警報器，並用中繼器防止電流「倒流」。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：生活中的「或」：爸爸「或」媽媽來接都可以</div></div>
+<div class="slot" data-min="10" data-label="第1節 新概念"><b>10 分</b><div><b>新概念</b>：真值表：0＝關、1＝開，全班一起填 OR 表</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：兩個開關都能開的燈：網頁先接、遊戲再蓋</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：多入口警報器：3 個入口的壓力板接到同一個音符盒</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：互相測試：每個入口都會響嗎？</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">🔀</span><b>OR（或）</b>輸入 A <b>或</b> B 有電，輸出就有電。只有兩個都關，才不會亮。</div><div class="lc"><span class="ic">📋</span><b>真值表</b>把所有可能的開關組合列出來的表：<br>A=0 B=0 → 0｜A=1 B=0 → 1｜A=0 B=1 → 1｜A=1 B=1 → 1</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>紅石的 OR 最簡單：<b>兩條紅石粉接在一起</b>就是 OR。</li><li>接在一起的線，電也可能「倒流」去點亮另一條線上的東西；在每條線上放一個中繼器就能擋住。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：兩個開關都能開的燈 🔀</h3></header>
+  <div class="items">🎒 準備物品：拉桿 ×2、紅石粉、紅石燈</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s05a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>房間門口和床邊各放一個拉桿。</li><li>兩個拉桿各鋪一條紅石粉，在中間<b>合成一條</b>。</li><li>合起來的線接到天花板的燈。</li><li>測試真值表的 4 種組合，填在紅石日誌裡。</li></ol>
+  <div class="tip">💡 OR 的缺點：兩個都開時，要兩個都關掉燈才會暗。下下堂的 XOR 會解決這個問題。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出 2 個開關的 OR 燈，填好真值表。</div><div class="lv f"><b>🦊 五、六年級</b>：做成 3 個開關（A 或 B 或 C），真值表有幾列？</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：多入口警報器 🚨</h3></header>
+  <div class="items">🎒 準備物品：壓力板 ×3、紅石粉、中繼器、音符盒</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s05b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>蓋一間有 3 個入口的小屋，每個入口放壓力板。</li><li>3 條紅石粉接到同一個音符盒（可以放 2～3 個音符盒讓聲音更大）。</li><li>每條線靠近合流的地方放一個中繼器，防止電流倒流。</li><li>從每個入口走進去測試。</li></ol>
+  <div class="tip">💡 音符盒只在「新的」訊號時響一次。站在壓力板上不動，只會響一聲。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：3 個入口都能讓警報響。</div><div class="lv f"><b>🦊 五、六年級</b>：再加一盞「哪個入口」的指示燈：入口 1 進來，1 號燈亮（想想看要怎麼避免電流倒流）。</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：OR 用「接在一起」就能做，不需要程式。下一堂 AND 會用 MakeCode 的「如果……而且……」來對照。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>寫出 OR 的真值表，並舉一個生活中的 OR 例子。</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>真值表用 0／1 對三四年級可能抽象，可以改用「關／開」「暗／亮」。</li><li>壓力板種類：石頭壓力板只感應生物；木頭壓力板連物品也會觸發，學生丟東西時會誤觸。</li><li>分組建議：三四年級和五六年級混齡兩人一組，高年級負責解釋真值表。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s05a": {"title": "🔀 應用 1：兩個開關都能開的燈（OR）", "desc": "把兩條線接在一起，再接到燈。", "rows": ["L:A - - ? . .", ". . . ? ? O:L", "L:B - - ? . ."], "tools": ["dust"], "names": {"A": "拉桿A", "B": "拉桿B", "L": "燈"}, "challenges": [{"name": "A 或 B 任何一個打開，燈就亮", "level": "🐣", "steps": [{"set": {"A": false, "B": false}, "expect": {"L": false}}, {"set": {"A": true, "B": false}, "expect": {"L": true}}, {"set": {"A": false, "B": true}, "expect": {"L": true}}, {"set": {"A": true, "B": true}, "expect": {"L": true}}]}]}, "s05b": {"title": "🚨 應用 2：多入口警報", "desc": "三個入口都有壓力板，誰踩到都會響。用 🖐️ 點壓力板試試。", "rows": ["P:1 - - - .", ". . . - .", "P:2 - - - - N12:N", ". . . - .", "P:3 - - - ."], "names": {"1": "入口1", "2": "入口2", "3": "入口3", "N": "警報"}, "challenges": [{"name": "每個入口都會讓警報響", "level": "🐣", "demo": true, "steps": [{"set": {"1": true}, "atLeast": {"N": 1}}, {"set": {"1": false}, "wait": 5}, {"set": {"2": true}, "atLeast": {"N": 2}}, {"set": {"2": false}, "wait": 5}, {"set": {"3": true}, "atLeast": {"N": 3}}]}]}};
+window.QUIZ = [{"q": "OR（或）什麼時候會亮？", "o": ["兩個都要開", "只要有一個開", "兩個都要關"], "a": 1, "why": "只要有一個開就亮。"}, {"q": "A=0、B=0，OR 的輸出是？", "o": ["0", "1"], "a": 0, "why": "兩個都關，才是 0。"}, {"q": "在紅石裡做 OR 最簡單的方法是？", "o": ["兩條線接在一起", "放一支火把", "放一個活塞"], "a": 0, "why": "兩條紅石粉合成一條就是 OR。"}, {"q": "為什麼合流的地方要放中繼器？", "o": ["讓電更快", "防止電流倒流", "讓聲音更大"], "a": 1, "why": "中繼器是單行道，電不會跑回另一條線。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
