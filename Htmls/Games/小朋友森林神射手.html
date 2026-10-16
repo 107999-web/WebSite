@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>森林神射手 🏹 萌萌蘋果大挑戰</title>
+    <style>
+        /* 全域可愛風設定 */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #eef9f1;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        h1 {
+            color: #4a7c59;
+            margin: 10px 0 5px 0;
+            text-shadow: 2px 2px #fff;
+            font-size: 28px;
+        }
+
+        /* 遊戲畫布與外框 */
+        #game-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            background: linear-gradient(to bottom, #9bf6ff, #caffbf);
+            border: 8px solid #ffadad;
+            border-radius: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* 雲朵背景裝飾 */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 20px;
+            opacity: 0.8;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+        .cloud-1 { width: 80px; height: 30px; top: 30px; left: 50px; animation: float 15s infinite linear; }
+        .cloud-2 { width: 100px; height: 35px; top: 70px; right: 80px; animation: float 20s infinite linear reverse; }
+
+        @keyframes float {
+            0% { transform: translateX(-50px); }
+            100% { transform: translateX(650px); }
+        }
+
+        /* 資訊列 */
+        #hud {
+            display: flex;
+            justify-content: space-between;
+            width: 560px;
+            padding: 10px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #68534d;
+        }
+
+        .hud-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 15px;
+            border-radius: 15px;
+            border: 2px solid #ffd166;
+        }
+
+        /* 遊戲元素：弓箭與目標 */
+        #bow {
+            position: absolute;
+            left: 30px;
+            top: 180px;
+            font-size: 50px;
+            transition: transform 0.1s ease-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .arrow {
+            position: absolute;
+            font-size: 30px;
+            z-index: 5;
+        }
+
+        .target {
+            position: absolute;
+            font-size: 40px;
+            animation: bobble 1.5s infinite ease-in-out alternate;
+            z-index: 5;
+        }
+
+        @keyframes bobble {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-10px); }
+        }
+
+        /* 特效：愛心與擊中 */
+        .pop {
+            position: absolute;
+            font-size: 30px;
+            animation: popOut 0.5s forwards;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        @keyframes popOut {
+            0 { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.5) translateY(-20px); opacity: 0; }
+        }
+
+        /* 結束與開始畫面重疊層 */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 17px;
+        }
+
+        .btn {
+            background: #ff7096;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px #ff477e;
+            transition: all 0.1s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: #ff85a2;
+        }
+
+        .btn:active {
+            box-shadow: 0 2px #ff477e;
+            transform: translateY(3px);
+        }
+
+        .hide { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <h1>🏹 小朋友森林神射手 🍎</h1>
+
+    <div id="hud">
+        <div class="hud-item">得分: <span id="score-txt">0</span></div>
+        <div class="hud-item">倒數時間: <span id="time-txt">30</span> 秒</div>
+    </div>
+
+    <div id="game-container">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+
+        <div id="bow">🏹</div>
+
+        <div id="start-screen" class="screen">
+            <h2 style="color: #ff7096; font-size: 32px; margin: 0;">準備好挑戰了嗎？</h2>
+            <p style="color: #6c757d; font-size: 18px; text-align: center; margin: 10px 20px; line-height: 1.6;">
+                上下移動滑鼠來瞄準，<br>點擊滑鼠左鍵就能射出小箭，擊中好吃的蘋果！
+            </p>
+            <button class="btn" onclick="startGame()">開始遊戲 🚀</button>
+        </div>
+
+        <div id="end-screen" class="screen hide">
+            <h2 style="color: #4a7c59; font-size: 36px; margin: 0;">時間到！⏱️</h2>
+            <p style="font-size: 24px; color: #ff7096; margin: 15px 0;">你的總得分是：<span id="final-score">0</span> 分</p>
+            <p id="rank-msg" style="font-size: 18px; color: #68534d; font-weight: bold;"></p>
+            <button class="btn" onclick="startGame()">再玩一次 🔁</button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const bow = document.getElementById('bow');
+        const scoreTxt = document.getElementById('score-txt');
+        const timeTxt = document.getElementById('time-txt');
+        const startScreen = document.getElementById('start-screen');
+        const endScreen = document.getElementById('end-screen');
+        const finalScoreTxt = document.getElementById('final-score');
+        const rankMsg = document.getElementById('rank-msg');
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = false;
+        let gameTimer = null;
+        let appleTimer = null;
+        let arrows = [];
+        let targets = [];
+
+        // 監聽滑鼠在遊戲區內的移動，控制弓箭上下位置
+        container.addEventListener('mousemove', (e) => {
+            if (!gameActive) return;
+            const rect = container.getBoundingClientRect();
+            let relativeY = e.clientY - rect.top - 25; 
+            
+            // 限制弓箭不超出邊界
+            if (relativeY < 10) relativeY = 10;
+            if (relativeY > 340) relativeY = 340;
+            
+            bow.style.top = relativeY + 'px';
+        });
+
+        // 點擊滑鼠射箭
+        container.addEventListener('click', (e) => {
+            if (!gameActive) return;
+            // 避免點擊到選單按鈕時也觸發發射
+            if (e.target.tagName === 'BUTTON' || e.target.closest('.screen:not(.hide)')) return;
+
+            shootArrow();
+        });
+
+        // 開始遊戲初始化
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            scoreTxt.innerText = score;
+            timeTxt.innerText = timeLeft;
+            gameActive = true;
+
+            // 清除上一局殘留的元件
+            document.querySelectorAll('.arrow').forEach(el => el.remove());
+            document.querySelectorAll('.target').forEach(el => el.remove());
+            arrows = [];
+            targets = [];
+
+            // 隱藏選單
+            startScreen.classList.add('hide');
+            endScreen.classList.add('hide');
+
+            // 清除舊的計時器防止重複疊加
+            clearInterval(gameTimer);
+            clearInterval(appleTimer);
+
+            // 啟動計時器
+            gameTimer = setInterval(updateTime, 1000);
+            // 啟動蘋果生成器
+            appleTimer = setInterval(spawnApple, 1200);
+            
+            spawnApple();
+
+            // 啟動主要遊戲物理動畫循環
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 時間倒數
+        function updateTime() {
+            timeLeft--;
+            timeTxt.innerText = timeLeft;
+
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // 生成可愛的蘋果目標
+        function spawnApple() {
+            if (!gameActive) return;
+
+            const apple = document.createElement('div');
+            apple.className = 'target';
+            apple.innerText = Math.random() > 0.3 ? '🍎' : '🍏';
+            
+            const randomY = Math.floor(Math.random() * 280) + 20;
+            apple.style.top = randomY + 'px';
+            apple.style.left = '600px'; // 從最右側外面飛入
+            
+            container.appendChild(apple);
+
+            const speed = Math.random() * 2 + 2; // 移動速度
+
+            targets.push({
+                element: apple,
+                x: 600,
+                y: randomY,
+                speed: speed
+            });
+        }
+
+        // 射箭動作
+        function shootArrow() {
+            const arrowEl = document.createElement('div');
+            arrowEl.className = 'arrow';
+            arrowEl.innerText = '🏹'; // 可以直接用這個符號代表發射出去的箭
+            
+            const bowY = parseInt(bow.style.top) + 10;
+            arrowEl.style.top = bowY + 'px';
+            arrowEl.style.left = '60px';
+            
+            container.appendChild(arrowEl);
+
+            arrows.push({
+                element: arrowEl,
+                x: 60,
+                y: bowY,
+                speed: 8
+            });
+        }
+
+        // 遊戲核心邏輯循環
+        function gameLoop() {
+            if (!gameActive) return;
+
+            // 1. 移動箭頭
+            for (let i = arrows.length - 1; i >= 0; i--) {
+                let a = arrows[i];
+                a.x += a.speed;
+                a.element.style.left = a.x + 'px';
+
+                if (a.x > 620) {
+                    a.element.remove();
+                    arrows.splice(i, 1);
+                    continue;
+                }
+
+                // 2. 檢查碰撞
+                for (let j = targets.length - 1; j >= 0; j--) {
+                    let t = targets[j];
+                    
+                    if (Math.abs(a.x - t.x) < 35 && Math.abs(a.y - t.y) < 35) {
+                        createPopEffect(t.x, t.y);
+                        
+                        score += 10;
+                        scoreTxt.innerText = score;
+
+                        a.element.remove();
+                        arrows.splice(i, 1);
+                        
+                        t.element.remove();
+                        targets.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+
+            // 3. 移動蘋果
+            for (let j = targets.length - 1; j >= 0; j--) {
+                let t = targets[j];
+                t.x -= t.speed;
+                t.element.style.left = t.x + 'px';
+
+                if (t.x < -50) {
+                    t.element.remove();
+                    targets.splice(j, 1);
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 擊中特效
+        function createPopEffect(x, y) {
+            const pop = document.createElement('div');
+            pop.className = 'pop';
+            pop.innerText = Math.random() > 0.5 ? '✨' : '❤️';
+            pop.style.left = x + 'px';
+            pop.style.top = y + 'px';
+            container.appendChild(pop);
+            
+            setTimeout(() => { pop.remove(); }, 500);
+        }
+
+        // 遊戲結束
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            clearInterval(appleTimer);
+
+            let msg = "";
+            if (score >= 150) {
+                msg = "哇！你是傳說中的森林神射手！太厲害了！👑";
+            } else if (score >= 80) {
+                msg = "好棒喔！百發百中，反應很快喔！🌟";
+            } else {
+                msg = "再接再厲！多練習幾次一定會更厲害！👍";
+            }
+            rankMsg.innerText = msg;
+
+            finalScoreTxt.innerText = score;
+            endScreen.classList.remove('hide');
+        }
+    </script>
+</body>
+</html>

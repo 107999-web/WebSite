@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft Education 座標與方位教學模擬器 (支援動態 Y 軸高度)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      user-select: none;
+      overflow: hidden;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .compass-dial {
+      transition: transform 0.08s linear;
+    }
+    /* 3D Floating tag labels */
+    .floating-3d-tag {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      pointer-events: none;
+      white-space: nowrap;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.15s ease;
+    }
+    .tag-start {
+      background: rgba(255, 255, 255, 0.95);
+      color: #15803d;
+      border: 1.5px solid #22c55e;
+    }
+    .tag-end {
+      background: rgba(255, 255, 255, 0.95);
+      color: #1d4ed8;
+      border: 1.5px solid #3b82f6;
+    }
+    .tag-center {
+      background: rgba(239, 68, 68, 0.95);
+      color: #ffffff;
+      border: 1.5px solid #dc2626;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
+
+  <!-- Header -->
+  <header class="h-14 bg-slate-900/95 backdrop-blur border-b border-slate-800 flex items-center justify-between px-3 sm:px-4 z-30 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-950/50 border border-emerald-400/40">
+        <i class="fa-solid fa-cube text-white text-base"></i>
+      </div>
+      <div>
+        <h1 class="text-sm sm:text-base font-black tracking-wide text-emerald-400 flex items-center gap-2">
+          Minecraft Education <span class="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-700/60 font-mono-code font-bold">三維座標系統 (含 Y 軸調控)</span>
+        </h1>
+        <p class="text-[11px] text-slate-400 hidden md:block">(0,0,0) 貫穿中心 · 支援任意 Y 軸懸空與立體 3D 填充</p>
+      </div>
+    </div>
+
+    <!-- Direction Badges -->
+    <div class="hidden lg:flex items-center gap-3 text-xs font-mono-code bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg shadow-inner">
+      <span class="flex items-center gap-1.5 text-rose-400"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>+X 東方 (前)</span>
+      <span class="flex items-center gap-1.5 text-blue-400"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>+Z 南方 (右)</span>
+      <span class="flex items-center gap-1.5 text-emerald-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>+Y 上方 (天)</span>
+      <div class="h-3 w-px bg-slate-800 mx-1"></div>
+      <span id="headerBlockCount" class="text-amber-400 font-bold">方塊數: 0</span>
+    </div>
+
+    <!-- Quick Buttons -->
+    <div class="flex items-center gap-2">
+      <button id="downloadCodeBtn" title="下載此離線完整網頁" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-download text-sky-400"></i>
+        <span class="hidden sm:inline">下載網頁</span>
+      </button>
+      <button id="showScreenshotSampleBtn" title="載入範例 (Start: -1,0,-1 ~ End: 1,0,1)" class="px-2.5 py-1.5 bg-amber-950/70 hover:bg-amber-900/80 text-amber-300 text-xs font-semibold rounded-lg border border-amber-700/50 transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+        <span class="hidden sm:inline">載入範例</span>
+      </button>
+      <button id="resetCamBtn" title="重置為最佳觀測視角" class="p-2 bg-slate-800 hover:bg-slate-700 text-xs rounded-lg border border-slate-700 transition text-slate-300">
+        <i class="fa-solid fa-camera-rotate"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="flex-1 relative flex overflow-hidden">
+    
+    <!-- 3D Canvas Viewport -->
+    <div id="canvas-container" class="w-full h-full relative cursor-crosshair">
+      
+      <!-- Realtime Target Cube HUD -->
+      <div class="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur border border-slate-700/90 rounded-xl p-3 shadow-2xl pointer-events-none min-w-[240px] text-xs">
+        <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-800 text-[10px] uppercase font-bold text-slate-400">
+          <span>游標中心點座標</span>
+          <span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>立體中心對齊</span>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-[10px] text-slate-400 font-semibold mb-0.5">方塊整數中心 (Block Center):</div>
+          <div class="text-lg font-mono-code font-black text-white tracking-wider">
+            ( <span id="hudX" class="text-rose-400">0</span>, 
+              <span id="hudY" class="text-emerald-400">0</span>, 
+              <span id="hudZ" class="text-blue-400">0</span> )
+          </div>
+        </div>
+
+        <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800 text-[11px] space-y-1 mb-2">
+          <div class="flex justify-between">
+            <span class="text-slate-400">空間方位:</span>
+            <span id="hudDirectionText" class="font-bold text-sky-300">原點 (0, 0, 0)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">佔據區間:</span>
+            <span id="hudBoundText" class="font-mono-code text-[10px] text-slate-300">[-0.5~0.5, -0.5~0.5, -0.5~0.5]</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono-code text-[10px] text-slate-300 flex items-center justify-between">
+          <span class="text-emerald-400 font-bold">指令:</span>
+          <span id="hudMiniCmd" class="truncate text-slate-200 ml-1">/setblock 0 0 0 redstone_block</span>
+        </div>
+      </div>
+
+      <!-- Quick Interactive Y-Level Adjuster Widget (Floats at left) -->
+      <div class="absolute top-48 left-3 z-10 bg-slate-900/95 backdrop-blur border border-emerald-500/40 rounded-xl p-2.5 shadow-2xl flex flex-col items-center gap-1.5 text-xs select-none">
+        <div class="text-[10px] font-bold text-emerald-400 uppercase flex items-center gap-1">
+          <i class="fa-solid fa-arrows-up-down"></i> 工作高度 (Y)
+        </div>
+        <div class="flex items-center gap-1">
+          <button id="btnYUp" class="w-7 h-7 bg-slate-800 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded font-bold transition flex items-center justify-center border border-slate-700" title="增加高度 (Shift+滾輪向上)">
+            <i class="fa-solid fa-plus text-[10px]"></i>
+          </button>
+          <div class="w-12 text-center bg-slate-950 py-1 rounded font-mono-code font-bold text-emerald-300 text-sm border border-slate-800" id="currentYBadge">
+            Y: 0
+          </div>
+          <button id="btnYDown" class="w-7 h-7 bg-slate-800 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded font-bold transition flex items-center justify-center border border-slate-700" title="降低高度 (Shift+滾輪向下)">
+            <i class="fa-solid fa-minus text-[10px]"></i>
+          </button>
+        </div>
+        <div class="flex gap-1 w-full">
+          <button id="btnYReset" class="flex-1 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-medium border border-slate-700">
+            重設 Y=0
+          </button>
+        </div>
+        <div class="text-[9px] text-slate-400 font-mono-code text-center">
+          <span class="text-amber-400 font-bold">Shift+滾輪</span> 可動態升降
+        </div>
+      </div>
+
+      <!-- Realtime 3D Minecraft Compass HUD -->
+      <div class="absolute top-3 right-3 z-10 bg-slate-900/90 backdrop-blur border border-slate-700/80 rounded-2xl p-2.5 shadow-2xl flex flex-col items-center pointer-events-none select-none">
+        <div class="text-[9px] font-bold text-slate-400 mb-1 tracking-wider uppercase">Minecraft 空間方位</div>
+        <div class="w-20 h-20 relative rounded-full border-2 border-slate-600 bg-slate-950 flex items-center justify-center shadow-inner overflow-hidden">
+          <div id="compassDial" class="w-full h-full absolute inset-0 compass-dial flex items-center justify-center">
+            <span class="absolute right-1 text-[10px] font-black text-rose-500">東(+X)</span>
+            <span class="absolute left-1 text-[9px] font-bold text-slate-400">西(-X)</span>
+            <span class="absolute bottom-1 text-[10px] font-black text-blue-400">南(+Z)</span>
+            <span class="absolute top-1 text-[9px] font-bold text-slate-400">北(-Z)</span>
+            <div class="absolute w-12 h-0.5 bg-rose-500/40"></div>
+            <div class="absolute h-12 w-0.5 bg-blue-500/40"></div>
+          </div>
+          <div class="w-3 h-3 rounded-full bg-amber-400 shadow-md z-10 border border-slate-900"></div>
+        </div>
+        <span id="compassHeading" class="text-[10px] font-mono-code text-slate-300 mt-1 font-bold">視角: 東北</span>
+      </div>
+
+      <!-- Floating 3D Label DOM Elements -->
+      <div id="floatingTagsContainer" class="absolute inset-0 pointer-events-none overflow-hidden z-20">
+        <div id="startTag" class="floating-3d-tag tag-start hidden">
+          <i class="fa-solid fa-circle-dot text-[9px]"></i>
+          <span>Start: <span id="startTagCoords">(-1, 0, -1)</span></span>
+        </div>
+        <div id="endTag" class="floating-3d-tag tag-end hidden">
+          <i class="fa-solid fa-flag-checkered text-[9px]"></i>
+          <span>End: <span id="endTagCoords">(1, 0, 1)</span></span>
+        </div>
+        <div id="centerOriginTag" class="floating-3d-tag tag-center">
+          <i class="fa-solid fa-crosshairs text-[9px]"></i>
+          <span>(0, 0, 0)</span>
+        </div>
+      </div>
+
+      <!-- Quick Guidance Bar -->
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-slate-900/90 backdrop-blur border border-slate-700/80 px-4 py-1.5 rounded-full text-xs text-slate-300 pointer-events-none hidden md:flex items-center gap-4 shadow-xl">
+        <span><i class="fa-regular fa-hand-pointer text-emerald-400 mr-1"></i> 左鍵：放置／設定點</span>
+        <span><i class="fa-solid fa-arrows-up-down text-emerald-400 mr-1"></i> <strong>Shift + 滾輪</strong>：調整 Y 軸高度</span>
+        <span><i class="fa-solid fa-arrows-spin text-sky-400 mr-1"></i> 右鍵拖曳：旋轉視角</span>
+        <span><i class="fa-solid fa-arrows-up-down-left-right text-purple-400 mr-1"></i> 中鍵/Ctrl拖曳：平移</span>
+      </div>
+    </div>
+
+    <!-- Right Sidebar Controls -->
+    <aside class="w-80 bg-slate-900/95 border-l border-slate-800 flex flex-col h-full z-20 shrink-0">
+      
+      <!-- Operation Mode Segmented Controls -->
+      <div class="p-3 border-b border-slate-800">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">工具模式</label>
+        <div class="grid grid-cols-4 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80">
+          <button data-mode="single" class="mode-btn px-2 py-2 rounded-lg text-xs font-semibold flex flex-col items-center gap-1 transition text-slate-400 hover:text-white">
+            <i class="fa-solid fa-cube"></i>
+            <span>單格</span>
+          </button>
+          <button data-mode="cuboid" class="mode-btn active px-2 py-2 rounded-lg text-xs font-semibold flex flex-col items-center gap-1 transition bg-emerald-600 text-white shadow">
+            <i class="fa-solid fa-vector-square"></i>
+            <span>區域Fill</span>
+          </button>
+          <button data-mode="modify" class="mode-btn px-2 py-2 rounded-lg text-xs font-semibold flex flex-col items-center gap-1 transition text-slate-400 hover:text-white">
+            <i class="fa-solid fa-paintbrush"></i>
+            <span>改色</span>
+          </button>
+          <button data-mode="delete" class="mode-btn px-2 py-2 rounded-lg text-xs font-semibold flex flex-col items-center gap-1 transition text-slate-400 hover:text-white">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>刪除</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Controls Body -->
+      <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5">
+        
+        <!-- Block Palette -->
+        <div id="paletteSection" class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-200">選擇方塊材質</span>
+            <span id="selectedBlockName" class="text-xs text-emerald-400 font-semibold">紅石核心 (原點)</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5" id="paletteButtonsGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Cuboid Fill Interactive Config Panel -->
+        <div id="cuboidPanel" class="bg-slate-950/80 p-3 rounded-xl border border-sky-800/60 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-vector-square"></i> 3D 區域填充 (/fill)
+            </span>
+            <button id="clearFillPointsBtn" class="text-[11px] text-slate-400 hover:text-white underline">重設起終點</button>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-normal">
+            點選兩點定出對角頂點。搭配 <span class="text-emerald-400 font-bold">Shift+滾輪</span> 可任意升降 Y 軸構成 3D 立方體：
+          </p>
+          
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-slate-900 p-2 rounded-lg border border-emerald-900/60">
+              <div class="text-[10px] text-emerald-400 font-bold mb-1 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>起點 Start
+              </div>
+              <div class="grid grid-cols-3 gap-1">
+                <input type="number" id="inpP1X" value="-1" class="bg-slate-950 text-center rounded border border-slate-700 py-0.5 text-xs text-white" title="Start X">
+                <input type="number" id="inpP1Y" value="0" class="bg-slate-950 text-center rounded border border-slate-700 py-0.5 text-xs text-white" title="Start Y">
+                <input type="number" id="inpP1Z" value="-1" class="bg-slate-950 text-center rounded border border-slate-700 py-0.5 text-xs text-white" title="Start Z">
+              </div>
+            </div>
+            <div class="bg-slate-900 p-2 rounded-lg border border-blue-900/60">
+              <div class="text-[10px] text-blue-400 font-bold mb-1 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>終點 End
+              </div>
+              <div class="grid grid-cols-3 gap-1">
+                <input type="number" id="inpP2X" value="1" class="bg-slate-950 text-center rounded border border-slate-700 py-0.5 text-xs text-white" title="End X">
+                <input type="number" id="inpP2Y" value="0" class="bg-slate-950 text-center rounded border border-slate-700 py-0.5 text-xs text-white" title="End Y">
+                <input type="number" id="inpP2Z" value="1" class="bg-slate-950 text-center rounded border border-slate-700 py-0.5 text-xs text-white" title="End Z">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button id="btnPreviewFill" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs font-semibold rounded-lg border border-sky-800/40 transition">
+              預覽框
+            </button>
+            <button id="btnExecuteFill" class="flex-1 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg shadow-md shadow-sky-950/50 transition flex items-center justify-center gap-1">
+              <i class="fa-solid fa-fill-drip"></i> 實體填充
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Placement (/setblock) -->
+        <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-2">
+          <span class="text-xs font-bold text-slate-200 block">精確座標放置 (/setblock)</span>
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <div>
+              <span class="text-[10px] text-rose-400 font-semibold block mb-0.5">X (東/西)</span>
+              <input type="number" id="inpManualX" value="0" class="w-full bg-slate-900 text-center rounded border border-slate-700 py-1 font-mono-code text-white">
+            </div>
+            <div>
+              <span class="text-[10px] text-emerald-400 font-semibold block mb-0.5">Y (垂直高度)</span>
+              <input type="number" id="inpManualY" value="0" class="w-full bg-slate-900 text-center rounded border border-slate-700 py-1 font-mono-code text-white">
+            </div>
+            <div>
+              <span class="text-[10px] text-blue-400 font-semibold block mb-0.5">Z (南/北)</span>
+              <input type="number" id="inpManualZ" value="0" class="w-full bg-slate-900 text-center rounded border border-slate-700 py-1 font-mono-code text-white">
+            </div>
+          </div>
+          <button id="btnManualPlace" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-800/60 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-location-dot"></i> 在該中心座標生成方塊
+          </button>
+        </div>
+
+        <!-- Live Minecraft Command Box -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <div class="flex items-center justify-between text-[11px] mb-1.5">
+            <span class="text-slate-400 font-bold flex items-center gap-1"><i class="fa-solid fa-terminal text-amber-400"></i>Minecraft 指令同步</span>
+            <button id="btnCopyCommand" class="text-emerald-400 hover:underline text-[11px] font-semibold">複製指令</button>
+          </div>
+          <div id="commandBoxText" class="p-2.5 bg-slate-900 rounded-lg font-mono-code text-[11px] text-emerald-300 break-all select-all border border-slate-800">
+            /fill -1 0 -1 1 0 1 glass
+          </div>
+        </div>
+
+        <!-- History and Reset Actions -->
+        <div class="flex gap-2 pt-1 border-t border-slate-800">
+          <button id="btnUndo" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
+            <i class="fa-solid fa-rotate-left"></i> 復原 (Undo)
+          </button>
+          <button id="btnClearAll" class="flex-1 py-1.5 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/40 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
+            <i class="fa-solid fa-trash"></i> 全部重置
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <footer class="p-2.5 bg-slate-950 border-t border-slate-800 text-center shrink-0">
+        <p class="text-[11px] text-slate-500 font-medium">
+          Minecraft Education 空間三維教學 · 支援滾輪高度調節
+        </p>
+      </footer>
+    </aside>
+  </main>
+
+  <!-- JavaScript Logic -->
+  <script>
+    /* Block Materials Library */
+    const PALETTE = [
+      { id: 'redstone_block', name: '紅石核心 (原點)', hex: 0xb91c1c, edge: 0x7f1d1d },
+      { id: 'emerald_block', name: '綠寶石 (Start)', hex: 0x15803d, edge: 0x14532d },
+      { id: 'lapis_block', name: '青金石 (End)', hex: 0x1d4ed8, edge: 0x1e3a8a },
+      { id: 'grass', name: '草地 (Grass)', hex: 0x4d7c0f, edge: 0x365314 },
+      { id: 'dirt', name: '泥土 (Dirt)', hex: 0x78350f, edge: 0x451a03 },
+      { id: 'stone', name: '石頭 (Stone)', hex: 0x64748b, edge: 0x334155 },
+      { id: 'gold_block', name: '金塊 (Gold)', hex: 0xeab308, edge: 0xca8a04 },
+      { id: 'diamond_block', name: '鑽石 (Diamond)', hex: 0x06b6d4, edge: 0x0891b2 },
+      { id: 'glass', name: '黃色半透明 (區域)', hex: 0xfacc15, edge: 0xeab308, transparent: true, opacity: 0.45 },
+      { id: 'obsidian', name: '黑曜石 (Obsidian)', hex: 0x1e1b4b, edge: 0x0f172a }
+    ];
+
+    let selectedBlock = PALETTE[0];
+    let activeMode = 'cuboid'; // Default to screenshot-like cuboid fill
+    let currentWorkY = 0; // Current operational height layer
+
+    let p1 = { x: -1, y: 0, z: -1 };
+    let p2 = { x: 1, y: 0, z: 1 };
+    let isSelectingP2 = false;
+
+    /* History Stack */
+    const historyList = [];
+
+    /* ThreeJS Globals */
+    let scene, camera, renderer, controls;
+    let workPlane; // Dynamic raycasting plane at currentWorkY
+    let workPlaneVisualGrid; // Visible helper grid showing current height plane
+    const blocks = new Map(); // key `${x},${y},${z}` => Mesh
+    const raycaster = new THREE.Raycaster();
+    const mouseCoords = new THREE.Vector2();
+    let hoverPreviewMesh;
+    let previewFillGroup;
+
+    const UNIT_BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
+    const GRID_SIZE = 30;
+
+    function init3D() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xdce5ed); // Soft light-gray sky matching screenshot
+      scene.fog = new THREE.FogExp2(0xdce5ed, 0.015);
+
+      camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      camera.position.set(-6, 7, -6);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(w, h);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, 0, 0); // Origin center
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.update();
+
+      // Ambient & Directional Lighting
+      const ambient = new THREE.AmbientLight(0xffffff, 0.75);
+      scene.add(ambient);
+
+      const sun = new THREE.DirectionalLight(0xffffff, 0.85);
+      sun.position.set(15, 25, 12);
+      sun.castShadow = true;
+      sun.shadow.mapSize.width = 2048;
+      sun.shadow.mapSize.height = 2048;
+      scene.add(sun);
+
+      const hemi = new THREE.HemisphereLight(0xffffff, 0xb0bec5, 0.4);
+      scene.add(hemi);
+
+      // Construct Environment
+      setupCoordinateAxesThroughCenter();
+      setupFloorAndWorkPlane();
+      setupHoverCursor();
+
+      previewFillGroup = new THREE.Group();
+      scene.add(previewFillGroup);
+
+      // Event Handlers
+      window.addEventListener('resize', onResize);
+      container.addEventListener('pointermove', onPointerMove);
+      container.addEventListener('pointerdown', onPointerDown);
+      container.addEventListener('wheel', onContainerWheel, { passive: false });
+    }
+
+    function setupCoordinateAxesThroughCenter() {
+      const axesGroup = new THREE.Group();
+      const AXIS_LENGTH = 18;
+
+      // X-Axis (Red) - East / Forward
+      const xMat = new THREE.LineBasicMaterial({ color: 0xef4444, linewidth: 3 });
+      const xGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-AXIS_LENGTH, 0, 0),
+        new THREE.Vector3(AXIS_LENGTH, 0, 0)
+      ]);
+      axesGroup.add(new THREE.Line(xGeo, xMat));
+
+      // Z-Axis (Blue) - South / Right
+      const zMat = new THREE.LineBasicMaterial({ color: 0x2563eb, linewidth: 3 });
+      const zGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, -AXIS_LENGTH),
+        new THREE.Vector3(0, 0, AXIS_LENGTH)
+      ]);
+      axesGroup.add(new THREE.Line(zGeo, zMat));
+
+      // Y-Axis (Green) - Up / Height
+      const yMat = new THREE.LineBasicMaterial({ color: 0x16a34a, linewidth: 3 });
+      const yGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, -AXIS_LENGTH / 2, 0),
+        new THREE.Vector3(0, AXIS_LENGTH, 0)
+      ]);
+      axesGroup.add(new THREE.Line(yGeo, yMat));
+
+      // Floating labels in 3D
+      function createAxisLabel(text, color, pos) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 80;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.beginPath();
+        ctx.roundRect(4, 4, 248, 72, 14);
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.font = 'bold 30px "JetBrains Mono", sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 128, 40);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+        sprite.scale.set(2.4, 0.75, 1);
+        sprite.position.copy(pos);
+        return sprite;
+      }
+
+      axesGroup.add(createAxisLabel('+X 東方 (East)', '#ef4444', new THREE.Vector3(AXIS_LENGTH + 1.6, 0, 0)));
+      axesGroup.add(createAxisLabel('-X 西方 (West)', '#64748b', new THREE.Vector3(-AXIS_LENGTH - 1.6, 0, 0)));
+      axesGroup.add(createAxisLabel('+Z 南方 (South)', '#2563eb', new THREE.Vector3(0, 0, AXIS_LENGTH + 1.6)));
+      axesGroup.add(createAxisLabel('-Z 北方 (North)', '#64748b', new THREE.Vector3(0, 0, -AXIS_LENGTH - 1.6)));
+      axesGroup.add(createAxisLabel('+Y 上方 (Up)', '#16a34a', new THREE.Vector3(0, AXIS_LENGTH + 1.2, 0)));
+
+      scene.add(axesGroup);
+    }
+
+    function setupFloorAndWorkPlane() {
+      // Base Floor at Y = -0.5 (bottom of Y=0 cube layer)
+      const baseFloorY = -0.5;
+      const planeGeo = new THREE.PlaneGeometry(GRID_SIZE, GRID_SIZE);
+      planeGeo.rotateX(-Math.PI / 2);
+      const planeMat = new THREE.MeshStandardMaterial({
+        color: 0xedf2f7,
+        roughness: 0.95,
+        metalness: 0.05
+      });
+      const floorMesh = new THREE.Mesh(planeGeo, planeMat);
+      floorMesh.position.y = baseFloorY - 0.005;
+      floorMesh.receiveShadow = true;
+      scene.add(floorMesh);
+
+      // Base floor grid
+      const grid = new THREE.GridHelper(GRID_SIZE, GRID_SIZE, 0xa0aec0, 0xd2d6dc);
+      grid.position.y = baseFloorY;
+      scene.add(grid);
+
+      // Dynamic Raycast Working Plane:
+      // Sits exactly at center level of currentWorkY
+      const raycastPlaneGeo = new THREE.PlaneGeometry(GRID_SIZE * 2, GRID_SIZE * 2);
+      raycastPlaneGeo.rotateX(-Math.PI / 2);
+      const raycastMat = new THREE.MeshBasicMaterial({ visible: false });
+      workPlane = new THREE.Mesh(raycastPlaneGeo, raycastMat);
+      workPlane.position.y = currentWorkY;
+      scene.add(workPlane);
+
+      // Visual indicator for current active working layer Y
+      workPlaneVisualGrid = new THREE.GridHelper(GRID_SIZE, GRID_SIZE, 0x10b981, 0x34d399);
+      workPlaneVisualGrid.position.y = currentWorkY - 0.495; // Just below cube center
+      workPlaneVisualGrid.visible = false; // Shown when Y != 0 or when actively adjusting Y
+      scene.add(workPlaneVisualGrid);
+    }
+
+    function setupHoverCursor() {
+      const geo = new THREE.BoxGeometry(1.02, 1.02, 1.02);
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xef4444,
+        transparent: true,
+        opacity: 0.5
+      });
+      hoverPreviewMesh = new THREE.Mesh(geo, mat);
+
+      const edgeGeo = new THREE.EdgesGeometry(geo);
+      const edgeLine = new THREE.LineSegments(edgeGeo, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 }));
+      hoverPreviewMesh.add(edgeLine);
+      hoverPreviewMesh.visible = false;
+      scene.add(hoverPreviewMesh);
+    }
+
+    function createBlockMesh(x, y, z, blockType) {
+      const mat = new THREE.MeshStandardMaterial({
+        color: blockType.hex,
+        roughness: 0.6,
+        metalness: 0.1,
+        transparent: blockType.transparent || false,
+        opacity: blockType.opacity || 1.0
+      });
+
+      const mesh = new THREE.Mesh(UNIT_BOX_GEO, mat);
+      mesh.position.set(x, y, z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      const edges = new THREE.LineSegments(
+        new THREE.EdgesGeometry(UNIT_BOX_GEO),
+        new THREE.LineBasicMaterial({ color: blockType.edge || 0x000000, linewidth: 1.5 })
+      );
+      mesh.add(edges);
+
+      mesh.userData = { gridX: x, gridY: y, gridZ: z, type: blockType };
+      return mesh;
+    }
+
+    function addOrUpdateBlock(x, y, z, blockType, recordHistory = true) {
+      const key = `${x},${y},${z}`;
+      const existing = blocks.get(key);
+
+      if (existing) {
+        const prevType = existing.userData.type;
+        existing.material.color.setHex(blockType.hex);
+        existing.material.transparent = blockType.transparent || false;
+        existing.material.opacity = blockType.opacity || 1.0;
+        existing.userData.type = blockType;
+
+        if (recordHistory) {
+          historyList.push({
+            type: 'modify',
+            items: [{ x, y, z, prevType, newType: blockType }]
+          });
+        }
+      } else {
+        const mesh = createBlockMesh(x, y, z, blockType);
+        scene.add(mesh);
+        blocks.set(key, mesh);
+
+        if (recordHistory) {
+          historyList.push({
+            type: 'add',
+            items: [{ x, y, z, blockType }]
+          });
+        }
+      }
+      updateBlockCount();
+    }
+
+    function removeBlock(x, y, z, recordHistory = true) {
+      const key = `${x},${y},${z}`;
+      const mesh = blocks.get(key);
+      if (mesh) {
+        const prevType = mesh.userData.type;
+        scene.remove(mesh);
+        mesh.geometry.dispose();
+        mesh.material.dispose();
+        blocks.delete(key);
+
+        if (recordHistory) {
+          historyList.push({
+            type: 'delete',
+            items: [{ x, y, z, prevType }]
+          });
+        }
+        updateBlockCount();
+      }
+    }
+
+    function updateBlockCount() {
+      document.getElementById('headerBlockCount').textContent = `方塊數: ${blocks.size}`;
+    }
+
+    function setWorkY(newY) {
+      currentWorkY = Math.round(newY);
+      workPlane.position.y = currentWorkY;
+      workPlaneVisualGrid.position.y = currentWorkY - 0.495;
+      workPlaneVisualGrid.visible = (currentWorkY !== 0);
+
+      document.getElementById('currentYBadge').textContent = `Y: ${currentWorkY}`;
+      document.getElementById('inpManualY').value = currentWorkY;
+
+      // In cuboid mode, if currently picking end point, sync p2.y
+      if (activeMode === 'cuboid' && isSelectingP2) {
+        p2.y = currentWorkY;
+        document.getElementById('inpP2Y').value = currentWorkY;
+        renderCuboidPreview();
+      }
+    }
+
+    function onContainerWheel(e) {
+      // Key feature: Shift + Wheel directly adjusts Y level
+      if (e.shiftKey) {
+        e.preventDefault(); // Stop page zoom or camera zoom
+        if (e.deltaY < 0) {
+          setWorkY(currentWorkY + 1);
+        } else if (e.deltaY > 0) {
+          setWorkY(currentWorkY - 1);
+        }
+      }
+    }
+
+    function getIntersectedVoxel(event) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouseCoords.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseCoords.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouseCoords, camera);
+
+      // Prioritize existing blocks, then the work plane at currentWorkY
+      const targets = [workPlane, ...Array.from(blocks.values())];
+      const hits = raycaster.intersectObjects(targets, false);
+
+      if (hits.length === 0) return null;
+
+      const hit = hits[0];
+      let targetX, targetY, targetZ;
+      let clickedExisting = null;
+
+      if (hit.object === workPlane) {
+        targetX = Math.round(hit.point.x);
+        targetY = currentWorkY; // Snaps to current work plane!
+        targetZ = Math.round(hit.point.z);
+      } else {
+        clickedExisting = hit.object;
+        const u = clickedExisting.userData;
+
+        if (activeMode === 'single') {
+          // Normal outward stacking on block face
+          const n = hit.face.normal;
+          targetX = u.gridX + Math.round(n.x);
+          targetY = u.gridY + Math.round(n.y);
+          targetZ = u.gridZ + Math.round(n.z);
+        } else {
+          // Direct select for cuboid, modify, or delete
+          targetX = u.gridX;
+          targetY = u.gridY;
+          targetZ = u.gridZ;
+        }
+      }
+
+      return {
+        x: targetX,
+        y: targetY,
+        z: targetZ,
+        existing: clickedExisting
+      };
+    }
+
+    function onPointerMove(e) {
+      const hit = getIntersectedVoxel(e);
+      if (!hit) {
+        hoverPreviewMesh.visible = false;
+        return;
+      }
+
+      hoverPreviewMesh.visible = true;
+      hoverPreviewMesh.position.set(hit.x, hit.y, hit.z);
+
+      if (activeMode === 'delete') {
+        hoverPreviewMesh.material.color.setHex(0xef4444);
+      } else if (activeMode === 'modify') {
+        hoverPreviewMesh.material.color.setHex(0xf59e0b);
+      } else {
+        hoverPreviewMesh.material.color.setHex(selectedBlock.hex);
+      }
+
+      updateHUD(hit.x, hit.y, hit.z);
+    }
+
+    function onPointerDown(e) {
+      if (e.button !== 0) return; // Left mouse button only
+
+      const hit = getIntersectedVoxel(e);
+      if (!hit) return;
+
+      const { x, y, z, existing } = hit;
+
+      if (activeMode === 'single') {
+        addOrUpdateBlock(x, y, z, selectedBlock);
+        showCommand(`/setblock ${x} ${y} ${z} ${selectedBlock.id}`);
+      } else if (activeMode === 'delete') {
+        if (existing) {
+          removeBlock(existing.userData.gridX, existing.userData.gridY, existing.userData.gridZ);
+          showCommand(`/setblock ${x} ${y} ${z} air`);
+        }
+      } else if (activeMode === 'modify') {
+        if (existing) {
+          addOrUpdateBlock(existing.userData.gridX, existing.userData.gridY, existing.userData.gridZ, selectedBlock);
+          showCommand(`/setblock ${x} ${y} ${z} ${selectedBlock.id} replace`);
+        }
+      } else if (activeMode === 'cuboid') {
+        if (!isSelectingP2) {
+          // Set Start point (p1)
+          p1 = { x, y, z };
+          document.getElementById('inpP1X').value = x;
+          document.getElementById('inpP1Y').value = y;
+          document.getElementById('inpP1Z').value = z;
+          isSelectingP2 = true;
+          renderCuboidPreview();
+        } else {
+          // Set End point (p2)
+          p2 = { x, y, z };
+          document.getElementById('inpP2X').value = x;
+          document.getElementById('inpP2Y').value = y;
+          document.getElementById('inpP2Z').value = z;
+          isSelectingP2 = false;
+          renderCuboidPreview();
+        }
+      }
+    }
+
+    function renderCuboidPreview() {
+      while (previewFillGroup.children.length > 0) {
+        const child = previewFillGroup.children[0];
+        previewFillGroup.remove(child);
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      }
+
+      const minX = Math.min(p1.x, p2.x);
+      const maxX = Math.max(p1.x, p2.x);
+      const minY = Math.min(p1.y, p2.y);
+      const maxY = Math.max(p1.y, p2.y);
+      const minZ = Math.min(p1.z, p2.z);
+      const maxZ = Math.max(p1.z, p2.z);
+
+      const previewGeo = new THREE.BoxGeometry(0.99, 0.99, 0.99);
+      const previewMat = new THREE.MeshStandardMaterial({
+        color: 0xfacc15,
+        roughness: 0.3,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.48
+      });
+
+      const edgeGeo = new THREE.EdgesGeometry(previewGeo);
+      const edgeMat = new THREE.LineBasicMaterial({ color: 0xca8a04, linewidth: 1 });
+
+      for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+          for (let z = minZ; z <= maxZ; z++) {
+            if (blocks.has(`${x},${y},${z}`)) continue;
+
+            const previewCube = new THREE.Mesh(previewGeo, previewMat);
+            previewCube.position.set(x, y, z);
+            const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+            previewCube.add(edges);
+            previewFillGroup.add(previewCube);
+          }
+        }
+      }
+
+      document.getElementById('startTagCoords').textContent = `(${p1.x}, ${p1.y}, ${p1.z})`;
+      document.getElementById('endTagCoords').textContent = `(${p2.x}, ${p2.y}, ${p2.z})`;
+      document.getElementById('startTag').classList.remove('hidden');
+      document.getElementById('endTag').classList.remove('hidden');
+
+      showCommand(`/fill ${minX} ${minY} ${minZ} ${maxX} ${maxY} ${maxZ} ${selectedBlock.id}`);
+    }
+
+    function executeFillAction() {
+      const minX = Math.min(p1.x, p2.x);
+      const maxX = Math.max(p1.x, p2.x);
+      const minY = Math.min(p1.y, p2.y);
+      const maxY = Math.max(p1.y, p2.y);
+      const minZ = Math.min(p1.z, p2.z);
+      const maxZ = Math.max(p1.z, p2.z);
+
+      const items = [];
+
+      for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+          for (let z = minZ; z <= maxZ; z++) {
+            const key = `${x},${y},${z}`;
+            const existing = blocks.get(key);
+            addOrUpdateBlock(x, y, z, selectedBlock, false);
+            items.push({
+              x, y, z,
+              prevType: existing ? existing.userData.type : null,
+              newType: selectedBlock
+            });
+          }
+        }
+      }
+
+      historyList.push({ type: 'fill', items });
+      renderCuboidPreview();
+    }
+
+    function updateFloatingTagsPositions() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      function projectToScreen(vec3, element) {
+        if (!element || element.classList.contains('hidden')) return;
+
+        const p = vec3.clone();
+        p.project(camera);
+
+        if (p.z > 1) {
+          element.style.opacity = '0';
+          return;
+        }
+
+        element.style.opacity = '1';
+        const screenX = (p.x * 0.5 + 0.5) * w;
+        const screenY = (-(p.y * 0.5) + 0.5) * h;
+        element.style.left = `${screenX}px`;
+        element.style.top = `${screenY}px`;
+      }
+
+      projectToScreen(new THREE.Vector3(0, 0.75, 0), document.getElementById('centerOriginTag'));
+
+      if (p1) {
+        projectToScreen(new THREE.Vector3(p1.x, p1.y + 0.75, p1.z), document.getElementById('startTag'));
+      }
+
+      if (p2) {
+        projectToScreen(new THREE.Vector3(p2.x, p2.y + 0.75, p2.z), document.getElementById('endTag'));
+      }
+    }
+
+    function updateHUD(x, y, z) {
+      document.getElementById('hudX').textContent = x;
+      document.getElementById('hudY').textContent = y;
+      document.getElementById('hudZ').textContent = z;
+
+      const parts = [];
+      if (x > 0) parts.push(`東(+${x})`);
+      else if (x < 0) parts.push(`西(${x})`);
+
+      if (z > 0) parts.push(`南(+${z})`);
+      else if (z < 0) parts.push(`北(${z})`);
+
+      if (y > 0) parts.push(`上(+${y})`);
+      else if (y < 0) parts.push(`下(${y})`);
+
+      document.getElementById('hudDirectionText').textContent = parts.length > 0 ? parts.join(' · ') : '中心原點 (0, 0, 0)';
+      document.getElementById('hudBoundText').textContent = `[${(x-0.5).toFixed(1)}~${(x+0.5).toFixed(1)}, ${(y-0.5).toFixed(1)}~${(y+0.5).toFixed(1)}, ${(z-0.5).toFixed(1)}~${(z+0.5).toFixed(1)}]`;
+
+      let cmd = `/setblock ${x} ${y} ${z} ${selectedBlock.id}`;
+      if (activeMode === 'delete') cmd = `/setblock ${x} ${y} ${z} air`;
+      if (activeMode === 'cuboid') cmd = `/fill ${p1.x} ${p1.y} ${p1.z} ${x} ${y} ${z} ${selectedBlock.id}`;
+      document.getElementById('hudMiniCmd').textContent = cmd;
+    }
+
+    function showCommand(cmd) {
+      document.getElementById('commandBoxText').textContent = cmd;
+    }
+
+    function updateCompass() {
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+
+      const angle = Math.atan2(dir.z, dir.x);
+      const degrees = (angle * 180) / Math.PI;
+
+      const dial = document.getElementById('compassDial');
+      if (dial) {
+        dial.style.transform = `rotate(${-degrees}deg)`;
+      }
+
+      let heading = '';
+      if (degrees >= -22.5 && degrees <= 22.5) heading = '正東 (+X)';
+      else if (degrees > 22.5 && degrees < 67.5) heading = '東南 (+X, +Z)';
+      else if (degrees >= 67.5 && degrees <= 112.5) heading = '正南 (+Z)';
+      else if (degrees > 112.5 && degrees < 157.5) heading = '西南 (-X, +Z)';
+      else if (degrees >= 157.5 || degrees <= -157.5) heading = '正西 (-X)';
+      else if (degrees > -157.5 && degrees < -112.5) heading = '西北 (-X, -Z)';
+      else if (degrees >= -112.5 && degrees <= -67.5) heading = '正北 (-Z)';
+      else if (degrees > -67.5 && degrees < -22.5) heading = '東北 (+X, -Z)';
+
+      document.getElementById('compassHeading').textContent = `視角: ${heading}`;
+    }
+
+    function loadScreenshotScene() {
+      Array.from(blocks.values()).forEach(m => {
+        scene.remove(m);
+        m.geometry.dispose();
+        m.material.dispose();
+      });
+      blocks.clear();
+
+      setWorkY(0);
+
+      p1 = { x: -1, y: 0, z: -1 };
+      p2 = { x: 1, y: 0, z: 1 };
+      document.getElementById('inpP1X').value = -1;
+      document.getElementById('inpP1Y').value = 0;
+      document.getElementById('inpP1Z').value = -1;
+      document.getElementById('inpP2X').value = 1;
+      document.getElementById('inpP2Y').value = 0;
+      document.getElementById('inpP2Z').value = 1;
+
+      addOrUpdateBlock(0, 0, 0, PALETTE[0], false);
+      addOrUpdateBlock(-1, 0, -1, PALETTE[1], false);
+      addOrUpdateBlock(1, 0, 1, PALETTE[2], false);
+
+      camera.position.set(-6, 7, -6);
+      controls.target.set(0, 0, 0);
+      controls.update();
+
+      renderCuboidPreview();
+      showCommand(`/fill -1 0 -1 1 0 1 glass`);
+    }
+
+    function setupUI() {
+      // Build Palette
+      const paletteContainer = document.getElementById('paletteButtonsGrid');
+      paletteContainer.innerHTML = '';
+      PALETTE.forEach((b, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `w-full aspect-square rounded-lg border-2 transition transform active:scale-90 flex items-center justify-center ${
+          idx === 0 ? 'border-white scale-105 shadow-md shadow-rose-500/50' : 'border-transparent hover:border-slate-400'
+        }`;
+        btn.style.backgroundColor = '#' + b.hex.toString(16).padStart(6, '0');
+        btn.title = b.name;
+
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#paletteButtonsGrid button').forEach(el => {
+            el.classList.remove('border-white', 'scale-105', 'shadow-md', 'shadow-rose-500/50');
+            el.classList.add('border-transparent');
+          });
+          btn.classList.remove('border-transparent');
+          btn.classList.add('border-white', 'scale-105', 'shadow-md', 'shadow-rose-500/50');
+
+          selectedBlock = b;
+          document.getElementById('selectedBlockName').textContent = b.name;
+          showCommand(`/setblock 0 0 0 ${b.id}`);
+        });
+
+        paletteContainer.appendChild(btn);
+      });
+
+      // Mode Switchers
+      const modeBtns = document.querySelectorAll('.mode-btn');
+      modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          modeBtns.forEach(b => {
+            b.classList.remove('active', 'bg-emerald-600', 'text-white', 'shadow');
+            b.classList.add('text-slate-400');
+          });
+          btn.classList.add('active', 'bg-emerald-600', 'text-white', 'shadow');
+          btn.classList.remove('text-slate-400');
+          activeMode = btn.dataset.mode;
+        });
+      });
+
+      // Height (Y Level) Control Buttons
+      document.getElementById('btnYUp').addEventListener('click', () => setWorkY(currentWorkY + 1));
+      document.getElementById('btnYDown').addEventListener('click', () => setWorkY(currentWorkY - 1));
+      document.getElementById('btnYReset').addEventListener('click', () => setWorkY(0));
+
+      // Fill Actions
+      document.getElementById('btnPreviewFill').addEventListener('click', () => {
+        p1 = {
+          x: parseInt(document.getElementById('inpP1X').value) || 0,
+          y: parseInt(document.getElementById('inpP1Y').value) || 0,
+          z: parseInt(document.getElementById('inpP1Z').value) || 0
+        };
+        p2 = {
+          x: parseInt(document.getElementById('inpP2X').value) || 0,
+          y: parseInt(document.getElementById('inpP2Y').value) || 0,
+          z: parseInt(document.getElementById('inpP2Z').value) || 0
+        };
+        renderCuboidPreview();
+      });
+
+      document.getElementById('btnExecuteFill').addEventListener('click', () => {
+        p1 = {
+          x: parseInt(document.getElementById('inpP1X').value) || 0,
+          y: parseInt(document.getElementById('inpP1Y').value) || 0,
+          z: parseInt(document.getElementById('inpP1Z').value) || 0
+        };
+        p2 = {
+          x: parseInt(document.getElementById('inpP2X').value) || 0,
+          y: parseInt(document.getElementById('inpP2Y').value) || 0,
+          z: parseInt(document.getElementById('inpP2Z').value) || 0
+        };
+        executeFillAction();
+      });
+
+      document.getElementById('clearFillPointsBtn').addEventListener('click', () => {
+        while (previewFillGroup.children.length > 0) {
+          const c = previewFillGroup.children[0];
+          previewFillGroup.remove(c);
+        }
+        document.getElementById('startTag').classList.add('hidden');
+        document.getElementById('endTag').classList.add('hidden');
+        isSelectingP2 = false;
+      });
+
+      // Manual coordinate placement
+      document.getElementById('btnManualPlace').addEventListener('click', () => {
+        const x = parseInt(document.getElementById('inpManualX').value) || 0;
+        const y = parseInt(document.getElementById('inpManualY').value) || 0;
+        const z = parseInt(document.getElementById('inpManualZ').value) || 0;
+        addOrUpdateBlock(x, y, z, selectedBlock);
+        showCommand(`/setblock ${x} ${y} ${z} ${selectedBlock.id}`);
+      });
+
+      // Undo
+      document.getElementById('btnUndo').addEventListener('click', () => {
+        if (historyList.length === 0) return;
+        const rec = historyList.pop();
+        if (rec.type === 'add') {
+          rec.items.forEach(i => removeBlock(i.x, i.y, i.z, false));
+        } else if (rec.type === 'delete') {
+          rec.items.forEach(i => addOrUpdateBlock(i.x, i.y, i.z, i.prevType, false));
+        } else if (rec.type === 'modify') {
+          rec.items.forEach(i => addOrUpdateBlock(i.x, i.y, i.z, i.prevType, false));
+        } else if (rec.type === 'fill') {
+          rec.items.forEach(i => {
+            if (i.prevType) addOrUpdateBlock(i.x, i.y, i.z, i.prevType, false);
+            else removeBlock(i.x, i.y, i.z, false);
+          });
+        }
+      });
+
+      // Reset All
+      document.getElementById('btnClearAll').addEventListener('click', () => {
+        Array.from(blocks.values()).forEach(m => {
+          scene.remove(m);
+          m.geometry.dispose();
+          m.material.dispose();
+        });
+        blocks.clear();
+        while (previewFillGroup.children.length > 0) {
+          previewFillGroup.remove(previewFillGroup.children[0]);
+        }
+        historyList.length = 0;
+        loadScreenshotScene();
+      });
+
+      // Reset Camera
+      document.getElementById('resetCamBtn').addEventListener('click', () => {
+        camera.position.set(-6, 7, -6);
+        controls.target.set(0, 0, 0);
+        controls.update();
+      });
+
+      // Load Screenshot Sample
+      document.getElementById('showScreenshotSampleBtn').addEventListener('click', loadScreenshotScene);
+
+      // Copy Command
+      document.getElementById('btnCopyCommand').addEventListener('click', () => {
+        const text = document.getElementById('commandBoxText').textContent.trim();
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        const btn = document.getElementById('btnCopyCommand');
+        btn.textContent = '已複製！';
+        setTimeout(() => { btn.textContent = '複製指令'; }, 1200);
+      });
+
+      // Download Complete Standalone HTML
+      document.getElementById('downloadCodeBtn').addEventListener('click', () => {
+        const fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+        const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'minecraft_coordinates_with_y_level.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    function onResize() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      updateCompass();
+      updateFloatingTagsPositions();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = function() {
+      init3D();
+      setupUI();
+      loadScreenshotScene();
+      animate();
+    };
+  </script>
+</body>
+</html>

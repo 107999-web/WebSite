@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D 西洋棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060402;overflow:hidden;font-family:'Microsoft JhengHei',sans-serif;color:#e8d5a0}
+#c{display:block;width:100vw;height:100vh}
+
+/* ── START DIALOG ── */
+#start-dlg{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;z-index:100}
+.dlg-box{background:linear-gradient(160deg,#1c1003,#2a1a07);border:2px solid #7c5c22;border-radius:16px;padding:38px 48px;text-align:center;min-width:320px}
+.dlg-box h2{font-size:2.2rem;color:#f0c860;margin-bottom:8px;letter-spacing:.06em}
+.dlg-box p{font-size:.9rem;color:#a08050;margin-bottom:28px}
+.dlg-btn{display:block;width:100%;padding:14px;margin:10px 0;background:linear-gradient(135deg,#4a2c0a,#6a400f);border:1px solid #9a7030;border-radius:10px;color:#f0c860;font-size:1.1rem;cursor:pointer;transition:background .2s}
+.dlg-btn:hover{background:linear-gradient(135deg,#6a400f,#9a5e18)}
+
+/* ── HUD ── */
+#hud{position:fixed;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:20px;align-items:center;background:rgba(15,8,2,.75);padding:10px 24px;border-radius:30px;border:1px solid #5a3c12;z-index:50;pointer-events:none}
+#turn-badge{font-size:.95rem;color:#c8a248;letter-spacing:.04em}
+#check-badge{font-size:.9rem;color:#ff5544;font-weight:bold;display:none}
+.top-btn{pointer-events:all;background:none;border:1px solid #5a3c12;color:#a08050;padding:6px 14px;border-radius:16px;cursor:pointer;font-size:.8rem}
+.top-btn:hover{border-color:#9a7030;color:#f0c860}
+
+/* ── WIN OVERLAY ── */
+#win-dlg{position:fixed;inset:0;background:rgba(0,0,0,.80);display:none;align-items:center;justify-content:center;z-index:200}
+#win-dlg.show{display:flex}
+.win-box{background:linear-gradient(160deg,#1c1003,#2d1f08);border:2px solid #9a7030;border-radius:18px;padding:44px 60px;text-align:center}
+.win-box h2{font-size:2.6rem;color:#f0c860;margin-bottom:12px}
+.win-box p{color:#b09050;margin-bottom:28px}
+.win-box button{padding:12px 32px;background:#5a3c12;border:1px solid #9a7030;border-radius:10px;color:#f0c860;font-size:1.1rem;cursor:pointer}
+.win-box button:hover{background:#7a5418}
+
+/* ── PROMOTION DIALOG ── */
+#promo-dlg{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:150}
+#promo-dlg.show{display:flex}
+.promo-box{background:linear-gradient(160deg,#1c1003,#2a1a07);border:2px solid #7c5c22;border-radius:16px;padding:32px 44px;text-align:center}
+.promo-box h3{font-size:1.4rem;color:#f0c860;margin-bottom:20px}
+.promo-choices{display:flex;gap:14px;justify-content:center}
+.promo-btn{padding:16px 22px;background:#3a2008;border:1px solid #8a6020;border-radius:12px;color:#f0c860;font-size:2rem;cursor:pointer;transition:background .15s;line-height:1}
+.promo-btn:hover{background:#5a3c14}
+.promo-btn span{display:block;font-size:.75rem;color:#b08840;margin-top:4px}
+
+/* ── TOOLTIP ── */
+#tip{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:#6a4a1a;font-size:.75rem;pointer-events:none}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+<canvas id="c"></canvas>
+
+<div id="start-dlg">
+  <div class="dlg-box">
+    <h2>♟ 3D 西洋棋</h2>
+    <p>Three.js 立體象棋 · 完整西洋棋規則</p>
+    <button class="dlg-btn" onclick="startGame('pvp')">🎮 雙人對戰</button>
+    <button class="dlg-btn" onclick="startGame('ai')">🤖 人機對戰（你執白棋）</button>
+  </div>
+</div>
+
+<div id="hud" style="display:none">
+  <span id="turn-badge">白方回合</span>
+  <span id="check-badge">⚠ 將軍！</span>
+  <button class="top-btn" onclick="restartGame()">重新開始</button>
+  <button class="top-btn" onclick="resetView()">重設視角</button>
+</div>
+
+<div id="promo-dlg">
+  <div class="promo-box">
+    <h3>升變棋子</h3>
+    <div class="promo-choices">
+      <button class="promo-btn" onclick="pickPromo('Q')">♛<span>皇后</span></button>
+      <button class="promo-btn" onclick="pickPromo('R')">♜<span>城堡</span></button>
+      <button class="promo-btn" onclick="pickPromo('B')">♝<span>主教</span></button>
+      <button class="promo-btn" onclick="pickPromo('N')">♞<span>騎士</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="win-dlg">
+  <div class="win-box">
+    <h2 id="win-title">勝利！</h2>
+    <p id="win-msg"></p>
+    <button onclick="restartGame()">再來一局</button>
+  </div>
+</div>
+
+<div id="tip">拖曳旋轉 · 滾輪縮放 · 點選棋子移動</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════
+   CHESS LOGIC
+═══════════════════════════════════════════════════════ */
+const W='w', B='b';
+function opp(s){return s===W?B:W;}
+function nmOf(p){return p?p.t:null;}
+function sdOf(p){return p?p.c:null;}
+function inB8(r,c){return r>=0&&r<8&&c>=0&&c<8;}
+function cloneBd(b){return b.map(r=>r.map(p=>p?{...p}:null));}
+const PIV={K:20000,Q:900,R:500,B:330,N:320,P:100};
+
+function initBd(){
+  const b=Array(8).fill(0).map(()=>Array(8).fill(null));
+  const bk=['R','N','B','Q','K','B','N','R'];
+  for(let c=0;c<8;c++){
+    b[0][c]={c:B,t:bk[c],m:false};
+    b[1][c]={c:B,t:'P',m:false};
+    b[6][c]={c:W,t:'P',m:false};
+    b[7][c]={c:W,t:bk[c],m:false};
+  }
+  return b;
+}
+
+function getRaw(b,r,c,ep){
+  const p=b[r][c];if(!p)return[];
+  const s=p.c,t=p.t;
+  const mv=[];
+  function slide(dirs){
+    for(const[dr,dc]of dirs){
+      let nr=r+dr,nc=c+dc;
+      while(inB8(nr,nc)){
+        if(b[nr][nc]){if(b[nr][nc].c!==s)mv.push([nr,nc,'']);break;}
+        mv.push([nr,nc,'']);nr+=dr;nc+=dc;
+      }
+    }
+  }
+  function step(d){
+    for(const[dr,dc]of d){
+      const nr=r+dr,nc=c+dc;
+      if(inB8(nr,nc)&&(!b[nr][nc]||b[nr][nc].c!==s))mv.push([nr,nc,'']);
+    }
+  }
+  if(t==='R')slide([[-1,0],[1,0],[0,-1],[0,1]]);
+  else if(t==='B')slide([[-1,-1],[-1,1],[1,-1],[1,1]]);
+  else if(t==='Q')slide([[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]]);
+  else if(t==='N')step([[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]);
+  else if(t==='K')step([[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]);
+  else if(t==='P'){
+    const fwd=s===W?-1:1;
+    if(inB8(r+fwd,c)&&!b[r+fwd][c]){
+      mv.push([r+fwd,c,'']);
+      if(!p.m&&inB8(r+2*fwd,c)&&!b[r+2*fwd][c])mv.push([r+2*fwd,c,'dp']);
+    }
+    for(const dc of[-1,1]){
+      const nr=r+fwd,nc=c+dc;
+      if(!inB8(nr,nc))continue;
+      if(b[nr][nc]&&b[nr][nc].c!==s)mv.push([nr,nc,'']);
+      if(ep&&nr===ep[0]&&nc===ep[1])mv.push([nr,nc,'ep']);
+    }
+  }
+  return mv;
+}
+
+function findKing(b,s){
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)
+    if(b[r][c]&&b[r][c].c===s&&b[r][c].t==='K')return[r,c];
+  return null;
+}
+
+function isAtt(b,r,c,byS,ep=null){
+  for(let pr=0;pr<8;pr++)for(let pc=0;pc<8;pc++){
+    const p=b[pr][pc];if(!p||p.c!==byS)continue;
+    // Pawns attack diagonally regardless of target square content
+    if(p.t==='P'){
+      const fwd=byS===W?-1:1;
+      if(pr+fwd===r&&(pc-1===c||pc+1===c))return true;
+      continue;
+    }
+    if(getRaw(b,pr,pc,ep).some(([mr,mc])=>mr===r&&mc===c))return true;
+  }
+  return false;
+}
+
+function isChk(b,s){
+  const kp=findKing(b,s);
+  return kp?isAtt(b,kp[0],kp[1],opp(s)):false;
+}
+
+function getValid(b,r,c,ep,cr){
+  const p=b[r][c];if(!p)return[];
+  const s=p.c;
+  const raw=getRaw(b,r,c,ep);
+  const valid=[];
+  for(const mv of raw){
+    const[nr,nc,flag]=mv;
+    const nb=cloneBd(b);
+    if(flag==='ep'){
+      const capR=s===W?nr+1:nr-1;
+      nb[capR][nc]=null;
+    }
+    const pp={...p,m:true};
+    if(pp.t==='P'&&(nr===0||nr===7))pp.t='Q'; // auto-queen for legality check
+    nb[nr][nc]=pp;nb[r][c]=null;
+    if(!isChk(nb,s))valid.push(mv);
+  }
+  // Castling
+  if(p.t==='K'&&!p.m&&!isChk(b,s)){
+    const row=s===W?7:0;
+    if(r===row&&c===4){
+      if(cr[s].k&&b[row][7]&&b[row][7].t==='R'&&b[row][7].c===s&&!b[row][5]&&!b[row][6]
+         &&!isAtt(b,row,5,opp(s))&&!isAtt(b,row,6,opp(s)))valid.push([row,6,'cK']);
+      if(cr[s].q&&b[row][0]&&b[row][0].t==='R'&&b[row][0].c===s&&!b[row][1]&&!b[row][2]&&!b[row][3]
+         &&!isAtt(b,row,2,opp(s))&&!isAtt(b,row,3,opp(s)))valid.push([row,2,'cQ']);
+    }
+  }
+  return valid;
+}
+
+function getAllValid(b,s,ep,cr){
+  const all=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)
+    if(b[r][c]&&b[r][c].c===s)
+      getValid(b,r,c,ep,cr).forEach(mv=>all.push([r,c,...mv]));
+  return all;
+}
+
+function applyMove(b,r,c,nr,nc,flag,cr,promo='Q'){
+  const nb=cloneBd(b);
+  const p={...nb[r][c],m:true};
+  const newCR={w:{...cr.w},b:{...cr.b}};
+  let newEP=null;
+  if(flag==='ep'){const capR=p.c===W?nr+1:nr-1;nb[capR][nc]=null;}
+  else if(flag==='cK'){nb[r][5]={...nb[r][7],m:true};nb[r][7]=null;}
+  else if(flag==='cQ'){nb[r][3]={...nb[r][0],m:true};nb[r][0]=null;}
+  if(flag==='dp')newEP=[nr+(p.c===W?1:-1),nc];
+  if(p.t==='P'&&(nr===0||nr===7))p.t=promo;
+  nb[nr][nc]=p;nb[r][c]=null;
+  // Update castling rights
+  if(p.t==='K')newCR[p.c]={k:false,q:false};
+  if(p.t==='R'){if(c===7)newCR[p.c].k=false;if(c===0)newCR[p.c].q=false;}
+  if(nr===0&&nc===0)newCR[B].q=false;if(nr===0&&nc===7)newCR[B].k=false;
+  if(nr===7&&nc===0)newCR[W].q=false;if(nr===7&&nc===7)newCR[W].k=false;
+  return{board:nb,ep:newEP,cr:newCR};
+}
+
+/* ═══════════════════════════════════════════════════════
+   THREE.JS SCENE
+═══════════════════════════════════════════════════════ */
+const SP=1.15;
+function colX(c){return(c-3.5)*SP;}
+function rowZ(r){return(r-3.5)*SP;}
+
+let renderer,scene,camera;
+let pcGroup,hiGroup,chkGroup;
+let boardMeshes=[],hitBoxes=[];
+let camR=13,camTheta=0,camPhi=0.72;
+let dragSt=null;
+
+function initScene(){
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.1;
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x060402);
+  scene.fog=new THREE.Fog(0x060402,28,55);
+  camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,100);
+  updateCam();
+  // Lights
+  const amb=new THREE.AmbientLight(0xffe8c0,0.45);scene.add(amb);
+  const sun=new THREE.DirectionalLight(0xfff8ec,1.1);
+  sun.position.set(5,14,8);sun.castShadow=true;
+  sun.shadow.mapSize.width=2048;sun.shadow.mapSize.height=2048;
+  sun.shadow.camera.near=0.5;sun.shadow.camera.far=60;
+  sun.shadow.camera.left=-10;sun.shadow.camera.right=10;
+  sun.shadow.camera.top=10;sun.shadow.camera.bottom=-10;
+  scene.add(sun);
+  const fill=new THREE.DirectionalLight(0x5080d0,0.3);fill.position.set(-6,8,-4);scene.add(fill);
+  // Groups
+  pcGroup=new THREE.Group();scene.add(pcGroup);
+  hiGroup=new THREE.Group();scene.add(hiGroup);
+  chkGroup=new THREE.Group();scene.add(chkGroup);
+  buildBd();
+  buildHitBoxes();
+  window.addEventListener('resize',onResize);
+  renderer.setAnimationLoop(renderLoop);
+}
+
+function updateCam(){
+  camPhi=Math.max(0.25,Math.min(1.4,camPhi));
+  camR=Math.max(7,Math.min(22,camR));
+  camera.position.set(
+    camR*Math.sin(camPhi)*Math.sin(camTheta),
+    camR*Math.cos(camPhi),
+    camR*Math.sin(camPhi)*Math.cos(camTheta)
+  );
+  camera.lookAt(0,0,0);
+}
+function resetView(){camR=13;camTheta=0;camPhi=0.72;updateCam();}
+function onResize(){
+  renderer.setSize(innerWidth,innerHeight);
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+}
+
+/* ── BOARD ── */
+function buildBd(){
+  const lMat=new THREE.MeshPhongMaterial({color:0xF0D9B5,shininess:20});
+  const dMat=new THREE.MeshPhongMaterial({color:0xB58863,shininess:20});
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const sq=new THREE.Mesh(new THREE.PlaneGeometry(SP-0.02,SP-0.02),(r+c)%2===0?lMat:dMat);
+    sq.rotation.x=-Math.PI/2;sq.position.set(colX(c),0.001,rowZ(r));
+    sq.receiveShadow=true;sq.userData={r,c};
+    scene.add(sq);boardMeshes.push(sq);
+  }
+  // Board frame (mahogany base)
+  const fw=8*SP+0.6,fh=8*SP+0.6;
+  const bMat=new THREE.MeshPhongMaterial({color:0x3C1A04,shininess:15});
+  const base=new THREE.Mesh(new THREE.BoxGeometry(fw,0.22,fh),bMat);
+  base.position.y=-0.11;base.receiveShadow=true;scene.add(base);
+  // Border strips
+  const stMat=new THREE.MeshPhongMaterial({color:0x5C2A08,shininess:10});
+  [[fw,0.05,0.28,0,0.01,(fh+0.28)/2],[fw,0.05,0.28,0,0.01,-(fh+0.28)/2],
+   [0.28,0.05,fh,(fw+0.28)/2,0.01,0],[0.28,0.05,fh,-(fw+0.28)/2,0.01,0]].forEach(
+    ([w,h,d,x,y,z])=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),stMat);
+    m.position.set(x,y,z);scene.add(m);}
+  );
+  // Corner spheres
+  const cMat=new THREE.MeshPhongMaterial({color:0x7a4010,shininess:40,specular:new THREE.Color(0.3,0.2,0.1)});
+  for(const sx of[-1,1])for(const sz of[-1,1]){
+    const cor=new THREE.Mesh(new THREE.SphereGeometry(0.18,12,10),cMat);
+    cor.position.set(sx*fw/2,0.05,sz*fh/2);scene.add(cor);
+  }
+  // Rank and file labels using sprites
+  addLabels();
+  // Ground shadow catcher
+  const gnd=new THREE.Mesh(new THREE.PlaneGeometry(50,50),
+    new THREE.ShadowMaterial({opacity:0.35}));
+  gnd.rotation.x=-Math.PI/2;gnd.position.y=-0.22;
+  gnd.receiveShadow=true;scene.add(gnd);
+}
+
+function addLabels(){
+  const files='abcdefgh';const ranks='87654321';
+  const lMat=new THREE.SpriteMaterial({transparent:true});
+  const fw=8*SP+0.6;
+  // File labels (bottom)
+  for(let c=0;c<8;c++){
+    const sp=makeTextSprite(files[c],'#c8a060',0.7);
+    sp.position.set(colX(c),-0.05,fw/2+0.22);sp.scale.set(0.7,0.7,1);scene.add(sp);
+    const sp2=makeTextSprite(files[c],'#c8a060',0.7);
+    sp2.position.set(colX(c),-0.05,-fw/2-0.22);sp2.scale.set(0.7,0.7,1);scene.add(sp2);
+  }
+  // Rank labels (sides)
+  for(let r=0;r<8;r++){
+    const sp=makeTextSprite(ranks[r],'#c8a060',0.7);
+    sp.position.set(-fw/2-0.22,-0.05,rowZ(r));sp.scale.set(0.7,0.7,1);scene.add(sp);
+    const sp2=makeTextSprite(ranks[r],'#c8a060',0.7);
+    sp2.position.set(fw/2+0.22,-0.05,rowZ(r));sp2.scale.set(0.7,0.7,1);scene.add(sp2);
+  }
+}
+
+function makeTextSprite(txt,col,sz){
+  const cv=document.createElement('canvas');cv.width=64;cv.height=64;
+  const cx=cv.getContext('2d');
+  cx.fillStyle=col;cx.font='bold 44px Arial';
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText(txt,32,32);
+  const tex=new THREE.CanvasTexture(cv);
+  const mat=new THREE.SpriteMaterial({map:tex,transparent:true});
+  return new THREE.Sprite(mat);
+}
+
+function buildHitBoxes(){
+  const hMat=new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide});
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const hb=new THREE.Mesh(new THREE.PlaneGeometry(SP,SP),hMat);
+    hb.rotation.x=-Math.PI/2;hb.position.set(colX(c),0.005,rowZ(r));
+    hb.userData={r,c};scene.add(hb);hitBoxes.push(hb);
+  }
+}
+
+/* ── PIECES ── */
+function mkPc(tp,isW){
+  const mat=new THREE.MeshPhongMaterial({
+    color:isW?0xF5EDD5:0x1E1008,
+    shininess:isW?130:85,
+    specular:new THREE.Color(isW?.45:.08,isW?.42:.06,isW?.35:.04)
+  });
+  const G=new THREE.Group();
+  function add(geo,x=0,y=0,z=0,rx=0,ry=0,rz=0){
+    const m=new THREE.Mesh(geo,mat);
+    m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=true;G.add(m);return m;
+  }
+  const CYL=(r1,r2,h,y)=>add(new THREE.CylinderGeometry(r1,r2,h,20),0,y);
+  const BOX=(w,h,d,x,y,z,rz=0)=>add(new THREE.BoxGeometry(w,h,d),x,y,z,0,0,rz);
+  const SPH=(r,y)=>add(new THREE.SphereGeometry(r,16,12),0,y);
+  const CON=(r,h,y)=>add(new THREE.ConeGeometry(r,h,16),0,y);
+  // Base disc (all pieces)
+  CYL(0.30,0.35,0.07,0.035);
+  if(tp==='P'){
+    CYL(0.095,0.13,0.22,0.185);SPH(0.16,0.41);
+  }else if(tp==='R'){
+    CYL(0.12,0.17,0.26,0.205);
+    BOX(0.30,0.22,0.30,0,0.44,0);
+    [[-0.11,0.58,-0.11],[0.11,0.58,-0.11],[-0.11,0.58,0.11],[0.11,0.58,0.11]]
+      .forEach(([x,y,z])=>BOX(0.10,0.13,0.10,x,y,z));
+  }else if(tp==='N'){
+    CYL(0.10,0.15,0.28,0.215);
+    const nk=BOX(0.13,0.28,0.16,0,0.46,0.01,0.25);
+    BOX(0.24,0.16,0.20,0.05,0.62,0);
+  }else if(tp==='B'){
+    CYL(0.10,0.14,0.28,0.215);
+    SPH(0.155,0.44);
+    CON(0.10,0.30,0.66);SPH(0.04,0.83);
+  }else if(tp==='Q'){
+    CYL(0.11,0.16,0.32,0.235);
+    SPH(0.18,0.52);
+    add(new THREE.CylinderGeometry(0.20,0.20,0.07,18,1,true),0,0.68);
+    for(let i=0;i<5;i++){
+      const a=i/5*Math.PI*2;
+      add(new THREE.SphereGeometry(0.055,10,8),Math.cos(a)*0.19,0.77,Math.sin(a)*0.19);
+    }
+  }else if(tp==='K'){
+    CYL(0.12,0.17,0.36,0.255);
+    SPH(0.18,0.56);
+    add(new THREE.CylinderGeometry(0.20,0.20,0.07,18,1,true),0,0.73);
+    BOX(0.24,0.055,0.055,0,0.87,0);
+    BOX(0.055,0.28,0.055,0,0.87,0);
+  }
+  return G;
+}
+
+/* ── PIECE SYNC ── */
+function syncPcs(){
+  while(pcGroup.children.length)pcGroup.remove(pcGroup.children[0]);
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const p=gBoard[r][c];if(!p)continue;
+    const grp=mkPc(p.t,p.c===W);
+    grp.position.set(colX(c),0,rowZ(r));
+    if(p.t==='N'&&p.c===B)grp.rotation.y=Math.PI;
+    grp.userData={r,c,t:p.t,isW:p.c===W};
+    grp.traverse(ch=>{if(ch.isMesh)ch.userData=grp.userData;});
+    pcGroup.add(grp);
+  }
+}
+
+/* ── HIGHLIGHTS ── */
+function clearHi(){while(hiGroup.children.length)hiGroup.remove(hiGroup.children[0]);}
+function clearChk(){while(chkGroup.children.length)chkGroup.remove(chkGroup.children[0]);}
+
+function mkRing(r,c,col,r1=0.44,r2=0.52){
+  const m=new THREE.Mesh(new THREE.RingGeometry(r1,r2,32),
+    new THREE.MeshBasicMaterial({color:col,side:THREE.DoubleSide,transparent:true,opacity:.85}));
+  m.rotation.x=-Math.PI/2;m.position.set(colX(c),0.012,rowZ(r));return m;
+}
+function mkDot(r,c){
+  const m=new THREE.Mesh(new THREE.CircleGeometry(0.17,24),
+    new THREE.MeshBasicMaterial({color:0x44dd55,side:THREE.DoubleSide,transparent:true,opacity:.75}));
+  m.rotation.x=-Math.PI/2;m.position.set(colX(c),0.012,rowZ(r));return m;
+}
+
+function showHi(r,c,moves){
+  clearHi();
+  hiGroup.add(mkRing(r,c,0xFFD700,0.44,0.53));// gold selection ring
+  for(const[nr,nc,flag]of moves){
+    const isCapt=gBoard[nr][nc]!==null||(flag==='ep');
+    hiGroup.add(isCapt?mkRing(nr,nc,0xFF4444):mkDot(nr,nc));
+  }
+}
+
+function updChk(){
+  clearChk();
+  if(!gBoard)return;
+  const s=gTurn;
+  if(!isChk(gBoard,s))return;
+  const kp=findKing(gBoard,s);
+  if(!kp)return;
+  const pulse=new THREE.Mesh(new THREE.RingGeometry(0.44,0.58,32),
+    new THREE.MeshBasicMaterial({color:0xFF2020,side:THREE.DoubleSide,transparent:true,opacity:0.9}));
+  pulse.rotation.x=-Math.PI/2;pulse.position.set(colX(kp[1]),0.015,rowZ(kp[0]));
+  chkGroup.add(pulse);
+}
+
+/* ── ANIMATION ── */
+let animQ=[];
+let gBusy=false;
+
+function animMove(grp,toX,toZ,onDone){
+  const fromX=grp.position.x,fromZ=grp.position.z;
+  const ARC=1.6,STEPS=24;
+  let step=0;
+  animQ.push(()=>{
+    step++;
+    const t=step/STEPS;
+    grp.position.x=fromX+(toX-fromX)*t;
+    grp.position.z=fromZ+(toZ-fromZ)*t;
+    grp.position.y=ARC*Math.sin(Math.PI*t);
+    if(step>=STEPS){grp.position.y=0;if(onDone)onDone();return true;}
+    return false;
+  });
+}
+
+/* ── RENDER LOOP ── */
+let lastT=0;
+function renderLoop(t){
+  if(animQ.length>0){
+    const done=animQ[0]();if(done)animQ.shift();
+    if(animQ.length===0)gBusy=false;
+  }
+  // Pulse check indicator
+  if(chkGroup.children.length>0){
+    const op=0.6+0.3*Math.sin(t*0.006);
+    chkGroup.children[0].material.opacity=op;
+  }
+  renderer.render(scene,camera);
+}
+
+/* ═══════════════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════════════ */
+let gBoard,gTurn,gEP,gCR,gMode,gOver,gSel,gMoves,gPromo;
+
+function startGame(mode){
+  gMode=mode;gOver=false;gSel=null;gMoves=[];gPromo=null;
+  gBoard=initBd();
+  gTurn=W;
+  gEP=null;
+  gCR={w:{k:true,q:true},b:{k:true,q:true}};
+  document.getElementById('start-dlg').style.display='none';
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('win-dlg').className='';
+  document.getElementById('promo-dlg').className='';
+  syncPcs();clearHi();clearChk();updHUD();
+}
+
+function restartGame(){
+  if(gMode)startGame(gMode);
+  else{document.getElementById('start-dlg').style.display='flex';
+    document.getElementById('hud').style.display='none';}
+}
+
+/* ── HUD ── */
+function updHUD(){
+  const tb=document.getElementById('turn-badge');
+  const cb=document.getElementById('check-badge');
+  if(gOver){tb.textContent='';cb.style.display='none';return;}
+  const sideN=gTurn===W?'白方':'黑方';
+  const isAI=gMode==='ai'&&gTurn===B;
+  tb.textContent=isAI?`${sideN} (AI 思考中...)`:`${sideN} 回合`;
+  const chk=isChk(gBoard,gTurn);
+  cb.style.display=chk?'inline':'none';
+}
+
+/* ── CLICK LOGIC ── */
+function onSquare(r,c){
+  if(gOver||gBusy||gPromo)return;
+  if(gMode==='ai'&&gTurn===B)return; // AI's turn
+  const p=gBoard[r][c];
+  if(gSel){
+    const mv=gMoves.find(([nr,nc])=>nr===r&&nc===c);
+    if(mv){execPlayerMove(...gSel,mv[0],mv[1],mv[2]||'');return;}
+    if(p&&p.c===gTurn){gSel=[r,c];gMoves=getValid(gBoard,r,c,gEP,gCR).map(([nr,nc,f])=>[nr,nc,f||'']);showHi(r,c,gMoves);return;}
+    gSel=null;gMoves=[];clearHi();
+  }else{
+    if(p&&p.c===gTurn){
+      gSel=[r,c];
+      gMoves=getValid(gBoard,r,c,gEP,gCR).map(([nr,nc,f])=>[nr,nc,f||'']);
+      showHi(r,c,gMoves);
+    }
+  }
+}
+
+function execPlayerMove(r,c,nr,nc,flag){
+  // Check if pawn promotion
+  const p=gBoard[r][c];
+  if(p.t==='P'&&(nr===0||nr===7)){
+    gPromo={r,c,nr,nc,flag};
+    document.getElementById('promo-dlg').className='show';
+    return;
+  }
+  commitMove(r,c,nr,nc,flag,'Q');
+}
+
+function pickPromo(tp){
+  document.getElementById('promo-dlg').className='';
+  if(!gPromo)return;
+  const{r,c,nr,nc,flag}=gPromo;gPromo=null;
+  commitMove(r,c,nr,nc,flag,tp);
+}
+
+function commitMove(r,c,nr,nc,flag,promo){
+  gSel=null;gMoves=[];clearHi();gBusy=true;
+  // Find piece mesh and animate
+  let movMesh=null;
+  pcGroup.traverse(ch=>{if(ch.userData&&ch.userData.r===r&&ch.userData.c===c&&ch.parent===pcGroup)movMesh=ch;});
+  // Remove captured piece mesh
+  let capRow=nr,capCol=nc;
+  if(flag==='ep'){capRow=gTurn===W?nr+1:nr-1;capCol=nc;}
+  removePcMesh(capRow,capCol,flag==='ep');
+  // Handle castling rook
+  if(flag==='cK'){movRookMesh(r,7,r,5);}
+  if(flag==='cQ'){movRookMesh(r,0,r,3);}
+  // Apply board state
+  const res=applyMove(gBoard,r,c,nr,nc,flag,gCR,promo);
+  gBoard=res.board;gEP=res.ep;gCR=res.cr;
+  // Animate piece
+  if(movMesh){
+    movMesh.userData.r=nr;movMesh.userData.c=nc;
+    movMesh.traverse(ch=>{if(ch.isMesh){ch.userData.r=nr;ch.userData.c=nc;}});
+    animMove(movMesh,colX(nc),rowZ(nr),()=>{
+      // Rebuild scene to handle promotion change
+      syncPcs();
+      endTurn();
+    });
+  }else{syncPcs();endTurn();}
+}
+
+function removePcMesh(r,c,force=false){
+  if(!force&&!gBoard[r][c]&&r<8)return; // wait, we check against NEW board but haven't applied yet
+  // just do it
+  let found=null;
+  pcGroup.traverse(ch=>{
+    if(ch.userData&&ch.userData.r===r&&ch.userData.c===c&&ch.parent===pcGroup)found=ch;
+  });
+  if(found)pcGroup.remove(found);
+}
+
+function movRookMesh(r,c,nr,nc){
+  let found=null;
+  pcGroup.traverse(ch=>{if(ch.userData&&ch.userData.r===r&&ch.userData.c===c&&ch.parent===pcGroup)found=ch;});
+  if(found){found.position.set(colX(nc),0,rowZ(nr));found.userData.r=nr;found.userData.c=nc;
+    found.traverse(ch=>{if(ch.isMesh){ch.userData.r=nr;ch.userData.c=nc;}});}
+}
+
+function endTurn(){
+  gTurn=opp(gTurn);
+  gBusy=false;
+  updChk();
+  // Check end conditions
+  const moves=getAllValid(gBoard,gTurn,gEP,gCR);
+  if(moves.length===0){
+    if(isChk(gBoard,gTurn)){
+      const winner=opp(gTurn);
+      showWin(winner===W?'白方 勝利！':'黑方 勝利！',winner===W?'黑方將死（Checkmate）':'白方將死（Checkmate）');
+    }else{
+      showWin('平局','逼和（Stalemate）— 無合法著法');
+    }
+    return;
+  }
+  updHUD();
+  if(gMode==='ai'&&gTurn===B){
+    setTimeout(doAI,150);
+  }
+}
+
+function showWin(title,msg){
+  gOver=true;
+  document.getElementById('win-title').textContent=title;
+  document.getElementById('win-msg').textContent=msg;
+  document.getElementById('win-dlg').className='show';
+  document.getElementById('turn-badge').textContent='';
+  document.getElementById('check-badge').style.display='none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   AI — MINIMAX α-β DEPTH 3
+═══════════════════════════════════════════════════════ */
+// Position bonuses (from white's perspective, row 7 = rank 1 = white back rank)
+const PST_P=[
+  [0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],
+  [10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],
+  [0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],
+  [5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]
+];
+const PST_N=[
+  [-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],
+  [-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],
+  [-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],
+  [-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]
+];
+const PST_B=[
+  [-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],
+  [-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],
+  [-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],
+  [-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]
+];
+const PST_K_MG=[
+  [-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],
+  [-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],
+  [-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],
+  [20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]
+];
+
+function getRowForPST(r,isW){return isW?r:7-r;}
+
+function evalBd(b){
+  let sc=0;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const p=b[r][c];if(!p)continue;
+    const isW=p.c===W;
+    const sign=isW?1:-1;
+    let v=PIV[p.t]||0;
+    const pr=getRowForPST(r,isW);
+    if(p.t==='P')v+=PST_P[pr][c];
+    else if(p.t==='N')v+=PST_N[pr][c];
+    else if(p.t==='B')v+=PST_B[pr][c];
+    else if(p.t==='K')v+=PST_K_MG[pr][c];
+    sc+=sign*v;
+  }
+  return sc; // positive = good for white
+}
+
+function sortMvs(mvs,b){
+  return mvs.sort((a,mb)=>{
+    const ca=b[a[2]][a[3]],cb=b[mb[2]][mb[3]];
+    return (cb?(PIV[cb.t]||0):0)-(ca?(PIV[ca.t]||0):0);
+  });
+}
+
+function minimax(b,depth,alpha,beta,maxW,s,ep,cr){
+  if(depth===0)return{sc:evalBd(b)};
+  const mvs=getAllValid(b,s,ep,cr);
+  if(mvs.length===0){
+    if(isChk(b,s))return{sc:maxW?-19000:19000};
+    return{sc:0};
+  }
+  sortMvs(mvs,b);
+  let best=maxW?{sc:-Infinity}:{sc:Infinity};
+  for(const[r,c,nr,nc,flag='']of mvs){
+    const res=applyMove(b,r,c,nr,nc,flag||'',cr,'Q');
+    const ch=minimax(res.board,depth-1,alpha,beta,!maxW,opp(s),res.ep,res.cr);
+    if(maxW){if(ch.sc>best.sc){best={sc:ch.sc,mv:[r,c,nr,nc,flag||'']};alpha=Math.max(alpha,ch.sc);}
+    }else{if(ch.sc<best.sc){best={sc:ch.sc,mv:[r,c,nr,nc,flag||'']};beta=Math.min(beta,ch.sc);}}
+    if(beta<=alpha)break;
+  }
+  return best;
+}
+
+function doAI(){
+  if(gOver||gTurn!==B)return;
+  const res=minimax(gBoard,3,-Infinity,Infinity,false,B,gEP,gCR);
+  if(!res.mv){endTurn();return;}
+  const[r,c,nr,nc,flag='']=res.mv;
+  // AI always promotes to Queen
+  commitMove(r,c,nr,nc,flag||'','Q');
+}
+
+/* ═══════════════════════════════════════════════════════
+   INPUT HANDLING
+═══════════════════════════════════════════════════════ */
+function getPos(e){
+  const r=renderer.domElement.getBoundingClientRect();
+  let cx,cy;
+  if(e.touches){cx=e.touches[0].clientX-r.left;cy=e.touches[0].clientY-r.top;}
+  else{cx=e.clientX-r.left;cy=e.clientY-r.top;}
+  return{x:cx,y:cy};
+}
+
+function hitTest(mx,my){
+  const ray=new THREE.Raycaster();
+  const mouse=new THREE.Vector2(
+    (mx/renderer.domElement.clientWidth)*2-1,
+    -(my/renderer.domElement.clientHeight)*2+1
+  );
+  ray.setFromCamera(mouse,camera);
+  // Check pieces first
+  const pcMeshes=[];
+  pcGroup.traverse(c=>{if(c.isMesh)pcMeshes.push(c);});
+  const ph=ray.intersectObjects(pcMeshes);
+  if(ph.length>0){const ud=ph[0].object.userData;if(ud&&ud.r!==undefined)return[ud.r,ud.c];}
+  // Check board hitboxes
+  const bh=ray.intersectObjects(hitBoxes);
+  if(bh.length>0){const ud=bh[0].object.userData;if(ud&&ud.r!==undefined)return[ud.r,ud.c];}
+  return null;
+}
+
+const canvas=document.getElementById('c');
+canvas.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  const p=getPos(e);dragSt={x:p.x,y:p.y,moved:false,theta:camTheta,phi:camPhi};
+});
+canvas.addEventListener('mousemove',e=>{
+  if(!dragSt)return;
+  const p=getPos(e);
+  const dx=p.x-dragSt.x,dy=p.y-dragSt.y;
+  if(Math.abs(dx)>3||Math.abs(dy)>3)dragSt.moved=true;
+  if(dragSt.moved){
+    camTheta=dragSt.theta-dx*0.007;
+    camPhi=Math.max(0.25,Math.min(1.38,dragSt.phi+dy*0.007));
+    updateCam();
+  }
+});
+canvas.addEventListener('mouseup',e=>{
+  if(!dragSt)return;
+  if(!dragSt.moved){
+    const p=getPos(e);const sq=hitTest(p.x,p.y);
+    if(sq)onSquare(sq[0],sq[1]);
+  }
+  dragSt=null;
+});
+canvas.addEventListener('mouseleave',()=>{dragSt=null;});
+canvas.addEventListener('wheel',e=>{
+  camR=Math.max(7,Math.min(22,camR+e.deltaY*0.018));
+  updateCam();e.preventDefault();
+},{passive:false});
+
+// Touch
+let touchSt=null,pinchD0=null;
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const p=getPos(e);
+    touchSt={x:p.x,y:p.y,moved:false,theta:camTheta,phi:camPhi};
+  }else if(e.touches.length===2){
+    pinchD0=Math.hypot(e.touches[1].clientX-e.touches[0].clientX,e.touches[1].clientY-e.touches[0].clientY);
+    touchSt=null;
+  }
+},{passive:false});
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1&&touchSt){
+    const p=getPos(e);
+    const dx=p.x-touchSt.x,dy=p.y-touchSt.y;
+    if(Math.abs(dx)>4||Math.abs(dy)>4)touchSt.moved=true;
+    if(touchSt.moved){
+      camTheta=touchSt.theta-dx*0.007;
+      camPhi=Math.max(0.25,Math.min(1.38,touchSt.phi+dy*0.007));
+      updateCam();
+    }
+  }else if(e.touches.length===2&&pinchD0!=null){
+    const d=Math.hypot(e.touches[1].clientX-e.touches[0].clientX,e.touches[1].clientY-e.touches[0].clientY);
+    camR=Math.max(7,Math.min(22,camR*(pinchD0/d)));
+    pinchD0=d;updateCam();
+  }
+},{passive:false});
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  if(touchSt&&!touchSt.moved){
+    const r=renderer.domElement.getBoundingClientRect();
+    const tx=e.changedTouches[0].clientX-r.left,ty=e.changedTouches[0].clientY-r.top;
+    const sq=hitTest(tx,ty);if(sq)onSquare(sq[0],sq[1]);
+  }
+  touchSt=null;pinchD0=null;
+},{passive:false});
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+initScene();
+</script>
+</body>
+</html>

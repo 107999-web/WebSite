@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>紙本學習單：Scratch 積木教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.sheet{background:#fff;color:#2B2621;max-width:820px;margin:18px auto;padding:24px 28px;
+  border:3px solid var(--line);border-radius:18px;box-shadow:var(--shadow-s)}
+.sheet.hide{display:none}
+.sh{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;
+  border-bottom:2px solid #D9D2C8;padding-bottom:9px}
+.sh h2{font-size:1.28rem}
+.sh .no{font-size:.82rem;color:#6B655C;font-weight:800}
+.sh .f{font-size:.88rem}
+.u{display:inline-block;border-bottom:1.5px solid #8C8880;min-width:72px}
+.goal{background:#F5F1EA;border-radius:12px;padding:9px 14px;margin-top:12px;font-size:.9rem}
+.goal b{color:#A35B12}
+.blk{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sec2{margin-top:16px;break-inside:avoid}
+.sec2 h3{font-size:1rem;display:flex;align-items:center;gap:8px}
+.sec2 h3 .n{width:24px;height:24px;border-radius:50%;background:#E8853A;color:#fff;font-family:var(--f-num);
+  font-weight:800;display:grid;place-items:center;font-size:.82rem;flex:0 0 auto}
+.sec2 p{font-size:.9rem;margin:6px 0 0}
+.prog{background:#FAF7F2;border:2px solid #E4DDD2;border-radius:14px;padding:10px 12px;margin:8px 0;
+  display:inline-block;min-width:min(100%,260px)}
+.prog .snode{margin:2px 0}
+.line{border-bottom:1.5px solid #C9C2B8;height:1.7em;margin-top:6px}
+.box{border:1.5px dashed #B9B2A8;border-radius:10px;min-height:70px;margin-top:8px}
+.box.tall{min-height:110px}
+.chk{display:grid;gap:5px;margin-top:8px;font-size:.9rem}
+.chk div{display:flex;gap:8px;align-items:flex-start}
+.chk i{width:15px;height:15px;border:1.6px solid #8C8880;border-radius:4px;flex:0 0 auto;margin-top:4px}
+.foot{margin-top:16px;border-top:2px solid #D9D2C8;padding-top:8px;font-size:.8rem;color:#6B655C;
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pick{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+.pick button{border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;
+  font-family:var(--f-round);font-weight:700;font-size:.86rem;color:var(--ink);cursor:pointer}
+.pick button.on{border-color:var(--accent);background:var(--paper2)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+@media print{
+  header.top,.tools,.pick,.noprint{display:none!important}
+  body{background:#fff;background-image:none;line-height:1.55}
+  .wrap{padding:0;max-width:none}
+  .sheet{border:none;box-shadow:none;margin:0;padding:0;max-width:none;break-after:page}
+  .sheet:last-of-type{break-after:auto}
+  .sheet.hide{display:none!important}
+  .sec2,.prog{break-inside:avoid}
+  /* 壓成剛好一張 A4 */
+  .sh h2{font-size:1.16rem}
+  .goal{margin-top:6px;padding:5px 12px;font-size:.85rem}
+  .sec2{margin-top:7px}
+  .blk{margin-top:7px;gap:6px}
+  .sec2 h3{font-size:.95rem}
+  .sec2 p{font-size:.86rem;margin-top:4px}
+  .prog{padding:6px 10px;margin:5px 0}
+  .snode{margin:1px 0}
+  .sb{font-size:.82rem;padding:5px 10px;gap:5px;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .sb.round{padding:4px 12px}
+  .cwrap .chead,.cwrap .cmid,.cwrap .cfoot{font-size:.82rem;padding:5px 10px}
+  .cwrap .cfoot{height:11px;padding:0 10px}
+  .cwrap .cbody{border-left-width:11px;padding:4px 0 4px 7px;min-height:16px}
+  .sb span.sf,.sb span.nf,.sb .df{font-size:.8rem}
+  .box{min-height:48px;margin-top:5px}
+  .box.tall{min-height:58px}
+  .line{height:1.45em;margin-top:4px}
+  .chk{gap:3px;margin-top:5px;font-size:.85rem}
+  .foot{margin-top:8px;padding-top:5px;font-size:.74rem}
+  /* 讓「我的設計」自動撐滿剩下的版面 */
+  .sheet{display:flex;flex-direction:column;min-height:262mm}
+  .sec2.grow{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .sec2.grow .box{flex:1 1 auto}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:12mm}
+}
+</style>
+</head>
+<body>
+<header class="top noprint">
+  <div class="in">
+    <div class="brand">📝 紙本學習單 <em>七個單元</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="assess.html">紙本評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="pick noprint" id="pick"></div>
+  <div class="tools noprint">
+    <button class="btn" id="print">🖨 列印選取的學習單</button>
+    <span style="font-size:.86rem;color:var(--ink2);font-weight:700">一個單元剛好一張 A4，正反面印可省紙</span>
+  </div>
+  <div id="sheets"></div>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+function still(steps,host){
+  (steps||[]).forEach(function(st){
+    var b=UI.byId(st.id); if(!b)return;
+    var node=document.createElement('div');node.className='snode';
+    var el=UI.blockEl(b,false,st.args||{});
+    node.appendChild(el);
+    if(el.bodyEl)still(st.body,el.bodyEl);
+    if(el.body2El)still(st.body2,el.body2El);
+    host.appendChild(node);
+  });
+}
+
+var SHEETS=[
+{
+  n:1, icon:'🚶', title:'讓角色動起來', cat:'動作類',
+  goal:'知道舞台的座標，會用動作積木讓角色移動、轉彎、定位。',
+  blocks:['move','turnright','gotoxy','pointdir','changex','bounce'],
+  q1:'角色從 <b>x:0　y:0</b> 出發、面朝 90 度。執行下面的程式後，角色會停在哪裡？',
+  p1:[{id:'move',args:{STEPS:60}},{id:'changey',args:{DY:40}}],
+  a1:'x ＝ <span class="u"></span>　　y ＝ <span class="u"></span>',
+  q2:'想讓角色走到舞台的<b>左下角</b>附近（大約 x:−200　y:−150），你會用哪一塊積木？把數字填進去：',
+  p2:[{id:'gotoxy',args:{X:0,Y:0}}],
+  a2:'（直接把上面那塊積木的兩個數字改成你的答案）',
+  make:'請畫出或寫下一段程式，讓角色<b>走出一個三角形</b>。（提示：外角要轉 120 度）',
+  chk:['我知道舞台中央是 x:0　y:0。','我知道 90 度是朝右、0 度是朝上。','我分得出「移動」和「定位到」的差別。']
+},
+{
+  n:2, icon:'🎭', title:'說話與變裝', cat:'外觀類',
+  goal:'會讓角色說話、換造型、換背景、變大變小、隱藏與顯示。',
+  blocks:['sayfor','say','nextcostume','switchbackdrop','changesize','hide'],
+  q1:'下面兩塊積木有什麼不一樣？請各寫一句話說明。',
+  p1:[{id:'sayfor',args:{MSG:'Hello!',SECS:2}},{id:'say',args:{MSG:'Hello!'}}],
+  a1:'',
+  q2:'想做出「角色在走路」的動畫，除了「換下一個造型」之外，還<b>一定要</b>加上哪一塊積木？為什麼？',
+  p2:null,
+  a2:'',
+  make:'設計一段<b>打招呼小劇場</b>：角色先說一句話、換個造型、再說一句話。請寫下你的積木順序。',
+  chk:['我分得出「說出…持續 N 秒」和「說出」的差別。','我知道動畫一定要配「等待」才看得清楚。','我知道「隱藏」之後角色還在，只是看不見。']
+},
+{
+  n:3, icon:'🔁', title:'讓程式自己跑', cat:'事件類・控制類',
+  goal:'會用事件積木啟動程式，用迴圈和條件讓角色自己動作、自己判斷。',
+  blocks:['whenflag','repeat','forever','ifthen','wait','stop'],
+  q1:'執行下面的程式後，角色一共移動了幾點？',
+  p1:[{id:'repeat',args:{N:5},body:[{id:'move',args:{STEPS:20}}]}],
+  a1:'答：<span class="u"></span> 點',
+  q2:'下面這段程式想讓角色「一直走，碰到邊緣就轉身」，但角色只動了一下。<b>哪裡有問題？</b>',
+  p2:[{id:'whenflag'},{id:'move',args:{STEPS:10}},
+      {id:'ifthen',args:{COND:'碰到邊緣'},body:[{id:'turnright',args:{DEG:180}}]}],
+  a2:'',
+  make:'設計一段<b>會自己巡邏的角色</b>：走到邊緣就轉身，並說一句話。請寫下你的積木順序。',
+  chk:['我知道事件積木是程式的起跑線。','我知道積木要放進 C 型的凹槽裡面才會被重複。','我知道「如果」只檢查一次，要一直檢查就得放進迴圈。']
+},
+{
+  n:4, icon:'🔍', title:'讓角色有感覺', cat:'偵測類・運算類',
+  goal:'分得出三種積木形狀，會把回報型積木放進別的欄位裡。',
+  blocks:['touching','distto','ask','answer','opadd','opgt'],
+  q1:'把下面三塊積木<b>依形狀分類</b>，並寫出它們各自該放在哪裡。',
+  p1:[{id:'move',args:{STEPS:10}},{id:'distto',args:{WHAT:'鼠標'}},{id:'touching',args:{WHAT:'鼠標'}}],
+  a1:'凸形：<span class="u"></span>　橢圓形：<span class="u"></span>　六角形：<span class="u"></span>',
+  q2:'執行下面的程式後，角色會說什麼？（提示：角色一開始在 x:0）',
+  p2:[{id:'ifelse',args:{COND:'角色在右半邊'},
+      body:[{id:'say',args:{MSG:'我在右邊'}}],
+      body2:[{id:'say',args:{MSG:'我在左邊'}}]}],
+  a2:'答：<span class="u" style="min-width:140px"></span>',
+  make:'設計一個<b>問答遊戲</b>：問一個問題，答對說「答對了」，答錯說「再想想」。請寫下你的積木順序。',
+  chk:['我分得出凸形、圓形、六角形三種積木該放在哪裡。','我知道偵測積木只回答問題，自己不會讓角色動。','我會把一塊積木放進另一塊積木的欄位裡。']
+},
+{
+  n:5, icon:'📦', title:'讓程式記住事情', cat:'變數',
+  goal:'知道變數是一個有名字的盒子，分得清「設為」和「改變」。',
+  blocks:['varreport','setvar','changevar','showvar'],
+  q1:'執行下面的程式後，變數<b>分數</b>是多少？',
+  p1:[{id:'setvar',args:{V:'分數',N:'0'}},
+      {id:'repeat',args:{N:3},body:[{id:'changevar',args:{V:'分數',N:5}}]}],
+  a1:'答：<span class="u"></span>',
+  q2:'如果把上面迴圈裡的「改變 5」換成「<b>設為 5</b>」，結果會變成多少？為什麼？',
+  p2:null,
+  a2:'',
+  make:'設計一個<b>計分板</b>：遊戲開始分數歸零，每碰到一次目標就加 1 分。<b>歸零的積木要放在哪一層？</b>請畫出來。',
+  chk:['我分得出「設為」是整個換掉、「改變」是加上去。','我知道「設為 0」要放在綠旗下面，不能放進迴圈。','我知道要減少就在「改變」裡填負數。']
+},
+{
+  n:6, icon:'📋', title:'一次記住很多件事', cat:'清單',
+  goal:'知道清單是一排有編號的盒子，會用編號取出項目、會走訪整張清單。',
+  blocks:['listadd','listinsert','listitem','listlength','listindexof'],
+  q1:'執行下面的程式後，清單<b>排行榜</b>裡的內容<b>依序</b>是什麼？',
+  p1:[{id:'listdelall',args:{L:'排行榜'}},
+      {id:'listadd',args:{L:'排行榜',IT:'小明'}},
+      {id:'listadd',args:{L:'排行榜',IT:'小華'}},
+      {id:'listinsert',args:{L:'排行榜',N:1,IT:'冠軍'}}],
+  a1:'第 1 項 <span class="u"></span>　第 2 項 <span class="u"></span>　第 3 項 <span class="u"></span>',
+  q2:'承上題，「<b>小美 在 排行榜 裡的項目編號</b>」會得到什麼？為什麼？',
+  p2:null,
+  a2:'',
+  make:'設計一段程式，把清單裡的<b>每一項都唸一遍</b>。（提示：用一個變數當編號，重複「清單的長度」次）',
+  chk:['我知道清單的第一項是 1 不是 0。','我分得出添加、插入、替換三塊的差別。','我知道刪掉一項之後，後面的編號會往前移。']
+},
+{
+  n:7, icon:'🧩', title:'把程式包起來重複用', cat:'函式積木',
+  goal:'知道定義與呼叫的分工，會把重複的程式包成自訂積木。',
+  blocks:['define','callmy','defarg','callarg','argval'],
+  q1:'下面這段程式<b>按了綠旗卻沒有反應</b>，為什麼？',
+  p1:[{id:'define',args:{NAME:'跳一下'},body:[
+        {id:'changey',args:{DY:60}},{id:'changey',args:{DY:-60}}]}],
+  a2:'',
+  a1:'',
+  q2:'執行下面的程式後，角色總共走了幾點？',
+  p2:[{id:'defarg',body:[{id:'move',args:{STEPS:{__b:'argval',args:{}}}}]},
+      {id:'callarg',args:{V:15}},
+      {id:'callarg',args:{V:35}}],
+  a2:'答：<span class="u"></span> 點',
+  make:'找出你之前的作品裡<b>重複出現三次以上</b>的一段程式，把它包成自訂積木。請寫下積木的<b>名字</b>和<b>裡面包了什麼</b>。',
+  chk:['我知道定義自己不會執行，要有呼叫才會動。','我知道呼叫和定義的名字要一樣。','我知道改定義裡的內容，所有呼叫的地方都會一起變。']
+}
+];
+
+var host=document.getElementById('sheets'), pick=document.getElementById('pick'), els=[];
+SHEETS.forEach(function(S,idx){
+  var d=document.createElement('div');d.className='sheet';
+  var h='';
+  h+='<div class="sh"><div><div class="no">Scratch 積木教室・學習單 '+S.n+'</div>'+
+     '<h2>'+S.icon+' '+S.title+'　<span style="font-size:.8rem;color:#6B655C">'+S.cat+'</span></h2></div>'+
+     '<div class="f"><b>班級</b> <span class="u" style="min-width:60px"></span> '+
+     '<b>座號</b> <span class="u" style="min-width:44px"></span> '+
+     '<b>姓名</b> <span class="u" style="min-width:76px"></span></div></div>';
+  h+='<div class="goal"><b>這一課的目標</b>　'+S.goal+'</div>';
+  d.innerHTML=h;
+
+  var s0=document.createElement('div');s0.className='sec2';
+  s0.innerHTML='<h3><span class="n">1</span>這一課的積木</h3>'+
+    '<p style="color:#6B655C">看到這些積木要想得起來它們在做什麼。</p>';
+  var bl=document.createElement('div');bl.className='blk';
+  S.blocks.forEach(function(id){
+    var b=UI.byId(id); if(!b)return;
+    bl.appendChild(UI.blockEl(b,false,null));
+  });
+  s0.appendChild(bl);
+  d.appendChild(s0);
+
+  function qsec(n,title,text,prog,ansHtml,big){
+    var s=document.createElement('div');s.className='sec2';
+    s.innerHTML='<h3><span class="n">'+n+'</span>'+title+'</h3><p>'+text+'</p>';
+    if(prog){
+      var pb=document.createElement('div');pb.className='prog';
+      still(prog,pb);s.appendChild(pb);
+    }
+    if(ansHtml){
+      var a=document.createElement('p');a.style.marginTop='8px';a.innerHTML=ansHtml;s.appendChild(a);
+    }
+    if(big){
+      var g=document.createElement('div');g.className='line';s.appendChild(g);
+      var g2=document.createElement('div');g2.className='line';s.appendChild(g2);
+    }
+    d.appendChild(s);
+    return s;
+  }
+  qsec(2,'想一想',S.q1,S.p1,S.a1,!S.a1);
+  qsec(3,'再想一想',S.q2,S.p2,S.a2,!S.a2);
+
+  var s4=document.createElement('div');s4.className='sec2';
+  s4.className='sec2 grow';
+  s4.innerHTML='<h3><span class="n">4</span>我的設計</h3><p>'+S.make+'</p><div class="box tall"></div>';
+  d.appendChild(s4);
+
+  var s5=document.createElement('div');s5.className='sec2';
+  var ch='<h3><span class="n">5</span>我學會了嗎</h3><div class="chk">';
+  S.chk.forEach(function(t){ch+='<div><i></i><span>'+t+'</span></div>';});
+  ch+='</div>';
+  s5.innerHTML=ch;
+  d.appendChild(s5);
+
+  var f=document.createElement('div');f.className='foot';
+  f.innerHTML='<span>老師簽章 <span class="u" style="min-width:90px"></span></span>'+
+              '<span>日期 <span class="u" style="min-width:50px"></span> 月 <span class="u" style="min-width:40px"></span> 日</span>';
+  d.appendChild(f);
+
+  host.appendChild(d);
+  els.push(d);
+
+  var b=document.createElement('button');
+  b.textContent='學習單 '+S.n;
+  b.className='on';
+  b.addEventListener('click',function(){
+    d.classList.toggle('hide');
+    b.classList.toggle('on',!d.classList.contains('hide'));
+  });
+  pick.appendChild(b);
+});
+
+var all=document.createElement('button');
+all.textContent='全選／全不選';all.className='on';
+all.addEventListener('click',function(){
+  var anyHidden=els.some(function(e){return e.classList.contains('hide');});
+  els.forEach(function(e,i){
+    e.classList.toggle('hide',!anyHidden);
+    pick.children[i].classList.toggle('on',anyHidden);
+  });
+});
+pick.appendChild(all);
+
+document.getElementById('print').addEventListener('click',function(){window.print();});
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 1 教師手冊：讓角色動起來</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📗 單元 1 教師手冊 <em>讓角色動起來</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit1_student.html">學生版</a>
+      <a href="unit2_teacher.html">單元2 教師版</a>
+      <a href="unit3_teacher.html">單元3 教師版</a>
+      <a href="unit4_teacher.html">單元4 教師版</a>
+      <a href="unit5_teacher.html">單元5 教師版</a>
+      <a href="unit6_teacher.html">單元6 教師版</a>
+      <a href="unit7_teacher.html">單元7 教師版</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>單元 1 教師手冊</h1>
+    <p>對象：國小中高年級　·　時間：1～2 節（40 分鐘）　·　範圍：動作類 18 塊（核心 9 塊）　·　搭配：<a href="unit1_student.html">學生版實作單</a>、<a href="guide.html">積木圖鑑</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、教學目標</h3>
+    <ul class="tidy" style="font-size:.94rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>認知</b>：說出舞台座標系統的規則（中央為原點、右正上正、範圍 480×360）。</li>
+      <li><b>技能</b>：組合「移動」與「轉動」積木，讓角色依預期路徑移動。</li>
+      <li><b>問題解決</b>：角色行為不如預期時，能從方向、座標兩個面向找出原因。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>二、節次流程（40 分鐘）</h3>
+    <div class="tline"><div class="t">0–8′</div><div><b>座標暖身</b>：打開學生版第 1 段「座標大冒險」，全班一起猜星星的座標。建議先請學生說出「往右是變大還是變小」，再讓他們動手填。<span style="color:var(--ink2)">此活動可直接投影，全班搶答。</span></div></div>
+    <div class="tline"><div class="t">8–18′</div><div><b>認識積木</b>：帶學生玩第 2 段的「試一試」。重點示範<b>移動</b>與<b>右轉</b>的關係：先移動、再右轉 90 度、再移動，讓學生看出「前面」會改變。</div></div>
+    <div class="tline"><div class="t">18–32′</div><div><b>實作</b>：在 Scratch 中完成作品 2「走出正方形」。學生先自己試，卡住再看示範。</div></div>
+    <div class="tline"><div class="t">32–40′</div><div><b>分享與延伸</b>：請完成的學生示範，並提問「改成轉 120 度、重複 3 次會怎樣」，引導發現<b>轉的總角度是 360 度</b>。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、關鍵概念與學生迷思</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:26%">概念</th><th style="width:37%">學生常見迷思</th><th>教學建議</th></tr></thead>
+      <tbody>
+        <tr><td><b>移動的方向</b></td><td>以為「移動 10 點」就是往右走。</td><td>請學生先「右轉 90 度」再「移動」，親眼看到角色往下走。搭配舞台上的<b>藍色方向箭頭</b>最有效。</td></tr>
+        <tr><td><b>角度的定義</b></td><td>用數學課的角度去想（往右是 0 度、逆時針）。</td><td>明說 Scratch 是「<b>往上 0 度、順時針增加</b>」。請學生記四個關鍵值：0 上、90 右、180 下、−90 左。</td></tr>
+        <tr><td><b>y 軸方向</b></td><td>以為往下 y 會變大（受螢幕座標或表格習慣影響）。</td><td>用「爬樓梯」比喻：往上爬數字變大。讓學生實測「y 改變 10」。</td></tr>
+        <tr><td><b>改變 vs 設為</b></td><td>兩塊混用，導致角色不動或瞬移。</td><td>並排執行給學生看：「x 改變 0」不動、「x 設為 0」跳回中央。</td></tr>
+        <tr><td><b>迴轉方式</b></td><td>切成「左-右」後以為方向沒變。</td><td>用方向箭頭證明方向有變，只是外觀不轉。</td></tr>
+        <tr><td><b>反彈積木</b></td><td>只放「碰到邊緣就反彈」，角色卻不動。</td><td>強調它<b>不會移動角色</b>，必須和「移動」一起放在重複裡。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、三個作品的教學提示</h3>
+    <p style="font-size:.93rem;color:var(--ink2);margin:0">學生版的每個作品都附「看示範」按鈕，會在小舞台上逐塊高亮執行，適合在學生卡關時投影講解。</p>
+    <div class="tline"><div class="t">作品 1<br>跟著滑鼠</div><div><b>教學重點</b>：「面朝鼠標向」只轉方向、不移動，一定要再接「移動」。<b>易錯</b>：忘記放進重複無限次，角色只動一次。<b>差異化</b>：可請進階學生把移動步數改小（例如 3），做出更平滑的跟隨。</div></div>
+    <div class="tline"><div class="t">作品 2<br>正方形</div><div><b>教學重點</b>：這是「重複」概念的最佳入口，也是數學外角概念的連結。<b>易錯</b>：轉的角度填成內角 90 以外的值；或忘了先「面朝 90 度」導致起點方向不同。<b>延伸</b>：用「重複 4 次」取代四組積木，體會迴圈的價值。</div></div>
+    <div class="tline"><div class="t">作品 3<br>反彈</div><div><b>教學重點</b>：讓角色持續移動＋邊界判斷，是所有球類遊戲的基礎。<b>易錯</b>：角色倒立（沒設迴轉方式）、卡在牆邊（移動步數太大或沒有反彈）。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>五、差異化與延伸</h3>
+    <ul class="tidy" style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢</b>：只要求完成「移動＋轉彎」讓角色走出 L 形路線即可，正方形留作回家挑戰。</li>
+      <li><b>提早完成</b>：挑戰三角形（120 度）、五角形（72 度），並請他說明為什麼角度要這樣算。</li>
+      <li><b>跨領域</b>：數學的直角座標與外角和；體育的方位指令遊戲（老師說「右轉 90 度」，學生動作）。</li>
+      <li><b>無電腦時</b>：印出座標格線，讓學生用鉛筆走「移動／右轉」的指令路線（不插電活動）。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>六、評量規準</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>座標理解</b></td><td>能正確預測並說明任一座標的位置</td><td>能填出大致正確的座標</td><td>左右上下常混淆</td></tr>
+        <tr><td><b>積木運用</b></td><td>能自行組合出指定路徑並說明原理</td><td>能照著步驟完成作品</td><td>需逐步協助才能完成</td></tr>
+        <tr><td><b>除錯能力</b></td><td>能自行找出方向或座標的錯誤並修正</td><td>經提示後能找到問題</td><td>遇到問題即停住等待協助</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>七、課前準備與提醒</h3>
+    <ul class="tidy" style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li>本教材可離線使用，雙擊 index.html 即可；建議先在教師機開好投影。</li>
+      <li>學生版的小舞台與真實 Scratch 行為一致，但<b>角色不會跑出舞台外</b>（真實 Scratch 允許部分超出），這點若學生提問可直接說明。</li>
+      <li>提醒學生：Scratch 專案要用「檔案 → 儲存到你的電腦」另存，避免下課後作品遺失。</li>
+    </ul>
+  </div>
+
+  <footer>📗 單元 1 教師手冊　·　<a href="unit2_teacher.html">單元 2 教師手冊</a></footer>
+</div>
+</body>
+</html>

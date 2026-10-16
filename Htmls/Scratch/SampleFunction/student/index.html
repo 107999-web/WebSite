@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap"><section class="hero"><h1>🧰 Scratch 函式庫：51 個常用技巧，一塊積木就能用</h1><p>打字機、淡入淡出、抖動、清除分身、倒數計時、洗牌排序、重力跳躍……把 Scratch 作品裡最常寫的技巧做成<b>自訂積木（函式）</b>。每個函式都有說明、和檔案一模一樣的積木圖、可以動手按的試玩台，以及範例 .sb3。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="">8 遊戲機制</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">0　函式是什麼</a><a href="#kinds">　A 型與 B 型</a><a href="#warp">　不重新整理畫面</a><a href="#use">　放進自己的作品</a><a href="#map">🗺️ 函式地圖</a><a href="#cats">📚 8 類函式</a><a href="#dl">⬇ 下載</a><a href="#pits">⚠ 踩過的坑</a><div class="prog">第 0 章自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#3F4A56;color:#fff">第 0 章</span><h2>函式是什麼？</h2></div>
+<p class="lead">在 Scratch 裡，「函式積木」分類的<b>自訂積木</b>就是函式：把一段常用的程式包起來、取一個名字，要用的時候喊它的名字就好。</p>
+<div class="topic"><h3>🧩 函式 ＝ 有名字、有輸入、有輸出的小機器</h3>
+<p>例如 <span class="sb myblocks">淡入 <span class="rp myblocks">秒數</span> 秒</span> 這塊積木，「秒數」是它的<b>輸入</b>（參數）。
+呼叫時寫 <span class="sb myblocks">淡入 <span class="nv">1</span> 秒</span> 就是淡入 1 秒；寫 <span class="nv">3</span> 就是 3 秒。<b>寫一次、用很多次</b>，要改也只要改一個地方。</p>
+<div class="why"><b class="t">Scratch 的自訂積木沒辦法「回傳」答案</b>　所以這個函式庫約定：需要答案的函式，把答案寫進一個變數（<b>輸出變數</b>，大多叫「結果」），呼叫完再去讀它。</div></div>
+
+<div class="topic" id="kinds"><h3>🅰️🅱️ 兩種函式</h3>
+<p>自訂積木有一個限制：<b>只能在定義它的那個角色（或舞台）裡呼叫</b>。所以這 51 個函式分成兩種：</p>
+<div class="two">
+<div class="kindcard A"><h4>A 型｜角色自己用（27 個）</h4><p class="sm">淡入、抖動、打字機、跳躍……<b>動的是角色自己</b>，所以要放在那個角色裡。內部的變數都是「僅適用當前角色」，整個角色可以匯出成 .sprite3 帶到別的作品。</p>
+<div class="flowv"><span class="sb events">當 <span class="dd">空白 <i>▾</i></span> 鍵被按下</span><span class="sb myblocks">淡入 <span class="nv">1</span> 秒</span><span class="sb myblocks">抖動 <span class="nv">6</span> 次 強度 <span class="nv">10</span></span></div></div>
+<div class="kindcard B"><h4>B 型｜舞台服務台（24 個）</h4><p class="sm">數學、清單、計時……<b>只負責計算</b>，放在舞台上。任何角色要用：寫參數 → 廣播並等待 → 讀結果。</p>
+<div class="flowv"><span class="sb variables">變數 <span class="dd">參數1 <i>▾</i></span> 設為 <span class="nv">125</span></span><span class="sb events">廣播訊息 <span class="dd">秒數轉時間 <i>▾</i></span> 並等待</span><span class="sb looks">說出 <span class="rp variables">結果</span></span></div></div>
+</div></div>
+
+<section class="chap" id="warp" style="margin-top:22px"><div class="topic" style="margin-top:0"><h3>⚡ 「執行時不重新整理畫面」要不要勾？</h3>
+<p>建立自訂積木時有一個選項「執行時不重新整理畫面」。勾了，整塊積木會在一瞬間算完才更新畫面。</p></div>
+<div class="lab"><div class="lh">🔬 實驗 0：勾與不勾 <span class="tag">按一下</span></div><div data-lab="0"></div></div></section>
+
+<div class="topic" id="use"><h3>📦 怎麼把函式放進自己的作品？</h3>
+<ol>
+<li><b>最簡單：用「完整函式庫.sb3」當起點</b>　打開它、另存新檔，舞台已經裝好 24 個 B 型函式，「函式小幫手」角色裝好 27 個 A 型函式。把小幫手的造型換成你的角色就能開始做。</li>
+<li><b>匯入角色（.sprite3）</b>　在 Scratch 角色區按「上傳角色」，選 <b>小幫手_…sprite3</b>。A 型函式和它用到的變數會一起進來（用到的「所有角色適用」變數，Scratch 會自動在舞台建立）。</li>
+<li><b>用背包</b>　在範例檔裡把「定義」積木拖進背包，再從背包拖到你的角色。</li>
+<li><b>B 型函式</b>　舞台沒辦法匯出，請從完整函式庫把「定義」和「當收到訊息（函式名稱）」兩段一起用背包帶過去。</li>
+</ol>
+<p class="sm">所有 .sb3 都只用 Scratch 內建積木，<b>不需要擴充功能</b>，官方 Scratch 或 stretch3 都能開。</p></div>
+<div class="chklist"><label><input type="checkbox" id="k0a"> 我知道自訂積木的輸入叫做「參數」</label><label><input type="checkbox" id="k0b"> 我分得出 A 型和 B 型函式</label>
+<label><input type="checkbox" id="k0c"> 我知道動畫函式不勾、計算函式要勾「不重新整理畫面」</label></div>
+</section>
+
+<section class="chap" id="map"><div class="ch"><span class="cn" style="background:#3F4A56;color:#fff">地圖</span><h2>🗺️ 函式地圖（51 個）</h2></div>
+<p class="lead">點任何一個函式，就會跳到它的說明。</p>
+<div class="legend"><span><i style="background:var(--c-myblocks)"></i>A 型｜角色自己用</span><span><i style="background:#2AA89A"></i>B 型｜舞台服務台</span></div>
+<div data-map></div></section>
+
+<section class="chap" id="cats"><div class="ch"><span class="cn" style="background:#3F4A56;color:#fff">分類</span><h2>📚 8 類函式</h2></div>
+<p class="lead">每一類都有：試玩台、每個函式的說明卡與積木圖、範例 .sb3、網頁版、動手改的任務。</p><div class="cats8"><a class="catcard" href="c1.html" style="--mc:#9966FF"><b><i>1</i>文字與對話</b><span>讓角色「說話」的各種方法：一個字一個字打出來、做成旁白字幕、兩個角色輪流對話，還有處理文字的兩個小工具。</span></a><a class="catcard" href="c2.html" style="--mc:#FF6680"><b><i>2</i>出場與退場</b><span>角色怎麼「進場」、怎麼「離場」：淡入淡出、啵一聲跳出來、縮小消失、從天上掉下來、從邊邊滑進來。</span></a><a class="catcard" href="c3.html" style="--mc:#FF8C1A"><b><i>3</i>持續特效</b><span>讓角色「活起來」的小動作：抖一抖、閃一閃、呼吸、搖擺、漂浮，還有播放造型動畫。</span></a><a class="catcard" href="c4.html" style="--mc:#4C97FF"><b><i>4</i>角色管理</b><span>管理舞台上的角色與分身：一鍵重設、一次清掉所有分身、清空舞台、有編號的分身群，以及位置控制。</span></a><a class="catcard" href="c5.html" style="--mc:#0FBD8C"><b><i>5</i>計時與流程</b><span>和「時間」有關的函式：可以跳過的等待、倒數、碼錶、技能冷卻、把秒數變成 mm:ss，以及用一個變數切換畫面。</span></a><a class="catcard" href="c6.html" style="--mc:#59C059"><b><i>6</i>數學小工具</b><span>常用的數學小工具：限制範圍、兩點距離、在不在範圍內、四捨五入到小數第幾位、不重複的隨機數。</span></a><a class="catcard" href="c7.html" style="--mc:#FF661A"><b><i>7</i>清單工具</b><span>處理清單的 7 個函式：洗牌、排序、最大值、加總、平均、把一行文字拆成清單、把清單合成一行文字。</span></a><a class="catcard" href="c8.html" style="--mc:#E8544B"><b><i>8</i>遊戲機制</b><span>做遊戲一定會用到的機制：順暢的左右移動、有重力的跳躍、受傷與無敵時間、無敵閃爍、最高分、無限捲動的背景。</span></a></div></section>
+
+<section class="chap" id="dl"><div class="ch"><span class="cn" style="background:#3F4A56;color:#fff">下載</span><h2>⬇ 下載</h2></div>
+<div class="tablewrap"><table class="rubric dltab"><tr><th>分類</th><th>範例 .sb3</th><th>網頁版</th><th>A 型角色 .sprite3</th></tr><tr><td><b>1 文字與對話</b></td><td><a href="sb3/1_文字與對話.sb3" download>1_文字與對話.sb3</a></td><td><a href="play/1_文字與對話/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/小幫手_1_文字與對話.sprite3" download>小幫手_1_文字與對話.sprite3</a></td></tr><tr><td><b>2 出場與退場</b></td><td><a href="sb3/2_出場與退場.sb3" download>2_出場與退場.sb3</a></td><td><a href="play/2_出場與退場/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/小幫手_2_出場與退場.sprite3" download>小幫手_2_出場與退場.sprite3</a></td></tr><tr><td><b>3 持續特效</b></td><td><a href="sb3/3_持續特效.sb3" download>3_持續特效.sb3</a></td><td><a href="play/3_持續特效/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/小幫手_3_持續特效.sprite3" download>小幫手_3_持續特效.sprite3</a></td></tr><tr><td><b>4 角色管理</b></td><td><a href="sb3/4_角色管理.sb3" download>4_角色管理.sb3</a></td><td><a href="play/4_角色管理/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/小幫手_4_角色管理.sprite3" download>小幫手_4_角色管理.sprite3</a></td></tr><tr><td><b>5 計時與流程</b></td><td><a href="sb3/5_計時與流程.sb3" download>5_計時與流程.sb3</a></td><td><a href="play/5_計時與流程/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/小幫手_5_計時與流程.sprite3" download>小幫手_5_計時與流程.sprite3</a></td></tr><tr><td><b>6 數學小工具</b></td><td><a href="sb3/6_數學小工具.sb3" download>6_數學小工具.sb3</a></td><td><a href="play/6_數學小工具/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td>—（B 型都在舞台）</td></tr><tr><td><b>7 清單工具</b></td><td><a href="sb3/7_清單工具.sb3" download>7_清單工具.sb3</a></td><td><a href="play/7_清單工具/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td>—（B 型都在舞台）</td></tr><tr><td><b>8 遊戲機制</b></td><td><a href="sb3/8_遊戲機制.sb3" download>8_遊戲機制.sb3</a></td><td><a href="play/8_遊戲機制/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/小幫手_8_遊戲機制.sprite3" download>小幫手_8_遊戲機制.sprite3</a></td></tr><tr><td><b>全部</b></td><td><a href="sb3/完整函式庫.sb3" download>完整函式庫.sb3</a></td><td><a href="play/完整函式庫/index.html" target="_blank" rel="noopener">🎮 試玩</a></td><td><a href="sprite3/函式小幫手_全部.sprite3" download>函式小幫手_全部.sprite3</a></td></tr></table></div>
+<p class="sm">網頁版在 <code>play/</code>，直接雙擊就能玩（離線也可以）；<code>play/engine/</code> 要跟著一起複製。</p></section>
+
+<section class="chap" id="pits"><div class="ch"><span class="cn" style="background:#3F4A56;color:#fff">小心</span><h2>⚠ 做這個函式庫時踩過的坑</h2></div>
+<ul class="pitlist">
+<li><b>計時器在按綠旗時會歸零</b>：冷卻的「上次使用」、無敵的「無敵到」都要在綠旗重新設定，不然第一次會用不了（5-6、8-3）。</li>
+<li><b>先把變數設好，再廣播</b>：收到廣播才設生命值的話，別的角色可能先跑、讀到舊的值（8 遊戲機制）。</li>
+<li><b>按鍵的程式還在跑時，再按一次同一個鍵不會重新開始</b>：「說出…持續 0.4 秒」會讓連按變得沒反應，所以冷卻範例改用「說出」。</li>
+<li><b>補零的結果是文字，但「＝」會當數字比</b>：007 ＝ 7 成立（1-5）。</li>
+<li><b>「造型換成 (數字)」是第幾個、「造型換成 (文字)」是名稱</b>：用「換到第 n 個造型」就不會搞混（3-7）。</li>
+<li><b>角色不能整個移出舞台</b>：Scratch 會留一點在舞台上，所以無限捲動用 ±250 而不是 ±480（8-6）。</li>
+<li><b>清單不能當參數</b>：清單函式都處理「工作清單」（7）。</li>
+</ul></section>
+
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 參考：手勢模組教室、貓咪甜點店、Scratch 動畫製作教學、Scratch 積木教室</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

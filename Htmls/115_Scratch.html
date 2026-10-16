@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Scratch 培訓點名系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF7FA; --bg2:#F3FBFF;
+  --card:#FFFFFF; --card2:#FFF9FB;
+  --ink:#5D4037; --ink2:#8D7B74; --ink3:#B5A8A2;
+  --pink:#FF8FAB; --pink-d:#F4708F; --pink-s:#FADADD;
+  --mint:#8FD9B6; --mint-s:#DFF6EA;
+  --sky:#8CC7F0; --sky-s:#E1F1FC;
+  --cream:#FFD98E; --cream-s:#FFF3D6;
+  --purple:#B9A6E5; --purple-s:#EDE7FA;
+  --red:#FF8B8B; --red-s:#FFE2E2;
+  --grey:#CFC6C2; --grey-s:#F1ECEA;
+  --radius:24px; --radius-s:16px; --pill:999px;
+  --shadow:0 8px 20px rgba(255,182,193,.28);
+  --shadow-s:0 4px 10px rgba(184,164,158,.18);
+  --font:'M PLUS Rounded 1c','Nunito','Noto Sans TC','Microsoft JhengHei',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font); color:var(--ink); line-height:1.7;
+  background:var(--bg);
+  background-image:radial-gradient(rgba(255,182,193,.28) 1.6px, transparent 1.7px),
+                   radial-gradient(rgba(174,223,247,.22) 1.6px, transparent 1.7px);
+  background-size:34px 34px, 34px 34px;
+  background-position:0 0, 17px 17px;
+  min-height:100vh; padding-bottom:40px;
+  font-size:16px;
+}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:.5px;}
+button,input,select,textarea{font-family:var(--font);font-size:1rem;color:var(--ink);}
+button{cursor:pointer;}
+.hide{display:none !important;}
+
+/* ---------- App bar ---------- */
+.appbar{
+  position:sticky; top:0; z-index:50;
+  background:linear-gradient(135deg,#FFE3EC 0%,#FFF0F5 45%,#E5F4FF 100%);
+  border-bottom:3px solid #FFFFFF;
+  box-shadow:0 6px 18px rgba(255,182,193,.35);
+  padding:10px 14px 12px;
+}
+.appbar-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:8px;font-size:1.15rem;font-weight:800;}
+.brand .logo{
+  width:38px;height:38px;border-radius:14px;flex:none;
+  background:linear-gradient(135deg,var(--pink),#FFB0C4);
+  display:grid;place-items:center;font-size:1.2rem;
+  box-shadow:0 4px 10px rgba(255,143,171,.45);
+}
+.brand-sub{font-size:.72rem;color:var(--ink2);font-weight:500;line-height:1.2;}
+.spacer{flex:1 1 auto;}
+.clockbox{font-size:.8rem;color:var(--ink2);font-weight:600;text-align:right;line-height:1.35;}
+
+.tabs{display:flex;gap:8px;margin-top:10px;}
+.tab{
+  flex:1; border:3px solid #fff; background:rgba(255,255,255,.65);
+  border-radius:var(--pill); padding:10px 6px; font-weight:800; font-size:.95rem;
+  color:var(--ink2); transition:transform .18s, box-shadow .18s, background .18s;
+  min-height:48px;
+}
+.tab:hover{transform:scale(1.04);}
+.tab.active{background:var(--pink);color:#fff;box-shadow:0 6px 14px rgba(255,143,171,.45);}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px 14px 0;}
+.card{
+  background:var(--card); border:3px solid var(--pink-s); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px; margin-bottom:16px;
+}
+.card.blue{border-color:#D6ECFA;box-shadow:0 8px 20px rgba(140,199,240,.22);}
+.card.mint{border-color:#D3F0E2;box-shadow:0 8px 20px rgba(143,217,182,.22);}
+.card h2{font-size:1.05rem;display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.card h2 .spacer{min-width:10px;}
+.hint{font-size:.82rem;color:var(--ink2);line-height:1.6;}
+.divider{height:2px;background:var(--grey-s);border-radius:2px;margin:14px 0;}
+
+/* ---------- Controls ---------- */
+.btn{
+  border:none;border-radius:var(--pill);padding:11px 20px;font-weight:800;
+  background:var(--pink);color:#fff;box-shadow:0 4px 12px rgba(255,143,171,.4);
+  transition:transform .18s, box-shadow .18s, filter .18s; min-height:44px;
+}
+.btn:hover{transform:scale(1.06);}
+.btn:active{transform:scale(.97);}
+.btn.ghost{background:#fff;color:var(--ink);border:3px solid var(--pink-s);box-shadow:var(--shadow-s);}
+.btn.blue{background:var(--sky);box-shadow:0 4px 12px rgba(140,199,240,.45);}
+.btn.mint{background:var(--mint);box-shadow:0 4px 12px rgba(143,217,182,.45);}
+.btn.cream{background:var(--cream);color:#7A5B1E;box-shadow:0 4px 12px rgba(255,217,142,.5);}
+.btn.grey{background:var(--grey);box-shadow:none;}
+.btn.danger{background:var(--red);box-shadow:0 4px 12px rgba(255,139,139,.45);}
+.btn.sm{padding:7px 14px;font-size:.85rem;min-height:36px;}
+.btn.block{width:100%;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+label.fld{display:block;margin-bottom:12px;}
+label.fld > span{display:block;font-size:.82rem;font-weight:700;color:var(--ink2);margin-bottom:5px;}
+input[type=text],input[type=date],input[type=number],input[type=password],select,textarea{
+  width:100%;padding:11px 14px;border:3px solid var(--pink-s);border-radius:var(--radius-s);
+  background:var(--card2);outline:none;transition:border-color .2s, box-shadow .2s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--pink);box-shadow:0 0 0 4px rgba(255,143,171,.18);}
+textarea{min-height:120px;resize:vertical;line-height:1.6;font-size:.92rem;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 14px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 14px;}
+.inline{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.inline > label.fld{flex:1 1 170px;margin-bottom:12px;}
+
+/* ---------- Chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{
+  border:3px solid var(--pink-s);background:#fff;border-radius:var(--pill);
+  padding:8px 14px;font-size:.85rem;font-weight:700;color:var(--ink2);
+  transition:transform .15s, background .15s, color .15s, border-color .15s;min-height:40px;
+}
+.chip:hover{transform:scale(1.05);}
+.chip.on{background:var(--sky);color:#fff;border-color:var(--sky);}
+.chip.on.pink{background:var(--pink);border-color:var(--pink);}
+.slot-chip{min-width:104px;text-align:center;}
+
+/* ---------- Status ---------- */
+.st{display:inline-block;padding:3px 12px;border-radius:var(--pill);font-size:.78rem;font-weight:800;white-space:nowrap;}
+.st-pending{background:var(--grey-s);color:#8B807B;}
+.st-present{background:var(--mint-s);color:#2E8B62;}
+.st-late{background:var(--cream-s);color:#A8761A;}
+.st-leave{background:var(--sky-s);color:#2A7BB5;}
+.st-absent{background:var(--red-s);color:#C94F4F;}
+.st-skip{background:var(--purple-s);color:#6D5AA8;}
+
+/* ---------- Roll call ---------- */
+.slotbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.statbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.statpill{
+  background:var(--card2);border:3px solid var(--pink-s);border-radius:var(--pill);
+  padding:6px 14px;font-size:.85rem;font-weight:800;
+}
+.statpill b{font-size:1.05rem;margin-left:4px;}
+.stu-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:6px;}
+.stu{
+  background:var(--card2);border:3px solid var(--pink-s);border-radius:var(--radius-s);
+  padding:12px 12px 10px;transition:border-color .2s, box-shadow .2s;
+}
+.stu.done{border-color:var(--mint);box-shadow:0 4px 12px rgba(143,217,182,.25);}
+.stu.warn{border-color:var(--red);box-shadow:0 4px 12px rgba(255,139,139,.22);}
+.stu-head{display:flex;align-items:center;gap:9px;margin-bottom:9px;flex-wrap:wrap;}
+.avatar{
+  width:40px;height:40px;border-radius:14px;flex:none;display:grid;place-items:center;
+  font-weight:800;font-size:1rem;color:#fff;background:var(--pink);
+  box-shadow:0 3px 8px rgba(0,0,0,.08);
+}
+.stu-name{font-weight:800;font-size:1.02rem;line-height:1.2;}
+.stu-meta{font-size:.74rem;color:var(--ink3);font-weight:600;}
+.stbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.stbtn{
+  border:3px solid #EFE7E4;background:#fff;border-radius:14px;padding:9px 2px;
+  font-size:.85rem;font-weight:800;color:var(--ink2);transition:transform .15s,background .15s,color .15s,border-color .15s;
+  min-height:44px;
+}
+.stbtn:hover{transform:scale(1.05);}
+.stbtn.on-present{background:var(--mint);border-color:var(--mint);color:#fff;}
+.stbtn.on-late{background:var(--cream);border-color:var(--cream);color:#7A5B1E;}
+.stbtn.on-leave{background:var(--sky);border-color:var(--sky);color:#fff;}
+.stbtn.on-absent{background:var(--red);border-color:var(--red);color:#fff;}
+.stbtn.on-skip{background:var(--purple);border-color:var(--purple);color:#fff;}
+.stbtn.on-pending{background:var(--grey);border-color:var(--grey);color:#fff;}
+.note-in{margin-top:7px;padding:7px 12px !important;font-size:.82rem;border-width:2px !important;}
+
+/* ---------- Tables ---------- */
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-s);border:3px solid var(--pink-s);background:#fff;}
+table{border-collapse:collapse;width:100%;font-size:.88rem;}
+th,td{padding:9px 11px;text-align:left;white-space:nowrap;}
+thead th{background:var(--pink-s);color:#8A5A69;font-weight:800;position:sticky;top:0;font-size:.82rem;}
+tbody tr:nth-child(even){background:var(--card2);}
+tbody tr:hover{background:#FFF1F6;}
+td.num{text-align:center;font-weight:700;}
+.rate{font-weight:800;}
+.rate.good{color:#2E8B62;} .rate.mid{color:#A8761A;} .rate.bad{color:#C94F4F;}
+
+/* ---------- Banner / toast / modal ---------- */
+.banner{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--cream-s);border:3px solid var(--cream);border-radius:var(--radius-s);
+  padding:11px 14px;margin-bottom:14px;font-size:.88rem;font-weight:700;color:#8A6A24;
+}
+.banner.blue{background:var(--sky-s);border-color:var(--sky);color:#2A6E9E;}
+.empty{text-align:center;padding:34px 14px;color:var(--ink3);font-weight:700;}
+.empty .big{font-size:2.4rem;display:block;margin-bottom:6px;}
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);
+  background:var(--ink);color:#fff;padding:11px 22px;border-radius:var(--pill);
+  font-weight:700;font-size:.9rem;z-index:200;box-shadow:0 8px 20px rgba(0,0,0,.25);
+  transition:transform .3s cubic-bezier(.2,1.3,.5,1), opacity .25s;
+  max-width:88vw;text-align:center;opacity:0;visibility:hidden;pointer-events:none;
+}
+#toast.show{transform:translate(-50%,0);opacity:1;visibility:visible;}
+
+/* ---------- 啟用／停用切換開關 ---------- */
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+.switch .track{
+  width:52px;height:28px;flex:none;border-radius:var(--pill);background:var(--grey);
+  border:3px solid #fff;box-shadow:0 2px 6px rgba(184,164,158,.35) inset;
+  position:relative;transition:background .22s;
+}
+.switch .track.on{background:var(--mint);box-shadow:0 2px 6px rgba(143,217,182,.4) inset;}
+.switch .knob{
+  position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.22);transition:left .22s;
+}
+.switch .track.on .knob{left:26px;}
+.switch .txt{font-size:.8rem;font-weight:800;color:#8B807B;}
+.switch .txt.on{color:#2E8B62;}
+tr.off td{opacity:.5;}
+
+/* ---------- 維護模式頂部列 ---------- */
+.admin-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--sky-s);border:3px solid var(--sky);border-radius:var(--radius-s);
+  padding:10px 14px;margin-bottom:14px;
+}
+.admin-bar .state{font-size:.86rem;font-weight:800;color:#2A6E9E;}
+
+/* ---------- 精簡點名卡片 ---------- */
+.stu-list.mini{grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:9px;}
+.stu-mini{
+  display:flex;align-items:center;gap:9px;background:var(--card2);
+  border:3px solid var(--pink-s);border-radius:16px;padding:8px 10px;cursor:pointer;
+  transition:transform .16s, border-color .18s, background .18s;min-height:56px;
+}
+.stu-mini:hover{transform:scale(1.05);}
+.stu-mini:active{transform:scale(.97);}
+.stu-mini .avatar{width:34px;height:34px;border-radius:12px;font-size:.9rem;}
+.mini-body{min-width:0;flex:1;}
+.mini-name{font-weight:800;font-size:.95rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini-sub{font-size:.7rem;color:var(--ink3);font-weight:700;line-height:1.3;}
+.stu-mini.s-present{border-color:var(--mint);background:var(--mint-s);}
+.stu-mini.s-late{border-color:var(--cream);background:var(--cream-s);}
+.stu-mini.s-leave{border-color:var(--sky);background:var(--sky-s);}
+.stu-mini.s-absent{border-color:var(--red);background:var(--red-s);}
+.stu-mini.s-skip{border-color:var(--purple);background:var(--purple-s);}
+.stu-mini .tick{font-size:1.1rem;flex:none;}
+
+/* 其他學生（未排此時段） */
+.rc-body{display:block;}
+.group-title{
+  margin:16px 0 9px;font-size:.86rem;font-weight:800;color:var(--ink2);
+  padding-top:12px;border-top:2px dashed var(--pink-s);
+}
+.stu-mini.extra,.stu.extra{opacity:.72;border-style:dashed;}
+.stu-mini.extra:not(.s-skip),.stu.extra:not(.s-skip){opacity:1;border-style:solid;box-shadow:0 4px 12px rgba(185,166,229,.3);}
+
+/* 點名彈窗 */
+.rc-modal-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.rc-modal-head .avatar{width:54px;height:54px;border-radius:18px;font-size:1.3rem;}
+.rc-modal-name{font-size:1.3rem;font-weight:800;line-height:1.3;}
+.rc-modal-meta{font-size:.8rem;color:var(--ink3);font-weight:700;}
+.rc-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.rc-btns .stbtn{padding:16px 4px;font-size:1rem;border-radius:16px;min-height:60px;}
+@media (max-width:420px){ .rc-btns{grid-template-columns:repeat(2,1fr);} }
+tr.off td:last-child,tr.off td:nth-last-child(2){opacity:1;}
+.modal-bg{
+  position:fixed;inset:0;background:rgba(93,64,55,.4);backdrop-filter:blur(3px);
+  z-index:150;display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.modal{
+  background:var(--card);border:3px solid var(--pink-s);border-radius:var(--radius);
+  box-shadow:0 16px 40px rgba(0,0,0,.22);padding:20px;width:100%;max-width:520px;
+  max-height:88vh;overflow-y:auto;animation:pop .26s cubic-bezier(.2,1.3,.5,1);
+}
+@keyframes pop{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.bouncy{animation:bounce 1.6s ease-in-out infinite;}
+
+/* ---------- Sub tabs ---------- */
+.subtabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.subtab{
+  border:3px solid var(--pink-s);background:#fff;border-radius:var(--pill);
+  padding:8px 15px;font-weight:800;font-size:.87rem;color:var(--ink2);transition:.18s;min-height:42px;
+}
+.subtab:hover{transform:scale(1.05);}
+.subtab.active{background:var(--sky);color:#fff;border-color:var(--sky);}
+
+.lock-box{max-width:360px;margin:40px auto;text-align:center;}
+.lock-box .big{font-size:3rem;display:block;margin-bottom:8px;}
+
+/* ---------- Responsive ---------- */
+@media (max-width:640px){
+  body{font-size:15px;}
+  .wrap{padding:12px 10px 0;}
+  .card{padding:14px;border-radius:20px;}
+  .stu-list{grid-template-columns:1fr;}
+  .tab{font-size:.86rem;padding:9px 4px;}
+  .brand{font-size:1rem;}
+  .clockbox{font-size:.72rem;}
+}
+@media (min-width:900px){
+  .stu-list{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}
+}
+@media print{
+  .appbar,.tabs,.subtabs,.btn,.banner,#toast{display:none !important;}
+  body{background:#fff;} .card{box-shadow:none;border-color:#ccc;}
+}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-top">
+    <div class="brand">
+      <div class="logo bouncy">🎀</div>
+      <div>
+        <div id="appTitle">Scratch 培訓點名系統</div>
+        <div class="brand-sub" id="appSub">程式競賽培訓 · 出席管理</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="clockbox"><div id="clockDate">--</div><div id="clockTime">--:--</div></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="attend" onclick="switchView('attend')">📋 點名模式</button>
+    <button class="tab" data-view="query" onclick="switchView('query')">🔍 查詢模式</button>
+    <button class="tab" data-view="admin" onclick="switchView('admin')">🛠️ 維護模式</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div id="backupBanner" class="banner hide">
+    <span>🍬</span><span id="backupMsg"></span>
+    <span class="spacer"></span>
+    <button class="btn cream sm" onclick="exportJSON()">立即備份</button>
+    <button class="btn ghost sm" onclick="snoozeBackup()">稍後提醒</button>
+  </div>
+
+  <!-- ============ 點名模式 ============ -->
+  <section id="view-attend">
+    <div class="card">
+      <h2>🗓️ 選擇點名場次</h2>
+      <div class="inline">
+        <label class="fld" style="flex:1 1 190px;">
+          <span>點名日期</span>
+          <input type="date" id="rcDate" onchange="onDateChange()">
+        </label>
+        <div style="flex:0 0 auto;margin-bottom:12px;">
+          <div class="btn-row">
+            <button class="btn ghost sm" onclick="shiftDate(-1)">◀ 前一天</button>
+            <button class="btn ghost sm" onclick="setToday()">今天</button>
+            <button class="btn ghost sm" onclick="shiftDate(1)">後一天 ▶</button>
+          </div>
+        </div>
+      </div>
+      <div class="hint" id="rcDayInfo"></div>
+      <div class="slotbar" id="rcSlotBar"></div>
+    </div>
+
+    <div class="card mint" id="rcPanel">
+      <h2><span id="rcPanelTitle">👋 應到學生</span><span class="spacer"></span>
+        <button class="btn ghost sm" id="btnExtra" onclick="toggleExtra()">👥 其他學生：顯示中</button>
+        <button class="btn ghost sm" id="btnViewMode" onclick="toggleCompact()">🔳 精簡卡片</button>
+        <button class="btn mint sm" onclick="bulkSet('present')">全部出席</button>
+        <button class="btn ghost sm" onclick="bulkSet('pending')">全部重設</button>
+      </h2>
+      <div class="statbar" id="rcStats"></div>
+      <div class="divider"></div>
+      <div class="stu-list" id="rcList"></div>
+    </div>
+  </section>
+
+  <!-- ============ 查詢模式 ============ -->
+  <section id="view-query" class="hide">
+    <div class="subtabs">
+      <button class="subtab active" data-q="personal" onclick="switchQuery('personal')">👤 個人出席統計</button>
+      <button class="subtab" data-q="daily" onclick="switchQuery('daily')">📅 單日／單時段總覽</button>
+      <button class="subtab" data-q="range" onclick="switchQuery('range')">📊 期間彙總表</button>
+      <button class="subtab" data-q="alert" onclick="switchQuery('alert')">🚨 異常名單</button>
+    </div>
+
+    <div class="card blue" id="q-personal">
+      <h2>👤 個人出席統計</h2>
+      <div class="grid3">
+        <label class="fld"><span>起始日期</span><input type="date" id="qpFrom" onchange="renderPersonal()"></label>
+        <label class="fld"><span>結束日期</span><input type="date" id="qpTo" onchange="renderPersonal()"></label>
+        <label class="fld"><span>班級篩選</span><select id="qpClass" onchange="renderPersonal()"></select></label>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px;">
+        <button class="btn blue sm" onclick="renderPersonal()">重新統計</button>
+        <button class="btn ghost sm" onclick="exportCSV('personal')">匯出 CSV</button>
+        <button class="btn ghost sm" onclick="window.print()">列印</button>
+      </div>
+      <div class="hint" style="margin-bottom:8px;">出席率 =（出席 + 遲到）÷ 應到場次；「不出席」不列入應到場次計算。</div>
+      <div class="tbl-wrap"><table id="qpTable"></table></div>
+    </div>
+
+    <div class="card blue hide" id="q-daily">
+      <h2>📅 單日／單時段總覽</h2>
+      <div class="grid2">
+        <label class="fld"><span>日期</span><input type="date" id="qdDate" onchange="renderDaily()"></label>
+        <label class="fld"><span>時段</span><select id="qdSlot" onchange="renderDaily()"></select></label>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px;">
+        <button class="btn blue sm" onclick="renderDaily()">查詢</button>
+        <button class="btn ghost sm" onclick="exportCSV('daily')">匯出 CSV</button>
+      </div>
+      <div class="statbar" id="qdStats"></div>
+      <div class="divider"></div>
+      <div class="tbl-wrap"><table id="qdTable"></table></div>
+    </div>
+
+    <div class="card blue hide" id="q-range">
+      <h2>📊 期間彙總表（學生 × 場次）</h2>
+      <div class="grid3">
+        <label class="fld"><span>起始日期</span><input type="date" id="qrFrom" onchange="renderRange()"></label>
+        <label class="fld"><span>結束日期</span><input type="date" id="qrTo" onchange="renderRange()"></label>
+        <label class="fld"><span>班級篩選</span><select id="qrClass" onchange="renderRange()"></select></label>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px;">
+        <button class="btn blue sm" onclick="renderRange()">產生表格</button>
+        <button class="btn ghost sm" onclick="exportCSV('range')">匯出 CSV</button>
+        <button class="btn ghost sm" onclick="window.print()">列印</button>
+      </div>
+      <div class="hint" style="margin-bottom:8px;">代號：<span class="st st-present">出</span> <span class="st st-late">遲</span> <span class="st st-leave">假</span> <span class="st st-absent">缺</span> <span class="st st-skip">免</span> <span class="st st-pending">·</span></div>
+      <div class="tbl-wrap"><table id="qrTable"></table></div>
+    </div>
+
+    <div class="card blue hide" id="q-alert">
+      <h2>🚨 異常名單</h2>
+      <div class="grid3">
+        <label class="fld"><span>起始日期</span><input type="date" id="qaFrom" onchange="renderAlert()"></label>
+        <label class="fld"><span>結束日期</span><input type="date" id="qaTo" onchange="renderAlert()"></label>
+        <label class="fld"><span>累計缺席達幾次即列入</span><input type="number" id="qaAbs" value="3" min="1" onchange="renderAlert()"></label>
+        <label class="fld"><span>連續缺席達幾次即列入</span><input type="number" id="qaSeq" value="2" min="1" onchange="renderAlert()"></label>
+        <label class="fld"><span>出席率低於（%）即列入</span><input type="number" id="qaRate" value="70" min="0" max="100" onchange="renderAlert()"></label>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px;">
+        <button class="btn blue sm" onclick="renderAlert()">重新檢查</button>
+        <button class="btn ghost sm" onclick="exportCSV('alert')">匯出 CSV</button>
+      </div>
+      <div class="tbl-wrap"><table id="qaTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ============ 維護模式 ============ -->
+  <section id="view-admin" class="hide">
+    <div id="adminLock" class="card">
+      <div class="lock-box">
+        <span class="big bouncy">🔒</span>
+        <h2 style="justify-content:center;">維護模式已鎖定</h2>
+        <p class="hint">請輸入管理密碼以進入設定。</p>
+        <label class="fld"><input type="password" id="pinInput" inputmode="numeric" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')tryUnlock()"></label>
+        <button class="btn block" onclick="tryUnlock()">解鎖</button>
+      </div>
+    </div>
+
+    <div id="adminBody" class="hide">
+      <div class="admin-bar">
+        <span class="state" id="adminLockState">🛠️ 維護模式</span>
+        <span class="spacer"></span>
+        <button class="btn ghost sm" id="btnLockNow" onclick="lockNow()">🔒 立即鎖定</button>
+        <button class="btn cream sm" onclick="exitAdmin()">🚪 離開維護模式</button>
+      </div>
+      <div class="subtabs">
+        <button class="subtab active" data-a="students" onclick="switchAdmin('students')">🧑‍🎓 學生名單</button>
+        <button class="subtab" data-a="slots" onclick="switchAdmin('slots')">⏰ 培訓時段</button>
+        <button class="subtab" data-a="data" onclick="switchAdmin('data')">💾 資料備份</button>
+        <button class="subtab" data-a="sys" onclick="switchAdmin('sys')">⚙️ 系統設定</button>
+      </div>
+
+      <!-- 學生名單 -->
+      <div id="a-students">
+        <div class="card">
+          <h2>➕ 新增／編輯學生<span class="spacer"></span><span class="hint" id="stuEditHint"></span></h2>
+          <div class="grid2">
+            <label class="fld"><span>班級</span><input type="text" id="fClass" placeholder="例：601"></label>
+            <label class="fld"><span>座號</span><input type="text" id="fSeat" placeholder="例：05"></label>
+            <label class="fld"><span>姓名</span><input type="text" id="fName" placeholder="例：王小明"></label>
+            <label class="fld"><span>學號</span><input type="text" id="fSid" placeholder="例：1100123"></label>
+          </div>
+          <label class="fld"><span>可出席時段（預設全選，請依調查表取消不來的時段）</span></label>
+          <div class="chips" id="fSlots"></div>
+          <div class="btn-row" style="margin-top:6px;">
+            <button class="btn ghost sm" onclick="setAllSlots(true)">全選</button>
+            <button class="btn ghost sm" onclick="setAllSlots(false)">全部取消</button>
+          </div>
+          <div class="grid2" style="margin-top:12px;">
+            <label class="fld"><span>備註</span><input type="text" id="fNote" placeholder="選填"></label>
+            <label class="fld"><span>狀態</span>
+              <select id="fActive"><option value="1">啟用（列入點名）</option><option value="0">停用（暫不列入點名，資料保留）</option></select>
+            </label>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btnSaveStu" onclick="saveStudent()">💾 儲存學生</button>
+            <button class="btn grey" onclick="clearStudentForm()">取消／清空</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📋 學生名單<span class="spacer"></span><span class="hint" id="stuCount"></span></h2>
+          <div class="inline">
+            <label class="fld" style="flex:2 1 200px;"><span>搜尋（姓名／學號／班級）</span><input type="text" id="stuSearch" oninput="renderStudents()" placeholder="輸入關鍵字"></label>
+            <label class="fld" style="flex:1 1 140px;"><span>時段篩選</span><select id="stuSlotFilter" onchange="renderStudents()"></select></label>
+            <label class="fld" style="flex:1 1 120px;"><span>狀態篩選</span>
+              <select id="stuStateFilter" onchange="renderStudents()">
+                <option value="">全部</option><option value="on">僅啟用</option><option value="off">僅停用</option>
+              </select></label>
+          </div>
+          <div class="tbl-wrap"><table id="stuTable"></table></div>
+        </div>
+
+        <div class="card">
+          <h2>📥 批次貼上匯入名單</h2>
+          <p class="hint">每行一位學生，欄位以逗號、Tab 或空白分隔：<br>
+            <b>班級, 座號, 姓名, 學號</b>（第 5 欄可選填時段代碼，以 <b>|</b> 分隔）<br>
+            範例：<code>601,05,王小明,1100123</code>　或　<code>601,05,王小明,1100123,d1_am|d3_am|d1_pm</code><br>
+            時段代碼：<b>d1~d5</b> 代表週一至週五，<b>_am</b> 為早自習、<b>_pm</b> 為午休（如 <code>d3_am</code> = 週三早自習）。<br>
+            <b>未填第 5 欄時，該生會預設載入全部 9 個時段</b>，再由老師到名單中個別關閉不來的時段即可。<br>
+            學號相同者視為同一人，會更新原有資料而不重複新增。</p>
+          <textarea id="bulkText" placeholder="601,05,王小明,1100123&#10;601,12,李小美,1100130"></textarea>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn mint" onclick="bulkImport()">✨ 匯入名單</button>
+            <button class="btn ghost" onclick="document.getElementById('bulkText').value=''">清空</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 時段 -->
+      <div id="a-slots" class="hide">
+        <div class="card">
+          <h2>⏰ 培訓時段設定</h2>
+          <p class="hint">預設為週一至週五早自習（5 次）＋ 週一、二、四、五午休（4 次），共 <b>9 個時段</b>；週三為半天故無午休。可修改名稱與時間，或停用不需要的時段。</p>
+          <div class="tbl-wrap" style="margin-top:10px;"><table id="slotTable"></table></div>
+          <div class="btn-row" style="margin-top:12px;">
+            <button class="btn" onclick="saveSlots()">💾 儲存時段設定</button>
+            <button class="btn ghost" onclick="resetSlots()">↩️ 還原預設</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 資料 -->
+      <div id="a-data" class="hide">
+        <div class="card mint">
+          <h2>💾 匯出備份</h2>
+          <p class="hint">JSON 為完整備份（含學生、時段、所有點名紀錄與設定），可於另一台平板匯入接續使用；CSV 供 Excel 檢視與列印。</p>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn mint" onclick="exportJSON()">📦 匯出 JSON 完整備份</button>
+            <button class="btn ghost" onclick="exportCSV('records')">📄 匯出 CSV 點名紀錄</button>
+            <button class="btn ghost" onclick="exportCSV('students')">📄 匯出 CSV 學生名單</button>
+          </div>
+          <div class="hint" id="backupInfo" style="margin-top:10px;"></div>
+        </div>
+        <div class="card blue">
+          <h2>📤 匯入還原</h2>
+          <p class="hint">選擇先前匯出的 JSON 備份檔。<b>合併</b>會保留現有資料並以備份檔內容更新同一筆紀錄；<b>覆蓋</b>會清空目前所有資料。</p>
+          <label class="fld" style="margin-top:10px;"><span>匯入方式</span>
+            <select id="importMode">
+              <option value="merge">合併（建議：保留現有資料）</option>
+              <option value="replace">覆蓋（清空後完整還原）</option>
+            </select>
+          </label>
+          <input type="file" id="fileInput" accept=".json,application/json" style="display:none" onchange="importJSON(event)">
+          <div class="btn-row">
+            <button class="btn blue" onclick="document.getElementById('fileInput').click()">📂 選擇備份檔並匯入</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>🧹 資料清除</h2>
+          <div class="btn-row">
+            <button class="btn ghost" onclick="clearRecordsOnly()">清除所有點名紀錄（保留名單）</button>
+            <button class="btn danger" onclick="clearAll()">⚠️ 清除全部資料</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系統 -->
+      <div id="a-sys" class="hide">
+        <div class="card">
+          <h2>⚙️ 系統設定</h2>
+          <label class="fld"><span>系統名稱</span><input type="text" id="sTitle"></label>
+          <label class="fld"><span>副標題</span><input type="text" id="sSub"></label>
+          <div class="grid2">
+            <label class="fld"><span>培訓起始日</span><input type="date" id="sStart"></label>
+            <label class="fld"><span>培訓結束日</span><input type="date" id="sEnd"></label>
+          </div>
+          <div class="divider"></div>
+          <label class="fld"><span>維護模式密碼保護</span>
+            <select id="sLockOn"><option value="0">關閉（任何人可進入維護模式）</option><option value="1">開啟（需輸入密碼）</option></select>
+          </label>
+          <label class="fld"><span>管理密碼（開啟保護時使用）</span><input type="text" id="sPin" placeholder="例：1234"></label>
+          <p class="hint">開啟後，只要按上方的 <b>🚪 離開維護模式</b>、切換到點名／查詢模式，或重新開啟頁面，
+          維護模式就會自動上鎖，再次進入需輸入密碼；若想留在原畫面直接鎖定，可按 <b>🔒 立即鎖定</b>。
+          忘記密碼時，可清除瀏覽器資料重設（資料會一併清空，請先備份）。</p>
+          <div class="divider"></div>
+          <label class="fld"><span>備份提醒間隔（天）</span><input type="number" id="sBackupDays" min="1" max="60"></label>
+          <div class="btn-row">
+            <button class="btn" onclick="saveSettings()">💾 儲存設定</button>
+          </div>
+        </div>
+        <div class="card blue">
+          <h2>ℹ️ 使用說明</h2>
+          <p class="hint">
+            1. 先於「學生名單」建立學生，並依調查表勾選其可出席時段。<br>
+            2.「點名模式」選日期後，系統會自動列出當日可用時段（週三僅早自習）；點選時段即出現該時段應到學生。<br>
+            3. 每次點選狀態會<b>立即自動儲存</b>於本平板瀏覽器，不需另按儲存。<br>
+            4. 更換平板或重灌前，請於「資料備份」匯出 JSON，於新裝置匯入即可接續使用。<br>
+            5. 資料存放於瀏覽器 localStorage，請避免清除瀏覽器資料；建議每週匯出一次備份。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<div id="modalHost"></div>
+
+<script>
+/* =====================================================================
+   Scratch 培訓點名系統  —  資料層
+   ===================================================================== */
+const LS_KEY = 'scratch_rollcall_v1';
+const DAY_NAMES = ['日','一','二','三','四','五','六'];
+
+const STATUS = {
+  pending:{label:'未點名', short:'·', cls:'st-pending', btn:'on-pending'},
+  present:{label:'出席',   short:'出', cls:'st-present', btn:'on-present'},
+  late:   {label:'遲到',   short:'遲', cls:'st-late',    btn:'on-late'},
+  leave:  {label:'請假',   short:'假', cls:'st-leave',   btn:'on-leave'},
+  absent: {label:'缺席',   short:'缺', cls:'st-absent',  btn:'on-absent'},
+  skip:   {label:'不出席', short:'免', cls:'st-skip',    btn:'on-skip'}
+};
+const STATUS_ORDER = ['present','late','leave','absent','skip','pending'];
+
+function sortSlots(arr){
+  return arr.sort((a,b) => (a.day - b.day) || ((a.period === 'am' ? 0 : 1) - (b.period === 'am' ? 0 : 1)));
+}
+function defaultSlots(){
+  const s = [];
+  for(let d = 1; d <= 5; d++){
+    s.push({id:'d'+d+'_am', day:d, period:'am', name:'週'+DAY_NAMES[d]+' 早自習', time:'08:00-08:35', on:true});
+    if(d !== 3) s.push({id:'d'+d+'_pm', day:d, period:'pm', name:'週'+DAY_NAMES[d]+' 午休', time:'12:40-13:15', on:true});
+  }
+  return sortSlots(s);
+}
+
+function defaultDB(){
+  const y = new Date();
+  return {
+    v: 1,
+    settings:{
+      title:'Scratch 培訓點名系統',
+      sub:'程式競賽培訓 · 出席管理',
+      start: iso(y),
+      end: iso(new Date(y.getFullYear(), y.getMonth()+5, y.getDate())),
+      compact: true,
+      showExtra: true,
+      lockOn: 0,
+      pin: '1234',
+      backupDays: 7
+    },
+    slots: defaultSlots(),
+    students: [],
+    records: {},          // records[date][slotId][studentId] = {s,t,n}
+    meta:{ lastBackup:null, snoozeUntil:null, changes:0 }
+  };
+}
+
+let DB = defaultDB();
+
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      DB = Object.assign(defaultDB(), o);
+      DB.settings = Object.assign(defaultDB().settings, o.settings || {});
+      DB.meta = Object.assign({lastBackup:null, snoozeUntil:null, changes:0}, o.meta || {});
+      if(!Array.isArray(DB.slots) || !DB.slots.length) DB.slots = defaultSlots();
+      // 舊版預設時間自動更新為新版預設值
+      DB.slots.forEach(sl => {
+        if(sl.time === '07:50-08:20') sl.time = '08:00-08:35';
+        if(sl.time === '12:40-13:10') sl.time = '12:40-13:15';
+      });
+      sortSlots(DB.slots);   // 一律以「星期 → 早自習/午休」排序
+      if(!Array.isArray(DB.students)) DB.students = [];
+      if(!DB.records || typeof DB.records !== 'object') DB.records = {};
+    }
+  }catch(e){
+    console.error('讀取資料失敗', e);
+    toast('⚠️ 讀取本機資料失敗，已使用空白資料');
+  }
+}
+function saveDB(countChange){
+  try{
+    if(countChange) DB.meta.changes = (DB.meta.changes||0) + 1;
+    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+    return true;
+  }catch(e){
+    console.error(e);
+    toast('⚠️ 儲存失敗！請確認瀏覽器可用空間');
+    return false;
+  }
+}
+
+/* ---------- 小工具 ---------- */
+function $(id){ return document.getElementById(id); }
+function iso(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function parseISO(s){ const p = String(s).split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(){ return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function slotById(id){ return DB.slots.find(s => s.id === id); }
+function activeSlots(){ return DB.slots.filter(s => s.on !== false); }
+function slotsOfDay(day){ return activeSlots().filter(s => s.day === day); }
+
+let toastTimer = null;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function sortStudents(list){
+  return list.slice().sort((a,b) => {
+    const c = String(a.cls).localeCompare(String(b.cls), 'zh-Hant', {numeric:true});
+    if(c) return c;
+    const s = String(a.seat).localeCompare(String(b.seat), 'zh-Hant', {numeric:true});
+    if(s) return s;
+    return String(a.name).localeCompare(String(b.name), 'zh-Hant');
+  });
+}
+function studentById(id){ return DB.students.find(s => s.id === id); }
+
+/* 取得某日期某時段的紀錄物件（不建立） */
+function getRec(date, slotId, stuId){
+  const d = DB.records[date]; if(!d) return null;
+  const s = d[slotId]; if(!s) return null;
+  return s[stuId] || null;
+}
+function setRec(date, slotId, stuId, status, note){
+  if(!DB.records[date]) DB.records[date] = {};
+  if(!DB.records[date][slotId]) DB.records[date][slotId] = {};
+  const cur = DB.records[date][slotId][stuId] || {};
+  const def = defaultStatusOf(stuId, slotId);
+  if((status === def || (status == null && (cur.s || def) === def)) && !note){
+    delete DB.records[date][slotId][stuId];
+  }else{
+    DB.records[date][slotId][stuId] = {
+      s: status != null ? status : (cur.s || 'pending'),
+      t: new Date().toTimeString().slice(0,5),
+      n: note != null ? note : (cur.n || '')
+    };
+  }
+  if(DB.records[date][slotId] && !Object.keys(DB.records[date][slotId]).length) delete DB.records[date][slotId];
+  if(DB.records[date] && !Object.keys(DB.records[date]).length) delete DB.records[date];
+  saveDB(true);
+}
+/* 未排此時段的學生，預設狀態為「不出席」 */
+function defaultStatusOf(stuId, slotId){
+  const s = studentById(stuId);
+  return (s && shouldAttend(s, slotId)) ? 'pending' : 'skip';
+}
+function statusOf(date, slotId, stuId){
+  const r = getRec(date, slotId, stuId);
+  return r ? (r.s || 'pending') : defaultStatusOf(stuId, slotId);
+}
+function hasRec(date, slotId, stuId){ return !!getRec(date, slotId, stuId); }
+/* 該生是否於此時段應到 */
+function shouldAttend(stu, slotId){
+  return Array.isArray(stu.slots) && stu.slots.indexOf(slotId) >= 0;
+}
+function studentsForSlot(slotId){
+  return sortStudents(DB.students.filter(s => s.active !== false && shouldAttend(s, slotId)));
+}
+/* 該時段完整名冊：main = 應到、extra = 未排此時段（預設不出席，可臨時改狀態） */
+function rosterForSlot(slotId){
+  const all = DB.students.filter(s => s.active !== false);
+  const main = sortStudents(all.filter(s => shouldAttend(s, slotId)));
+  const extra = sortStudents(all.filter(s => !shouldAttend(s, slotId)));
+  return {main:main, extra:extra, all:main.concat(extra)};
+}
+function showExtra(){ return DB.settings.showExtra !== false; }
+
+/* 日期區間內的所有 (date, slotId) 場次 */
+function sessionsInRange(from, to){
+  const out = [];
+  if(!from || !to) return out;
+  const a = parseISO(from), b = parseISO(to);
+  if(isNaN(a) || isNaN(b) || a > b) return out;
+  for(let d = new Date(a); d <= b; d.setDate(d.getDate()+1)){
+    const day = d.getDay();
+    slotsOfDay(day).forEach(s => out.push({date: iso(d), slotId: s.id, slot: s}));
+  }
+  return out;
+}
+
+/* =====================================================================
+   介面切換 / 時鐘
+   ===================================================================== */
+let curView = 'attend';
+function switchView(v){
+  // 離開維護模式時自動上鎖，下次進入需重新輸入密碼
+  if(curView === 'admin' && v !== 'admin' && String(DB.settings.lockOn) === '1') adminUnlocked = false;
+  curView = v;
+  ['attend','query','admin'].forEach(k => {
+    $('view-' + k).classList.toggle('hide', k !== v);
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(v === 'admin') enterAdmin();
+  if(v === 'query') refreshQuery();
+  if(v === 'attend') renderRollcall();
+}
+
+function tickClock(){
+  const n = new Date();
+  $('clockDate').textContent = n.getFullYear() + '/' + String(n.getMonth()+1).padStart(2,'0') + '/' + String(n.getDate()).padStart(2,'0') + '（' + DAY_NAMES[n.getDay()] + '）';
+  $('clockTime').textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+}
+
+/* =====================================================================
+   點名模式
+   ===================================================================== */
+let rcDate = iso(new Date());
+let rcSlot = null;
+
+function setToday(){ rcDate = iso(new Date()); $('rcDate').value = rcDate; rcSlot = null; renderRollcall(); }
+function shiftDate(n){
+  const d = parseISO(rcDate); d.setDate(d.getDate() + n);
+  rcDate = iso(d); $('rcDate').value = rcDate; rcSlot = null; renderRollcall();
+}
+function onDateChange(){
+  const v = $('rcDate').value;
+  if(!v) return;
+  rcDate = v; rcSlot = null; renderRollcall();
+}
+
+function renderRollcall(){
+  $('rcDate').value = rcDate;
+  const day = parseISO(rcDate).getDay();
+  const slots = slotsOfDay(day);
+  const info = $('rcDayInfo');
+
+  if(!slots.length){
+    info.innerHTML = '📅 <b>' + rcDate + '（週' + DAY_NAMES[day] + '）</b> 沒有安排培訓時段。';
+    $('rcSlotBar').innerHTML = '';
+    $('rcPanel').classList.add('hide');
+    return;
+  }
+  $('rcPanel').classList.remove('hide');
+  const noon = slots.some(s => s.period === 'pm');
+  info.innerHTML = '📅 <b>' + rcDate + '（週' + DAY_NAMES[day] + '）</b> 共 ' + slots.length + ' 個時段' +
+    (day === 3 && !noon ? '　<span class="st st-leave">週三半天，無午休</span>' : '');
+
+  if(!rcSlot || !slots.some(s => s.id === rcSlot)) rcSlot = slots[0].id;
+
+  $('rcSlotBar').innerHTML = slots.map(s => {
+    const total = studentsForSlot(s.id).length;
+    const done = countDone(rcDate, s.id);
+    return '<button class="chip pink ' + (s.id === rcSlot ? 'on' : '') + '" onclick="pickSlot(\'' + s.id + '\')">' +
+      esc(s.name) + '　' + done + '/' + total + '</button>';
+  }).join('');
+
+  const slot = slotById(rcSlot);
+  $('rcPanelTitle').innerHTML = '👋 ' + esc(slot.name) + '　<span class="hint">' + esc(slot.time || '') + '</span>';
+  renderRcList();
+}
+function pickSlot(id){ rcSlot = id; renderRollcall(); }
+
+function countDone(date, slotId){
+  const list = studentsForSlot(slotId);
+  return list.filter(s => statusOf(date, slotId, s.id) !== 'pending').length;
+}
+
+function isCompact(){ return DB.settings.compact !== false; }
+function toggleCompact(){
+  DB.settings.compact = !isCompact();
+  saveDB(false); renderRollcall();
+  toast(isCompact() ? '🔳 已切換為精簡卡片' : '📋 已切換為詳細卡片');
+}
+
+function stuCardHTML(stu, idx, compact, isExtra){
+  const st = statusOf(rcDate, rcSlot, stu.id);
+  const rec = getRec(rcDate, rcSlot, stu.id);
+  if(compact){
+    return '<div class="stu-mini s-' + st + (isExtra ? ' extra' : '') + '" onclick="openStuModal(' + idx + ')" title="點一下選擇狀態">' +
+      avatarHTML(stu.name) +
+      '<div class="mini-body">' +
+        '<div class="mini-name">' + esc(pureName(stu.name) || stu.name) + '</div>' +
+        '<div class="mini-sub">' + esc(stu.cls) + '-' + esc(stu.seat) + '　<span class="st ' + STATUS[st].cls + '">' + STATUS[st].label + '</span></div>' +
+      '</div>' +
+      (rec && rec.n ? '<span class="tick" title="' + esc(rec.n) + '">📝</span>' : '') +
+    '</div>';
+  }
+  const cls = st === 'pending' ? '' : (st === 'absent' ? 'warn' : (st === 'skip' ? '' : 'done'));
+  const btns = ['present','late','leave','absent','skip','pending'].map(k =>
+    '<button class="stbtn ' + (st === k ? STATUS[k].btn : '') + '" onclick="mark(\'' + stu.id + '\',\'' + k + '\')">' + STATUS[k].label + '</button>'
+  ).join('');
+  return '<div class="stu ' + cls + (isExtra ? ' extra' : '') + '">' +
+    '<div class="stu-head">' +
+      avatarHTML(stu.name) +
+      '<div><div class="stu-name">' + esc(stu.name) + '　<span class="st ' + STATUS[st].cls + '">' + STATUS[st].label + '</span></div>' +
+      '<div class="stu-meta">' + esc(stu.cls) + ' 班　' + esc(stu.seat) + ' 號　學號 ' + esc(stu.sid) + (rec && rec.t ? '　⏱ ' + esc(rec.t) : '') + '</div></div>' +
+    '</div>' +
+    '<div class="stbtns">' + btns + '</div>' +
+    '<input class="note-in" type="text" placeholder="備註（選填）" value="' + esc(rec ? rec.n : '') + '" onchange="markNote(\'' + stu.id + '\', this.value)">' +
+  '</div>';
+}
+
+function toggleExtra(){
+  DB.settings.showExtra = !showExtra();
+  saveDB(false); renderRollcall();
+  toast(showExtra() ? '👥 已顯示其他學生' : '🙈 已隱藏其他學生');
+}
+
+function renderRcList(){
+  const r = rosterForSlot(rcSlot);
+  const box = $('rcList');
+  const compact = isCompact();
+  const wantExtra = showExtra();
+  $('btnViewMode').textContent = compact ? '🔳 精簡卡片' : '📋 詳細卡片';
+  $('btnExtra').textContent = wantExtra ? '👥 其他學生：顯示中' : '🙈 其他學生：隱藏';
+
+  if(!r.main.length && !(wantExtra && r.extra.length)){
+    box.className = 'stu-list';
+    box.innerHTML = '<div class="empty"><span class="big">🌸</span>此時段目前沒有學生<br><span class="hint">請至「維護模式 → 學生名單」新增學生</span></div>';
+    $('rcStats').innerHTML = '';
+    return;
+  }
+
+  const gridCls = 'stu-list' + (compact ? ' mini' : '');
+  const tally = {present:0, late:0, leave:0, absent:0, skip:0, pending:0};
+  r.main.forEach(stu => { const k = statusOf(rcDate, rcSlot, stu.id); tally[k] = (tally[k] || 0) + 1; });
+
+  let html = '';
+  if(r.main.length){
+    html += '<div class="' + gridCls + '">' + r.main.map((stu, i) => stuCardHTML(stu, i, compact, false)).join('') + '</div>';
+  }else{
+    html += '<div class="empty" style="padding:18px"><span class="hint">此時段沒有排定應到學生</span></div>';
+  }
+
+  let extraOn = 0;
+  r.extra.forEach(stu => { if(statusOf(rcDate, rcSlot, stu.id) !== 'skip') extraOn++; });
+
+  if(wantExtra && r.extra.length){
+    html += '<div class="group-title">👥 其他學生（未排此時段，預設不出席）' +
+            (extraOn ? '　<span class="st st-present">臨時出席 ' + extraOn + ' 人</span>' : '') + '</div>' +
+            '<div class="' + gridCls + '">' +
+            r.extra.map((stu, i) => stuCardHTML(stu, r.main.length + i, compact, true)).join('') + '</div>';
+  }
+
+  box.className = 'rc-body';
+  box.innerHTML = html;
+
+  $('rcStats').innerHTML =
+    '<span class="statpill">應到<b>' + r.main.length + '</b></span>' +
+    STATUS_ORDER.filter(k => k !== 'skip').map(k => '<span class="statpill"><span class="st ' + STATUS[k].cls + '">' + STATUS[k].label + '</span><b>' + (tally[k] || 0) + '</b></span>').join('') +
+    '<span class="statpill"><span class="st st-skip">不出席</span><b>' + (tally.skip || 0) + '</b></span>' +
+    (extraOn ? '<span class="statpill" style="border-color:var(--purple)">臨時出席<b>' + extraOn + '</b></span>' : '');
+}
+
+/* ---------- 點名彈窗 ---------- */
+let rcModalIdx = -1;
+function openStuModal(i){ rcModalIdx = i; renderStuModal(); }
+function renderStuModal(){
+  const list = rosterForSlot(rcSlot).all;
+  const stu = list[rcModalIdx];
+  if(!stu){ closeModal(); return; }
+  const st = statusOf(rcDate, rcSlot, stu.id);
+  const rec = getRec(rcDate, rcSlot, stu.id);
+  const g = groupOf(stu.name);
+  const slot = slotById(rcSlot) || {name:''};
+  const btns = ['present','late','leave','absent','skip','pending'].map(k =>
+    '<button class="stbtn ' + (st === k ? STATUS[k].btn : '') + '" onclick="markFromModal(\'' + k + '\')">' + STATUS[k].label + '</button>'
+  ).join('');
+  $('modalHost').innerHTML =
+    '<div class="modal-bg" onclick="if(event.target===this)closeStuModal()">' +
+      '<div class="modal" style="max-width:460px">' +
+        '<div class="rc-modal-head">' + avatarHTML(stu.name) +
+          '<div><div class="rc-modal-name">' + esc(pureName(stu.name) || stu.name) +
+            (g ? '　<span class="st" style="background:' + avatarColor(stu.name) + ';color:#fff">' + esc(g) + '</span>' : '') + '</div>' +
+            '<div class="rc-modal-meta">' + esc(stu.cls) + ' 班 ' + esc(stu.seat) + ' 號　學號 ' + esc(stu.sid) +
+            '<br>' + esc(rcDate) + '　' + esc(slot.name) +
+            (shouldAttend(stu, rcSlot) ? '' : '　<span class="st st-skip">未排此時段</span>') +
+            (rec && rec.t ? '　⏱ ' + esc(rec.t) : '') + '</div></div>' +
+          '<span class="spacer"></span>' +
+          '<span class="st ' + STATUS[st].cls + '">' + STATUS[st].label + '</span>' +
+        '</div>' +
+        '<div class="rc-btns">' + btns + '</div>' +
+        '<label class="fld" style="margin-top:14px;"><span>備註（選填，切換學生時自動保存）</span>' +
+          '<input type="text" id="mNote" placeholder="例：校隊集訓" value="' + esc(rec ? rec.n : '') + '"></label>' +
+        '<div class="btn-row" style="justify-content:space-between;align-items:center">' +
+          '<button class="btn ghost sm" onclick="modalNav(-1)"' + (rcModalIdx <= 0 ? ' disabled style="opacity:.4"' : '') + '>◀ 上一位</button>' +
+          '<span class="hint">' + (rcModalIdx + 1) + ' / ' + list.length + '</span>' +
+          '<button class="btn ghost sm" onclick="modalNav(1)"' + (rcModalIdx >= list.length - 1 ? ' disabled style="opacity:.4"' : '') + '>下一位 ▶</button>' +
+        '</div>' +
+        '<button class="btn grey block" style="margin-top:12px" onclick="closeStuModal()">關閉</button>' +
+      '</div></div>';
+}
+function saveModalNote(){
+  const list = rosterForSlot(rcSlot).all;
+  const stu = list[rcModalIdx];
+  const el = $('mNote');
+  if(!stu || !el) return;
+  const cur = statusOf(rcDate, rcSlot, stu.id);
+  const old = (getRec(rcDate, rcSlot, stu.id) || {}).n || '';
+  if(el.value !== old) setRec(rcDate, rcSlot, stu.id, cur, el.value);
+}
+function markFromModal(k){
+  const list = rosterForSlot(rcSlot).all;
+  const stu = list[rcModalIdx];
+  if(!stu) return;
+  const note = $('mNote') ? $('mNote').value : null;
+  setRec(rcDate, rcSlot, stu.id, k, note);
+  closeModal(); rcModalIdx = -1;
+  renderRollcall(); checkBackupReminder();
+  toast(pureName(stu.name) + ' → ' + STATUS[k].label);
+}
+function modalNav(d){
+  saveModalNote();
+  const list = rosterForSlot(rcSlot).all;
+  const n = rcModalIdx + d;
+  if(n < 0 || n >= list.length) return;
+  rcModalIdx = n; renderStuModal(); renderRcList();
+}
+function closeStuModal(){ saveModalNote(); closeModal(); rcModalIdx = -1; renderRollcall(); }
+
+/* 從姓名末端括號取出組別，例如「王小明(動)」→「動」 */
+function groupOf(name){
+  const m = String(name || '').match(/[（(]\s*([^）)]{1,4})\s*[)）]\s*$/);
+  return m ? m[1].trim() : '';
+}
+function pureName(name){ return String(name || '').replace(/[（(]\s*[^）)]{1,4}\s*[)）]\s*$/, '').trim(); }
+function avatarText(name){
+  const g = groupOf(name);
+  if(g) return g;
+  const n = pureName(name) || String(name || '?');
+  return n.slice(-2);
+}
+function avatarColor(name){
+  const g = groupOf(name);
+  if(/^動/.test(g)) return '#4CAF7D';   // 動畫組 → 綠
+  if(/^遊/.test(g)) return '#4A9FE0';   // 遊戲組 → 藍
+  const palette = ['#FF8FAB','#8CC7F0','#8FD9B6','#FFC46B','#B9A6E5','#F49AC1','#7FD1C8'];
+  let h = 0; const s = String(name || '');
+  for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+  return palette[h % palette.length];
+}
+function avatarHTML(name, cls){
+  const g = groupOf(name);
+  const txt = avatarText(name);
+  const fs = txt.length >= 3 ? 'font-size:.7rem;' : (txt.length === 2 && !g ? 'font-size:.85rem;' : '');
+  return '<div class="avatar' + (cls ? ' ' + cls : '') + '" style="background:' + avatarColor(name) + ';' + fs + '">' + esc(txt) + '</div>';
+}
+
+function mark(stuId, status){
+  setRec(rcDate, rcSlot, stuId, status, null);
+  renderRollcall();
+  checkBackupReminder();
+}
+function markNote(stuId, note){
+  const cur = statusOf(rcDate, rcSlot, stuId);
+  setRec(rcDate, rcSlot, stuId, cur, note);
+}
+function bulkSet(status){
+  const list = rosterForSlot(rcSlot).main;
+  if(!list.length) return;
+  const label = status === 'pending' ? '全部重設為「未點名」' : '全部標記為「' + STATUS[status].label + '」';
+  confirmBox('確定要將本時段 ' + list.length + ' 位學生' + label + '嗎？', () => {
+    list.forEach(s => setRec(rcDate, rcSlot, s.id, status, null));
+    renderRollcall();
+    toast('✅ 已' + label);
+  });
+}
+
+/* =====================================================================
+   查詢模式
+   ===================================================================== */
+let curQuery = 'personal';
+function switchQuery(q){
+  curQuery = q;
+  ['personal','daily','range','alert'].forEach(k => $('q-' + k).classList.toggle('hide', k !== q));
+  document.querySelectorAll('.subtab[data-q]').forEach(b => b.classList.toggle('active', b.dataset.q === q));
+  refreshQuery();
+}
+function refreshQuery(){
+  fillClassSelect('qpClass'); fillClassSelect('qrClass');
+  fillSlotSelect('qdSlot', true);
+  const t = iso(new Date());
+  const start = DB.settings.start || t;
+  if(!$('qpFrom').value){ $('qpFrom').value = start; $('qpTo').value = t; }
+  if(!$('qrFrom').value){ $('qrFrom').value = start; $('qrTo').value = t; }
+  if(!$('qaFrom').value){ $('qaFrom').value = start; $('qaTo').value = t; }
+  if(!$('qdDate').value){ $('qdDate').value = t; }
+  if(curQuery === 'personal') renderPersonal();
+  if(curQuery === 'daily') renderDaily();
+  if(curQuery === 'range') renderRange();
+  if(curQuery === 'alert') renderAlert();
+}
+function fillClassSelect(id){
+  const el = $(id); if(!el) return;
+  const cur = el.value;
+  const set = Array.from(new Set(DB.students.map(s => s.cls))).sort((a,b) => String(a).localeCompare(String(b), 'zh-Hant', {numeric:true}));
+  el.innerHTML = '<option value="">全部班級</option>' + set.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+  if(cur) el.value = cur;
+}
+function fillSlotSelect(id, allowAll){
+  const el = $(id); if(!el) return;
+  const cur = el.value;
+  el.innerHTML = (allowAll ? '<option value="">全部時段</option>' : '') +
+    activeSlots().map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('');
+  if(cur) el.value = cur;
+}
+
+/* 統計某學生於區間的資料 */
+function statsFor(stu, from, to){
+  const st = {total:0, present:0, late:0, leave:0, absent:0, skip:0, pending:0, seq:0, maxSeq:0};
+  sessionsInRange(from, to).forEach(s => {
+    // 應排時段，或雖未排但當次有留下紀錄（臨時出席）者，皆納入統計
+    if(!shouldAttend(stu, s.slotId) && !hasRec(s.date, s.slotId, stu.id)) return;
+    st.total++;
+    const k = statusOf(s.date, s.slotId, stu.id);
+    st[k] = (st[k] || 0) + 1;
+    if(k === 'absent'){ st.seq++; if(st.seq > st.maxSeq) st.maxSeq = st.seq; }
+    else if(k !== 'pending'){ st.seq = 0; }
+  });
+  st.counted = st.total - st.pending - st.skip;      // 應到場次
+  st.rate = st.counted > 0 ? Math.round((st.present + st.late) / st.counted * 1000) / 10 : null;
+  return st;
+}
+function rateCls(r){ return r == null ? '' : (r >= 90 ? 'good' : (r >= 70 ? 'mid' : 'bad')); }
+function rateTxt(r){ return r == null ? '—' : r.toFixed(1) + '%'; }
+
+function personalRows(){
+  const from = $('qpFrom').value, to = $('qpTo').value, cls = $('qpClass').value;
+  const list = sortStudents(DB.students.filter(s => s.active !== false && (!cls || s.cls === cls)));
+  return list.map(s => ({stu:s, st:statsFor(s, from, to)}));
+}
+function renderPersonal(){
+  const rows = personalRows();
+  const t = $('qpTable');
+  if(!rows.length){ t.innerHTML = '<tbody><tr><td class="empty">尚無學生資料</td></tr></tbody>'; return; }
+  t.innerHTML = '<thead><tr><th>班級</th><th>座號</th><th>姓名</th><th>學號</th><th>場次</th>' +
+    '<th>出席</th><th>遲到</th><th>請假</th><th>缺席</th><th>不出席</th><th>未點名</th><th>應到</th><th>出席率</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + esc(r.stu.cls) + '</td><td class="num">' + esc(r.stu.seat) + '</td><td><b>' + esc(r.stu.name) + '</b></td><td>' + esc(r.stu.sid) + '</td>' +
+      '<td class="num">' + r.st.total + '</td><td class="num">' + r.st.present + '</td><td class="num">' + r.st.late + '</td>' +
+      '<td class="num">' + r.st.leave + '</td><td class="num">' + r.st.absent + '</td><td class="num">' + r.st.skip + '</td>' +
+      '<td class="num">' + r.st.pending + '</td><td class="num">' + r.st.counted + '</td>' +
+      '<td class="num rate ' + rateCls(r.st.rate) + '">' + rateTxt(r.st.rate) + '</td></tr>').join('') + '</tbody>';
+}
+
+function dailyRows(){
+  const date = $('qdDate').value, slotFilter = $('qdSlot').value;
+  if(!date) return [];
+  const day = parseISO(date).getDay();
+  const slots = slotsOfDay(day).filter(s => !slotFilter || s.id === slotFilter);
+  const out = [];
+  slots.forEach(sl => {
+    const r = rosterForSlot(sl.id);
+    const list = r.main.concat(r.extra.filter(stu => hasRec(date, sl.id, stu.id)));
+    sortStudents(list).forEach(stu => {
+      const rec = getRec(date, sl.id, stu.id);
+      out.push({date:date, slot:sl, stu:stu, st:statusOf(date, sl.id, stu.id),
+                note:rec ? rec.n : '', time:rec ? rec.t : '',
+                extra: !shouldAttend(stu, sl.id)});
+    });
+  });
+  return out;
+}
+function renderDaily(){
+  const rows = dailyRows();
+  const t = $('qdTable'), date = $('qdDate').value;
+  const day = date ? parseISO(date).getDay() : -1;
+  if(!rows.length){
+    $('qdStats').innerHTML = '';
+    t.innerHTML = '<tbody><tr><td class="empty"><span class="big">🌙</span>' + (day >= 0 && !slotsOfDay(day).length ? '該日（週' + DAY_NAMES[day] + '）無培訓時段' : '查無應到學生') + '</td></tr></tbody>';
+    return;
+  }
+  const tally = {};
+  rows.forEach(r => tally[r.st] = (tally[r.st] || 0) + 1);
+  $('qdStats').innerHTML = '<span class="statpill">應到<b>' + rows.length + '</b></span>' +
+    STATUS_ORDER.map(k => '<span class="statpill"><span class="st ' + STATUS[k].cls + '">' + STATUS[k].label + '</span><b>' + (tally[k] || 0) + '</b></span>').join('');
+  t.innerHTML = '<thead><tr><th>時段</th><th>班級</th><th>座號</th><th>姓名</th><th>學號</th><th>狀態</th><th>記錄時間</th><th>備註</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + esc(r.slot.name) + '</td><td>' + esc(r.stu.cls) + '</td><td class="num">' + esc(r.stu.seat) + '</td>' +
+      '<td><b>' + esc(r.stu.name) + '</b>' + (r.extra ? ' <span class="st st-skip">臨時</span>' : '') + '</td><td>' + esc(r.stu.sid) + '</td>' +
+      '<td><span class="st ' + STATUS[r.st].cls + '">' + STATUS[r.st].label + '</span></td>' +
+      '<td>' + esc(r.time || '—') + '</td><td>' + esc(r.note || '') + '</td></tr>').join('') + '</tbody>';
+}
+
+function renderRange(){
+  const from = $('qrFrom').value, to = $('qrTo').value, cls = $('qrClass').value;
+  const t = $('qrTable');
+  let ses = sessionsInRange(from, to);
+  const students = sortStudents(DB.students.filter(s => s.active !== false && (!cls || s.cls === cls)));
+  if(!ses.length || !students.length){
+    t.innerHTML = '<tbody><tr><td class="empty"><span class="big">📭</span>此區間沒有場次或學生</td></tr></tbody>';
+    return;
+  }
+  let note = '';
+  if(ses.length > 80){ note = '（場次過多，僅顯示前 80 場，完整資料請匯出 CSV）'; ses = ses.slice(0, 80); }
+  const head = '<thead><tr><th>班級</th><th>座號</th><th>姓名</th>' +
+    ses.map(s => '<th>' + s.date.slice(5) + '<br>' + esc(s.slot.name.replace('週','').replace(' ', '')) + '</th>').join('') +
+    '<th>出席率</th></tr></thead>';
+  const body = students.map(stu => {
+    const st = statsFor(stu, from, to);
+    return '<tr><td>' + esc(stu.cls) + '</td><td class="num">' + esc(stu.seat) + '</td><td><b>' + esc(stu.name) + '</b></td>' +
+      ses.map(s => {
+        const rec = hasRec(s.date, s.slotId, stu.id);
+        if(!shouldAttend(stu, s.slotId) && !rec) return '<td class="num" style="color:#DDD">-</td>';
+        const k = statusOf(s.date, s.slotId, stu.id);
+        return '<td class="num"><span class="st ' + STATUS[k].cls + '">' + STATUS[k].short + '</span>' +
+               (rec && !shouldAttend(stu, s.slotId) ? '<sup style="color:#B9A6E5">＋</sup>' : '') + '</td>';
+      }).join('') +
+      '<td class="num rate ' + rateCls(st.rate) + '">' + rateTxt(st.rate) + '</td></tr>';
+  }).join('');
+  t.innerHTML = head + '<tbody>' + body + '</tbody>' + (note ? '<caption style="caption-side:bottom;padding:8px;font-size:.8rem;color:#B5A8A2">' + note + '</caption>' : '');
+}
+
+function alertRows(){
+  const from = $('qaFrom').value, to = $('qaTo').value;
+  const nAbs = +$('qaAbs').value || 3, nSeq = +$('qaSeq').value || 2, minRate = +$('qaRate').value;
+  const out = [];
+  sortStudents(DB.students.filter(s => s.active !== false)).forEach(stu => {
+    const st = statsFor(stu, from, to);
+    const reasons = [];
+    if(st.absent >= nAbs) reasons.push('累計缺席 ' + st.absent + ' 次');
+    if(st.maxSeq >= nSeq) reasons.push('連續缺席 ' + st.maxSeq + ' 次');
+    if(st.counted > 0 && st.rate != null && st.rate < minRate) reasons.push('出席率 ' + st.rate.toFixed(1) + '%');
+    if(reasons.length) out.push({stu:stu, st:st, reasons:reasons});
+  });
+  return out;
+}
+function renderAlert(){
+  const rows = alertRows();
+  const t = $('qaTable');
+  if(!rows.length){
+    t.innerHTML = '<tbody><tr><td class="empty"><span class="big">🎉</span>太棒了，目前沒有異常名單！</td></tr></tbody>';
+    return;
+  }
+  t.innerHTML = '<thead><tr><th>班級</th><th>座號</th><th>姓名</th><th>學號</th><th>缺席</th><th>連續缺席</th><th>請假</th><th>出席率</th><th>提醒原因</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + esc(r.stu.cls) + '</td><td class="num">' + esc(r.stu.seat) + '</td><td><b>' + esc(r.stu.name) + '</b></td><td>' + esc(r.stu.sid) + '</td>' +
+      '<td class="num">' + r.st.absent + '</td><td class="num">' + r.st.maxSeq + '</td><td class="num">' + r.st.leave + '</td>' +
+      '<td class="num rate ' + rateCls(r.st.rate) + '">' + rateTxt(r.st.rate) + '</td>' +
+      '<td>' + esc(r.reasons.join('、')) + '</td></tr>').join('') + '</tbody>';
+}
+
+/* =====================================================================
+   維護模式
+   ===================================================================== */
+let adminUnlocked = false;
+let editingId = null;
+let formSlots = [];
+
+function enterAdmin(){
+  const need = String(DB.settings.lockOn) === '1';
+  if(!need || adminUnlocked){ showAdminBody(); }
+  else{ $('adminLock').classList.remove('hide'); $('adminBody').classList.add('hide'); $('pinInput').value = ''; }
+}
+function lockNow(){
+  adminUnlocked = false;
+  $('pinInput').value = '';
+  $('adminBody').classList.add('hide');
+  $('adminLock').classList.remove('hide');
+  toast('🔒 維護模式已鎖定');
+}
+/* 離開維護模式：回到點名模式，並依設定重新上鎖 */
+function exitAdmin(){
+  clearStudentForm();
+  adminUnlocked = false;
+  $('pinInput').value = '';
+  switchView('attend');
+  document.querySelector('.tab[data-view="attend"]');
+  toast(String(DB.settings.lockOn) === '1' ? '🔒 已離開並鎖定維護模式' : '👋 已離開維護模式');
+}
+function updateAdminBar(){
+  const on = String(DB.settings.lockOn) === '1';
+  $('btnLockNow').classList.toggle('hide', !on);
+  $('adminLockState').textContent = on ? '🔓 維護模式（密碼保護開啟中，離開後需重新輸入密碼）' : '🛠️ 維護模式（未設密碼保護）';
+}
+function showAdminBody(){
+  adminUnlocked = true;
+  $('adminLock').classList.add('hide');
+  $('adminBody').classList.remove('hide');
+  updateAdminBar();
+  if(!editingId && !formSlots.length) formSlots = activeSlots().map(s => s.id);
+  renderSlotChips(); renderStudents(); renderSlotTable(); loadSettingsForm(); renderBackupInfo();
+  fillSlotSelect('stuSlotFilter', true);
+}
+function tryUnlock(){
+  if($('pinInput').value === String(DB.settings.pin)){ showAdminBody(); toast('🔓 已解鎖'); }
+  else{ toast('❌ 密碼不正確'); $('pinInput').value = ''; }
+}
+function switchAdmin(a){
+  ['students','slots','data','sys'].forEach(k => $('a-' + k).classList.toggle('hide', k !== a));
+  document.querySelectorAll('.subtab[data-a]').forEach(b => b.classList.toggle('active', b.dataset.a === a));
+  if(a === 'slots') renderSlotTable();
+  if(a === 'data') renderBackupInfo();
+  if(a === 'sys') loadSettingsForm();
+}
+
+/* ---- 學生表單 ---- */
+function renderSlotChips(){
+  $('fSlots').innerHTML = activeSlots().map(s =>
+    '<button type="button" class="chip slot-chip ' + (formSlots.indexOf(s.id) >= 0 ? 'on' : '') + '" onclick="toggleFormSlot(\'' + s.id + '\')">' + esc(s.name) + '</button>'
+  ).join('');
+}
+function toggleFormSlot(id){
+  const i = formSlots.indexOf(id);
+  if(i >= 0) formSlots.splice(i, 1); else formSlots.push(id);
+  renderSlotChips();
+}
+function setAllSlots(on){ formSlots = on ? activeSlots().map(s => s.id) : []; renderSlotChips(); }
+function clearStudentForm(){
+  editingId = null; formSlots = activeSlots().map(s => s.id);   // 新增學生時預設全部時段
+  ['fClass','fSeat','fName','fSid','fNote'].forEach(id => $(id).value = '');
+  $('fActive').value = '1';
+  $('stuEditHint').textContent = '';
+  $('btnSaveStu').textContent = '💾 儲存學生';
+  renderSlotChips();
+}
+function saveStudent(){
+  const cls = $('fClass').value.trim(), seat = $('fSeat').value.trim(),
+        name = $('fName').value.trim(), sid = $('fSid').value.trim(), note = $('fNote').value.trim();
+  if(!name){ toast('⚠️ 請輸入姓名'); $('fName').focus(); return; }
+  const act = $('fActive').value !== '0';
+  if(editingId){
+    const s = studentById(editingId);
+    if(s){ Object.assign(s, {cls:cls, seat:seat, name:name, sid:sid, note:note, slots:formSlots.slice(), active:act}); }
+    toast('✅ 已更新 ' + name);
+  }else{
+    DB.students.push({id:uid(), cls:cls, seat:seat, name:name, sid:sid, note:note, slots:formSlots.slice(), active:act});
+    toast('🌸 已新增 ' + name);
+  }
+  saveDB(true); clearStudentForm(); renderStudents();
+}
+function editStudent(id){
+  const s = studentById(id); if(!s) return;
+  editingId = id; formSlots = Array.isArray(s.slots) ? s.slots.slice() : [];
+  $('fClass').value = s.cls || ''; $('fSeat').value = s.seat || '';
+  $('fName').value = s.name || ''; $('fSid').value = s.sid || ''; $('fNote').value = s.note || '';
+  $('fActive').value = s.active === false ? '0' : '1';
+  $('stuEditHint').textContent = '正在編輯：' + s.name;
+  $('btnSaveStu').textContent = '💾 更新學生';
+  renderSlotChips();
+  $('fName').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function delStudent(id){
+  const s = studentById(id); if(!s) return;
+  confirmBox('確定要刪除「' + s.name + '」嗎？<br><span class="hint">其既有點名紀錄將一併移除，此動作無法復原。</span>', () => {
+    DB.students = DB.students.filter(x => x.id !== id);
+    Object.keys(DB.records).forEach(d => Object.keys(DB.records[d]).forEach(sl => { delete DB.records[d][sl][id]; }));
+    saveDB(true); clearStudentForm(); renderStudents(); toast('🗑️ 已刪除 ' + s.name);
+  });
+}
+function toggleActive(id){
+  const s = studentById(id); if(!s) return;
+  s.active = (s.active === false);
+  saveDB(true); renderStudents(); renderRollcall();
+  toast((s.active ? '✅ 已啟用 ' : '⏸️ 已停用 ') + s.name + (s.active ? '' : '（不會出現在點名名單）'));
+}
+function renderStudents(){
+  const kw = ($('stuSearch').value || '').trim().toLowerCase();
+  const sf = $('stuSlotFilter') ? $('stuSlotFilter').value : '';
+  const st = $('stuStateFilter') ? $('stuStateFilter').value : '';
+  let list = sortStudents(DB.students);
+  if(kw) list = list.filter(s => (s.name + ' ' + s.sid + ' ' + s.cls + ' ' + s.seat).toLowerCase().indexOf(kw) >= 0);
+  if(sf) list = list.filter(s => shouldAttend(s, sf));
+  if(st === 'on') list = list.filter(s => s.active !== false);
+  if(st === 'off') list = list.filter(s => s.active === false);
+  const nOn = DB.students.filter(s => s.active !== false).length;
+  $('stuCount').textContent = '共 ' + DB.students.length + ' 人（啟用 ' + nOn + '、停用 ' + (DB.students.length - nOn) + '）' +
+    (list.length !== DB.students.length ? '　符合 ' + list.length + ' 人' : '');
+  const t = $('stuTable');
+  if(!list.length){ t.innerHTML = '<tbody><tr><td class="empty"><span class="big">🐣</span>尚無學生資料，請由上方新增或批次匯入</td></tr></tbody>'; return; }
+  t.innerHTML = '<thead><tr><th>班級</th><th>座號</th><th>姓名</th><th>學號</th><th>可出席時段</th><th>狀態</th><th>操作</th></tr></thead><tbody>' +
+    list.map(s => {
+      const names = (s.slots || []).map(id => { const sl = slotById(id); return sl ? sl.name.replace('週','').replace(' ','') : ''; }).filter(Boolean);
+      const on = s.active !== false;
+      const gg = groupOf(s.name);
+      return '<tr class="' + (on ? '' : 'off') + '"><td>' + esc(s.cls) + '</td><td class="num">' + esc(s.seat) + '</td>' +
+        '<td><b>' + esc(pureName(s.name) || s.name) + '</b>' + (gg ? ' <span class="st" style="background:' + avatarColor(s.name) + ';color:#fff">' + esc(gg) + '</span>' : '') + '</td><td>' + esc(s.sid) + '</td>' +
+        '<td style="white-space:normal;max-width:320px;">' + (names.length ? names.map(n => '<span class="st st-leave" style="margin:1px">' + esc(n) + '</span>').join(' ') : '<span class="hint">未設定</span>') + '（' + names.length + '）</td>' +
+        '<td><span class="switch" onclick="toggleActive(\'' + s.id + '\')" title="點一下切換啟用／停用">' +
+          '<span class="track' + (on ? ' on' : '') + '"><span class="knob"></span></span>' +
+          '<span class="txt' + (on ? ' on' : '') + '">' + (on ? '啟用' : '停用') + '</span></span></td>' +
+        '<td><button class="btn ghost sm" onclick="editStudent(\'' + s.id + '\')">編輯</button> ' +
+        '<button class="btn danger sm" onclick="delStudent(\'' + s.id + '\')">刪除</button></td></tr>';
+    }).join('') + '</tbody>';
+}
+function bulkImport(){
+  const txt = $('bulkText').value.trim();
+  if(!txt){ toast('⚠️ 請先貼上名單'); return; }
+  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  let added = 0, updated = 0, bad = 0;
+  lines.forEach(line => {
+    const p = line.split(/[,\t;，、]+|\s{2,}/).map(x => x.trim()).filter(x => x !== '');
+    if(p.length < 3){ bad++; return; }
+    const cls = p[0], seat = p[1], name = p[2], sid = p[3] || '';
+    let slots = [];
+    if(p[4]){ slots = p[4].split(/[|/]+/).map(x => x.trim()).filter(x => slotById(x)); }
+    if(!slots.length) slots = activeSlots().map(x => x.id);   // 未指定時段者預設全選，由老師再個別關閉
+    const exist = DB.students.find(s => (sid && s.sid === sid) || (s.cls === cls && s.seat === seat && s.name === name));
+    if(exist){
+      exist.cls = cls; exist.seat = seat; exist.name = name; exist.sid = sid || exist.sid;
+      if(p[4]) exist.slots = slots;
+      else if(!Array.isArray(exist.slots) || !exist.slots.length) exist.slots = slots;
+      updated++;
+    }else{
+      DB.students.push({id:uid(), cls:cls, seat:seat, name:name, sid:sid, note:'', slots:slots, active:true});
+      added++;
+    }
+  });
+  saveDB(true); renderStudents(); fillClassSelect('qpClass'); fillClassSelect('qrClass');
+  $('bulkText').value = '';
+  toast('✨ 新增 ' + added + ' 人、更新 ' + updated + ' 人' + (bad ? '、略過 ' + bad + ' 行' : ''));
+}
+
+/* ---- 時段 ---- */
+function renderSlotTable(){
+  $('slotTable').innerHTML = '<thead><tr><th>啟用</th><th>星期</th><th>節次</th><th>顯示名稱</th><th>時間</th><th>代碼</th><th>應到人數</th></tr></thead><tbody>' +
+    DB.slots.map((s, i) => '<tr>' +
+      '<td class="num"><input type="checkbox" data-si="' + i + '" data-f="on" ' + (s.on !== false ? 'checked' : '') + ' style="width:22px;height:22px"></td>' +
+      '<td>週' + DAY_NAMES[s.day] + '</td><td>' + (s.period === 'am' ? '早自習' : '午休') + '</td>' +
+      '<td><input type="text" data-si="' + i + '" data-f="name" value="' + esc(s.name) + '" style="min-width:150px"></td>' +
+      '<td><input type="text" data-si="' + i + '" data-f="time" value="' + esc(s.time || '') + '" style="min-width:120px"></td>' +
+      '<td><code>' + esc(s.id) + '</code></td>' +
+      '<td class="num">' + studentsForSlot(s.id).length + '</td></tr>').join('') + '</tbody>';
+}
+function saveSlots(){
+  $('slotTable').querySelectorAll('[data-si]').forEach(el => {
+    const i = +el.dataset.si, f = el.dataset.f;
+    DB.slots[i][f] = (f === 'on') ? el.checked : el.value.trim();
+  });
+  sortSlots(DB.slots);
+  saveDB(true); renderSlotTable(); renderSlotChips(); fillSlotSelect('qdSlot', true); fillSlotSelect('stuSlotFilter', true);
+  toast('✅ 時段設定已儲存');
+}
+function resetSlots(){
+  confirmBox('確定要還原成預設的 9 個時段嗎？<br><span class="hint">學生已勾選的時段代碼不會改變。</span>', () => {
+    DB.slots = defaultSlots(); saveDB(true); renderSlotTable(); renderSlotChips(); toast('↩️ 已還原預設時段');
+  });
+}
+
+/* ---- 系統設定 ---- */
+function loadSettingsForm(){
+  const s = DB.settings;
+  $('sTitle').value = s.title; $('sSub').value = s.sub;
+  $('sStart').value = s.start || ''; $('sEnd').value = s.end || '';
+  $('sLockOn').value = String(s.lockOn || 0); $('sPin').value = s.pin || '';
+  $('sBackupDays').value = s.backupDays || 7;
+}
+function saveSettings(){
+  const s = DB.settings;
+  s.title = $('sTitle').value.trim() || 'Scratch 培訓點名系統';
+  s.sub = $('sSub').value.trim();
+  s.start = $('sStart').value; s.end = $('sEnd').value;
+  s.lockOn = $('sLockOn').value; s.pin = $('sPin').value.trim() || '1234';
+  s.backupDays = Math.max(1, +$('sBackupDays').value || 7);
+  saveDB(true); applyBranding();
+  updateAdminBar();
+  if(String(s.lockOn) === '1'){
+    toast('✅ 已開啟密碼保護（密碼 ' + s.pin + '）；離開維護模式後需重新輸入');
+  }else{
+    toast('✅ 設定已儲存');
+  }
+}
+function applyBranding(){
+  $('appTitle').textContent = DB.settings.title;
+  $('appSub').textContent = DB.settings.sub;
+  document.title = DB.settings.title;
+}
+
+/* =====================================================================
+   匯出 / 匯入 / 備份提醒
+   ===================================================================== */
+function stamp(){
+  const n = new Date();
+  return n.getFullYear() + String(n.getMonth()+1).padStart(2,'0') + String(n.getDate()).padStart(2,'0') +
+         '_' + String(n.getHours()).padStart(2,'0') + String(n.getMinutes()).padStart(2,'0');
+}
+function download(filename, content, mime){
+  try{
+    const blob = new Blob([content], {type: mime || 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 800);
+    return true;
+  }catch(e){ console.error(e); toast('⚠️ 下載失敗：' + e.message); return false; }
+}
+function exportJSON(){
+  const payload = JSON.parse(JSON.stringify(DB));
+  payload.exportedAt = new Date().toISOString();
+  payload.app = 'scratch-rollcall';
+  if(download('點名系統備份_' + stamp() + '.json', JSON.stringify(payload, null, 2), 'application/json;charset=utf-8')){
+    DB.meta.lastBackup = new Date().toISOString();
+    DB.meta.changes = 0; DB.meta.snoozeUntil = null;
+    saveDB(false); checkBackupReminder(); renderBackupInfo();
+    toast('📦 備份已匯出');
+  }
+}
+function csvCell(v){
+  const s = String(v == null ? '' : v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function toCSV(rows){ return '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n'); }
+
+function exportCSV(kind){
+  let rows = [], name = '';
+  if(kind === 'records'){
+    name = '點名紀錄明細';
+    rows.push(['日期','星期','時段','時間','班級','座號','姓名','學號','狀態','記錄時間','備註']);
+    Object.keys(DB.records).sort().forEach(date => {
+      const day = DAY_NAMES[parseISO(date).getDay()];
+      Object.keys(DB.records[date]).forEach(slotId => {
+        const sl = slotById(slotId) || {name:slotId, time:''};
+        Object.keys(DB.records[date][slotId]).forEach(stuId => {
+          const stu = studentById(stuId); if(!stu) return;
+          const r = DB.records[date][slotId][stuId];
+          rows.push([date, '週'+day, sl.name, sl.time || '', stu.cls, stu.seat, stu.name, stu.sid,
+                     (STATUS[r.s] || STATUS.pending).label, r.t || '', r.n || '']);
+        });
+      });
+    });
+  }else if(kind === 'students'){
+    name = '學生名單';
+    rows.push(['班級','座號','姓名','學號','可出席時段代碼','可出席時段','狀態','備註']);
+    sortStudents(DB.students).forEach(s => {
+      const ids = (s.slots || []);
+      rows.push([s.cls, s.seat, s.name, s.sid, ids.join('|'),
+        ids.map(i => { const sl = slotById(i); return sl ? sl.name : i; }).join('、'),
+        s.active === false ? '停用' : '啟用', s.note || '']);
+    });
+  }else if(kind === 'personal'){
+    name = '個人出席統計_' + $('qpFrom').value + '至' + $('qpTo').value;
+    rows.push(['班級','座號','姓名','學號','場次','出席','遲到','請假','缺席','不出席','未點名','應到','出席率(%)']);
+    personalRows().forEach(r => rows.push([r.stu.cls, r.stu.seat, r.stu.name, r.stu.sid, r.st.total,
+      r.st.present, r.st.late, r.st.leave, r.st.absent, r.st.skip, r.st.pending, r.st.counted,
+      r.st.rate == null ? '' : r.st.rate]));
+  }else if(kind === 'daily'){
+    name = '單日總覽_' + $('qdDate').value;
+    rows.push(['日期','時段','班級','座號','姓名','學號','狀態','記錄時間','備註']);
+    dailyRows().forEach(r => rows.push([r.date, r.slot.name, r.stu.cls, r.stu.seat, r.stu.name, r.stu.sid,
+      STATUS[r.st].label, r.time || '', r.note || '']));
+  }else if(kind === 'range'){
+    const from = $('qrFrom').value, to = $('qrTo').value, cls = $('qrClass').value;
+    name = '期間彙總_' + from + '至' + to;
+    const ses = sessionsInRange(from, to);
+    const students = sortStudents(DB.students.filter(s => s.active !== false && (!cls || s.cls === cls)));
+    rows.push(['班級','座號','姓名','學號'].concat(ses.map(s => s.date + ' ' + s.slot.name)).concat(['出席率(%)']));
+    students.forEach(stu => {
+      const st = statsFor(stu, from, to);
+      rows.push([stu.cls, stu.seat, stu.name, stu.sid].concat(
+        ses.map(s => (shouldAttend(stu, s.slotId) || hasRec(s.date, s.slotId, stu.id)) ? STATUS[statusOf(s.date, s.slotId, stu.id)].label : '')
+      ).concat([st.rate == null ? '' : st.rate]));
+    });
+  }else if(kind === 'alert'){
+    name = '異常名單_' + $('qaFrom').value + '至' + $('qaTo').value;
+    rows.push(['班級','座號','姓名','學號','缺席','連續缺席','請假','出席率(%)','提醒原因']);
+    alertRows().forEach(r => rows.push([r.stu.cls, r.stu.seat, r.stu.name, r.stu.sid, r.st.absent, r.st.maxSeq,
+      r.st.leave, r.st.rate == null ? '' : r.st.rate, r.reasons.join('、')]));
+  }
+  if(rows.length <= 1){ toast('⚠️ 沒有可匯出的資料'); return; }
+  download(name + '_' + stamp() + '.csv', toCSV(rows), 'text/csv;charset=utf-8');
+  toast('📄 已匯出 CSV（' + (rows.length - 1) + ' 筆）');
+}
+
+function importJSON(ev){
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if(!file) return;
+  const mode = $('importMode').value;
+  const rd = new FileReader();
+  rd.onload = function(){
+    let o;
+    try{ o = JSON.parse(rd.result); }
+    catch(e){ toast('❌ 檔案格式錯誤，無法解析'); return; }
+    if(!o || !o.students || !o.records){ toast('❌ 這不是本系統的備份檔'); return; }
+    const nStu = (o.students || []).length;
+    let nRec = 0; Object.keys(o.records || {}).forEach(d => Object.keys(o.records[d]).forEach(s => nRec += Object.keys(o.records[d][s]).length));
+    confirmBox('備份檔內含 <b>' + nStu + '</b> 位學生、<b>' + nRec + '</b> 筆點名紀錄。<br>' +
+      (mode === 'replace' ? '<span class="st st-absent">將清空目前資料並完整還原</span>' : '將與現有資料<b>合併</b>（同學號或同班級座號姓名者視為同一人）') + '，確定執行嗎？', () => {
+      if(mode === 'replace'){
+        DB = Object.assign(defaultDB(), o);
+        DB.settings = Object.assign(defaultDB().settings, o.settings || {});
+        if(Array.isArray(DB.slots)) sortSlots(DB.slots);
+      }else{
+        if(Array.isArray(o.slots) && o.slots.length) DB.slots = sortSlots(o.slots);
+        const idMap = {};
+        (o.students || []).forEach(ns => {
+          const ex = DB.students.find(s => (ns.sid && s.sid === ns.sid) || (s.cls === ns.cls && s.seat === ns.seat && s.name === ns.name));
+          if(ex){ idMap[ns.id] = ex.id; ex.slots = ns.slots || ex.slots; ex.note = ns.note || ex.note; }
+          else{ const nid = ns.id && !studentById(ns.id) ? ns.id : uid(); idMap[ns.id] = nid; DB.students.push(Object.assign({}, ns, {id:nid})); }
+        });
+        Object.keys(o.records || {}).forEach(date => Object.keys(o.records[date]).forEach(slotId => {
+          Object.keys(o.records[date][slotId]).forEach(oldId => {
+            const nid = idMap[oldId] || oldId;
+            if(!DB.records[date]) DB.records[date] = {};
+            if(!DB.records[date][slotId]) DB.records[date][slotId] = {};
+            DB.records[date][slotId][nid] = o.records[date][slotId][oldId];
+          });
+        }));
+      }
+      DB.meta.lastBackup = new Date().toISOString(); DB.meta.changes = 0;
+      saveDB(false); applyBranding(); adminUnlocked = true; showAdminBody(); renderRollcall(); refreshQuery();
+      toast('✅ 匯入完成');
+    });
+  };
+  rd.readAsText(file, 'utf-8');
+}
+
+function clearRecordsOnly(){
+  let recCount = 0;
+  Object.keys(DB.records).forEach(d => Object.keys(DB.records[d]).forEach(sl => recCount += Object.keys(DB.records[d][sl]).length));
+  confirmBox('確定清除<b>所有點名紀錄</b>（共 <b>' + recCount + '</b> 筆）嗎？學生名單與設定會保留。<br><span class="hint">建議先匯出備份，此動作無法復原。</span>',
+    () => {
+      confirmBox('🚨 <b>再次確認</b><br>將刪除全部 <b>' + recCount + '</b> 筆點名紀錄，確定執行嗎？',
+        () => { DB.records = {}; saveDB(true); renderRollcall(); refreshQuery(); toast('🧹 已清除所有點名紀錄'); },
+        {danger:true, yesText:'我確定，清除紀錄'});
+    }, {danger:true, yesText:'繼續'});
+}
+function clearAll(){
+  let recCount = 0;
+  Object.keys(DB.records).forEach(d => Object.keys(DB.records[d]).forEach(sl => recCount += Object.keys(DB.records[d][sl]).length));
+  confirmBox('⚠️ 確定要清除<b>全部資料</b>嗎？<br>目前有 <b>' + DB.students.length + '</b> 位學生、<b>' + recCount + '</b> 筆點名紀錄與所有系統設定。' +
+    '<br><span class="hint">此動作無法復原，建議先匯出 JSON 備份。</span>',
+    () => {
+      // 第二次確認：需輸入驗證碼
+      const code = String(Math.floor(1000 + Math.random() * 9000));
+      confirmBox('🚨 <b>最後確認</b><br>請輸入下列驗證碼以確定清除全部資料：' +
+        '<div style="text-align:center;margin:14px 0;font-size:2rem;font-weight:800;letter-spacing:10px;color:#C94F4F">' + code + '</div>' +
+        '<input type="text" id="delCode" inputmode="numeric" placeholder="請輸入上方 4 位數字" style="text-align:center;letter-spacing:6px;font-size:1.2rem">',
+        (v) => {
+          if(String(v || '').trim() !== code){ toast('❌ 驗證碼不正確，已取消清除'); return; }
+          DB = defaultDB(); saveDB(false); applyBranding(); clearStudentForm(); showAdminBody(); renderRollcall(); refreshQuery();
+          toast('🧹 已清除全部資料');
+        }, {danger:true, yesText:'我確定，清除全部資料', capture:'delCode'});
+    }, {danger:true, yesText:'繼續'});
+}
+
+/* ---- 備份提醒 ---- */
+function checkBackupReminder(){
+  const b = $('backupBanner');
+  const days = DB.settings.backupDays || 7;
+  const now = Date.now();
+  if(DB.meta.snoozeUntil && now < DB.meta.snoozeUntil){ b.classList.add('hide'); return; }
+  const last = DB.meta.lastBackup ? new Date(DB.meta.lastBackup).getTime() : null;
+  const overdue = !last || (now - last) > days * 86400000;
+  const many = (DB.meta.changes || 0) >= 50;
+  if((overdue && (DB.meta.changes || 0) > 0) || many){
+    $('backupMsg').innerHTML = last
+      ? '距離上次備份已 <b>' + Math.floor((now - last) / 86400000) + '</b> 天，期間新增 <b>' + DB.meta.changes + '</b> 次異動，建議匯出 JSON 備份。'
+      : '尚未做過備份，目前已有 <b>' + DB.meta.changes + '</b> 次資料異動，建議匯出 JSON 備份。';
+    b.classList.remove('hide');
+  }else{ b.classList.add('hide'); }
+}
+function snoozeBackup(){
+  DB.meta.snoozeUntil = Date.now() + 86400000;
+  saveDB(false); $('backupBanner').classList.add('hide'); toast('⏰ 明天再提醒您');
+}
+function renderBackupInfo(){
+  const el = $('backupInfo'); if(!el) return;
+  let recCount = 0;
+  Object.keys(DB.records).forEach(d => Object.keys(DB.records[d]).forEach(s => recCount += Object.keys(DB.records[d][s]).length));
+  const last = DB.meta.lastBackup ? new Date(DB.meta.lastBackup).toLocaleString('zh-TW') : '尚未備份';
+  el.innerHTML = '目前資料：<b>' + DB.students.length + '</b> 位學生、<b>' + recCount + '</b> 筆點名紀錄、<b>' + Object.keys(DB.records).length + '</b> 個有紀錄的日期。<br>上次備份時間：<b>' + esc(last) + '</b>　｜　自上次備份後異動：<b>' + (DB.meta.changes || 0) + '</b> 次';
+}
+
+/* ---- 確認對話框 ---- */
+function confirmBox(html, onYes, opt){
+  opt = opt || {};
+  const host = $('modalHost');
+  host.innerHTML = '<div class="modal-bg" onclick="if(event.target===this)closeModal()">' +
+    '<div class="modal"><h2>' + (opt.danger ? '⚠️ 危險操作' : '🎀 請確認') + '</h2>' +
+    '<div style="margin:10px 0 18px;line-height:1.8">' + html + '</div>' +
+    '<div class="btn-row" style="justify-content:flex-end"><button class="btn grey" onclick="closeModal()">取消</button>' +
+    '<button class="btn' + (opt.danger ? ' danger' : '') + '" id="mYes">' + (opt.yesText || '確定') + '</button></div></div></div>';
+  $('mYes').onclick = function(){
+    let captured = null;
+    if(opt.capture && $(opt.capture)) captured = $(opt.capture).value;
+    closeModal();
+    onYes(captured);
+  };
+  if(opt.capture && $(opt.capture)) setTimeout(() => $(opt.capture).focus(), 120);
+}
+function closeModal(){ $('modalHost').innerHTML = ''; }
+
+/* =====================================================================
+   啟動
+   ===================================================================== */
+function init(){
+  loadDB();
+  applyBranding();
+  rcDate = iso(new Date());
+  $('rcDate').value = rcDate;
+  tickClock(); setInterval(tickClock, 10000);
+  renderRollcall();
+  checkBackupReminder();
+  window.addEventListener('beforeunload', function(){ saveDB(false); });
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

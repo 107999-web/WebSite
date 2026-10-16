@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI 節奏接龍大作戰・學生版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/comp.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🎵 AI 節奏接龍大作戰 <em>學生版</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="anim.html">動畫組</a>
+      <a class="on" href="game.html">遊戲組</a>
+      <a href="ideas.html">情境卡</a>
+      <a href="plan.html">進度表</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge g">臺北市 115 年度貓咪盃・初賽　國小遊戲 AI 互動組</span>
+    <h1>AI 節奏接龍大作戰</h1>
+    <p>音樂不只可以用耳朵聽，也可以<b>用身體動作演奏</b>。舞臺上的音樂精靈要跟你玩「節奏接龍」：你得看清楚提示、記住順序，再用動作把節奏做出來。<br>
+      這一頁把題目拆成五件要做的事，而且<b>每一件都有可以直接玩的示範</b>。</p>
+    <div class="goals">
+      <div><b>先玩再寫</b>　下面第 2 段是一個做好的完整遊戲，玩過一輪再回頭看程式，會清楚很多。</div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">1</span>題目在要求什麼</h2>
+    <div class="taskgrid" id="tasks"></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">2</span>先玩玩看：完整的節奏接龍</h2>
+    <p>用<b>滑鼠點按鈕</b>或<b>鍵盤方向鍵</b>（←　↑　→）做出動作。真實作品裡，這三顆按鈕會換成手勢或頭部動作的判定。</p>
+
+    <div class="panelbox" style="margin-top:12px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center">
+        <button class="btn flag" id="gStart">▶ 開始遊戲</button>
+        <button class="btn ghost" id="gReset">↺ 重來</button>
+        <span class="readypill" id="readyPill">預備姿勢</span>
+        <button class="btn ghost sm" id="gBack">↩ 回到預備姿勢</button>
+      </div>
+
+      <div class="rmsg" id="gMsg">按「開始」進入第一關</div>
+
+      <div class="seqrow" id="seq"></div>
+      <div style="text-align:center;font-size:.84rem;color:var(--ink2);margin-top:4px" id="seqHint">系統的節奏會顯示在這裡</div>
+
+      <div class="moverow" id="moveRow"></div>
+
+      <div class="scorerow">
+        <div><div class="k">關卡</div><div class="v" id="gLv">1</div></div>
+        <div><div class="k">分數</div><div class="v" id="gSc">0</div></div>
+        <div><div class="k">連續正確</div><div class="v" id="gCb">0</div></div>
+        <div><div class="k">生命</div><div class="v" id="gLf">3</div></div>
+      </div>
+      <div class="note" style="font-size:.86rem">
+        做完一個動作之後，按鈕會<b>暫時不能按</b>——因為還沒回到預備姿勢。這正是題目任務一要求的「<b>避免同一動作被重複判定</b>」。
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">3</span>三個動作、三種聲音</h2>
+    <p>任務一要「至少 3 種手部或頭部的動作」，任務二要「不同動作對應不同的音符、樂器或舞臺動畫」。<br>
+      建議<b>優先挑容易穩定判斷的動作</b>——差距越大越不會誤判。</p>
+    <div class="tablewrap"><table class="rubric">
+      <tr><th>動作</th><th>怎麼判斷（Handpose2Scratch）</th><th>怎麼判斷（Facemesh2Scratch）</th><th>對應效果</th></tr>
+      <tr><td>👈 手向左</td><td>食指尖的 x ＜ −90</td><td>鼻尖 x − 額頭 x ＜ −25（向左轉頭）</td><td>Sol（392 Hz）＋角色向左跳</td></tr>
+      <tr><td>🙌 手舉高</td><td>食指尖的 y ＞ 80</td><td>鼻尖 y − 額頭 y 變小（抬頭）</td><td>Do（523 Hz）＋角色變大</td></tr>
+      <tr><td>👉 手向右</td><td>食指尖的 x ＞ 90</td><td>鼻尖 x − 額頭 x ＞ 25（向右轉頭）</td><td>Mi（659 Hz）＋角色向右跳</td></tr>
+      <tr><td>🧍 預備姿勢</td><td>−40 ＜ x ＜ 40 <b>且</b> y ＜ 0</td><td>鼻尖與額頭 x 差 ＜ 15</td><td>不發聲，只是把旗標歸零</td></tr>
+    </table></div>
+    <p style="font-size:.9rem;color:var(--ink2);margin-top:9px">
+      ⚠️ 門檻數字一定要<b>在你自己的教室實測</b>再訂。光線、鏡頭高度、學生身高都會影響。</p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">4</span>最關鍵的一段：避免重複判定</h2>
+    <p>如果不處理，手舉高的那一秒鐘，「重複無限次」可能跑了<b>三十幾圈</b>，同一個動作就被算成三十幾次。<br>
+      解法是一個<b>旗標變數</b>：做過就鎖住，直到回到預備姿勢才解鎖。</p>
+
+    <div class="fsm">
+      <div class="st a">預備姿勢<br><span style="font-weight:400;font-size:.8rem;color:var(--ink2)">旗標 ＝ 0</span></div>
+      <div class="ar"><b>→</b>做出動作<br>記一次分、播聲音</div>
+      <div class="st b">已觸發（鎖住）<br><span style="font-weight:400;font-size:.8rem;color:var(--ink2)">旗標 ＝ 1</span></div>
+      <div class="ar"><b>→</b>手放下／頭轉正<br>解鎖</div>
+      <div class="st a">回到預備姿勢<br><span style="font-weight:400;font-size:.8rem;color:var(--ink2)">旗標 ＝ 0</span></div>
+    </div>
+
+    <div class="work" style="margin-top:14px">
+      <h3>🔒 旗標寫法（三個動作各做一份，或包成自訂積木）</h3>
+      <div id="d1"></div>
+      <p style="font-size:.9rem;color:var(--ink2);margin-top:8px">
+        💡 三個動作的程式長得幾乎一樣，正是<b>包成自訂積木</b>的好時機——定義一塊「判斷動作」，主程式就很乾淨。</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">5</span>亂數節奏與序列記錄</h2>
+    <p>任務三要「系統利用亂數產生 3～5 個動作組成的節奏順序」。動作要<b>一個接一個記下來</b>，這就是<b>清單</b>的工作。</p>
+    <div class="cols2">
+      <div class="work">
+        <h3>① 產生一段亂數節奏</h3>
+        <p style="font-size:.92rem">清空清單，再用「重複」把亂數動作加進去。1＝手向左、2＝手舉高、3＝手向右。</p>
+        <div id="d2"></div>
+      </div>
+      <div class="work">
+        <h3>② 依序播放提示</h3>
+        <p style="font-size:.92rem">用「編號」當索引，從 1 數到清單的長度，每一圈播一個提示。</p>
+        <div id="d3"></div>
+      </div>
+    </div>
+    <div class="work" style="margin-top:14px">
+      <h3>③ 比對玩家的動作</h3>
+      <p style="font-size:.92rem">玩家做出動作時，拿它和<b>清單的第（編號）項</b>比對。對了就編號加 1，錯了就重來或扣分。</p>
+      <div id="d4"></div>
+    </div>
+    <div class="note" style="margin-top:12px">
+      第二關的<b>接龍</b>只要改一行：玩家全部答對後，不要重新產生節奏，而是<b>「添加 隨機取數 1 到 3 到 節奏清單」</b>，序列就會越接越長。
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">6</span>關卡、分數與難度</h2>
+    <div class="cols2">
+      <div class="work">
+        <h3>🏁 兩個關卡的條件</h3>
+        <table class="rubric">
+          <tr><th>關卡</th><th>玩法</th><th>通過條件</th></tr>
+          <tr><td>第一關<br>節奏記憶</td><td>亂數產生 3～5 個動作，依序播放，玩家完整做出來</td><td>連續答對 <b>3</b> 輪</td></tr>
+          <tr><td>第二關<br>節奏接龍</td><td>每答對一次，序列就<b>多加一個</b>動作</td><td>接到 <b>10</b> 個動作</td></tr>
+          <tr><td colspan="2"><b>遊戲結束條件</b></td><td>生命歸零，或第二關挑戰成功</td></tr>
+        </table>
+      </div>
+      <div class="work">
+        <h3>💯 計分與難度</h3>
+        <table class="rubric">
+          <tr><th>事件</th><th>做法</th></tr>
+          <tr><td>答對一輪</td><td>分數 ＋（10 × 節奏長度）</td></tr>
+          <tr><td>連續正確</td><td>再加（連續次數 × 5），連越多加越多</td></tr>
+          <tr><td>做錯</td><td>連續歸零、生命 −1，該輪重新挑戰</td></tr>
+          <tr><td>難度遞增</td><td>每過一輪把提示間隔<b>縮短</b>（例如 −50 毫秒，最低 220）</td></tr>
+        </table>
+        <div id="d5"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">7</span>程式說明文件要寫什麼</h2>
+    <p>題目指定要說明：<b>動作判定方式（含如何避免重複判定）、亂數節奏產生方法、動作序列的記錄方式、關卡通過與遊戲結束條件</b>。一項都不能少。</p>
+    <div class="docgrid" id="doc"></div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">8</span>送出前自我檢核</h2>
+    <div class="self" id="self"></div>
+  </section>
+
+  <footer>🎵 AI 節奏接龍大作戰・學生版　·　臺北市 115 年度國民中小學 Scratch 貓咪盃競賽 初賽題目</footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script src="assets/rhythm.js"></script>
+<script>
+/* ---------- 1. 任務卡 ---------- */
+var TASKS5=[
+ {n:'一',t:'三種動作 ＋ 預備姿勢判定',
+  d:'至少使用 <b>3 種</b>手部或頭部動作。每個動作之間須能判斷玩家<b>已回到預備姿勢</b>，避免同一動作被重複判定。',
+  tip:'建議優先選容易穩定判斷的動作。第 4 段有完整的旗標寫法。'},
+ {n:'二',t:'不同動作對應不同效果',
+  d:'每個動作要對應<b>不同的音符、樂器聲音或舞臺動畫</b>。',
+  tip:'示範用 Sol／Do／Mi 三個音；也可以再加角色動畫讓畫面更豐富。'},
+ {n:'三',t:'兩個關卡，各有通過條件',
+  d:'第一關<b>節奏記憶</b>：亂數產生 3～5 個動作依序播放。第二關<b>節奏接龍</b>：答對後系統再加一個動作，序列越來越長。',
+  tip:'兩關都要自訂通過條件與遊戲結束條件，第 6 段有一份可以直接用的表。'},
+ {n:'四',t:'計分與連續加分',
+  d:'每完成一輪可得分，<b>連續正確要有加分機制</b>；動作錯誤則重新挑戰該輪或扣分。',
+  tip:'示範用「10 × 長度 ＋ 連續次數 × 5」，連越多加越多。'},
+ {n:'五',t:'難度逐漸增加（可選）',
+  d:'例如縮短反應時間、增加動作數量或提高節奏速度。',
+  tip:'最省事的做法是每過一輪就把提示間隔減少一點點。'}
+];
+(function(){
+  var h=document.getElementById('tasks');
+  TASKS5.forEach(function(t){
+    var d=document.createElement('label');d.className='taskcard';
+    d.innerHTML='<input type="checkbox"><div><div class="tn">任務'+t.n+'</div>'+
+      '<div class="tt">'+t.t+'</div><p>'+t.d+'</p><div class="tip">💡 '+t.tip+'</div></div>';
+    h.appendChild(d);
+  });
+})();
+
+/* ---------- 2. 節奏遊戲 ---------- */
+var MV=Rhythm.moves(), btns={};
+(function(){
+  var row=document.getElementById('moveRow');
+  MV.forEach(function(m){
+    var b=document.createElement('button');
+    b.className='movebtn';b.dataset.id=m.id;
+    b.innerHTML='<span class="ic">'+m.icon+'</span><span>'+m.name+'</span>'+
+                '<span class="nt">'+m.note+'　'+Math.round(m.hz)+' Hz</span>';
+    b.addEventListener('click',function(){Rhythm.doMove(m.id);});
+    row.appendChild(b);btns[m.id]=b;
+  });
+})();
+document.getElementById('gStart').addEventListener('click',function(){Rhythm.start(1);});
+document.getElementById('gReset').addEventListener('click',function(){Rhythm.reset();});
+document.getElementById('gBack').addEventListener('click',function(){Rhythm.setReady(true);});
+document.addEventListener('keydown',function(e){
+  var m=MV.filter(function(x){return x.key===e.key;})[0];
+  if(m){e.preventDefault();Rhythm.doMove(m.id);}
+  if(e.key===' '){e.preventDefault();Rhythm.setReady(true);}
+});
+
+function icon(id){var m=MV.filter(function(x){return x.id===id;})[0];return m?m.icon:'?';}
+Rhythm.on(function(s){
+  document.getElementById('gLv').textContent=s.level;
+  document.getElementById('gSc').textContent=s.score;
+  document.getElementById('gCb').textContent=s.combo;
+  document.getElementById('gLf').textContent=s.life;
+  document.getElementById('gMsg').textContent=s.msg;
+  var p=document.getElementById('readyPill');
+  p.className='readypill '+(s.ready?'on':'off');
+  p.textContent=s.ready?'✓ 已回到預備姿勢':'✗ 還沒回到預備姿勢';
+  document.getElementById('gBack').disabled=s.ready;
+  /* 節奏格 */
+  var sq=document.getElementById('seq');sq.textContent='';
+  var hl=Rhythm.highlight();
+  s.seq.forEach(function(id,i){
+    var c=document.createElement('div');c.className='seqchip';
+    if(s.phase==='show'){ if(i===hl)c.className+=' now'; else if(i>hl)c.className+=' hide'; }
+    else if(s.phase==='play'){
+      if(i<s.input.length)c.className+=' done';
+      else if(i===s.input.length)c.className+=' now';
+      else c.className+=' hide';
+    }
+    c.textContent=icon(id);
+    sq.appendChild(c);
+  });
+  document.getElementById('seqHint').textContent=
+    s.phase==='show'?'👀 看清楚順序⋯⋯':
+    s.phase==='play'?'👆 換你做！已完成 '+s.input.length+' / '+s.seq.length:
+    s.phase==='over'?'遊戲結束':'系統的節奏會顯示在這裡';
+  /* 按鈕可用狀態 */
+  MV.forEach(function(m){
+    btns[m.id].disabled = !(s.phase==='play'&&s.ready);
+    btns[m.id].classList.toggle('lit', s.phase==='show'&&s.seq[hl]===m.id);
+  });
+});
+Rhythm.reset();
+
+/* ---------- 積木示範 ---------- */
+function still(steps,host){
+  (steps||[]).forEach(function(st){
+    var b=UI.byId(st.id); if(!b)return;
+    var node=document.createElement('div');node.className='snode';
+    var el=UI.blockEl(b,false,st.args||{});
+    node.appendChild(el);
+    if(el.bodyEl)still(st.body,el.bodyEl);
+    if(el.body2El)still(st.body2,el.body2El);
+    host.appendChild(node);
+  });
+}
+function prog(steps,hostId){
+  var d=document.createElement('div');d.className='prog';
+  still(steps,d);document.getElementById(hostId).appendChild(d);
+}
+
+/* 4. 旗標避免重複判定 */
+prog([
+  {id:'whenflag'},
+  {id:'handmirror',args:{M:'鏡像開啟'}},
+  {id:'setvar',args:{V:'編號',N:'0'}},
+  {id:'forever',body:[
+    {id:'ifthen',args:{COND:{__b:'opand',args:{
+        A:{__b:'opgt',args:{A:{__b:'handy',args:{P:'食指尖'}},B:'80'}},
+        B:{__b:'opeq',args:{A:{__b:'varreport',args:{V:'編號'}},B:'0'}}}}},body:[
+      {id:'setvar',args:{V:'編號',N:'1'}},
+      {id:'sayfor',args:{MSG:'手舉高！Do',SECS:0.4}},
+      {id:'changevar',args:{V:'分數',N:10}}
+    ]},
+    {id:'ifthen',args:{COND:{__b:'oplt',args:{A:{__b:'handy',args:{P:'食指尖'}},B:'0'}}},body:[
+      {id:'setvar',args:{V:'編號',N:'0'}}
+    ]}
+  ]}
+],'d1');
+
+/* 5-① 亂數節奏 */
+prog([
+  {id:'listdelall',args:{L:'排行榜'}},
+  {id:'setvar',args:{V:'速度',N:'4'}},
+  {id:'repeat',args:{N:{__b:'oprandom',args:{A:3,B:5}}},body:[
+    {id:'listadd',args:{L:'排行榜',IT:{__b:'oprandom',args:{A:1,B:3}}}}
+  ]}
+],'d2');
+
+/* 5-② 依序播放提示 */
+prog([
+  {id:'setvar',args:{V:'編號',N:'1'}},
+  {id:'repeat',args:{N:{__b:'listlength',args:{L:'排行榜'}}},body:[
+    {id:'sayfor',args:{MSG:{__b:'listitem',args:{L:'排行榜',N:{__b:'varreport',args:{V:'編號'}}}},SECS:0.5}},
+    {id:'wait',args:{SECS:0.2}},
+    {id:'changevar',args:{V:'編號',N:1}}
+  ]}
+],'d3');
+
+/* 5-③ 比對 */
+prog([
+  {id:'ifelse',args:{COND:{__b:'opeq',args:{
+      A:{__b:'varreport',args:{V:'生命'}},
+      B:{__b:'listitem',args:{L:'排行榜',N:{__b:'varreport',args:{V:'編號'}}}}}}},
+   body:[
+     {id:'changevar',args:{V:'編號',N:1}},
+     {id:'sayfor',args:{MSG:'答對了！',SECS:0.4}}
+   ],
+   body2:[
+     {id:'setvar',args:{V:'my variable',N:'0'}},
+     {id:'changevar',args:{V:'分數',N:-5}},
+     {id:'sayfor',args:{MSG:'做錯了，這一輪重來',SECS:1}}
+   ]}
+],'d4');
+
+/* 6 難度遞增 */
+prog([
+  {id:'changevar',args:{V:'速度',N:-0.05}},
+  {id:'ifthen',args:{COND:{__b:'oplt',args:{A:{__b:'varreport',args:{V:'速度'}},B:'0.22'}}},body:[
+    {id:'setvar',args:{V:'速度',N:'0.22'}}
+  ]}
+],'d5');
+
+/* ---------- 7. 說明文件 ---------- */
+var DOC=[
+ ['① 動作判定方式','用哪個擴充模組、偵測哪個部位、三個動作各自的<b>門檻值</b>是多少，以及為什麼這樣訂。',
+  '例：Handpose2Scratch 偵測食指尖。手向左 x ＜ −90、手舉高 y ＞ 80、手向右 x ＞ 90。'],
+ ['② 如何避免重複判定','用什麼變數當旗標？什麼情況算「回到預備姿勢」？',
+  '例：旗標變數「已觸發」。動作成立時設為 1；回到 −40 ＜ x ＜ 40 且 y ＜ 0 才設回 0。'],
+ ['③ 亂數節奏產生方法','用哪一塊積木產生亂數、範圍多少、產生幾個。',
+  '例：「重複（隨機取數 3 到 5）次：添加（隨機取數 1 到 3）到 節奏清單」。'],
+ ['④ 動作序列的記錄方式','節奏和玩家的輸入各存在哪裡？用什麼比對？',
+  '例：節奏存在清單「節奏」，用變數「編號」當索引，玩家每做一個動作就和「節奏的第（編號）項」比對。'],
+ ['⑤ 關卡通過與結束條件','兩關各自的通過條件、遊戲結束條件寫成<b>數字</b>。',
+  '例：第一關連續答對 3 輪過關；第二關接到 10 個動作挑戰成功；生命歸零遊戲結束。']
+];
+(function(){
+  var h=document.getElementById('doc');
+  DOC.forEach(function(d){
+    var c=document.createElement('div');c.className='doccard';
+    c.innerHTML='<div class="dt">'+d[0]+'</div><p>'+d[1]+'</p><div class="eg">'+d[2]+'</div>';
+    h.appendChild(c);
+  });
+})();
+
+/* ---------- 8. 自我檢核 ---------- */
+var SELF=[
+ '至少有<b>三種</b>手部或頭部動作，而且判斷得很穩。',
+ '每個動作都<b>對應不同的聲音或動畫</b>。',
+ '同一個動作<b>不會連續重複判定</b>（有預備姿勢的旗標）。',
+ '偵測不到手或臉時程式<b>不會當掉</b>。',
+ '第一關的節奏是<b>亂數產生</b>的 3～5 個動作。',
+ '第二關會讓節奏<b>越接越長</b>。',
+ '兩關都有寫清楚的<b>通過條件</b>，也有<b>遊戲結束條件</b>。',
+ '有計分，而且<b>連續正確會加更多分</b>。',
+ '做錯時有處理（重來或扣分），不是沒反應。',
+ '程式說明文件四個指定項目都寫了。'
+];
+(function(){
+  var h=document.getElementById('self');
+  SELF.forEach(function(t){
+    var l=document.createElement('label');
+    l.innerHTML='<input type="checkbox"><span>'+t+'</span>';
+    h.appendChild(l);
+  });
+})();
+</script>
+</body>
+</html>

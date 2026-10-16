@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Tree Viewer Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .json-tree ul {
+            list-style-type: none;
+            padding-left: 1.5rem;
+            margin: 0;
+            border-left: 1px dashed #cbd5e1;
+        }
+        .json-tree li {
+            position: relative;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        
+        .json-tree .caret {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            width: 1.25rem;
+            text-align: center;
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+        .json-tree .caret::before {
+            content: "▼";
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        .json-tree .caret.collapsed::before {
+            transform: rotate(-90deg);
+        }
+        .json-tree .collapsed-content {
+            display: none !important;
+        }
+        
+        .json-key { color: #6366f1; font-weight: 600; }
+        .json-string { color: #10b981; }
+        .json-number { color: #f59e0b; }
+        .json-boolean { color: #a855f7; font-weight: 600; }
+        .json-null { color: #94a3b8; font-style: italic; }
+        .json-bracket { color: #64748b; }
+        
+        /* Scrollbar aesthetics */
+        textarea::-webkit-scrollbar, .overflow-auto::-webkit-scrollbar { width: 8px; height: 8px; }
+        textarea::-webkit-scrollbar-track, .overflow-auto::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb, .overflow-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover, .overflow-auto::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <header class="bg-white border-b border-slate-200 shadow-sm py-4 px-6 sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">JSON Tree Viewer <span class="text-indigo-600">Pro</span></h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="download-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2" disabled>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Save JSON
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-screen-2xl w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Editor Section -->
+        <section class="flex-1 flex flex-col gap-4 lg:w-5/12 h-[calc(100vh-140px)]">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Editor</h2>
+                    <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-1.5 px-3 rounded-md transition-colors border border-slate-200 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        Upload File
+                        <input type="file" id="file-input" accept=".json" class="hidden">
+                    </label>
+                </div>
+                
+                <textarea id="json-input" class="w-full flex-grow p-4 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-mono text-sm resize-none shadow-inner" placeholder="Paste your JSON string here..."></textarea>
+                
+                <div class="mt-4 flex justify-between items-center h-10">
+                    <p id="error-message" class="text-red-600 bg-red-50 px-3 py-1.5 rounded-md text-sm font-semibold border border-red-200 hidden truncate max-w-[60%]"></p>
+                    <button id="render-btn" class="ml-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Render Tree
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="flex-1 flex flex-col gap-4 lg:w-7/12 h-[calc(100vh-140px)]">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+                
+                <!-- Advanced Toolbar -->
+                <div class="bg-slate-50 border-b border-slate-200 p-3 flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex-grow flex flex-wrap gap-2 items-center">
+                        <div class="relative flex-grow min-w-[200px] max-w-xs">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" id="search-input" placeholder="Search..." class="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                        </div>
+                        <div class="relative flex-grow min-w-[200px] max-w-xs">
+                            <input type="text" id="replace-input" placeholder="Replace with..." class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                        </div>
+                        <button id="replace-all-btn" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-1.5 px-3 rounded-md transition-colors" disabled>Replace All</button>
+                    </div>
+                    
+                    <div class="flex gap-1.5 border-l border-slate-300 pl-3">
+                        <button id="expand-all-btn" class="text-xs font-semibold text-indigo-700 bg-indigo-100 hover:bg-indigo-200 px-2.5 py-1.5 rounded-md transition-colors">Expand</button>
+                        <button id="collapse-all-btn" class="text-xs font-semibold text-slate-700 bg-slate-200 hover:bg-slate-300 px-2.5 py-1.5 rounded-md transition-colors">Collapse</button>
+                    </div>
+                </div>
+                
+                <!-- Tree Container -->
+                <div class="p-5 overflow-auto flex-grow bg-white json-tree" id="tree-container">
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 space-y-3">
+                        <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span class="text-sm font-medium">Rendered JSON will appear here.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const DOM = {
+            jsonInput: document.getElementById('json-input'),
+            fileInput: document.getElementById('file-input'),
+            renderBtn: document.getElementById('render-btn'),
+            treeContainer: document.getElementById('tree-container'),
+            errorMessage: document.getElementById('error-message'),
+            expandAllBtn: document.getElementById('expand-all-btn'),
+            collapseAllBtn: document.getElementById('collapse-all-btn'),
+            searchInput: document.getElementById('search-input'),
+            replaceInput: document.getElementById('replace-input'),
+            replaceAllBtn: document.getElementById('replace-all-btn'),
+            downloadBtn: document.getElementById('download-btn'),
+        };
+
+        let currentJsonData = null;
+
+        // Initialize events
+        DOM.fileInput.addEventListener('change', handleFileUpload);
+        DOM.renderBtn.addEventListener('click', parseAndRender);
+        DOM.expandAllBtn.addEventListener('click', () => toggleAllNodes(true));
+        DOM.collapseAllBtn.addEventListener('click', () => toggleAllNodes(false));
+        DOM.searchInput.addEventListener('input', () => renderTree(currentJsonData));
+        DOM.replaceAllBtn.addEventListener('click', handleReplaceAll);
+        DOM.downloadBtn.addEventListener('click', handleDownload);
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                DOM.jsonInput.value = event.target.result;
+                parseAndRender();
+            };
+            reader.readAsText(file);
+            e.target.value = ''; // Reset input so same file can be uploaded again if needed
+        }
+
+        function handleDownload() {
+            if (!currentJsonData) return;
+            
+            const jsonString = JSON.stringify(currentJsonData, null, 4);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function parseAndRender() {
+            const rawValue = DOM.jsonInput.value.trim();
+            if (!rawValue) {
+                showError('Please input JSON first.');
+                currentJsonData = null;
+                updateActionButtonsState();
+                return;
+            }
+
+            try {
+                currentJsonData = JSON.parse(rawValue);
+                hideError();
+                updateActionButtonsState();
+                // Format the textarea content nicely
+                DOM.jsonInput.value = JSON.stringify(currentJsonData, null, 4);
+                renderTree(currentJsonData);
+            } catch (error) {
+                showError('Invalid JSON format: ' + error.message);
+                currentJsonData = null;
+                updateActionButtonsState();
+            }
+        }
+
+        function handleReplaceAll() {
+            if (!currentJsonData) return;
+            
+            const search = DOM.searchInput.value;
+            const replace = DOM.replaceInput.value;
+            
+            if (!search) return;
+
+            // Deep replace over the JSON object
+            currentJsonData = recursivelyReplace(currentJsonData, search, replace);
+            
+            // Sync back to text area and re-render
+            DOM.jsonInput.value = JSON.stringify(currentJsonData, null, 4);
+            renderTree(currentJsonData);
+        }
+
+        function recursivelyReplace(obj, search, replace) {
+            if (typeof obj === 'string') {
+                return obj.split(search).join(replace); // Global literal string replacement
+            } else if (Array.isArray(obj)) {
+                return obj.map(item => recursivelyReplace(item, search, replace));
+            } else if (typeof obj === 'object' && obj !== null) {
+                const newObj = {};
+                for (const [key, value] of Object.entries(obj)) {
+                    const newKey = key.split(search).join(replace);
+                    newObj[newKey] = recursivelyReplace(value, search, replace);
+                }
+                return newObj;
+            }
+            return obj;
+        }
+
+        function renderTree(data) {
+            if (data === null) {
+                DOM.treeContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 space-y-3">
+                        <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="text-sm font-medium">No valid JSON to display.</span>
+                    </div>`;
+                return;
+            }
+
+            DOM.treeContainer.innerHTML = '';
+            const searchTerm = DOM.searchInput.value;
+            
+            const rootWrapper = document.createElement('div');
+            const [nodeEl, _] = buildTreeNode('root', data, true, true, searchTerm);
+            rootWrapper.appendChild(nodeEl);
+            DOM.treeContainer.appendChild(rootWrapper);
+        }
+
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function highlightText(text, term) {
+            const escapedText = escapeHtml(text);
+            if (!term) return escapedText;
+            
+            const escapedTerm = escapeHtml(term);
+            if (!escapedTerm) return escapedText;
+
+            const regex = new RegExp(`(${escapeRegExp(escapedTerm)})`, 'gi');
+            return escapedText.replace(regex, `<mark class="bg-yellow-300 text-yellow-900 rounded-sm px-0.5 font-bold shadow-sm">$1</mark>`);
+        }
+
+        // Returns [HTMLElement, hasMatchBoolean]
+        function buildTreeNode(key, value, isLast, isRoot = false, searchTerm = "") {
+            const li = document.createElement('li');
+            const isObject = value !== null && typeof value === 'object';
+            const isArray = Array.isArray(value);
+            
+            let nodeHasMatch = false;
+
+            // Generate Key HTML
+            let keyHtml = '';
+            if (!isRoot && key !== null) {
+                const searchKeyText = String(key);
+                if (searchTerm && searchKeyText.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    nodeHasMatch = true;
+                }
+                const formattedKey = highlightText(key, searchTerm);
+                keyHtml = `<span class="json-key">"${formattedKey}"</span><span class="json-bracket">: </span>`;
+            }
+
+            if (isObject) {
+                const isEmpty = Object.keys(value).length === 0;
+                const openBracket = isArray ? '[' : '{';
+                const closeBracket = isArray ? ']' : '}';
+
+                if (isEmpty) {
+                    li.innerHTML = `${keyHtml}<span class="json-bracket">${openBracket}${closeBracket}</span>${isLast ? '' : '<span class="json-bracket">,</span>'}`;
+                } else {
+                    const caret = document.createElement('span');
+                    caret.className = 'caret';
+                    
+                    const labelSpan = document.createElement('span');
+                    labelSpan.innerHTML = `${keyHtml}<span class="json-bracket">${openBracket}</span>`;
+                    labelSpan.style.cursor = 'pointer';
+                    
+                    li.appendChild(caret);
+                    li.appendChild(labelSpan);
+
+                    const ul = document.createElement('ul');
+                    const keys = Object.keys(value);
+                    
+                    let childHasMatch = false;
+                    keys.forEach((childKey, index) => {
+                        const childIsLast = index === keys.length - 1;
+                        const [childLi, matched] = buildTreeNode(isArray ? null : childKey, value[childKey], childIsLast, false, searchTerm);
+                        if (matched) childHasMatch = true;
+                        ul.appendChild(childLi);
+                    });
+
+                    // Auto-expand logic based on search matches
+                    if (searchTerm && (nodeHasMatch || childHasMatch)) {
+                        nodeHasMatch = true;
+                        // Don't add collapsed classes
+                    } else if (isRoot) {
+                        // Root always open by default
+                    } else if (!searchTerm) {
+                        // Default state: you can define if you want them collapsed or open initially. Open is safer.
+                    }
+
+                    // Click to toggle
+                    const toggleNode = (e) => {
+                        if(e) e.stopPropagation();
+                        caret.classList.toggle('collapsed');
+                        ul.classList.toggle('collapsed-content');
+                    };
+                    caret.onclick = toggleNode;
+                    labelSpan.onclick = toggleNode;
+
+                    li.appendChild(ul);
+                    
+                    const closingSpan = document.createElement('span');
+                    closingSpan.innerHTML = `<span class="json-bracket">${closeBracket}</span>${isLast ? '' : '<span class="json-bracket">,</span>'}`;
+                    li.appendChild(closingSpan);
+                }
+            } else {
+                let valueHtml = '';
+                let rawStringVal = String(value);
+                
+                if (searchTerm && typeof value === 'string' && rawStringVal.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    nodeHasMatch = true;
+                }
+
+                if (typeof value === 'string') {
+                    valueHtml = `<span class="json-string">"${highlightText(value, searchTerm)}"</span>`;
+                } else if (typeof value === 'number') {
+                    valueHtml = `<span class="json-number">${highlightText(value, searchTerm)}</span>`;
+                } else if (typeof value === 'boolean') {
+                    valueHtml = `<span class="json-boolean">${highlightText(value, searchTerm)}</span>`;
+                } else if (value === null) {
+                    valueHtml = `<span class="json-null">${highlightText("null", searchTerm)}</span>`;
+                }
+                
+                li.innerHTML = `<span style="padding-left: 1.25rem;"></span>${keyHtml}${valueHtml}${isLast ? '' : '<span class="json-bracket">,</span>'}`;
+            }
+
+            return [li, nodeHasMatch];
+        }
+
+        function toggleAllNodes(expand) {
+            const carets = document.querySelectorAll('.json-tree .caret');
+            const uls = document.querySelectorAll('.json-tree ul');
+            
+            carets.forEach(c => expand ? c.classList.remove('collapsed') : c.classList.add('collapsed'));
+            uls.forEach(u => expand ? u.classList.remove('collapsed-content') : u.classList.add('collapsed-content'));
+            
+            // Re-expand root elements to keep structure visible if collapsing
+            if (!expand) {
+                const rootUls = Array.from(DOM.treeContainer.children).flatMap(c => Array.from(c.children)).filter(el => el.tagName === 'UL');
+                rootUls.forEach(ul => ul.classList.remove('collapsed-content'));
+                
+                if(DOM.treeContainer.firstElementChild) {
+                    const topCaret = DOM.treeContainer.firstElementChild.querySelector('.caret');
+                    const topUl = DOM.treeContainer.firstElementChild.querySelector('ul');
+                    if(topCaret) topCaret.classList.remove('collapsed');
+                    if(topUl) topUl.classList.remove('collapsed-content');
+                }
+            }
+        }
+
+        function showError(msg) {
+            DOM.errorMessage.textContent = msg;
+            DOM.errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            DOM.errorMessage.classList.add('hidden');
+        }
+
+        function updateActionButtonsState() {
+            const isValid = currentJsonData !== null;
+            DOM.replaceAllBtn.disabled = !isValid;
+            DOM.downloadBtn.disabled = !isValid;
+            
+            if (isValid) {
+                DOM.replaceAllBtn.classList.replace('bg-slate-800', 'bg-indigo-600');
+                DOM.replaceAllBtn.classList.replace('hover:bg-slate-700', 'hover:bg-indigo-700');
+            } else {
+                DOM.replaceAllBtn.classList.replace('bg-indigo-600', 'bg-slate-800');
+                DOM.replaceAllBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-slate-700');
+            }
+        }
+
+        // Initialize with default demo data
+        DOM.jsonInput.value = JSON.stringify({
+            "project": "JSON Tree Viewer Pro",
+            "version": 2.0,
+            "isLive": true,
+            "author": null,
+            "features": [
+                "Expandable nodes",
+                "Real-time Search & Highlighting",
+                "Deep Replace functionality",
+                "Save to .json file"
+            ],
+            "settings": {
+                "theme": "light",
+                "indentation": 4
+            },
+            "sample_data": {
+                "user_id": 98453,
+                "role": "admin",
+                "bio": "Loves building web tools."
+            }
+        }, null, 4);
+        
+        parseAndRender();
+
+    </script>
+</body>
+</html>

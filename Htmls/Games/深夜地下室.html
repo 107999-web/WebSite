@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深夜的地下室</title>
+    <style>
+        /* CSS：營造黑暗與恐怖氛圍 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505; /* 極深的黑色 */
+            color: #333; /* 隱約可見的暗灰色字體 */
+            font-family: 'Courier New', Courier, monospace; /* 復古打字機字體 */
+            overflow: hidden; /* 防止滾動條出現 */
+            cursor: none; /* 隱藏滑鼠游標，增加沉浸感與不安感 */
+        }
+
+        /* 背景散落的詭異文字 */
+        .creepy-text {
+            position: absolute;
+            font-size: 16px;
+            user-select: none;
+            z-index: 1;
+            font-weight: bold;
+        }
+
+        /* 黑暗遮罩 (純 CSS 實現的手電筒光圈效果) */
+        #flashlight {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 讓滑鼠可以點擊穿透這層黑暗 */
+            z-index: 10;
+            /* 預設把畫面全黑 */
+            background: rgba(0, 0, 0, 1);
+        }
+
+        /* 門 (出口) */
+        #door {
+            position: absolute;
+            font-size: 45px;
+            cursor: pointer;
+            z-index: 5;
+            transition: transform 0.2s;
+        }
+        #door:hover { transform: scale(1.2); }
+
+        /* 鬼影 (陷阱) */
+        #ghost {
+            position: absolute;
+            font-size: 55px;
+            z-index: 5;
+            opacity: 0.8; /* 在黑暗中微微透出 */
+        }
+
+        /* 突發驚嚇 (Jump Scare) 畫面設計 */
+        #jumpscare {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8b0000; /* 血紅色 */
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            font-size: 120px;
+            font-weight: bold;
+            /* 劇烈震動動畫 */
+            animation: shake 0.1s infinite;
+        }
+
+        /* 畫面震動的關鍵影格 */
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-3px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* 勝利畫面 */
+        #win-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-size: 32px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="creepy-text" style="top: 15%; left: 20%;">好安靜...</div>
+    <div class="creepy-text" style="top: 40%; left: 70%;">有人在呼吸</div>
+    <div class="creepy-text" style="top: 80%; left: 30%;">快逃</div>
+    <div class="creepy-text" style="top: 60%; left: 10%;">不要回頭</div>
+    <div class="creepy-text" style="top: 25%; left: 80%;">它看見你了</div>
+
+    <div id="door" title="點擊逃脫">🚪</div>
+    <div id="ghost">👁️</div>
+
+    <div id="flashlight"></div>
+
+    <div id="jumpscare">
+        <div>💀</div>
+        <div style="font-size: 50px; margin-top: 20px;">抓 到 你 了</div>
+    </div>
+    <div id="win-screen">
+        <div>你成功找到了出口... 這次算你好運。</div>
+    </div>
+
+    <script>
+        // JavaScript：遊戲邏輯控制
+        const flashlight = document.getElementById('flashlight');
+        const door = document.getElementById('door');
+        const ghost = document.getElementById('ghost');
+        const jumpscare = document.getElementById('jumpscare');
+        const winScreen = document.getElementById('win-screen');
+        
+        let gameActive = true;
+
+        // 函數：隨機將物件擺放到畫面上的任何角落
+        function randomizePosition(element) {
+            // 扣除一些邊距，避免物件超出視窗外
+            const maxX = window.innerWidth - 80;
+            const maxY = window.innerHeight - 80;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            element.style.left = randomX + 'px';
+            element.style.top = randomY + 'px';
+        }
+
+        // 遊戲開始時，隨機放置門和鬼
+        randomizePosition(door);
+        randomizePosition(ghost);
+
+        // 監聽滑鼠移動事件 (手電筒效果核心)
+        document.addEventListener('mousemove', function(e) {
+            if (!gameActive) return;
+            
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // 使用 CSS 放射狀漸層，在滑鼠位置畫出透明的圓孔（手電筒的光）
+            flashlight.style.background = `radial-gradient(circle at ${x}px ${y}px, transparent 0%, rgba(0,0,0,0.98) 120px, #000 140px)`;
+            
+            // 檢查滑鼠(手電筒)是否太靠近鬼影
+            const ghostRect = ghost.getBoundingClientRect();
+            // 計算鬼影的中心點座標
+            const ghostX = ghostRect.left + ghostRect.width / 2;
+            const ghostY = ghostRect.top + ghostRect.height / 2;
+            
+            // 計算滑鼠到鬼影的直線距離
+            const distance = Math.sqrt(Math.pow(x - ghostX, 2) + Math.pow(y - ghostY, 2));
+            
+            // 如果手電筒照到鬼 (距離小於 60 像素)，觸發死亡驚嚇！
+            if (distance < 60) {
+                triggerJumpscare();
+            }
+        });
+
+        // 監聽點擊門的事件 (勝利條件)
+        door.addEventListener('click', function() {
+            if (!gameActive) return;
+            gameActive = false; // 停止遊戲邏輯
+            winScreen.style.display = 'flex'; // 顯示勝利白畫面
+            flashlight.style.display = 'none'; // 拿掉黑暗
+        });
+
+        // 觸發驚嚇效果的函數
+        function triggerJumpscare() {
+            if (!gameActive) return;
+            gameActive = false; // 停止遊戲邏輯
+            jumpscare.style.display = 'flex'; // 顯示血紅震動畫面
+            
+            // 如果你想加入更恐怖的聲音，可以準備一個尖叫聲檔案 scream.mp3 放在同目錄
+            // const audio = new Audio('scream.mp3');
+            // audio.play();
+        }
+    </script>
+</body>
+</html>

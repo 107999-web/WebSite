@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<!-- 課堂搶答王 1.3 題庫編輯器（離線版）：由 20260925_課堂搶答王/tools/sync_versions.py 自動產生，請勿直接修改 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課堂搶答王・題庫編輯器</title>
+<style>
+:root{--bg:#F4F1FA;--bar:#46178F;--bar2:#2E0F63;--card:#fff;--ink:#2B2B3A;--ink2:#6B6B80;--line:#E4DEF2;--soft:#F8F6FC;--acc:#7B3FE4;--ok:#26890C;--no:#E21B3C;--warn:#B26A00;
+  --f:'Microsoft JhengHei','PingFang TC','Noto Sans TC',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17172A;--card:#23233A;--ink:#EEEEF6;--ink2:#A9A9C2;--line:#3A3A58;--soft:#1D1D32;--warn:#F0B040}}
+:root[data-theme="dark"]{--bg:#17172A;--card:#23233A;--ink:#EEEEF6;--ink2:#A9A9C2;--line:#3A3A58;--soft:#1D1D32;--warn:#F0B040}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--f)}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;background:linear-gradient(90deg,var(--bar),var(--bar2));color:#fff}
+header .logo{font-weight:900;font-size:1.1rem;white-space:nowrap}
+#title{flex:1;min-width:160px;max-width:420px;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:6px 10px;font-weight:800;font-size:1.05rem}
+#title::placeholder{color:rgba(255,255,255,.6)}
+#fileInfo{font-size:.85rem;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.hb{border:none;border-radius:10px;padding:7px 12px;font-weight:800;font-size:.92rem;background:rgba(255,255,255,.16);color:#fff;white-space:nowrap}
+.hb:hover{background:rgba(255,255,255,.28)}.hb.go{background:var(--ok)}.hb[disabled]{opacity:.4;cursor:default}
+.sp{flex:1}
+.menu{position:relative}
+.menu .dd{position:absolute;right:0;top:110%;background:var(--card);color:var(--ink);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:250px;z-index:20}
+.menu .dd button{display:block;width:100%;text-align:left;border:none;background:none;padding:9px 12px;border-radius:8px;font-weight:700}
+.menu .dd button small{display:block;font-weight:400;color:var(--ink2);font-size:.78rem}
+.menu .dd button:hover{background:var(--soft)}
+main{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;padding:14px;max-width:1500px;margin:0 auto}
+@media(max-width:860px){main{grid-template-columns:minmax(0,1fr)}#side{position:static;max-height:40vh}}
+.card{background:var(--card);border-radius:16px;box-shadow:0 4px 16px rgba(46,15,99,.08);border:1px solid var(--line)}
+/* 題目清單 */
+#side{display:flex;flex-direction:column;padding:10px;position:sticky;top:64px;max-height:calc(100vh - 80px)}
+#side h3{margin:2px 4px 8px;font-size:.95rem;display:flex;align-items:center;gap:6px}
+#side h3 span{color:var(--ink2);font-weight:600;font-size:.85rem}
+#list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:2px}
+.qi{display:flex;gap:8px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:7px 8px;background:var(--card);cursor:pointer;user-select:none}
+.qi:hover{border-color:color-mix(in srgb,var(--acc) 45%,var(--line))}
+.qi.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 9%,var(--card))}
+.qi.drag{opacity:.35}.qi.over{box-shadow:0 -3px 0 var(--acc)}
+.qi .no{font-weight:900;color:var(--ink2);width:1.6em;text-align:right;flex:0 0 auto}
+.qi .tx{flex:1;min-width:0;font-size:.9rem;line-height:1.3}
+.qi .tx b{display:block;font-size:.72rem;color:var(--acc)}
+.qi .tx span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qi .th{width:36px;height:36px;border-radius:6px;object-fit:cover;flex:0 0 auto;background:var(--soft)}
+.qi .bad{color:var(--no);font-weight:900}
+.addrow{display:flex;gap:6px;margin-top:8px}
+.btn{border:none;border-radius:10px;padding:8px 12px;font-weight:800;background:var(--line);color:var(--ink)}
+.btn:hover{filter:brightness(.96)}
+.btn.p{background:var(--acc);color:#fff}.btn.d{background:transparent;color:var(--no)}.btn.sm{padding:5px 9px;font-size:.85rem}
+.btn[disabled]{opacity:.4;cursor:default}
+select.btn{padding:7px 8px}
+/* 編輯區 */
+#ed{padding:16px 18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.types{display:flex;gap:4px;flex-wrap:wrap;background:var(--soft);padding:4px;border-radius:12px}
+.types button{border:none;background:none;border-radius:9px;padding:7px 12px;font-weight:800;color:var(--ink2)}
+.types button.on{background:var(--acc);color:#fff}
+.lbl{font-weight:800;font-size:.9rem;margin-bottom:5px;display:flex;gap:8px;align-items:baseline}
+.lbl small{font-weight:400;color:var(--ink2)}
+#qText{width:100%;border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:1.35rem;font-weight:800;resize:none;background:var(--card);min-height:64px;line-height:1.4}
+#qText:focus,.opt input:focus,.fld:focus{outline:none;border-color:var(--acc)}
+.cnt{font-size:.78rem;color:var(--ink2);text-align:right}
+.cnt.over{color:var(--no);font-weight:800}
+/* 圖片 */
+.imgbox{border:2px dashed var(--line);border-radius:14px;padding:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--soft)}
+.imgbox.hot{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--soft))}
+.imgbox img{max-height:170px;max-width:min(340px,100%);border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.imgbox .miss{width:170px;height:110px;border-radius:10px;display:grid;place-items:center;text-align:center;background:var(--line);color:var(--ink2);font-size:.8rem;padding:6px}
+.imgbox .hint{color:var(--ink2);font-size:.9rem}
+/* 選項 */
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{display:flex;align-items:center;gap:8px;border-radius:14px;padding:8px 10px;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.opt .sh{font-size:1.4rem;width:1.3em;text-align:center;flex:0 0 auto}
+.opt input{flex:1;min-width:0;border:2px solid transparent;border-radius:10px;padding:9px 10px;font-size:1.05rem;font-weight:700;background:rgba(255,255,255,.95);color:#222}
+.opt .ck{width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.9);background:rgba(0,0,0,.15);color:#fff;font-size:1.3rem;font-weight:900;flex:0 0 auto;display:grid;place-items:center}
+.opt .ck.on{background:#fff;color:var(--ok)}
+.opt .x{border:none;background:rgba(0,0,0,.2);color:#fff;border-radius:8px;width:30px;height:30px;font-weight:900;flex:0 0 auto}
+.opt.poll .ck{display:none}
+.tf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tf button{border:none;border-radius:16px;padding:22px;font-size:1.6rem;font-weight:900;color:#fff;opacity:.45;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+.tf button.on{opacity:1;outline:4px solid var(--ok);outline-offset:3px}
+.ord{display:flex;flex-direction:column;gap:8px}
+.ord .opt{background:#5B5BD6}
+.ord .num{font-weight:900;font-size:1.2rem;width:1.5em;text-align:center}
+.ord .mv{border:none;background:rgba(255,255,255,.22);color:#fff;border-radius:8px;width:30px;height:30px;font-weight:900}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--ok);color:#fff;border-radius:999px;padding:6px 8px 6px 14px;font-weight:800}
+.chip button{border:none;background:rgba(0,0,0,.2);color:#fff;border-radius:50%;width:24px;height:24px;font-weight:900}
+.fld{border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--card)}
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 16px}
+.set label{display:flex;flex-direction:column;gap:4px;font-weight:800;font-size:.9rem}
+.msgs{display:flex;flex-direction:column;gap:4px;font-size:.9rem}
+.msgs .e{color:var(--no);font-weight:700}.msgs .w{color:var(--warn);font-weight:700}.msgs .ok{color:var(--ok);font-weight:700}
+/* 預覽 */
+.pv{background:linear-gradient(160deg,#46178F,#2E0F63);border-radius:14px;padding:12px;color:#fff}
+.pv .pq{background:#fff;color:#2B2B3A;border-radius:10px;padding:10px;text-align:center;font-weight:900;font-size:1.05rem;word-break:break-word}
+.pv .pimg{display:block;max-height:90px;max-width:60%;margin:8px auto 0;border-radius:8px}
+.pv .pg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}
+.pv .po{border-radius:8px;padding:8px;font-weight:800;font-size:.85rem;display:flex;gap:6px;align-items:center;word-break:break-word}
+.pv .po.dim{opacity:.35}
+.pv .ph{text-align:center;font-size:.8rem;opacity:.8;margin-top:6px}
+.empty{padding:40px 20px;text-align:center;color:var(--ink2)}
+.empty b{display:block;font-size:1.3rem;color:var(--ink);margin-bottom:8px}
+/* 視窗 */
+dialog{border:none;border-radius:18px;padding:0;width:min(820px,94vw);background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(20,10,40,.55)}
+.dlg{padding:16px 18px;display:flex;flex-direction:column;gap:10px;max-height:88vh;overflow:auto}
+.dlg h3{margin:0;font-size:1.1rem}
+.banks{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto}
+.banks button{text-align:left;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:9px 12px;display:flex;gap:10px;align-items:center}
+.banks button:hover{border-color:var(--acc)}
+.banks small{color:var(--ink2)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:52vh;overflow:auto}
+.gal button{border:2px solid var(--line);border-radius:10px;background:var(--soft);padding:4px;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:.75rem;word-break:break-all}
+.gal button:hover{border-color:var(--acc)}
+.gal img{width:100%;height:90px;object-fit:contain}
+#srcText{width:100%;height:56vh;font-family:Consolas,'Microsoft JhengHei',monospace;font-size:.95rem;border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--card);resize:vertical}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;z-index:50;max-width:90vw}
+.drop{position:fixed;inset:0;background:rgba(70,23,143,.55);color:#fff;display:grid;place-items:center;font-size:2rem;font-weight:900;z-index:40;pointer-events:none}
+kbd{background:var(--line);border-radius:5px;padding:0 5px;font-size:.8em}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">🧩 題庫編輯器</span>
+  <input id="title" placeholder="題庫名稱" maxlength="40" title="題庫名稱（會顯示在遊戲畫面上）">
+  <span id="fileInfo"></span>
+  <span class="sp"></span>
+  <button class="hb" id="bUndo" title="復原（Ctrl+Z）">↶</button>
+  <button class="hb" id="bRedo" title="重做（Ctrl+Y）">↷</button>
+  <button class="hb" id="bNew">📄 新題庫</button>
+  <button class="hb" id="bOpen">📂 開啟／匯入</button>
+  <button class="hb" id="bSave" title="Ctrl+S">💾 儲存</button>
+  <span class="menu"><button class="hb" id="bExp">⬇ 匯出 ▾</button>
+    <div class="dd" id="expMenu" hidden>
+      <button data-x="kahoot">Kahoot 試算表（.xlsx）<small>上傳到 Kahoot「匯入試算表」。只帶單選／複選／是非題</small></button>
+      <button data-x="table">Excel 表格（.xlsx）<small>所有題型與設定，可在 Excel 大量整理後再匯入</small></button>
+      <button data-x="txt">純文字題庫（.txt）<small>課堂搶答王的題庫格式</small></button>
+      <button data-x="zip" data-off>題庫＋圖片（.zip）<small>解壓縮到課堂搶答王的資料夾即可使用</small></button>
+    </div></span>
+  <button class="hb" id="bSrc" title="直接看／改文字格式">📝 文字模式</button>
+  <button class="hb go" id="bUse" data-srv>▶ 使用這份題庫</button>
+</header>
+<main>
+  <section class="card" id="side">
+    <h3>題目 <span id="qCount"></span></h3>
+    <div id="list"></div>
+    <div class="addrow"><button class="btn p" id="bAdd" style="flex:1">＋ 新增題目</button>
+      <select class="btn" id="addType" title="新題目的題型"><option value="single">單選</option><option value="multi">複選</option><option value="tf">是非</option><option value="text">填答</option><option value="order">排序</option><option value="poll">投票</option></select></div>
+    <div class="cnt" style="text-align:left;margin-top:6px">拖曳可以調整順序・<kbd>Ctrl</kbd>+<kbd>S</kbd> 儲存</div>
+  </section>
+  <section class="card" id="ed"></section>
+</main>
+
+<dialog id="dOpen"><div class="dlg">
+  <h3>📂 開啟／匯入題庫</h3>
+  <div class="row"><button class="btn p" id="oPick">從電腦選擇檔案…</button><span class="cnt" style="text-align:left">支援 .txt（本程式格式）、.xlsx（Kahoot 範本或 Excel 表格）、.csv、.zip（題庫＋圖片）。也可以把檔案直接拖進編輯器。</span></div>
+  <label class="row" style="font-size:.9rem"><input type="checkbox" id="oMerge"> 加在目前題目的後面（合併），不取代</label>
+  <div data-srv><div class="lbl">或從「題庫」資料夾開啟</div><div class="banks" id="oBanks"></div></div>
+  <div class="row"><span class="sp"></span><button class="btn" data-close>關閉</button></div>
+</div></dialog>
+<dialog id="dSave"><div class="dlg">
+  <h3>💾 儲存到「題庫」資料夾</h3>
+  <label class="row">檔名 <input class="fld" id="sName" style="flex:1" maxlength="60"> <span>.txt</span></label>
+  <div class="msgs" id="sMsg"></div>
+  <div class="row"><span class="sp"></span><button class="btn" data-close>取消</button><button class="btn p" id="sGo">儲存</button></div>
+</div></dialog>
+<dialog id="dGal"><div class="dlg">
+  <h3>🖼 從「題庫/圖片」挑一張</h3>
+  <div class="gal" id="gal"></div>
+  <div class="row"><span class="cnt" id="galInfo"></span><span class="sp"></span><button class="btn" data-close>關閉</button></div>
+</div></dialog>
+<dialog id="dSrc"><div class="dlg">
+  <h3>📝 文字模式 <small class="cnt">直接修改題庫文字，按「套用」回到可視化編輯</small></h3>
+  <textarea id="srcText" spellcheck="false"></textarea>
+  <div class="msgs" id="srcMsg"></div>
+  <div class="row"><button class="btn" id="srcCopy">📋 複製全部</button><span class="sp"></span><button class="btn" data-close>取消</button><button class="btn p" id="srcApply">套用</button></div>
+</div></dialog>
+<dialog id="dInfo"><div class="dlg">
+  <h3 id="iTitle"></h3>
+  <div class="msgs" id="iBody"></div>
+  <div class="row"><span class="sp"></span><button class="btn p" data-close>知道了</button></div>
+</div></dialog>
+<input type="file" id="fOpen" accept=".txt,.csv,.xlsx,.zip" hidden>
+<input type="file" id="fImg" accept="image/*" hidden>
+
+<script>/* 課堂搶答王・題庫函式庫（題庫編輯器用；離線網頁版也內嵌同一份）
+   parse_bank()／bank_to_text()／parse_rows() 與 server_core.py 的 Python 版本一一對應，
+   tools/test_editor.py 會用同樣的輸入比對兩邊的結果。 */
+var BankLib=(function(){
+'use strict';
+var QTYPES={single:'單選',multi:'複選',tf:'是非',text:'填答',order:'排序',poll:'投票'};
+var TYPE_TAGS={'單選':'single','選擇':'single','複選':'multi','多選':'multi','是非':'tf','對錯':'tf','填答':'text','簡答':'text','填空':'text','數字':'text',
+  '排序':'order','順序':'order','投票':'poll','意見':'poll','調查':'poll'};
+var TF_TRUE=['對','o','○','〇','✓','✔','是','true','t','yes','y','正確','v'];
+var TF_FALSE=['錯','x','×','✗','✘','╳','否','false','f','no','n','錯誤'];
+var KEY_RE=/^(時間|秒數|秒|答案|正解|解說|說明|解析|圖片|圖)\s*[:：]?\s*([\s\S]*)$/;
+var TAG_RE=/^\s*[\[【［]([^\]】］]{1,60})[\]】］]\s*/;
+var KAHOOT_TIMES=[5,10,20,30,60,90,120,240];
+
+function cut(s,n){s=String(s==null?'':s);if(s.length<=n)return s;return Array.from(s).slice(0,n).join('');}
+function strip(s){return String(s==null?'':s).replace(/^[\s﻿]+|[\s﻿]+$/g,'');}
+function normAnswer(s){s=String(s==null?'':s).normalize('NFKC').trim().toLowerCase().replace(/\s+/g,'');return s.replace(/[。.!！?？,，、]+$/,'');}
+function firstInt(s){var m=String(s==null?'':s).normalize('NFKC').match(/\d+/);return m?parseInt(m[0],10):null;}
+function defaultTime(t){return {text:30,order:30,multi:30,poll:20}[t]||20;}
+function mkQ(){return {type:null,text:'',options:[],correct:[],answers:[],time:null,points:'normal',image:'',explain:'',_marks:[]};}
+function splitAnswers(v){return String(v).split(/\s*[\/／|｜]\s*/).map(strip).filter(Boolean);}
+
+function finish(q,where){
+  var marks=q._marks||[];delete q._marks;
+  var opts=q.options,i;
+  if(q.type===null){
+    if(opts.length)q.type=marks.filter(Boolean).length>1?'multi':'single';
+    else if(q.answers.length){var a=normAnswer(q.answers[0]);q.type=q.answers.length===1&&(TF_TRUE.indexOf(a)>=0||TF_FALSE.indexOf(a)>=0)?'tf':'text';}
+    else return where+'找不到選項或答案';
+  }
+  var t=q.type;
+  if(!q.text)return where+'沒有題目文字';
+  if(t==='tf'){
+    var truth=null;
+    if(opts.length){for(i=0;i<opts.length&&i<marks.length;i++)if(marks[i])truth=TF_TRUE.indexOf(normAnswer(opts[i]))>=0;}
+    else if(q.answers.length){var b=normAnswer(q.answers[0]);truth=TF_TRUE.indexOf(b)>=0?true:TF_FALSE.indexOf(b)>=0?false:null;}
+    if(truth===null)return where+'是非題的答案要寫「對」或「錯」';
+    q.options=['對','錯'];q.correct=[truth?0:1];q.answers=[];
+  }else if(t==='single'||t==='multi'||t==='poll'){
+    if(opts.length<2||opts.length>6)return where+'選項要 2～6 個（現在 '+opts.length+' 個）';
+    q.correct=[];for(i=0;i<marks.length;i++)if(marks[i])q.correct.push(i);
+    if(t==='single'&&q.correct.length!==1){if(q.correct.length>1)q.type='multi';else return where+'請在正確答案前面加 *';}
+    if(t==='multi'&&!q.correct.length)return where+'請在正確答案前面加 *（可以好幾個）';
+    if(t==='poll'){q.correct=[];q.points='none';}
+  }else if(t==='order'){
+    if(opts.length<2||opts.length>6)return where+'排序題要 2～6 項（現在 '+opts.length+' 項）';
+    q.correct=opts.map(function(_,k){return k;});
+  }else if(t==='text'){
+    q.options=[];if(!q.answers.length)return where+'填答題要寫「答案 …」';
+  }
+  if(q.time===null)q.time=defaultTime(q.type);
+  q.time=Math.max(5,Math.min(240,q.time|0));
+  return '';
+}
+
+/* lenient：格式不完整的題目也保留（標 bad），讓編輯器可以接著修；遊戲用的解析不保留 */
+function keep(q,marks,err,lenient,questions,errors){
+  if(!err){questions.push(q);return;}
+  errors.push(err);if(!lenient)return;
+  if(!q.type)q.type=q.options.length?'single':q.answers.length?'text':'single';
+  var t=q.type;
+  if(t==='single'||t==='multi'||t==='poll'){q.correct=[];marks.forEach(function(m,i){if(m)q.correct.push(i);});}
+  else if(t==='order')q.correct=q.options.map(function(_,i){return i;});
+  else if(t==='tf'){q.options=['對','錯'];q.correct=[];q.answers=[];}
+  if(q.time===null)q.time=defaultTime(t);
+  delete q._marks;q.bad=err;questions.push(q);
+}
+/* 文字題庫 → {title, questions, errors} */
+function parseBank(text,defTitle,lenient){
+  var title=defTitle||'題庫',questions=[],errors=[],blocks=[],cur=[],start=0;
+  var lines=String(text==null?'':text).replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');lines.push('');
+  lines.forEach(function(raw,k){var no=k+1,line=strip(raw).replace(/^﻿+/,'');
+    if(line[0]==='#'||line[0]==='＃'){var m=line.match(/^[#＃]\s*(題庫|標題|名稱)\s*[:：]\s*(.+)$/);if(m)title=cut(strip(m[2]),40);return;}
+    if(!line){if(cur.length){blocks.push([start,cur]);cur=[];}return;}
+    if(!cur.length)start=no;cur.push(line);});
+  blocks.forEach(function(bl){
+    var st=bl[0],block=bl[1],q=mkQ(),first=block[0],m;
+    while((m=first.match(TAG_RE))){
+      var tag=strip(m[1]);first=first.slice(m[0].length);
+      if(TYPE_TAGS[tag])q.type=TYPE_TAGS[tag];
+      else if(['加倍','雙倍','2倍','x2'].indexOf(tag)>=0)q.points='double';
+      else if(tag==='不計分'||tag==='練習')q.points='none';
+      else if(/^\d+\s*秒$/.test(tag.normalize('NFKC')))q.time=parseInt(tag.normalize('NFKC').replace(/\D/g,''),10);
+      else if(tag.slice(0,2)==='圖:'||tag.slice(0,2)==='圖：')q.image=strip(tag.slice(2));
+      else errors.push('第 '+st+' 行：看不懂的標籤 ['+tag+']（已略過）');
+    }
+    q.text=cut(strip(first),300);
+    block.slice(1).forEach(function(line){
+      var km=line.match(KEY_RE);
+      if(km&&line[0]!=='*'){var key=km[1],val=strip(km[2]);
+        if(key==='時間'||key==='秒數'||key==='秒'){var n=val.normalize('NFKC').replace(/\D/g,'');if(n)q.time=parseInt(n,10);}
+        else if(key==='答案'||key==='正解')q.answers=splitAnswers(val);
+        else if(key==='解說'||key==='說明'||key==='解析')q.explain=cut(val,300);
+        else q.image=val;
+        return;}
+      var mark='*＊✓✔'.indexOf(line[0])>=0;
+      var opt=mark?strip(line.slice(1)):line;
+      if(!mark)opt=opt.replace(/^[-–•・]\s*/,'');
+      if(opt){q.options.push(cut(opt,120));q._marks.push(mark);}
+    });
+    var marks=q._marks.slice(),err=finish(q,'第 '+st+' 行的題目：');
+    keep(q,marks,err,lenient,questions,errors);
+  });
+  return {title:title,questions:questions,errors:errors};
+}
+
+/* 題目 → 文字題庫（與 Python 的 bank_to_text 相同） */
+function bankToText(title,qs){
+  var out=['# 題庫：'+title,''];
+  qs.forEach(function(q){
+    var tags='';
+    if((q.type!=='single'&&q.type!=='multi')||(q.type==='multi'&&q.correct.length<2))tags+='['+QTYPES[q.type]+']';
+    if(q.points==='double')tags+='[加倍]';else if(q.points==='none'&&q.type!=='poll')tags+='[不計分]';
+    out.push((tags?tags+' ':'')+q.text);
+    if(q.type==='tf')out.push('答案 '+(q.correct.length?(q.correct[0]===0?'對':'錯'):''));
+    else if(q.type==='text')out.push('答案 '+q.answers.join(' / '));
+    else if(q.type==='order')q.options.forEach(function(o){out.push(o);});
+    else q.options.forEach(function(o,i){out.push((q.correct.indexOf(i)>=0?'*':'')+o);});
+    if(q.image)out.push('圖片 '+q.image);
+    if(q.time!==defaultTime(q.type))out.push('時間 '+q.time);
+    if(q.explain)out.push('解說 '+q.explain);
+    out.push('');
+  });
+  return out.join('\n');
+}
+
+/* 表格（CSV／Excel／Kahoot 範本）→ 題目。rows 是字串陣列的陣列 */
+function isAnsCol(c){return /answer|選項|答案/.test(c)&&/\d/.test(c)&&!/correct|正確/.test(c);}
+function parseRows(rows,defTitle,lenient){
+  rows=rows.map(function(r){return r.map(function(c){return c==null?'':String(c);});}).filter(function(r){return r.some(function(c){return strip(c);});});
+  var title=defTitle||'題庫',questions=[],errors=[];
+  var col={q:0,opts:[1,2,3,4],time:5,correct:6,type:null,explain:null,image:null,points:null};
+  for(var i=0;i<Math.min(15,rows.length);i++){
+    var low=rows[i].map(function(c){return strip(c).toLowerCase();});
+    var nonEmpty=low.filter(Boolean);
+    if(nonEmpty.length&&/^(題庫名稱|題庫|標題|title|quiz title)$/.test(nonEmpty[0])&&nonEmpty.length>1){title=cut(strip(rows[i][low.indexOf(nonEmpty[1])]),40);continue;}
+    var hasQ=low.some(function(c){return c.indexOf('question')>=0||c.indexOf('題目')>=0;});
+    if(hasQ&&low.filter(isAnsCol).length>=2){
+      col={q:null,opts:[],time:null,correct:null,type:null,explain:null,image:null,points:null};
+      low.forEach(function(c,j){
+        if(!c)return;
+        if(col.q===null&&(c.indexOf('question')>=0||c.indexOf('題目')>=0))col.q=j;
+        else if(isAnsCol(c))col.opts.push(j);
+        else if(/time|秒|時間/.test(c))col.time=j;
+        else if(/correct|正確|正解/.test(c)||c==='答案')col.correct=j;
+        else if(/type|題型/.test(c))col.type=j;
+        else if(/解說|explain|說明/.test(c))col.explain=j;
+        else if(/圖|image|picture/.test(c))col.image=j;
+        else if(/分數|計分|points/.test(c))col.points=j;
+      });
+      rows=rows.slice(i+1);break;
+    }
+  }
+  var get=function(r,j){return j!==null&&j<r.length?strip(r[j]):'';};
+  var n=0;
+  rows.forEach(function(r){
+    var opts=col.opts.map(function(j){return get(r,j);});
+    if(!get(r,col.q)&&!opts.some(Boolean)&&!get(r,col.correct))return;   /* 說明列、備註列 */
+    n++;var q=mkQ();
+    q.text=cut(get(r,col.q),300);
+    while(opts.length&&!opts[opts.length-1])opts.pop();
+    var tag=get(r,col.type);if(TYPE_TAGS[tag])q.type=TYPE_TAGS[tag];
+    var corr=get(r,col.correct),t=firstInt(get(r,col.time));
+    if(t!==null)q.time=t;
+    q.explain=cut(get(r,col.explain),300);
+    q.image=get(r,col.image);
+    var pt=get(r,col.points).toLowerCase();
+    if(/加倍|雙倍|double|^2$/.test(pt))q.points='double';else if(/不計分|none|^0$/.test(pt))q.points='none';
+    if(q.type==='text'||(!opts.some(Boolean)&&corr)){
+      q.type=q.type||'text';q.answers=splitAnswers(corr);q._marks=[];
+    }else{
+      var idx={};(corr.normalize('NFKC').match(/\d+/g)||[]).forEach(function(x){idx[parseInt(x,10)-1]=1;});
+      q.options=[];q._marks=[];opts.forEach(function(o,j){if(o){q.options.push(cut(o,120));q._marks.push(!!idx[j]);}});
+    }
+    var marks=q._marks.slice(),err=finish(q,'表格第 '+n+' 題：');
+    keep(q,marks,err,lenient,questions,errors);
+  });
+  return {title:title,questions:questions,errors:errors};
+}
+
+/* CSV 文字 → rows */
+function parseCSV(text){
+  text=String(text).replace(/^﻿/,'');var rows=[],row=[],f='',q=false,i,c;
+  for(i=0;i<text.length;i++){c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;continue;}
+    if(c==='"')q=true;else if(c===','){row.push(f);f='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f='';}else f+=c;}
+  if(f||row.length){row.push(f);rows.push(row);}
+  return rows;
+}
+function decodeBytes(u8){
+  if(u8[0]===0xEF&&u8[1]===0xBB&&u8[2]===0xBF)u8=u8.subarray(3);
+  try{return new TextDecoder('utf-8',{fatal:true}).decode(u8);}catch(e){}
+  try{return new TextDecoder('big5',{fatal:true}).decode(u8);}catch(e){}
+  try{return new TextDecoder('utf-16le',{fatal:true}).decode(u8);}catch(e){}
+  return new TextDecoder('utf-8').decode(u8);
+}
+
+/* ---------- ZIP（讀：store/deflate；寫：store）---------- */
+var CRC=null;
+function crc32(u8){if(!CRC){CRC=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;CRC[n]=c>>>0;}}
+  var x=0xFFFFFFFF;for(var i=0;i<u8.length;i++)x=CRC[(x^u8[i])&255]^(x>>>8);return (x^0xFFFFFFFF)>>>0;}
+function utf8(s){return new TextEncoder().encode(s);}
+function inflateRaw(u8){
+  if(typeof DecompressionStream==='undefined')return Promise.reject(new Error('這個瀏覽器不支援解壓縮，請改用新版 Chrome／Edge'));
+  var ds=new DecompressionStream('deflate-raw');
+  var out=new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer();
+  return out.then(function(b){return new Uint8Array(b);});
+}
+function unzip(u8){
+  var dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength),e=-1;
+  for(var i=u8.length-22;i>=Math.max(0,u8.length-65557);i--)if(dv.getUint32(i,true)===0x06054b50){e=i;break;}
+  if(e<0)return Promise.reject(new Error('不是有效的 zip／xlsx 檔'));
+  var cnt=dv.getUint16(e+10,true),off=dv.getUint32(e+16,true),jobs=[],files={};
+  for(var k=0;k<cnt;k++){
+    if(dv.getUint32(off,true)!==0x02014b50)break;
+    var flags=dv.getUint16(off+8,true),method=dv.getUint16(off+10,true),csize=dv.getUint32(off+20,true),nlen=dv.getUint16(off+28,true),
+        xlen=dv.getUint16(off+30,true),clen=dv.getUint16(off+32,true),loc=dv.getUint32(off+42,true);
+    var nb=u8.subarray(off+46,off+46+nlen),name=flags&0x800?new TextDecoder().decode(nb):decodeBytes(nb);
+    off+=46+nlen+xlen+clen;
+    var ds=loc+30+dv.getUint16(loc+26,true)+dv.getUint16(loc+28,true),data=u8.subarray(ds,ds+csize);
+    if(name.slice(-1)==='/')continue;
+    (function(name,method,data){
+      jobs.push((method===8?inflateRaw(data):Promise.resolve(data)).then(function(d){files[name]=d;}));
+    })(name,method,data);
+  }
+  return Promise.all(jobs).then(function(){return files;});
+}
+function zip(files){ /* files: [{name, data(Uint8Array|string)}] → Uint8Array（不壓縮） */
+  var parts=[],cen=[],off=0;
+  files.forEach(function(f){
+    var name=utf8(f.name),data=typeof f.data==='string'?utf8(f.data):f.data,crc=crc32(data);
+    var h=new Uint8Array(30+name.length),v=new DataView(h.buffer);
+    v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);v.setUint16(8,0,true);v.setUint16(10,0,true);v.setUint16(12,0x21,true);
+    v.setUint32(14,crc,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,name.length,true);h.set(name,30);
+    var c=new Uint8Array(46+name.length),w=new DataView(c.buffer);
+    w.setUint32(0,0x02014b50,true);w.setUint16(4,20,true);w.setUint16(6,20,true);w.setUint16(8,0x800,true);w.setUint16(12,0,true);w.setUint16(14,0x21,true);
+    w.setUint32(16,crc,true);w.setUint32(20,data.length,true);w.setUint32(24,data.length,true);w.setUint16(28,name.length,true);w.setUint32(42,off,true);c.set(name,46);
+    parts.push(h,data);cen.push(c);off+=h.length+data.length;
+  });
+  var csz=cen.reduce(function(a,c){return a+c.length;},0),end=new Uint8Array(22),ev=new DataView(end.buffer);
+  ev.setUint32(0,0x06054b50,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,csz,true);ev.setUint32(16,off,true);
+  var all=parts.concat(cen,[end]),n=all.reduce(function(a,c){return a+c.length;},0),out=new Uint8Array(n),p=0;
+  all.forEach(function(a){out.set(a,p);p+=a.length;});return out;
+}
+
+/* ---------- XLSX ---------- */
+/* 用正規表示式讀 XML（瀏覽器與 node 都能跑，不需要 DOMParser） */
+function unesc(s){return s.replace(/&(#x[0-9a-fA-F]+|#\d+|lt|gt|amp|quot|apos);/g,function(m,e){
+  if(e[0]==='#')return String.fromCodePoint(e[1]==='x'||e[1]==='X'?parseInt(e.slice(2),16):parseInt(e.slice(1),10));
+  return {lt:'<',gt:'>',amp:'&',quot:'"',apos:"'"}[e];});}
+function tTexts(x){x=x.replace(/<(\w+:)?rPh\b[\s\S]*?<\/(\w+:)?rPh>/g,'');var out='',m,re=/<(?:\w+:)?t(?:\s[^>]*)?>([\s\S]*?)<\/(?:\w+:)?t>/g;while((m=re.exec(x)))out+=m[1];return unesc(out);}
+function attr(a,name){var m=new RegExp('(?:^|\\s)'+name+'="([^"]*)"').exec(a);return m?m[1]:null;}
+function colIndex(ref){var m=/^([A-Z]+)/.exec(ref||''),n=0;if(!m)return -1;for(var i=0;i<m[1].length;i++)n=n*26+m[1].charCodeAt(i)-64;return n-1;}
+function xlsxRows(u8){
+  return unzip(u8).then(function(f){
+    var td=function(k){return f[k]?new TextDecoder().decode(f[k]):'';},shared=[],m,re;
+    re=/<(?:\w+:)?si\b[^>]*>([\s\S]*?)<\/(?:\w+:)?si>/g;var ss=td('xl/sharedStrings.xml');while((m=re.exec(ss)))shared.push(tTexts(m[1]));
+    var sheet='xl/worksheets/sheet1.xml';
+    try{var wb=td('xl/workbook.xml'),s0=/<(?:\w+:)?sheet\b([^>]*)\/?>/.exec(wb),rid=s0&&(/\br:id="([^"]+)"/.exec(s0[1])||/\b\w+:id="([^"]+)"/.exec(s0[1]));
+      if(rid){var rels=td('xl/_rels/workbook.xml.rels'),rr=new RegExp('<Relationship\\b[^>]*Id="'+rid[1]+'"[^>]*>').exec(rels);
+        if(rr){var tg=attr(rr[0].replace(/^<Relationship/,''),'Target').replace(/^\/?(xl\/)?/,'');if(f['xl/'+tg])sheet='xl/'+tg;}}}catch(e){}
+    if(!f[sheet]){var ks=Object.keys(f).filter(function(k){return /^xl\/worksheets\/[^/]+\.xml$/.test(k);}).sort();if(!ks.length)throw new Error('xlsx 裡找不到工作表');sheet=ks[0];}
+    var rows=[],xs=td(sheet),rre=/<(?:\w+:)?row\b([^>]*?)(?:\/>|>([\s\S]*?)<\/(?:\w+:)?row>)/g;
+    while((m=rre.exec(xs))){
+      var ri=parseInt(attr(m[1],'r'),10)-1,row=[],cm,k=0;if(!(ri>=0))ri=rows.length;
+      var cre=/<(?:\w+:)?c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/(?:\w+:)?c>)/g,body=m[2]||'';
+      while((cm=cre.exec(body))){
+        var ci=colIndex(attr(cm[1],'r'));if(ci<0)ci=k;k=ci+1;
+        var t=attr(cm[1],'t'),inner=cm[2]||'',vm=/<(?:\w+:)?v>([\s\S]*?)<\/(?:\w+:)?v>/.exec(inner),v=vm?unesc(vm[1]):'';
+        if(t==='s')v=shared[parseInt(v,10)]||'';else if(t==='inlineStr')v=tTexts(inner);else if(t==='b')v=v==='1'?'TRUE':'FALSE';
+        else if(t!=='str'&&/^-?\d+\.0+$/.test(v))v=v.replace(/\.0+$/,'');
+        while(row.length<ci)row.push('');row[ci]=v;}
+      while(rows.length<ri)rows.push([]);rows[ri]=row;}
+    return rows;
+  });
+}
+function xesc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');}
+function colName(i){var s='';i++;while(i>0){var m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
+/* rows → xlsx；opt.widths 欄寬、opt.bold 要粗體的列號（0 起算）、opt.sheet 工作表名稱 */
+function writeXlsx(rows,opt){
+  opt=opt||{};var bold=opt.bold||[];
+  var sd=rows.map(function(r,i){return '<row r="'+(i+1)+'">'+r.map(function(v,j){
+    if(v===''||v==null)return '';var ref=colName(j)+(i+1),st=bold.indexOf(i)>=0?' s="1"':(opt.wrap?' s="2"':'');
+    if(typeof v==='number')return '<c r="'+ref+'"'+st+'><v>'+v+'</v></c>';
+    return '<c r="'+ref+'" t="inlineStr"'+st+'><is><t xml:space="preserve">'+xesc(v)+'</t></is></c>';}).join('')+'</row>';}).join('');
+  var cols=opt.widths?'<cols>'+opt.widths.map(function(w,i){return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>';}).join('')+'</cols>':'';
+  var NS='xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  var H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  return zip([
+    {name:'[Content_Types].xml',data:H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
+    {name:'_rels/.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',data:H+'<workbook '+NS+'><sheets><sheet name="'+xesc(opt.sheet||'Sheet1')+'" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'xl/styles.xml',data:H+'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf/></cellStyleXfs><cellXfs count="3"><xf/><xf fontId="1" applyFont="1"/><xf applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf></cellXfs></styleSheet>'},
+    {name:'xl/worksheets/sheet1.xml',data:H+'<worksheet '+NS+'>'+cols+'<sheetData>'+sd+'</sheetData></worksheet>'}
+  ]);
+}
+var TABLE_HEAD=['題型','題目','選項1','選項2','選項3','選項4','選項5','選項6','正確答案','秒數','分數','圖片','解說'];
+function tableRows(title,qs){
+  var rows=[['題庫名稱',title],[],TABLE_HEAD];
+  qs.forEach(function(q){
+    var r=[QTYPES[q.type],q.text],i;
+    for(i=0;i<6;i++)r.push(q.type==='text'||q.type==='tf'?'':(q.options[i]||''));
+    r.push(q.type==='tf'?(q.correct[0]===0?'對':'錯'):q.type==='text'?q.answers.join(' / '):q.type==='single'||q.type==='multi'?q.correct.map(function(k){return k+1;}).join(','):'');
+    r.push(q.time===defaultTime(q.type)?'':q.time);
+    r.push(q.points==='double'?'加倍':q.points==='none'&&q.type!=='poll'?'不計分':'');
+    r.push(q.image||'');r.push(q.explain||'');rows.push(r);
+  });
+  rows.push([]);rows.push(['說明：正確答案寫選項編號（複選用逗號分開，例 1,3）；是非題寫 對／錯；填答題寫可接受的答案（用 / 分開）；排序題把選項照正確順序填，正確答案留空。秒數、分數、圖片、解說可以空白。']);
+  return rows;
+}
+function tableXlsx(title,qs){return writeXlsx(tableRows(title,qs),{bold:[2],widths:[8,40,16,16,16,16,12,12,12,7,8,16,40],sheet:'題庫'});}
+/* Kahoot 官方試算表範本：第 8 列標題、第 9 列起每列一題（B 題目、C～F 答案 1～4、G 秒數、H 正確答案編號） */
+function kahootXlsx(title,qs){
+  var rows=[[],['','Quiz template'],['','Add questions, at least two answer alternatives, time limit and choose correct answers (at least one). Have fun creating your awesome quiz!'],
+    ['','Remember: questions have a limit of 120 characters and answers can have 75 characters max. Text will turn red in Excel or Google Docs if you exceed this limit. If several answers are correct, separate them with a comma.'],
+    ['','See an example question below (don\'t forget to overwrite this with your first question!)'],['','And remember,  if you\'re not using Excel you need to export to .xlsx format before you upload to Kahoot!'],[],
+    ['','Question - max 120 characters','Answer 1 - max 75 characters','Answer 2 - max 75 characters','Answer 3 - max 75 characters','Answer 4 - max 75 characters','Time limit (sec) – 5, 10, 20, 30, 60, 90, 120, or 240 secs','Correct answer(s) - choose at least one']];
+  var warn=[],n=0;
+  qs.forEach(function(q,i){
+    var no='第 '+(i+1)+' 題';
+    if(q.type==='text'||q.type==='order'||q.type==='poll'){warn.push(no+'（'+QTYPES[q.type]+'題）Kahoot 範本不支援，已略過');return;}
+    if(q.options.length>4){warn.push(no+' 有 '+q.options.length+' 個選項，Kahoot 最多 4 個，已略過');return;}
+    var t=KAHOOT_TIMES.reduce(function(a,b){return Math.abs(b-q.time)<Math.abs(a-q.time)?b:a;});
+    if(t!==q.time)warn.push(no+' 秒數 '+q.time+' 改成 Kahoot 可用的 '+t);
+    if(Array.from(q.text).length>120)warn.push(no+' 題目超過 120 字，已截斷');
+    if(q.options.some(function(o){return Array.from(o).length>75;}))warn.push(no+' 有選項超過 75 字，已截斷');
+    if(q.image)warn.push(no+' 的圖片不會帶到 Kahoot，請在 Kahoot 上另外加');
+    n++;var r=[n,cut(q.text,120)],k;
+    for(k=0;k<4;k++)r.push(q.options[k]?cut(q.options[k],75):'');
+    r.push(t);r.push(q.correct.map(function(x){return x+1;}).join(','));rows.push(r);
+  });
+  return {data:writeXlsx(rows,{bold:[7],widths:[4,60,26,26,26,26,14,14]}),count:n,warnings:warn};
+}
+
+/* 單題檢查（編輯器即時提示用）：傳回錯誤與提醒 */
+var RESERVED=/^(時間|秒數|秒|答案|正解|解說|說明|解析|圖片|圖)\s*[:：]?/;
+function check(q){
+  var e=[],w=[],t=q.type,opts=(q.options||[]).map(strip);
+  if(!strip(q.text))e.push('還沒有寫題目');
+  if(t==='single'||t==='multi'||t==='poll'||t==='order'){
+    var filled=opts.filter(Boolean);
+    if(filled.length<2)e.push((t==='order'?'排序題':'')+'至少要 2 個'+(t==='order'?'項目':'選項'));
+    if(t==='single'&&q.correct.length!==1)e.push('請選 1 個正確答案（按選項旁的 ✓）');
+    if(t==='multi'&&!q.correct.length)e.push('請至少選 1 個正確答案');
+    var seen={};filled.forEach(function(o){var k=normAnswer(o);if(seen[k])w.push('有兩個選項一樣：「'+o+'」');seen[k]=1;});
+    opts.forEach(function(o,i){if(o&&RESERVED.test(o)&&!(q.correct.indexOf(i)>=0&&t!=='order'))w.push('選項「'+cut(o,10)+'」開頭是保留字，存檔後會被當成設定，請換個說法');
+      if(o&&/^[*＊✓✔\-–•・]/.test(o))w.push('選項「'+cut(o,10)+'」開頭的符號在存檔時會被去掉或當成正解記號');});
+  }
+  if(t==='text'&&!(q.answers||[]).filter(function(a){return strip(a);}).length)e.push('請至少寫 1 個可接受的答案');
+  if(/^\s*[\[【［#＃]/.test(q.text||''))w.push('題目開頭的 [ 或 # 會被當成標籤或註解');
+  return {errors:e,warnings:w};
+}
+
+return {QTYPES:QTYPES,TYPE_TAGS:TYPE_TAGS,defaultTime:defaultTime,normAnswer:normAnswer,parseBank:parseBank,bankToText:bankToText,
+  parseRows:parseRows,parseCSV:parseCSV,decodeBytes:decodeBytes,unzip:unzip,zip:zip,crc32:crc32,xlsxRows:xlsxRows,writeXlsx:writeXlsx,
+  tableRows:tableRows,tableXlsx:tableXlsx,kahootXlsx:kahootXlsx,check:check,cut:cut,KAHOOT_TIMES:KAHOOT_TIMES};
+})();
+if(typeof module!=='undefined')module.exports=BankLib;
+</script>
+<script>
+(function(){
+'use strict';
+var MODE='offline';            /* server＝課堂搶答王裡開啟（存到題庫資料夾）；offline＝離線網頁版（下載檔案） */
+var SRV=MODE==='server';
+var L=BankLib,QT=L.QTYPES;
+var COLORS=['#E21B3C','#1368CE','#D89E00','#26890C','#8E3FCF','#0AA3A3'],SHAPES=['▲','◆','●','■','★','♥'];
+var TFC=['#1368CE','#E21B3C'];
+var $=function(id){return document.getElementById(id);};
+var E={title:'',file:'',qs:[],sel:0,dirty:false,hist:[],fut:[],snap:'',imgs:{},media:[],banks:[],uid:0};
+var DRAFT='qk-editor-draft';
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function toast(t,ms){var e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(function(){e.remove();},ms||2400);}
+function post(u,d){return fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{})}).then(function(r){return r.json();});}
+function oneLine(s){return String(s==null?'':s).replace(/[\r\n]+/g,' ').replace(/^\s+|\s+$/g,'');}
+function info(title,lines){$('iTitle').textContent=title;$('iBody').innerHTML=lines.map(function(l){return '<div class="'+(l[0]||'')+'">'+esc(l[1])+'</div>';}).join('');$('dInfo').showModal();}
+document.querySelectorAll('[data-srv]').forEach(function(e){if(!SRV)e.hidden=true;});
+document.querySelectorAll('[data-off]').forEach(function(e){if(SRV)e.hidden=true;});
+document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=function(){b.closest('dialog').close();};});
+
+/* ---------- 題目模型 ---------- */
+function blank(type){var q={_id:++E.uid,type:type||'single',text:'',options:[],correct:[],answers:[],time:null,points:'normal',image:'',explain:''};
+  if(q.type==='single'||q.type==='multi'||q.type==='poll')q.options=['','','',''];
+  if(q.type==='order')q.options=['','','',''];
+  if(q.type==='tf')q.options=['對','錯'];
+  if(q.type==='poll')q.points='none';
+  return q;}
+function fromLib(q){return {_id:++E.uid,type:q.type,text:q.text,options:q.options.slice(),correct:q.correct.slice(),answers:q.answers.slice(),
+  time:q.time===L.defaultTime(q.type)?null:q.time,points:q.points,image:q.image||'',explain:q.explain||''};}
+function toLib(q){
+  var o={type:q.type,text:oneLine(q.text),options:[],correct:[],answers:[],time:q.time==null?L.defaultTime(q.type):q.time,
+    points:q.type==='poll'?'none':q.points,image:q.image||'',explain:oneLine(q.explain)};
+  if(q.type==='tf'){o.options=['對','錯'];o.correct=q.correct.slice(0,1);}
+  else if(q.type==='text'){o.answers=q.answers.map(oneLine).filter(Boolean);}
+  else{q.options.forEach(function(x,i){x=oneLine(x);if(x){if(q.correct.indexOf(i)>=0)o.correct.push(o.options.length);o.options.push(x);}});
+    if(q.type==='order')o.correct=o.options.map(function(_,i){return i;});
+    if(q.type==='poll')o.correct=[];}
+  return o;}
+function chk(q){return L.check(toLib(q));}
+function bankText(){return L.bankToText(oneLine(E.title)||'我的題庫',E.qs.map(toLib));}
+function cur(){return E.qs[E.sel];}
+
+/* ---------- 復原／重做、未儲存 ---------- */
+function state(){return JSON.stringify({t:E.title,q:E.qs});}
+var chT=null;
+function changed(now){clearTimeout(chT);var f=function(){var s=state();if(s===E.snap)return;E.hist.push(E.snap);if(E.hist.length>80)E.hist.shift();E.fut=[];E.snap=s;setDirty(true);saveDraft();updUndo();};
+  if(now)f();else chT=setTimeout(f,500);}
+function restore(s){var d=JSON.parse(s);E.title=d.t;E.qs=d.q;E.uid=E.qs.reduce(function(m,q){return Math.max(m,q._id||0);},E.uid);E.snap=s;
+  if(E.sel>=E.qs.length)E.sel=Math.max(0,E.qs.length-1);$('title').value=E.title;setDirty(true);saveDraft();render();updUndo();}
+function undo(){changed(true);if(!E.hist.length)return;E.fut.push(E.snap);restore(E.hist.pop());}
+function redo(){if(!E.fut.length)return;E.hist.push(E.snap);restore(E.fut.pop());}
+function updUndo(){$('bUndo').disabled=!E.hist.length;$('bRedo').disabled=!E.fut.length;}
+function setDirty(d){E.dirty=d;$('fileInfo').textContent=(E.file?'📄 '+E.file:'（尚未儲存）')+(d?' ・ 未儲存':' ・ 已儲存');}
+function resetDoc(title,qs,file){E.title=title;E.qs=qs;E.file=file||'';E.sel=0;E.hist=[];E.fut=[];$('title').value=title;E.snap=state();setDirty(false);updUndo();render();}
+window.addEventListener('beforeunload',function(e){if(E.dirty){e.preventDefault();e.returnValue='';}});
+function saveDraft(){if(SRV)return;try{localStorage.setItem(DRAFT,JSON.stringify({t:E.title,q:E.qs,imgs:E.imgs,file:E.file,at:Date.now()}));}catch(e){try{localStorage.setItem(DRAFT,JSON.stringify({t:E.title,q:E.qs,file:E.file,at:Date.now()}));}catch(e2){}}}
+
+/* ---------- 題目清單 ---------- */
+function imgSrc(name){if(!name)return '';if(SRV)return '/media/'+encodeURIComponent(name);return E.imgs[name]||'';}
+function renderList(){
+  var bad=0;
+  $('list').innerHTML=E.qs.map(function(q,i){var c=chk(q);if(c.errors.length)bad++;
+    return '<div class="qi'+(i===E.sel?' on':'')+'" draggable="true" data-i="'+i+'"><span class="no">'+(i+1)+'</span>'+
+      '<span class="tx"><b>'+QT[q.type]+(q.points==='double'?'・⚡加倍':'')+(c.errors.length?' <span class="bad" title="'+esc(c.errors.join('、'))+'">⚠ 未完成</span>':'')+'</b><span>'+(esc(oneLine(q.text))||'<i style="opacity:.6">（還沒寫題目）</i>')+'</span></span>'+
+      (q.image?(imgSrc(q.image)?'<img class="th" src="'+esc(imgSrc(q.image))+'" alt="">':'<span class="th" title="找不到圖片">🖼</span>'):'')+'</div>';}).join('')||'<div class="empty" style="padding:20px">還沒有題目</div>';
+  $('qCount').textContent=E.qs.length+' 題'+(bad?'・'+bad+' 題未完成':'');
+}
+var dragFrom=-1;
+$('list').addEventListener('click',function(e){var it=e.target.closest('.qi');if(!it)return;E.sel=+it.getAttribute('data-i');render();});
+$('list').addEventListener('dragstart',function(e){var it=e.target.closest('.qi');if(!it)return;dragFrom=+it.getAttribute('data-i');it.classList.add('drag');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','q');}catch(x){}});
+$('list').addEventListener('dragend',function(){dragFrom=-1;renderList();});
+$('list').addEventListener('dragover',function(e){if(dragFrom<0)return;e.preventDefault();document.querySelectorAll('.qi.over').forEach(function(x){x.classList.remove('over');});var it=e.target.closest('.qi');if(it)it.classList.add('over');});
+$('list').addEventListener('drop',function(e){if(dragFrom<0)return;e.preventDefault();var it=e.target.closest('.qi');var to=it?+it.getAttribute('data-i'):E.qs.length-1;moveQ(dragFrom,to);dragFrom=-1;});
+function moveQ(from,to){if(from===to||to<0||to>=E.qs.length)return;var q=E.qs.splice(from,1)[0];E.qs.splice(to,0,q);E.sel=to;changed(true);render();}
+
+/* ---------- 編輯區 ---------- */
+function render(){renderList();renderEd();}
+function renderEd(){
+  var ed=$('ed'),q=cur();
+  if(!q){ed.innerHTML='<div class="empty"><b>開始建立題庫</b>按左下角「＋ 新增題目」，或「📂 開啟／匯入」現有的題庫、Kahoot 試算表、Excel 表格。<br>也可以直接把檔案拖進來。</div>';return;}
+  var n=E.sel,h='';
+  h+='<div class="row"><div class="types" id="types">'+Object.keys(QT).map(function(k){return '<button data-t="'+k+'" class="'+(q.type===k?'on':'')+'">'+QT[k]+'</button>';}).join('')+'</div><span class="sp"></span>'+
+    '<span class="cnt">第 '+(n+1)+' / '+E.qs.length+' 題</span><button class="btn sm" id="qUp" title="往上移">↑</button><button class="btn sm" id="qDn" title="往下移">↓</button>'+
+    '<button class="btn sm" id="qDup">⧉ 複製</button><button class="btn sm d" id="qDel">🗑 刪除</button></div>';
+  h+='<div><div class="lbl">題目</div><textarea id="qText" rows="2" maxlength="300" placeholder="在這裡輸入題目，例如：台灣最高的山是哪一座？"></textarea><div class="cnt" id="qTextN"></div></div>';
+  h+='<div><div class="lbl">圖片 <small>（可省略）拖曳圖片到框裡、按 Ctrl+V 貼上，或選擇檔案；大張照片會自動縮小</small></div><div class="imgbox" id="imgBox"></div></div>';
+  h+='<div id="ansArea"></div>';
+  h+='<div class="set"><label>作答時間<select class="fld" id="qTime"></select></label>'+
+    '<label>計分<select class="fld" id="qPts"><option value="normal">標準</option><option value="double">⚡ 分數加倍</option><option value="none">不計分（練習）</option></select></label>'+
+    '<label style="grid-column:span 2">解說 <small style="font-weight:400;color:var(--ink2)">公布答案時顯示（可省略）</small><input class="fld" id="qExp" maxlength="300" placeholder="例：玉山主峰海拔約 3952 公尺。"></label></div>';
+  h+='<div class="msgs" id="qMsg"></div>';
+  h+='<div><div class="lbl">預覽 <small>投影幕上大約的樣子</small></div><div class="pv" id="pv"></div></div>';
+  ed.innerHTML=h;
+  $('qText').value=q.text;$('qExp').value=q.explain;
+  var times=[5,10,15,20,30,45,60,90,120,180,240];if(q.time!=null&&times.indexOf(q.time)<0){times.push(q.time);times.sort(function(a,b){return a-b;});}
+  $('qTime').innerHTML='<option value="">預設（'+L.defaultTime(q.type)+' 秒）</option>'+times.map(function(t){return '<option value="'+t+'"'+(q.time===t?' selected':'')+'>'+t+' 秒</option>';}).join('');
+  $('qPts').value=q.type==='poll'?'none':q.points;$('qPts').disabled=q.type==='poll';
+  $('types').onclick=function(e){var b=e.target.closest('[data-t]');if(b)setType(b.getAttribute('data-t'));};
+  $('qUp').onclick=function(){moveQ(n,n-1);};$('qDn').onclick=function(){moveQ(n,n+1);};
+  $('qDup').onclick=function(){var c=JSON.parse(JSON.stringify(q));c._id=++E.uid;E.qs.splice(n+1,0,c);E.sel=n+1;changed(true);render();toast('已複製成第 '+(n+2)+' 題');};
+  $('qDel').onclick=function(){if((oneLine(q.text)||q.options.some(Boolean))&&!confirm('刪除第 '+(n+1)+' 題？（可以按 ↶ 復原）'))return;E.qs.splice(n,1);if(E.sel>=E.qs.length)E.sel=E.qs.length-1;if(E.sel<0)E.sel=0;changed(true);render();};
+  var tx=$('qText');autoH(tx);
+  tx.oninput=function(){var v=tx.value.replace(/[\r\n]+/g,' ');if(v!==tx.value)tx.value=v;q.text=v;autoH(tx);live();};
+  tx.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();var f=document.querySelector('#ansArea input');if(f)f.focus();}};
+  $('qExp').oninput=function(){q.explain=this.value;live();};
+  $('qTime').onchange=function(){q.time=this.value?+this.value:null;live();renderPv();};
+  $('qPts').onchange=function(){q.points=this.value;live();renderList();};
+  renderImg();renderAns();live(true);
+  if(!q.text)setTimeout(function(){tx.focus();},30);
+}
+function autoH(t){t.style.height='auto';t.style.height=Math.max(64,t.scrollHeight+4)+'px';}
+function live(noChange){
+  var q=cur();if(!q)return;
+  var c=chk(q),n=Array.from(q.text).length;
+  var tn=$('qTextN');if(tn){tn.textContent=n+' / 300'+(n>120?'　（超過 120 字，匯出到 Kahoot 時會被截斷）':'');tn.className='cnt'+(n>120?' over':'');}
+  $('qMsg').innerHTML=c.errors.map(function(x){return '<div class="e">⚠ '+esc(x)+'</div>';}).join('')+c.warnings.map(function(x){return '<div class="w">💡 '+esc(x)+'</div>';}).join('')||'<div class="ok">✓ 這一題可以用了</div>';
+  var it=document.querySelector('.qi[data-i="'+E.sel+'"]');
+  if(it){var sp=it.querySelector('.tx span');if(sp)sp.innerHTML=esc(oneLine(q.text))||'<i style="opacity:.6">（還沒寫題目）</i>';
+    var b=it.querySelector('.tx b');if(b)b.innerHTML=QT[q.type]+(q.points==='double'?'・⚡加倍':'')+(c.errors.length?' <span class="bad">⚠ 未完成</span>':'');}
+  renderPv();
+  if(!noChange)changed();
+}
+function setType(t){
+  var q=cur();if(q.type===t)return;var old=q.type,filled=q.options.filter(function(o){return oneLine(o);});
+  if(t==='tf'){q.options=['對','錯'];q.correct=[];}
+  else if(t==='text'){q.answers=old==='tf'?[]:(q.correct.map(function(i){return q.options[i];}).filter(Boolean));if(!q.answers.length&&old==='text')q.answers=[];q.options=[];q.correct=[];}
+  else{
+    if(old==='tf'||old==='text'){q.options=old==='text'&&q.answers.length?q.answers.slice(0,6):['','','',''];while(q.options.length<(t==='order'?3:4))q.options.push('');q.correct=[];}
+    else if(!filled.length){q.options=['','','',''];}
+    if(t==='single')q.correct=q.correct.slice(0,1);
+    if(t==='order'||t==='poll')q.correct=[];
+  }
+  if(t==='poll')q.points='none';else if(old==='poll')q.points='normal';
+  q.type=t;changed(true);$('addType').value=t;renderEd();renderList();
+}
+/* 答案區 */
+function renderAns(){
+  var q=cur(),a=$('ansArea'),h='';
+  if(q.type==='tf'){
+    a.innerHTML='<div class="lbl">正確答案 <small>點一下選「對」或「錯」</small></div><div class="tf"><button data-v="0" style="background:'+TFC[0]+'" class="'+(q.correct[0]===0?'on':'')+'">○ 對</button><button data-v="1" style="background:'+TFC[1]+'" class="'+(q.correct[0]===1?'on':'')+'">✕ 錯</button></div>';
+    a.querySelectorAll('[data-v]').forEach(function(b){b.onclick=function(){q.correct=[+b.getAttribute('data-v')];renderAns();live();};});return;}
+  if(q.type==='text'){
+    h='<div class="lbl">可接受的答案 <small>可以有好幾個（例：12、十二）。比對時全形半形、大小寫、空白、句尾標點都不影響</small></div><div class="chips">'+
+      q.answers.map(function(x,i){return '<span class="chip">'+esc(x)+'<button data-del="'+i+'" title="刪除">✕</button></span>';}).join('')+
+      '<input class="fld" id="ansIn" placeholder="輸入答案後按 Enter" style="min-width:220px"><button class="btn" id="ansAdd">＋ 加入</button></div>';
+    a.innerHTML=h;
+    var add=function(){var v=oneLine($('ansIn').value);if(!v)return;v.split(/\s*[\/／|｜]\s*/).filter(Boolean).forEach(function(x){if(q.answers.indexOf(x)<0)q.answers.push(x);});renderAns();live();$('ansIn').focus();};
+    $('ansAdd').onclick=add;$('ansIn').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();add();}};
+    a.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){q.answers.splice(+b.getAttribute('data-del'),1);renderAns();live();};});return;}
+  if(q.type==='order'){
+    h='<div class="lbl">項目 <small>照「正確順序」由上往下排（遊戲時會自動打亂），用 ↑↓ 調整</small></div><div class="ord">'+
+      q.options.map(function(o,i){return '<div class="opt"><span class="num">'+'①②③④⑤⑥'.charAt(i)+'</span><input data-o="'+i+'" maxlength="120" placeholder="第 '+(i+1)+' 個"><button class="mv" data-up="'+i+'" title="往上">↑</button><button class="mv" data-dn="'+i+'" title="往下">↓</button>'+(q.options.length>2?'<button class="x" data-x="'+i+'" title="刪除">✕</button>':'')+'</div>';}).join('')+'</div>';
+  }else{
+    var poll=q.type==='poll';
+    h='<div class="lbl">選項 <small>'+(poll?'投票題不計分，沒有正確答案':q.type==='multi'?'按 ✓ 標出所有正確答案（要全部選對才算對）':'按 ✓ 標出正確答案')+'</small></div><div class="opts">'+
+      q.options.map(function(o,i){var on=q.correct.indexOf(i)>=0;return '<div class="opt'+(poll?' poll':'')+'" style="background:'+COLORS[i]+'"><span class="sh">'+SHAPES[i]+'</span><input data-o="'+i+'" maxlength="120" placeholder="選項 '+(i+1)+(i>=2?'（可省略）':'')+'">'+
+        '<button class="ck'+(on?' on':'')+'" data-c="'+i+'" title="'+(on?'正確答案':'設成正確答案')+'">'+(on?'✓':'')+'</button>'+(q.options.length>2?'<button class="x" data-x="'+i+'" title="刪除這個選項">✕</button>':'')+'</div>';}).join('')+'</div>';
+  }
+  if(q.options.length<6)h+='<div class="row" style="margin-top:8px"><button class="btn sm" id="optAdd">＋ 新增'+(q.type==='order'?'項目':'選項')+'（最多 6 個）</button></div>';
+  a.innerHTML=h;
+  a.querySelectorAll('[data-o]').forEach(function(inp){var i=+inp.getAttribute('data-o');inp.value=q.options[i]||'';
+    inp.oninput=function(){q.options[i]=inp.value;live();};
+    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();var nx=a.querySelector('[data-o="'+(i+1)+'"]');if(nx)nx.focus();else if(q.options.length<6&&inp.value){q.options.push('');renderAns();live();a.querySelector('[data-o="'+(i+1)+'"]').focus();}}};});
+  a.querySelectorAll('[data-c]').forEach(function(b){b.onclick=function(){var i=+b.getAttribute('data-c'),k=q.correct.indexOf(i);
+    if(q.type==='single')q.correct=[i];else if(k>=0)q.correct.splice(k,1);else{q.correct.push(i);q.correct.sort();}renderAns();live();};});
+  a.querySelectorAll('[data-x]').forEach(function(b){b.onclick=function(){var i=+b.getAttribute('data-x');q.options.splice(i,1);
+    q.correct=q.correct.filter(function(c){return c!==i;}).map(function(c){return c>i?c-1:c;});renderAns();live();};});
+  a.querySelectorAll('[data-up],[data-dn]').forEach(function(b){b.onclick=function(){var i=+(b.getAttribute('data-up')||b.getAttribute('data-dn')),j=b.hasAttribute('data-up')?i-1:i+1;
+    if(j<0||j>=q.options.length)return;var t=q.options[i];q.options[i]=q.options[j];q.options[j]=t;renderAns();live();a.querySelector('[data-o="'+j+'"]').focus();};});
+  if($('optAdd'))$('optAdd').onclick=function(){q.options.push('');renderAns();live();a.querySelector('[data-o="'+(q.options.length-1)+'"]').focus();};
+}
+/* 預覽 */
+function renderPv(){
+  var q=cur(),pv=$('pv');if(!q||!pv)return;var o=toLib(q),h='<div class="pq">'+(esc(o.text)||'<span style="opacity:.4">（題目）</span>')+'</div>';
+  if(q.image&&imgSrc(q.image))h+='<img class="pimg" src="'+esc(imgSrc(q.image))+'" alt="">';
+  if(q.type==='text')h+='<div class="ph">✍ 學生在自己的裝置上輸入答案'+(o.answers.length?'　正解：'+esc(o.answers.join('、')):'')+'</div>';
+  else if(q.type==='order')h+='<div class="pg">'+o.options.map(function(x,i){return '<div class="po" style="background:#5B5BD6">'+'①②③④⑤⑥'.charAt(i)+' '+esc(x)+'</div>';}).join('')+'</div><div class="ph">上面是正確順序；遊戲時會打亂</div>';
+  else{var tf=q.type==='tf';h+='<div class="pg">'+o.options.map(function(x,i){var ok=o.correct.indexOf(i)>=0;
+    return '<div class="po'+(q.type!=='poll'&&o.correct.length&&!ok?' dim':'')+'" style="background:'+(tf?TFC[i]:COLORS[i])+'">'+(tf?['○','✕'][i]:SHAPES[i])+' '+esc(x)+(ok?' ✔':'')+'</div>';}).join('')+'</div>';}
+  h+='<div class="ph">⏱ '+o.time+' 秒'+(o.points==='double'?'・⚡ 分數加倍':o.points==='none'?'・不計分':'')+'</div>';
+  pv.innerHTML=h;
+}
+
+/* ---------- 圖片 ---------- */
+function renderImg(){
+  var q=cur(),box=$('imgBox'),h='';
+  if(q.image){var src=imgSrc(q.image);
+    h=(src?'<img src="'+esc(src)+'" alt="" id="imgEl">':'<div class="miss">找不到「'+esc(q.image)+'」<br>'+(SRV?'請確認它在「題庫/圖片」資料夾':'請一起開啟 .zip 或重新選圖')+'</div>')+
+      '<div style="display:flex;flex-direction:column;gap:6px"><span class="cnt" style="text-align:left">'+esc(q.image)+'</span><div class="row"><button class="btn sm" id="imgPick">換一張…</button>'+(SRV?'<button class="btn sm" id="imgGal">從圖片資料夾挑</button>':'')+'<button class="btn sm d" id="imgDel">移除圖片</button></div></div>';
+  }else{
+    h='<span style="font-size:2rem">🖼</span><span class="hint">把圖片拖到這裡，或</span><button class="btn sm" id="imgPick">選擇圖片…</button>'+(SRV?'<button class="btn sm" id="imgGal">從「題庫/圖片」挑</button>':'');
+  }
+  box.innerHTML=h;
+  $('imgPick').onclick=function(){$('fImg').click();};
+  if($('imgGal'))$('imgGal').onclick=openGallery;
+  if($('imgDel'))$('imgDel').onclick=function(){q.image='';renderImg();renderList();live();};
+  box.ondragover=function(e){if(hasFiles(e)){e.preventDefault();e.stopPropagation();box.classList.add('hot');}};
+  box.ondragleave=function(){box.classList.remove('hot');};
+  box.ondrop=function(e){e.preventDefault();e.stopPropagation();box.classList.remove('hot');hideDrop();var f=e.dataTransfer.files[0];if(f&&/^image\//.test(f.type))addImage(f);else if(f)toast('這不是圖片檔');};
+}
+$('fImg').onchange=function(){var f=this.files[0];this.value='';if(f)addImage(f);};
+document.addEventListener('paste',function(e){
+  if(!cur()||document.querySelector('dialog[open]'))return;
+  var it=Array.prototype.filter.call((e.clipboardData||{}).items||[],function(x){return /^image\//.test(x.type);})[0];
+  if(it){e.preventDefault();var f=it.getAsFile();if(f)addImage(f,'貼上的圖片.png');}
+});
+function safeName(n){n=String(n||'圖片').replace(/[\\\/:*?"<>|\[\]【】［］\s]+/g,'_').replace(/^_+|_+$/g,'');return n||'圖片';}
+/* 大照片縮小：最長邊 1280、JPEG 品質 0.85；小的 PNG／GIF／SVG 保持原檔 */
+function shrink(file){
+  return new Promise(function(ok){
+    var small=file.size<600*1024;
+    if(/gif|svg/.test(file.type)){return ok({blob:file,name:file.name});}
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){var w=img.naturalWidth,h=img.naturalHeight,s=Math.min(1,1280/Math.max(w,h));
+      if(Math.max(w,h)<=1600&&small){URL.revokeObjectURL(url);return ok({blob:file,name:file.name});}   /* 不大就保留原檔（PNG 透明背景也保留） */
+      var c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+      c.toBlob(function(b){URL.revokeObjectURL(url);ok({blob:b||file,name:String(file.name||'圖片').replace(/\.[^.]+$/,'')+'.jpg',shrunk:w+'×'+h+' → '+c.width+'×'+c.height});},'image/jpeg',.85);};
+    img.onerror=function(){URL.revokeObjectURL(url);ok({blob:file,name:file.name});};img.src=url;
+  });
+}
+function blobB64(b){return new Promise(function(ok){var r=new FileReader();r.onload=function(){ok(String(r.result).split(',')[1]);};r.readAsDataURL(b);});}
+function blobURL(b){return new Promise(function(ok){var r=new FileReader();r.onload=function(){ok(String(r.result));};r.readAsDataURL(b);});}
+function addImage(file,name){
+  var q=cur();if(!q)return;
+  shrink(file).then(function(r){
+    var nm=safeName(name&&!file.name?name:(r.name||name||'圖片.png'));if(!/\.(png|jpe?g|gif|webp|svg)$/i.test(nm))nm+='.png';
+    return storeImage(nm,r.blob).then(function(fn){q.image=fn;renderImg();renderList();live();changed(true);toast('已加入圖片 '+fn+(r.shrunk?'（已縮小 '+r.shrunk+'）':''));});
+  }).catch(function(e){toast('圖片加入失敗：'+(e&&e.message||e));});
+}
+function storeImage(name,blob){
+  if(SRV)return blobB64(blob).then(function(b64){return post('/api/h/upload_media',{name:name,b64:b64});}).then(function(r){if(!r.ok)throw new Error(r.msg);E.media=null;return r.file;});
+  return blobURL(blob).then(function(url){
+    var base=name.replace(/\.[^.]+$/,''),ext=name.slice(base.length),fn=name,k=2;
+    while(E.imgs[fn]&&E.imgs[fn]!==url)fn=base+'_'+(k++)+ext;
+    E.imgs[fn]=url;saveDraft();return fn;});
+}
+function openGallery(){
+  $('gal').innerHTML='<span class="cnt">讀取中…</span>';$('dGal').showModal();
+  fetch('/api/h/media_list').then(function(r){return r.json();}).then(function(r){
+    E.media=r.files||[];$('galInfo').textContent=E.media.length+' 張・資料夾：'+(r.folder||'');
+    $('gal').innerHTML=E.media.map(function(f){return '<button data-f="'+esc(f.name)+'"><img loading="lazy" src="/media/'+encodeURIComponent(f.name)+'" alt="">'+esc(f.name)+'</button>';}).join('')||'<span class="cnt">資料夾裡還沒有圖片</span>';
+    $('gal').querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){var q=cur();q.image=b.getAttribute('data-f');$('dGal').close();renderImg();renderList();live();changed(true);};});
+  });
+}
+
+/* ---------- 新增 ---------- */
+$('bAdd').onclick=function(){var t=$('addType').value;var q=blank(t);E.qs.splice(E.qs.length?E.sel+1:0,0,q);E.sel=E.qs.length?E.qs.indexOf(q):0;changed(true);render();};
+$('title').oninput=function(){E.title=this.value;changed();};
+$('bUndo').onclick=undo;$('bRedo').onclick=redo;
+$('bNew').onclick=function(){if(E.dirty&&!confirm('目前的題庫還沒儲存，確定要開新的？'))return;E.imgs={};resetDoc('我的題庫',[blank('single')],'');saveDraft();};
+
+/* ---------- 開啟／匯入 ---------- */
+$('bOpen').onclick=function(){
+  if(SRV){$('oBanks').innerHTML='<span class="cnt">讀取中…</span>';fetch('/api/h/banks').then(function(r){return r.json();}).then(function(r){E.banks=r.banks||[];
+    $('oBanks').innerHTML=E.banks.map(function(b){return '<button data-f="'+esc(b.file)+'"><span style="font-size:1.3rem">'+(/\.xlsx$/i.test(b.file)?'📊':/\.csv$/i.test(b.file)?'📑':'📄')+'</span><span style="flex:1"><b>'+esc(b.title)+'</b><br><small>'+esc(b.file)+'・'+b.count+' 題'+(b.errors?'・'+b.errors+' 個問題':'')+'</small></span></button>';}).join('')||'<span class="cnt">資料夾是空的</span>';
+    $('oBanks').querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){openServerFile(b.getAttribute('data-f'));};});});}
+  $('dOpen').showModal();
+};
+$('oPick').onclick=function(){$('fOpen').click();};
+$('fOpen').onchange=function(){var f=this.files[0];this.value='';if(f)importFile(f);};
+function readFile(f){return new Promise(function(ok,no){var r=new FileReader();r.onload=function(){ok(new Uint8Array(r.result));};r.onerror=no;r.readAsArrayBuffer(f);});}
+function openServerFile(fn){
+  if(!$('oMerge').checked&&E.dirty&&!confirm('目前的題庫還沒儲存，確定要開啟別的？'))return;
+  fetch('/api/h/bank_file?file='+encodeURIComponent(fn)).then(function(r){if(!r.ok)throw new Error('讀不到檔案');return r.arrayBuffer();})
+    .then(function(b){return parseBytes(fn,new Uint8Array(b));}).then(function(res){applyImport(res,fn);}).catch(function(e){toast('開啟失敗：'+e.message);});
+}
+function importFile(f){
+  if(!$('oMerge').checked&&E.dirty&&!confirm('目前的題庫還沒儲存，確定要開啟別的？'))return;
+  readFile(f).then(function(u8){return parseBytes(f.name,u8);}).then(function(res){applyImport(res,null,f.name);}).catch(function(e){toast('開啟失敗：'+(e&&e.message||e),4000);});
+}
+/* 任何檔案 → {title, questions, errors, images:{name:Uint8Array}, kind} */
+function parseBytes(name,u8){
+  var base=name.replace(/^.*[\\\/]/,'').replace(/\.[^.]+$/,''),ext=(name.match(/\.([^.]+)$/)||['',''])[1].toLowerCase();
+  if(ext==='zip'||(ext!=='xlsx'&&u8[0]===0x50&&u8[1]===0x4B&&ext!=='txt'&&ext!=='csv')){
+    return L.unzip(u8).then(function(files){
+      var names=Object.keys(files),imgs={},main=null;
+      names.forEach(function(n){if(/\.(png|jpe?g|gif|webp|svg)$/i.test(n)&&!/__MACOSX/.test(n))imgs[n.replace(/^.*\//,'')]=files[n];});
+      main=names.filter(function(n){return /\.txt$/i.test(n)&&!/格式說明|readme|說明/i.test(n)&&!/__MACOSX/.test(n);})[0]||names.filter(function(n){return /\.(xlsx|csv)$/i.test(n);})[0];
+      if(!main)throw new Error('zip 裡找不到題庫檔（.txt／.xlsx／.csv）');
+      return parseBytes(main.replace(/^.*\//,''),files[main]).then(function(r){r.images=imgs;return r;});
+    });
+  }
+  if(ext==='xlsx')return L.xlsxRows(u8).then(function(rows){var r=L.parseRows(rows,base,true);r.kind=isKahoot(rows)?'Kahoot 試算表':'Excel 表格';return r;});
+  var text=L.decodeBytes(u8);
+  var r=ext==='csv'?L.parseRows(L.parseCSV(text),base,true):L.parseBank(text,base,true);
+  r.kind=ext==='csv'?'CSV 表格':'文字題庫';
+  return Promise.resolve(r);
+}
+function isKahoot(rows){return rows.some(function(r){return r.some(function(c){return /question - max|answer 1 - max/i.test(c||'');});});}
+function applyImport(res,serverFile,localName){
+  var imgs=res.images||{},jobs=[],rename={};
+  Object.keys(imgs).forEach(function(n){
+    var used=res.questions.some(function(q){return q.image===n;});if(!used)return;
+    var ext=n.split('.').pop().toLowerCase(),blob=new Blob([imgs[n]],{type:'image/'+(ext==='jpg'?'jpeg':ext==='svg'?'svg+xml':ext)});
+    jobs.push(storeImage(n,blob).then(function(fn){if(fn!==n)rename[n]=fn;}));
+  });
+  return Promise.all(jobs).then(function(){
+    var qs=res.questions.map(function(q){var e=fromLib(q);if(rename[e.image])e.image=rename[e.image];return e;});
+    var merge=$('oMerge').checked&&E.qs.length;
+    $('dOpen').close();
+    if(merge){E.qs=E.qs.concat(qs);E.sel=E.qs.length-qs.length;changed(true);render();}
+    else{var file=serverFile&&/\.txt$/i.test(serverFile)?serverFile:'';resetDoc(res.title,qs.length?qs:[blank('single')],file);if(!SRV&&localName)E.file=localName.replace(/\.[^.]+$/,'')+'.txt';setDirty(!file);saveDraft();}
+    var bad=res.questions.filter(function(q){return q.bad;}).length,miss=qs.filter(function(q){return q.image&&!imgSrc(q.image);}).length;
+    var lines=[['ok','✓ 讀到 '+res.questions.length+' 題（'+(res.kind||'')+'）'+(merge?'，已加在後面':'')]];
+    if(bad)lines.push(['e','⚠ 其中 '+bad+' 題格式不完整，已標「未完成」，請在左邊清單找到後補上']);
+    (res.errors||[]).slice(0,12).forEach(function(e){lines.push(['w','・'+e]);});
+    if(miss&&!SRV)lines.push(['w','有 '+miss+' 題的圖片不在檔案裡（純文字題庫不含圖片），可以重新選圖，或改開啟 .zip']);
+    if(serverFile&&!/\.txt$/i.test(serverFile))lines.push(['w','這是 '+serverFile.split('.').pop().toUpperCase()+' 檔，儲存時會另存成 .txt 題庫']);
+    if(bad||(res.errors||[]).length||miss||lines.length>1)info('匯入結果',lines);else toast(lines[0][1]);
+  });
+}
+/* 整個視窗都可以拖檔案進來 */
+function hasFiles(e){return e.dataTransfer&&Array.prototype.indexOf.call(e.dataTransfer.types||[],'Files')>=0;}
+var dropEl=null;function hideDrop(){if(dropEl){dropEl.remove();dropEl=null;}}
+document.addEventListener('dragover',function(e){if(!hasFiles(e))return;e.preventDefault();if(!dropEl){dropEl=document.createElement('div');dropEl.className='drop';dropEl.textContent='放開以開啟題庫檔（txt／xlsx／csv／zip）';document.body.appendChild(dropEl);}});
+document.addEventListener('dragleave',function(e){if(e.clientX<=0||e.clientY<=0||e.clientX>=innerWidth||e.clientY>=innerHeight)hideDrop();});
+document.addEventListener('drop',function(e){if(!hasFiles(e))return;e.preventDefault();hideDrop();var f=e.dataTransfer.files[0];if(!f)return;
+  if(/^image\//.test(f.type)){if(cur())addImage(f);return;}importFile(f);});
+
+/* ---------- 儲存 ---------- */
+function problems(){var n=0;E.qs.forEach(function(q){if(chk(q).errors.length)n++;});return n;}
+function download(name,data,type){var b=data instanceof Blob?data:new Blob([data],{type:type||'application/octet-stream'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);}
+function baseName(){return safeName(oneLine(E.title)||'我的題庫');}
+function usedImages(){var s={};E.qs.forEach(function(q){if(q.image&&E.imgs[q.image])s[q.image]=1;});return Object.keys(s);}
+function dataURLBytes(u){var b=atob(u.split(',')[1]),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+function save(){
+  changed(true);
+  if(!SRV){
+    var imgs=usedImages();
+    if(imgs.length){exportZip();}else{download((E.file||baseName()+'.txt'),'﻿'+bankText().replace(/\n/g,'\r\n'),'text/plain;charset=utf-8');}
+    E.file=E.file||baseName()+'.txt';setDirty(false);saveDraft();
+    if(problems())toast('已下載；有 '+problems()+' 題未完成，遊戲時會被略過',3500);
+    return;}
+  $('sName').value=(E.file||baseName()).replace(/\.txt$/i,'');
+  var p=problems();$('sMsg').innerHTML=p?'<div class="w">⚠ 有 '+p+' 題未完成：可以先存起來下次再改，但遊戲時這些題目會被略過。</div>':'<div class="ok">✓ 全部 '+E.qs.length+' 題都可以用</div>';
+  $('dSave').showModal();$('sName').select();
+}
+$('sGo').onclick=function(){
+  var fn=safeName($('sName').value.trim()).replace(/\.txt$/i,'')+'.txt';
+  var go=function(){post('/api/h/save_bank',{file:fn,text:bankText()}).then(function(r){if(!r.ok){$('sMsg').innerHTML='<div class="e">'+esc(r.msg)+'</div>';return;}
+    E.file=r.msg;setDirty(false);$('dSave').close();toast('已存成 題庫/'+r.msg);});};
+  if(fn!==E.file){fetch('/api/h/banks').then(function(r){return r.json();}).then(function(r){
+    if((r.banks||[]).some(function(b){return b.file===fn;})&&!confirm('「'+fn+'」已經存在，要覆蓋嗎？'))return;go();});}
+  else go();
+};
+$('sName').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('sGo').click();}};
+$('bSave').onclick=save;
+$('bUse').onclick=function(){
+  var go=function(){post('/api/h/open_bank',{file:E.file}).then(function(r){if(r.ok)info('▶ 已經換成這份題庫',[['ok',r.msg],['','回到主持畫面就可以開始遊戲了。']].concat((r.errors||[]).length?[['w','有 '+r.errors.length+' 題格式不完整被略過']]:[]));else toast(r.msg,4000);});};
+  if(E.dirty||!E.file){toast('請先儲存');save();var t=setInterval(function(){if(!$('dSave').open){clearInterval(t);if(!E.dirty&&E.file)go();}},300);return;}
+  go();
+};
+
+/* ---------- 匯出 ---------- */
+$('bExp').onclick=function(e){e.stopPropagation();$('expMenu').hidden=!$('expMenu').hidden;};
+document.addEventListener('click',function(){$('expMenu').hidden=true;});
+$('expMenu').onclick=function(e){var b=e.target.closest('[data-x]');if(!b)return;var x=b.getAttribute('data-x');$('expMenu').hidden=true;changed(true);
+  var ok=E.qs.map(toLib).filter(function(q,i){return !chk(E.qs[i]).errors.length;}),skip=E.qs.length-ok.length;
+  if(x==='kahoot'){var k=L.kahootXlsx(oneLine(E.title),ok);download(baseName()+'_Kahoot.xlsx',k.data);
+    var lines=[['ok','✓ 已匯出 '+k.count+' 題到「'+baseName()+'_Kahoot.xlsx」'],['','到 Kahoot 建立 Kahoot →「新增問題」旁的「匯入試算表」選這個檔案。']];
+    if(skip)lines.push(['w','未完成的 '+skip+' 題沒有匯出']);k.warnings.forEach(function(w){lines.push(['w','・'+w]);});info('Kahoot 試算表',lines);}
+  else if(x==='table'){download(baseName()+'.xlsx',L.tableXlsx(oneLine(E.title),ok));toast('已匯出 Excel 表格（'+ok.length+' 題）'+(skip?'，未完成的 '+skip+' 題沒有匯出':''),3500);}
+  else if(x==='txt'){download(baseName()+'.txt','﻿'+bankText().replace(/\n/g,'\r\n'),'text/plain;charset=utf-8');}
+  else if(x==='zip'){exportZip();}
+};
+function exportZip(){
+  var files=[{name:'題庫/'+baseName()+'.txt',data:'﻿'+bankText().replace(/\n/g,'\r\n')}];
+  usedImages().forEach(function(n){files.push({name:'題庫/圖片/'+n,data:dataURLBytes(E.imgs[n])});});
+  download(baseName()+'.zip',L.zip(files),'application/zip');
+  info('已下載 '+baseName()+'.zip',[['ok','✓ 題庫 1 份、圖片 '+(files.length-1)+' 張'],['','使用方式：把 zip 解壓縮到「課堂搶答王」程式所在的資料夾（裡面的「題庫」資料夾會合併進去），主持畫面按 ↻ 就看得到。'],['','之後要再修改，可以在這個編輯器直接開啟這個 .zip。']]);
+}
+
+/* ---------- 文字模式 ---------- */
+$('bSrc').onclick=function(){changed(true);$('srcText').value=bankText();$('srcMsg').innerHTML='';$('dSrc').showModal();srcCheck();};
+var scT=null;function srcCheck(){clearTimeout(scT);scT=setTimeout(function(){var r=L.parseBank($('srcText').value,'題庫',true),bad=r.questions.filter(function(q){return q.bad;}).length;
+  $('srcMsg').innerHTML='<div class="'+(bad?'w':'ok')+'">「'+esc(r.title)+'」共 '+r.questions.length+' 題'+(bad?'，'+bad+' 題格式不完整':'')+'</div>'+r.errors.slice(0,6).map(function(e){return '<div class="e">⚠ '+esc(e)+'</div>';}).join('');},250);}
+$('srcText').oninput=srcCheck;
+$('srcCopy').onclick=function(){var t=$('srcText');t.select();try{navigator.clipboard.writeText(t.value).then(function(){toast('已複製');});}catch(e){document.execCommand('copy');toast('已複製');}};
+$('srcApply').onclick=function(){var r=L.parseBank($('srcText').value,E.title||'我的題庫',true);E.title=r.title;$('title').value=E.title;
+  E.qs=r.questions.map(fromLib);if(!E.qs.length)E.qs=[blank('single')];if(E.sel>=E.qs.length)E.sel=0;changed(true);$('dSrc').close();render();toast('已套用（'+E.qs.length+' 題）');};
+
+/* ---------- 鍵盤 ---------- */
+document.addEventListener('keydown',function(e){
+  var k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==='s'){e.preventDefault();if(!document.querySelector('dialog[open]'))save();return;}
+  if(document.querySelector('dialog[open]'))return;
+  var inText=/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'');
+  if((e.ctrlKey||e.metaKey)&&k==='z'&&!e.shiftKey&&!inText){e.preventDefault();undo();}
+  else if((e.ctrlKey||e.metaKey)&&(k==='y'||(k==='z'&&e.shiftKey))&&!inText){e.preventDefault();redo();}
+  else if((e.ctrlKey||e.metaKey)&&k==='z'&&!e.shiftKey&&inText){changed(true);}  /* 輸入框裡先讓瀏覽器自己復原文字 */
+});
+
+/* ---------- 啟動 ---------- */
+window.__qkEditor={state:function(){return {title:E.title,file:E.file,dirty:E.dirty,sel:E.sel,qs:E.qs.map(toLib),bad:problems(),imgs:Object.keys(E.imgs),hist:E.hist.length};},text:bankText,lib:L};
+(function start(){
+  var p=new URLSearchParams(location.search),f=p.get('file');
+  if(SRV&&f){resetDoc('',[],'');openServerFile(f);return;}
+  if(!SRV){try{var d=JSON.parse(localStorage.getItem(DRAFT)||'null');
+    if(d&&d.q&&d.q.length&&confirm('找到上次沒有存檔的草稿「'+(d.t||'我的題庫')+'」（'+d.q.length+' 題，'+new Date(d.at).toLocaleString()+'），要繼續編輯嗎？\n按「取消」會開一份新的題庫。')){
+      E.imgs=d.imgs||{};resetDoc(d.t||'我的題庫',d.q,d.file||'');E.uid=d.q.reduce(function(m,q){return Math.max(m,q._id||0);},0);setDirty(true);return;}}catch(e){}}
+  resetDoc('我的題庫',[blank('single')],'');
+})();
+})();
+</script>
+</body>
+</html>

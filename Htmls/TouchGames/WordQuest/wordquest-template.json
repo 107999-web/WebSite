@@ -1,0 +1,23 @@
+{
+  "範例類別": {
+    "icon": "🌟",
+    "color": "#38bdf8",
+    "words": [
+      {
+        "word": "APPLE",
+        "hint": "蘋果",
+        "emoji": "🍎"
+      },
+      {
+        "word": "BANANA",
+        "hint": "香蕉",
+        "emoji": "🍌"
+      },
+      {
+        "word": "CHERRY",
+        "hint": "櫻桃",
+        "emoji": "🍒"
+      }
+    ]
+  }
+}

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>小朋友下樓梯</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #ffe6e6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: sans-serif;
+        overflow: hidden;
+    }
+    #gameArea {
+        position: relative;
+        width: 400px;
+        height: 600px;
+        background-color: #e0f7fa;
+        border: 6px solid #b2ebf2;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    canvas {
+        display: block;
+    }
+    #ui {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        font-size: 22px;
+        font-weight: 900;
+        color: #006064;
+        background: rgba(255,255,255,0.7);
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+    #gameOver {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.85);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 36px;
+        color: #d32f2f;
+        font-weight: 900;
+        z-index: 10;
+    }
+    button {
+        margin-top: 30px;
+        padding: 12px 24px;
+        font-size: 20px;
+        font-weight: bold;
+        background-color: #ff80ab;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button:active {
+        transform: scale(0.95);
+    }
+</style>
+</head>
+<body>
+<div id="gameArea">
+    <div id="ui">SCORE: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div id="gameOver">
+        GAME OVER
+        <button onclick="resetGame()">重新開始</button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const gameOverScreen = document.getElementById('gameOver');
+
+    let animationId;
+    let score = 0;
+    let keys = { left: false, right: false };
+    let gameSpeed = 2.5;
+
+    const player = {
+        x: 200,
+        y: 100,
+        width: 30,
+        height: 30,
+        vx: 0,
+        vy: 0,
+        speed: 6,
+        gravity: 0.6,
+        color: '#ff4081'
+    };
+
+    let platforms = [];
+    const platformWidth = 100;
+    const platformHeight = 18;
+
+    function initPlatforms() {
+        platforms = [];
+        for (let i = 0; i < 6; i++) {
+            platforms.push({
+                x: Math.random() * (canvas.width - platformWidth),
+                y: i * 110 + 150
+            });
+        }
+    }
+
+    function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.beginPath();
+        ctx.roundRect(player.x - player.width / 2, player.y - player.height, player.width, player.height, 12);
+        ctx.fill();
+        
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(player.x - 7, player.y - 18, 5, 0, Math.PI * 2);
+        ctx.arc(player.x + 7, player.y - 18, 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#212121';
+        ctx.beginPath();
+        ctx.arc(player.x - 7, player.y - 18, 2.5, 0, Math.PI * 2);
+        ctx.arc(player.x + 7, player.y - 18, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawPlatforms() {
+        platforms.forEach(p => {
+            ctx.fillStyle = '#aed581';
+            ctx.beginPath();
+            ctx.roundRect(p.x, p.y, platformWidth, platformHeight, 10);
+            ctx.fill();
+            
+            ctx.fillStyle = '#8bc34a';
+            ctx.beginPath();
+            ctx.roundRect(p.x, p.y, platformWidth, 6, 5);
+            ctx.fill();
+        });
+        
+        ctx.fillStyle = '#ef5350';
+        for(let i = 0; i < canvas.width; i += 20) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i + 10, 25);
+            ctx.lineTo(i + 20, 0);
+            ctx.fill();
+        }
+    }
+
+    function update() {
+        if (keys.left) player.vx = -player.speed;
+        else if (keys.right) player.vx = player.speed;
+        else player.vx = 0;
+
+        player.vy += player.gravity;
+        player.x += player.vx;
+        player.y += player.vy;
+
+        if (player.x - player.width / 2 < 0) player.x = player.width / 2;
+        if (player.x + player.width / 2 > canvas.width) player.x = canvas.width - player.width / 2;
+
+        for (let i = 0; i < platforms.length; i++) {
+            let p = platforms[i];
+            p.y -= gameSpeed;
+
+            if (player.vy >= 0 && 
+                player.y <= p.y + 12 && 
+                player.y + player.vy >= p.y && 
+                player.x + player.width / 2 > p.x && 
+                player.x - player.width / 2 < p.x + platformWidth) {
+                
+                player.y = p.y;
+                player.vy = -gameSpeed;
+            }
+
+            if (p.y + platformHeight < 0) {
+                platforms.splice(i, 1);
+                platforms.push({
+                    x: Math.random() * (canvas.width - platformWidth),
+                    y: canvas.height + 30
+                });
+                score += 1;
+                scoreEl.innerText = score;
+                if (score % 10 === 0) gameSpeed += 0.3;
+                i--;
+            }
+        }
+
+        if (player.y - player.height < 25 || player.y > canvas.height) {
+            endGame();
+        }
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        update();
+        drawPlatforms();
+        drawPlayer();
+        animationId = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+        cancelAnimationFrame(animationId);
+        gameOverScreen.style.display = 'flex';
+    }
+
+    window.resetGame = function() {
+        gameOverScreen.style.display = 'none';
+        player.x = 200;
+        player.y = 100;
+        player.vy = 0;
+        score = 0;
+        gameSpeed = 2.5;
+        scoreEl.innerText = score;
+        initPlatforms();
+        loop();
+    }
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') keys.left = true;
+        if (e.key === 'ArrowRight') keys.right = true;
+    });
+
+    window.addEventListener('keyup', e => {
+        if (e.key === 'ArrowLeft') keys.left = false;
+        if (e.key === 'ArrowRight') keys.right = false;
+    });
+
+    initPlatforms();
+    loop();
+</script>
+</body>
+</html>

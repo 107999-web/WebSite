@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>程式說明文件・部落樂舞（火堆旁的節奏）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/fire.css">
+<style>
+.docwrap{max-width:900px;margin:0 auto;padding:0 18px 60px}
+.docsec{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:14px 18px;margin-top:16px}
+.docsec h3{font-size:1.05rem;margin:0 0 6px}
+.docsec .hint{font-size:.84rem;color:var(--ink2);margin:0 0 8px}
+.f{display:block;width:100%;font-family:inherit;font-size:.95rem;color:var(--ink);background:var(--paper2);
+  border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px}
+textarea.f{min-height:88px;resize:vertical;line-height:1.7}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.lbl{font-size:.82rem;color:var(--ink2);font-weight:700;margin-top:8px;display:block}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.saveinfo{font-size:.84rem;color:var(--ink2)}
+@media print{
+  header.top,.toolbar,.noprint{display:none!important}
+  body{background:#fff}
+  .docsec{break-inside:avoid;border-color:#bbb;box-shadow:none}
+  .f{background:#fff;border-color:#ccc}
+  textarea.f{min-height:0;height:auto;overflow:visible}
+  @page{size:A4;margin:14mm}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📄 程式說明文件 <em>部落樂舞・火堆旁的節奏</em></div>
+    <div class="unitnav" style="margin-left:auto"><a href="index.html">← 回製作教學</a></div>
+  </div>
+</header>
+<div class="docwrap">
+  <section class="hero">
+    <h1>程式說明文件</h1>
+    <p>題目最後一行要求交程式說明文件，內容要說明<b>動作判定方式（含如何避免重複判定）</b>、<b>亂數節奏產生方法</b>、<b>動作序列的記錄方式</b>、<b>關卡通過與遊戲結束條件</b>。
+      下面已經先填好這份範例作品的內容，<b>請把數值與文字換成你自己的</b>，改完按「列印 / 存成 PDF」。</p>
+    <div class="toolbar noprint">
+      <button class="btn" id="doPrint">🖨️ 列印 / 存成 PDF</button>
+      <button class="btn ghost" id="doReset">↺ 還原成範例內容</button>
+      <button class="btn ghost" id="doClear">🧹 全部清空</button>
+      <span class="saveinfo" id="saveInfo">內容會自動存在這台電腦的瀏覽器</span>
+    </div>
+  </section>
+
+  <div class="docsec">
+    <h3>一、基本資料</h3>
+    <div class="row2">
+      <div><span class="lbl">作品名稱</span><input class="f" data-k="title" value="部落樂舞：火堆旁的節奏"></div>
+      <div><span class="lbl">組別</span><input class="f" data-k="group" value="國小遊戲 AI 互動組"></div>
+      <div><span class="lbl">學校／班級</span><input class="f" data-k="school" value=""></div>
+      <div><span class="lbl">製作者</span><input class="f" data-k="author" value=""></div>
+      <div><span class="lbl">使用的擴充功能</span><input class="f" data-k="ext" value="Facemesh2Scratch（stretch3），臉部 468 點偵測"></div>
+      <div><span class="lbl">執行環境</span><input class="f" data-k="env" value="Chrome + 網路攝影機，stretch3.github.io"></div>
+    </div>
+  </div>
+
+  <div class="docsec">
+    <h3>二、遊戲簡介</h3>
+    <textarea class="f" data-k="intro">圍著火堆的部落樂舞場景，玩家用頭部動作演奏三種樂器，完成音樂精靈出的節奏。
+向左轉頭 ＝ 低音木鼓，點頭 ＝ 竹鐘（高音），向右轉頭 ＝ 沙鈴。
+每做對一個動作，火堆就竄高一截並改變火光顏色；做錯時火光瞬間暗下來並扣一把火把。
+第一關是「節奏記憶」，第二關是「節奏接龍」，序列會越接越長。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>三、動作判定方式（題目要求）</h3>
+    <p class="hint">要寫清楚「用哪些點、怎麼算、門檻是多少」。</p>
+    <textarea class="f" data-k="detect">使用 Facemesh2Scratch 的五個部位：鼻尖 (2)、臉部左緣 (455)、臉部右緣 (235)、額頭頂端 (11)、下巴 (153)。
+
+守門條件：先判斷「人數 > 0」。偵測不到臉時，座標積木回傳的是空白而不是 0，直接計算會讓數值亂跳。
+另外再判斷「臉寬 > 10」，避免臉太小或抓錯時除以 0。
+
+計算方式（只用加減乘除與比大小）：
+・臉寬 ＝ ｜臉部左緣x − 臉部右緣x｜
+・臉中心x ＝（臉部左緣x ＋ 臉部右緣x）÷ 2
+・轉頭比 ＝（鼻尖x − 臉中心x）÷ 臉寬 × 100　→ 鼻尖偏離臉中線「臉寬的百分之幾」
+・臉高 ＝ ｜額頭頂端y − 下巴y｜
+・臉中心y ＝（額頭頂端y ＋ 下巴y）÷ 2
+・點頭比 ＝（臉中心y − 鼻尖y）÷ 臉高 × 100　→ 低頭時鼻尖落到臉中心下方，數值變大
+
+判定順序（順序很重要，先排除左右再判斷點頭）：
+① 轉頭比 < −轉頭門檻 → 向左轉頭（木鼓，編號 1）
+② 轉頭比 > 轉頭門檻 → 向右轉頭（沙鈴，編號 3）
+③ 以上皆非且 點頭比 > 點頭門檻 → 點頭（竹鐘，編號 2）
+④ 其他 → 預備姿勢（臉朝正前方）
+
+攝影機模式：必須使用「鏡像」模式（英文值 on，畫面像照鏡子）。若選到不鏡像的模式，
+臉部 x 座標會整個變號，轉頭的左右會顛倒。程式另外提供變數「左右相反」：設成 1 時會把轉頭比變號，
+不必修改任何積木即可修正左右顛倒（預設 0）。
+
+門檻值做成變數：轉頭門檻 ＝ 18、點頭門檻 ＝ 8。因為門檻會受座位高度與攝影機角度影響，
+上課或比賽前先看畫面左上角的「轉頭比／點頭比」實際數字，再調整這兩個變數。
+採用「比例」而不是直接用座標，是為了讓玩家坐遠或坐近都不必重新調整。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>四、如何避免同一動作被重複判定（題目要求）</h3>
+    <textarea class="f" data-k="repeat">使用旗標變數「可以觸發」：
+・偵測到預備姿勢（臉朝正前方）時，把「可以觸發」設為 1。
+・送出任何一個動作後，立刻把「可以觸發」設為 0。
+因此頭一直轉著不放也只會算一次，必須把臉轉回正前方才能做下一個動作。
+
+另外，自訂積木「送出動作」還會檢查「階段 ＝ 等待」，只有輪到玩家的時候動作才算數；
+開場階段做動作只會試音（讓玩家先熟悉三個動作），不會影響分數。
+
+這個設計在本遊戲特別重要：節奏裡常常出現連續兩個相同的動作（例如木鼓、木鼓），
+有了預備姿勢，「連做兩次」和「一次拖太久」才分得出來。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>五、亂數節奏產生方法（題目要求）</h3>
+    <textarea class="f" data-k="random">用清單「節奏」存放這一輪的動作順序，每一項是 1（向左轉頭）、2（點頭）或 3（向右轉頭）。
+
+第一關（節奏記憶）：每一輪重新出題。
+　先「刪除清單的全部項目」，再「重複（隨機取數 3 到 5）次：添加（隨機取數 1 到 3）到 節奏」。
+　也就是動作數量與內容都由亂數決定。
+
+第二關（節奏接龍）：不清空清單。
+　剛進第二關時先產生 3 個動作；之後玩家每答對一輪，就在清單最後面「添加（隨機取數 1 到 3）」一個新動作，
+　前面的順序完全不變，序列因此越接越長（符合題目「系統增加一個新的節奏」的定義）。
+
+變數「節奏長度」＝ 清單「節奏」的長度，用來控制提示播放次數與比對次數。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>六、動作序列的記錄方式（題目要求）</h3>
+    <textarea class="f" data-k="record">用兩個清單：
+・「節奏」：系統出的題目（正確答案）。
+・「玩家動作」：玩家實際做出來的順序，每做一個動作就「添加到最後面」。
+
+比對方式：變數「玩家第幾個」記錄玩家已經做到第幾個動作。
+每收到一個動作就先 +1，再比較「這次動作 ＝ 節奏的第（玩家第幾個）項」。
+相同 → 廣播「打對了」（火堆竄高、樂器響一聲）；不同 → 把「這輪正確」設為 0，該輪立刻結束。
+當「玩家第幾個 ＝ 節奏長度」時代表整段做完，這一輪成功。
+
+重要細節：從「玩家答案」讀到動作後，要先搬到變數「這次動作」並立刻把「玩家答案」歸零，
+再去播放動畫。如果等動畫播完才歸零，玩家在動畫期間做的下一個動作會被一起清掉，
+會造成「每一輪的第 2 個動作永遠消失」。（這是實測時發現並修正的問題。）</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>七、關卡通過條件與遊戲結束條件（題目要求）</h3>
+    <textarea class="f" data-k="level">第一關・節奏記憶
+　每輪亂數產生 3～5 個動作 → 依序播放提示 → 玩家照順序做出來。
+　通過條件：連續 3 輪完全正確。通過後清空清單，進入第二關。
+
+第二關・節奏接龍
+　系統先給 3 個動作，玩家答對後系統在末端再加一個。
+　通過條件（挑戰成功）：序列長度到達 10 並且該輪完全正確。
+
+遊戲結束條件
+　答錯一次扣一把火把（共 3 把），該輪重新挑戰；火把歸零 → 遊戲結束。
+　或第二關達成 10 個 → 挑戰成功（顯示通關字卡與總分）。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>八、計分與難度設計</h3>
+    <textarea class="f" data-k="score">計分：
+・每輪得分 ＝ 10 × 該輪動作數（第二關序列越長，分數自然越高）。
+・連續正確加分：連續 3 輪不出錯進入「火光全開」狀態，該輪分數 ×2。
+・答錯：不扣分，但扣一把火把並重新挑戰該輪（連續正確歸零、火光全開取消）。
+
+難度遞增：
+・每答對一輪，提示間隔 −0.04 秒（40 毫秒），下限 0.25 秒（250 毫秒）。
+・第二關序列每輪加長一個動作，要記的內容也越來越多。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>九、角色與程式架構</h3>
+    <textarea class="f" data-k="arch">舞台：主流程（開場 → 第一關 → 第二關 → 結束）、自訂積木「出題」「播放提示」「等待玩家」「算分數與過關」。
+動作牌：自訂積木「辨識動作」（勾選執行時不重新整理畫面）、可以觸發旗標、自訂積木「送出動作（編號）」、鍵盤測試（← 木鼓、↓ 竹鐘、→ 沙鈴）。
+木鼓、竹鐘、沙鈴：三個角色程式完全相同，只有區域變數「我的編號」不同（1／2／3）；收到「亮起」「打對了」「試音」時，先比對「我的編號 ＝ 目前音」再亮起並播放自己的音效。
+火堆：依變數「火高」切換暗／小／中／大／全開五個造型，做對一個動作就竄高一截，做錯歸零。
+音樂精靈：開場說明、答對答錯與過關結束的台詞。
+火把：3 個分身代表 3 條命，位置用「編號 × 34 − 34」算出來，依「命」切換亮／滅。
+字卡：關卡卡、看好囉、換你做、答對、火光全開、答錯、通關、結束。</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>十、測試紀錄</h3>
+    <p class="hint">寫下自己實際測到的結果，評審會看重這一段。</p>
+    <textarea class="f" data-k="test">1. 動作辨識：預備、向左轉頭、點頭、向右轉頭四種狀態都能正確顯示在畫面下方的牌子上（看不到臉時顯示「看不到臉」）。
+2. 重複判定：頭一直向左轉 1.6 秒，只送出 1 次動作；把臉轉回正前方後再轉一次，才會送出第 2 次。
+3. 第一關：連續 3 輪完全正確後自動進入第二關，並顯示「第二關・節奏接龍」字卡。
+4. 第二關：序列由 3 個開始，每答對一輪加 1 個，接到 10 個並答對時顯示通關字卡。
+5. 計分：連續第 3 輪起進入火光全開，該輪分數確實 ×2。
+6. 難度：每答對一輪提示間隔縮短 0.04 秒，到 0.25 秒後不再縮短。
+7. 失敗：連續答錯 3 次，火把由 3 → 0，顯示遊戲結束字卡。
+8. 左右方向：以實體攝影機確認「向左轉頭 → 木鼓」；若相反，把「左右相反」設成 1 後即正確。
+9. 待調整：（在教室電腦實測後填寫，例如轉頭門檻要改成多少）</textarea>
+  </div>
+
+  <div class="docsec">
+    <h3>十一、參考資料與說明</h3>
+    <textarea class="f" data-k="ref">・Facemesh2Scratch：Junya Ishihara（champierre）開發，TensorFlow.js facemesh 模型（源自 MediaPipe Face Mesh），於 stretch3.github.io 使用。
+・情境構想：臺北市貓咪盃 AI 互動組情境選擇卡「部落樂舞・火堆旁的節奏」。
+・角色、背景、音效皆為自行製作（SVG 與合成波形）。
+・隱私：臉部影像只在自己的電腦上運算，不會上傳；課堂上不錄影、不截圖同學的臉。</textarea>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY='fire2026.doc';
+  var fields=[].slice.call(document.querySelectorAll('[data-k]'));
+  var defaults={};fields.forEach(function(f){defaults[f.getAttribute('data-k')]=f.value;});
+  function save(){
+    var o={};fields.forEach(function(f){o[f.getAttribute('data-k')]=f.value;});
+    try{localStorage.setItem(KEY,JSON.stringify(o));document.getElementById('saveInfo').textContent='已自動儲存（'+new Date().toLocaleTimeString('zh-TW')+'）';}
+    catch(e){document.getElementById('saveInfo').textContent='這個瀏覽器不允許儲存，請記得列印或另存 PDF。';}
+  }
+  try{
+    var o=JSON.parse(localStorage.getItem(KEY)||'{}');
+    fields.forEach(function(f){var k=f.getAttribute('data-k');if(o[k]!=null)f.value=o[k];});
+  }catch(e){}
+  fields.forEach(function(f){f.addEventListener('input',save);});
+  function grow(t){if(t.tagName==='TEXTAREA'){t.style.height='auto';t.style.height=(t.scrollHeight+4)+'px';}}
+  fields.forEach(function(f){grow(f);f.addEventListener('input',function(){grow(f);});});
+  document.getElementById('doPrint').addEventListener('click',function(){fields.forEach(grow);window.print();});
+  document.getElementById('doReset').addEventListener('click',function(){
+    if(!confirm('要把所有欄位還原成範例內容嗎？'))return;
+    fields.forEach(function(f){f.value=defaults[f.getAttribute('data-k')];grow(f);});save();
+  });
+  document.getElementById('doClear').addEventListener('click',function(){
+    if(!confirm('要清空所有欄位嗎？'))return;
+    fields.forEach(function(f){f.value='';grow(f);});save();
+  });
+})();
+</script>
+</body>
+</html>

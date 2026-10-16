@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 7 教師手冊：把程式包起來重複用</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📕 單元 7 教師手冊 <em>把程式包起來重複用</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit7_student.html">學生版</a>
+      <a href="unit5_teacher.html">單元5</a>
+      <a href="unit6_teacher.html">單元6</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>單元 7 教師手冊</h1>
+    <p>對象：國小高年級（建議六年級，或已完成單元 1～6 者）　·　時間：2 節（40 分鐘）　·　範圍：函式積木 5 塊　·　搭配：<a href="unit7_student.html">學生版實作單</a>、<a href="guide.html">積木圖鑑</a>、<a href="mistakes.html">易錯點總表</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、教學目標</h3>
+    <ul style="font-size:.94rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>認知</b>：說明「定義」與「呼叫」的分工，知道定義本身不會執行。</li>
+      <li><b>技能</b>：把重複出現的程式段落抽出來，定義成自訂積木並在主程式呼叫。</li>
+      <li><b>思維</b>：理解<b>抽象化</b>——替一段流程命名，主程式就能用「在做什麼」而不是「怎麼做」來閱讀。</li>
+    </ul>
+    <div class="note" style="margin-top:12px">這是整套教材的<b>最後一課，也是最接近真正寫程式的一課</b>。所有程式語言的函式、方法、副程式都是同一個概念。學生在這裡建立的直覺，未來學 Python 或 JavaScript 都用得上。</div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、節次流程（兩節課）</h3>
+    <div class="tline"><div class="t">第1節<br>0–10′</div><div><b>不插電導入</b>：請一位學生當機器人，老師唸指令。先唸完整版：「抬左腳、抬右腳、抬左腳、抬右腳、抬左腳、抬右腳」，再問全班：「有沒有更短的說法？」引導出「走三步」這個<b>名字</b>——這就是自訂積木。</div></div>
+    <div class="tline"><div class="t">10–25′</div><div><b>對照示範</b>：學生版第 1 段。兩段程式做的事一樣，請學生回答「如果要把跳的高度從 60 改成 100，各要改幾個地方？」答案是 <b>6 個</b> vs <b>2 個</b>，說服力很強。</div></div>
+    <div class="tline"><div class="t">25–40′</div><div><b>實際建立一塊積木</b>：務必在<b>真實的 Scratch</b> 裡示範「建立一個積木 → 命名 → 確定 → 定義出現 → 積木清單多一塊」這整個流程，因為小舞台是預先建好的。完成作品 1。</div></div>
+    <div class="tline"><div class="t">第2節<br>0–15′</div><div><b>把迴圈包進去</b>：完成作品 2「走正方形」。重點是主程式只剩一塊積木，非常好讀。可請學生比較「重複 4 次｛移動、右轉｝」直接寫在主程式的版本。</div></div>
+    <div class="tline"><div class="t">15–35′</div><div><b>參數（本課難點）</b>：學生版第 4 段與作品 3。先示範沒有參數時得做三塊幾乎一樣的積木，再示範一塊帶輸入方塊的就解決了。</div></div>
+    <div class="tline"><div class="t">35–40′</div><div><b>回顧整套教材</b>：從單元 1 的「移動 10 點」到這一課的自訂積木，請學生說說自己覺得最有用的一塊積木是什麼、為什麼。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、關鍵概念與學生迷思</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">概念</th><th style="width:38%">學生常見迷思</th><th>教學建議</th></tr></thead>
+      <tbody>
+        <tr><td><b>定義不會執行</b></td><td>寫好定義就按綠旗，以為會自己動。</td><td>比喻：定義像<b>食譜</b>，寫好放在抽屜裡不會自己變出菜，要有人照著做。</td></tr>
+        <tr><td><b>要同名才叫得動</b></td><td>定義叫「跳一下」，呼叫的卻選到別的名字。</td><td>在小舞台裡兩邊都是下拉選單，請學生逐字對照。真實 Scratch 則不會有這個問題（積木本身就是那個名字）。</td></tr>
+        <tr><td><b>改一處，處處都變</b></td><td>以為改了定義只會影響第一次呼叫。</td><td>這正是自訂積木最大的好處。刻意改一次定義再執行，讓學生親眼看到三次全部跟著變。</td></tr>
+        <tr><td><b>什麼時候該包起來</b></td><td>把只用一次的東西也包成積木，反而更難讀。</td><td>經驗法則：<b>用到三次以上</b>，或那段程式有一個「說得出口的名字」時才包。</td></tr>
+        <tr><td><b>名字要看得懂</b></td><td>把積木命名為 a、積木 1。</td><td>名字要寫<b>在做什麼</b>（走正方形、說哈囉），不是編號。這是程式素養。</td></tr>
+        <tr><td><b>參數不是變數</b></td><td>想在定義外面用「步數」。</td><td>參數<b>只在定義裡面有意義</b>，做完就忘了。要跨段落保存請用變數。</td></tr>
+        <tr><td><b>輸入方塊的位置</b></td><td>在定義裡直接打數字，參數就沒用了。</td><td>要把圓形的參數積木<b>放進欄位</b>，這需要用到單元 4 的嵌套技巧。</td></tr>
+        <tr><td><b>不小心無限呼叫</b></td><td>在定義裡呼叫自己，程式卡住。</td><td>小舞台設有 12 層上限會自動停。可以順勢介紹「遞迴」這個名詞，但不必深入。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、三個作品的教學提示</h3>
+    <div class="tline"><div class="t">作品 1<br>跳一下</div><div><b>教學重點</b>：最單純的「定義－呼叫」結構。<b>務必做的事</b>：完成後當場把定義裡的 60 改成 100 再執行，三次跳躍一起變高——這個瞬間是本課最有說服力的時刻。<b>易錯</b>：把動作放在定義外面。</div></div>
+    <div class="tline"><div class="t">作品 2<br>走正方形</div><div><b>教學重點</b>：<b>迴圈可以被包進自訂積木</b>，主程式因此只剩一塊。<b>易錯</b>：迴轉方式設成「左﹣右」就轉不出正方形，要設「任意」。<b>延伸</b>：呼叫四次、每次之間右轉 90 度，會走出更大的圖形。</div></div>
+    <div class="tline"><div class="t">作品 3<br>走幾步</div><div><b>教學重點</b>：一個定義、三種輸入、三種結果，這是<b>參數</b>最直觀的示範。<b>易錯</b>：定義裡的「移動」欄位忘記放參數，結果三次都走一樣遠。<b>檢查方法</b>：問學生「這三次走的距離一樣嗎？」不一樣才算成功。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>五、差異化與延伸</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢</b>：只要能定義一塊積木並成功呼叫一次，就算達標；參數的部分可以只看示範不動手。</li>
+      <li><b>提早完成</b>：挑戰用帶參數的積木做出階梯（走 20、走 40、走 60），或把單元 6 的清單走訪包成一塊「唸出全部」。</li>
+      <li><b>跨領域</b>：數學的函數概念（給一個輸入、得到一個輸出）；國語的段落大意（替一段文字下標題，和替一段程式命名是同一件事）。</li>
+      <li><b>不插電</b>：全班共同編一本「動作字典」——把「原地轉圈」「拍手三下」等常用動作各取一個名字寫在黑板上，之後老師只唸名字，學生要做出對應動作。</li>
+      <li><b>銜接未來</b>：可以告訴學生，這一課學的東西在其他程式語言裡叫做<b>函式</b>（function）。他們已經會了。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>六、評量規準</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>概念理解</b></td><td>能說明定義與呼叫的分工，並預測改定義後的結果</td><td>知道定義要有呼叫才會動</td><td>以為定義會自己執行</td></tr>
+        <tr><td><b>抽象化</b></td><td>能主動指出程式裡哪一段該包成積木，並取出合適的名字</td><td>能依提示完成定義與呼叫</td><td>尚未看出重複的段落</td></tr>
+        <tr><td><b>參數運用</b></td><td>能自行設計帶輸入方塊的積木並正確使用</td><td>能依步驟完成作品 3</td><td>參數欄位常留空或填死數字</td></tr>
+        <tr><td><b>程式可讀性</b></td><td>積木命名清楚，主程式一看就懂在做什麼</td><td>命名尚可</td><td>使用無意義的名稱</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>七、關於小舞台的說明（與真實 Scratch 的差異）</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>「定義」的形狀不同（最重要的一點）</b>：真實 Scratch 的定義是<b>帽子積木</b>，要做的事<b>接在它下面</b>；本教材的腳本區是扁平的串列，如果照樣做成帽子，程式跑到定義時會把下面的積木當成一般程式直接執行，語意就錯了。因此改成 <b>C 型積木</b>，要做的事<b>包在凹槽裡</b>，並把上緣畫成帽子的圓角。<b>請務必向學生說明這個差異</b>，換到真實 Scratch 時只要改成「接在下面」即可。</li>
+      <li><b>積木是預先建好的</b>：小舞台固定提供「跳一下」「走正方形」與一塊帶參數的「走幾步 (步數)」；真實 Scratch 要按「<b>建立一個積木</b>」自己造。建議在 Scratch 裡完整示範一次建立流程。</li>
+      <li><b>建立積木的對話框</b>提供三種零件：<b>添加輸入方塊（數字或文字）</b>、<b>添加輸入方塊（布林值）</b>、<b>添加說明文字</b>，另有「執行完畢再更新畫面」選項（用於畫圖時加速）。小舞台只模擬第一種。</li>
+      <li><b>參數只有一個</b>：小舞台的帶參數積木固定是「走幾步 (步數)」；真實 Scratch 可以加任意多個輸入方塊。</li>
+      <li><b>遞迴上限 12 層</b>：在定義裡呼叫自己時會自動停下來，不會讓瀏覽器當掉。</li>
+      <li><b>執行時會逐塊高亮</b>，包括跳進定義裡面的積木，這是真實 Scratch 沒有的教學輔助，講解呼叫流程時很好用（建議把速度調成「慢」）。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>八、整套教材的收尾</h3>
+    <p style="font-size:.94rem;margin:6px 0 0">七個單元走完，學生接觸過的積木涵蓋八大類 115 塊。若要安排總結活動，建議讓學生自選主題做一個小作品，並要求至少用到：</p>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li>一個<b>事件</b>積木當起跑線（單元 3）</li>
+      <li>一個<b>迴圈</b>與一個<b>條件</b>（單元 3、4）</li>
+      <li>一個<b>變數</b>做計分或計時（單元 5）</li>
+      <li>一塊<b>自訂積木</b>（本單元）</li>
+    </ul>
+    <p style="font-size:.93rem;margin:8px 0 0">發表時請學生用<b>自己的話</b>說明程式怎麼跑，而不是唸出積木名稱——這是最能看出理解程度的評量方式。</p>
+  </div>
+
+  <footer>📕 單元 7 教師手冊　·　<a href="unit5_teacher.html">單元 5</a>　·　<a href="unit6_teacher.html">單元 6</a></footer>
+</div>
+</body>
+</html>

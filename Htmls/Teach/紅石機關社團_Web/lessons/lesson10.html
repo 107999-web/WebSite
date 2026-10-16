@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 堂｜漏斗、投擲器、發射器：搬運物品</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="10">
+<main class="wrap">
+
+<section class="hero" style="--u:#81C784">
+  <span class="tag">第 10 堂 ／ 單元3　感測與自動化</span>
+  <h1>漏斗、投擲器、發射器：搬運物品 📦</h1>
+  <p>紅石不只能控制燈和門，還能搬東西！漏斗會把物品一個一個送到下一個容器，投擲器會「丟」出物品，發射器會「使用」物品：射箭、放煙火、倒水。</p>
+  <div class="chips"><span class="chip">🧱 漏斗、箱子、投擲器、發射器、壓力板、煙火</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>知道漏斗會往「嘴巴朝向」的容器送東西，有紅石訊號時會停住。</li><li>分得出投擲器（丟出物品）和發射器（使用物品）。</li><li>做出漏斗輸送帶和歡迎煙火門。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：學校的物品是怎麼送到教室的？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：漏斗方向怎麼放？投擲器 vs 發射器實驗</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：漏斗輸送帶：網頁放對方向，再在遊戲做「自動倉庫」</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：歡迎煙火門：壓力板 → 發射器放煙火</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：參觀全班的煙火門</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">🔻</span><b>漏斗</b>把東西送進「嘴巴（細細那端）朝向」的容器，每秒約 2.5 個。上面的箱子裡的東西也會被吸下來。<b>有紅石訊號時漏斗會停住</b>。</div><div class="lc"><span class="ic">📤</span><b>投擲器</b>收到訊號就把 1 個物品<b>丟</b>出去；前面是容器的話會直接放進去。</div><div class="lc"><span class="ic">🏹</span><b>發射器</b>收到訊號就<b>使用</b> 1 個物品：箭射出去、煙火放出去、水桶倒水、雪球丟出去。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>放漏斗時要<b>蹲下（Shift）</b>對著目標容器按右鍵，漏斗的嘴巴才會接到它。</li><li>投擲器和發射器長得很像：發射器的臉上是「嘴巴」，投擲器是「一個洞」。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：漏斗輸送帶（自動倉庫） 📦</h3></header>
+  <div class="items">🎒 準備物品：箱子 ×2、漏斗 ×4～6</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s10a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>放一個「收件箱」，下面接一個漏斗。</li><li>蹲下，一個接一個把漏斗連成一條線，最後接到「倉庫箱子」。</li><li>把 64 個物品丟進收件箱，看它們慢慢跑到倉庫。</li><li>在中間某個漏斗旁放拉桿：拉桿打開，輸送帶就停住！</li></ol>
+  <div class="tip">💡 漏斗的嘴巴方向在放下時決定，放錯了只能挖掉重放。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出可以自動搬東西的輸送帶。</div><div class="lv f"><b>🦊 五、六年級</b>：用拉桿做出「暫停」開關，並解釋為什麼會停。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：歡迎煙火門 🎆</h3></header>
+  <div class="items">🎒 準備物品：壓力板、紅石粉、發射器、煙火（創造物品欄有）</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s10b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>在家門口放壓力板。</li><li>門旁邊放兩個發射器，臉朝上。</li><li>打開發射器，放入煙火。</li><li>紅石粉從壓力板接到發射器。走過門口——砰！</li></ol>
+  <div class="tip">💡 發射器只在「新的」訊號時發射一次。站在壓力板上不動，只會放一發。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出歡迎煙火門。</div><div class="lv f"><b>🦊 五、六年級</b>：加上中繼器延遲，讓兩邊的煙火一前一後放出來。</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：漏斗方向與容器的關係要在遊戲裡親手放才記得住，這堂專心實作。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>如果你有一條漏斗輸送帶，你想用它自動送什麼？</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>發射器裝水桶、岩漿桶可能破壞同學的作品，課堂上只提供煙火、箭、雪球。</li><li>漏斗的速度（每秒約 2.5 個）在網頁模擬中是 0.4 秒 1 個。</li><li>下一堂會用比較器「讀」箱子裝多少東西，請學生保留今天的倉庫。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s10a": {"title": "📦 應用 1：漏斗輸送帶", "desc": "最左邊的漏斗裡有 10 個物品。在黃色格子放漏斗（箭頭朝 →），把東西送進箱子。", "rows": ["h>@10:H ? ? ? C:C"], "tools": ["hopper"], "names": {"H": "漏斗", "C": "箱子"}, "challenges": [{"name": "10 個物品全部送進箱子", "level": "🐣", "steps": [{"wait": 150, "atLeast": {"C": 10}}]}]}, "s10b": {"title": "🎆 應用 2：歡迎煙火門", "desc": "發射器裡有 16 個煙火。從壓力板鋪紅石粉到發射器。", "rows": ["P:P ? ? ? f>@16:F ."], "tools": ["dust"], "names": {"P": "壓力板", "F": "發射器"}, "challenges": [{"name": "有人踩就放煙火", "level": "🐣", "steps": [{"set": {"P": true}, "atLeast": {"F": 1}}]}, {"name": "每踩一次都放一發", "level": "🦊", "steps": [{"set": {"P": true}, "atLeast": {"F": 1}}, {"set": {"P": false}, "wait": 5}, {"set": {"P": true}, "atLeast": {"F": 2}}]}]}};
+window.QUIZ = [{"q": "漏斗會把東西送到哪裡？", "o": ["嘴巴朝向的容器", "天空", "隨機"], "a": 0, "why": "漏斗細細那端（嘴巴）接到哪個容器，就送到哪裡。"}, {"q": "漏斗旁邊有紅石訊號時會？", "o": ["送得更快", "停住", "爆炸"], "a": 1, "why": "有訊號時漏斗會被鎖住，不送東西。"}, {"q": "想要「射箭」，要用哪一個？", "o": ["投擲器", "發射器", "漏斗"], "a": 1, "why": "發射器會「使用」物品，箭就會射出去。"}, {"q": "放漏斗時要按住哪個鍵，才能接到箱子上？", "o": ["Shift（蹲下）", "Ctrl", "空白鍵"], "a": 0, "why": "蹲下才不會打開箱子，而是把漏斗接上去。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

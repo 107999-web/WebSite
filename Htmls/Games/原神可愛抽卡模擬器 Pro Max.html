@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 原神可愛抽卡模擬器 Pro Max ✨</title>
+    <style>
+        :root {
+            --5star: #FFD700;
+            --4star: #ba55d3;
+            --3star: #87ceeb;
+            --bg-color-1: #a8edea;
+            --bg-color-2: #fed6e3;
+        }
+
+        @keyframes backgroundFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, var(--bg-color-1), var(--bg-color-2), #e0c3fc, #fbc2eb);
+            background-size: 400% 400%;
+            animation: backgroundFlow 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 900px;
+            width: 90%;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        h1 {
+            color: #ff8fb3;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(255, 143, 179, 0.2);
+            font-size: 2.2rem;
+        }
+
+        p.subtitle {
+            color: #7a7a7a;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            margin-top: 0;
+        }
+
+        .resource-box {
+            background: rgba(255, 240, 245, 0.8);
+            border: 2px dashed #ffb6c1;
+            padding: 10px 25px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-bottom: 25px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .resource-box span.highlight {
+            color: #d15c7e;
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        button:not(:disabled):active {
+            transform: translateY(1px) scale(0.97);
+        }
+
+        /* 禁用按鈕的樣式 */
+        button:disabled {
+            background: #cccccc !important;
+            color: #888888 !important;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-single {
+            background: linear-gradient(45deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #4a6fa5;
+        }
+
+        .btn-multi {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%);
+            color: #d15c7e;
+        }
+
+        #results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            min-height: 220px;
+            padding: 10px;
+        }
+
+        /* --- 動態核心 CSS --- */
+        @keyframes cardReveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) rotateY(180deg);
+            }
+            70% {
+                transform: scale(1.05) rotateY(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 5px var(--5star); }
+            50% { box-shadow: 0 0 25px var(--5star), 0 0 10px #ffea00; }
+            100% { box-shadow: 0 0 5px var(--5star); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 15px 10px;
+            width: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            
+            /* 套用揭曉動畫 */
+            opacity: 0;
+            animation: cardReveal 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            
+            /* 動態透視效果 */
+            perspective: 1000px;
+            transition: transform 0.3s;
+            backface-visibility: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.03);
+        }
+
+        /* 五星專屬金光閃爍 */
+        .card.star-5 {
+            border: 3px solid var(--5star);
+            background: #fffdf0;
+            animation: cardReveal 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards, goldPulse 2s infinite 0.6s;
+        }
+
+        .card.star-4 {
+            border: 3px solid var(--4star);
+            background: #fefaff;
+        }
+
+        .card.star-3 {
+            border: 3px solid var(--3star);
+            background: #fcfefe;
+        }
+
+        .card .emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card .name {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .card .stars {
+            font-size: 0.8rem;
+            letter-spacing: -1px;
+        }
+
+        .star-5 .stars { color: var(--5star); text-shadow: 0 0 2px rgba(255,215,0,0.5); }
+        .star-4 .stars { color: var(--4star); }
+        .star-3 .stars { color: var(--3star); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>✨ 原神可愛抽卡模擬器 Pro Max ✨</h1>
+        <p class="subtitle">300 抽挑戰！看看你能帶走多少五星角色！</p>
+        
+        <div class="resource-box">
+            💎 原石：<span id="gem-count" class="highlight">48000</span> ｜ 
+            🎟️ 剩餘次數：<span id="pull-count" class="highlight">300</span> 抽
+        </div>
+
+        <div class="btn-group">
+            <button id="btn-single" class="btn-single" onclick="gacha(1)">🌟 單抽</button>
+            <button id="btn-multi" class="btn-multi" onclick="gacha(10)">🌠 十連抽</button>
+        </div>
+
+        <div id="results">
+            <!-- 抽卡結果會顯示在這裡 -->
+        </div>
+    </div>
+
+    <script>
+        // 設定初始資源
+        let remainingPulls = 300;
+        const gemsPerPull = 160;
+
+        // 大幅擴充的獎池
+        const pool = {
+            star5: [
+                { name: '胡桃', emoji: '👻' }, { name: '雷電將軍', emoji: '⚡' },
+                { name: '納西妲', emoji: '🌱' }, { name: '芙寧娜', emoji: '💧' },
+                { name: '鍾離', emoji: '🛡️' }, { name: '神里綾華', emoji: '❄️' },
+                { name: '溫迪', emoji: '🌪️' }, { name: '楓原萬葉', emoji: '🍁' },
+                { name: '夜蘭', emoji: '🎲' }, { name: '甘雨', emoji: '🏹' },
+                { name: '魈', emoji: '👹' }, { name: '八重神子', emoji: '🦊' },
+                { name: '神里綾人', emoji: '🧋' }, { name: '那維萊特', emoji: '⚖️' },
+                { name: '林尼', emoji: '🎩' }, { name: '萊歐斯利', emoji: '🥊' },
+                { name: '妮露', emoji: '💃' }, { name: '艾爾海森', emoji: '🎧' },
+                { name: '阿蕾奇諾', emoji: '🔥' }, { name: '瑪拉妮', emoji: '🦈' },
+                { name: '基尼奇', emoji: '🦖' }, { name: '希諾寧', emoji: '🐆' },
+                { name: '可莉', emoji: '💣' }, { name: '達達利亞', emoji: '🐳' },
+                { name: '宵宮', emoji: '🎇' }, { name: '珊瑚宮心海', emoji: '🐟' },
+                { name: '荒瀧一斗', emoji: '🪨' }, { name: '流浪者', emoji: '🎐' }
+            ],
+            star4: [
+                { name: '香菱', emoji: '🌶️' }, { name: '行秋', emoji: '📚' },
+                { name: '班尼特', emoji: '👍' }, { name: '菲謝爾', emoji: '🐦‍⬛' },
+                { name: '芭芭拉', emoji: '🎵' }, { name: '迪奧娜', emoji: '🐱' },
+                { name: '諾艾爾', emoji: '🧹' }, { name: '凝光', emoji: '💎' },
+                { name: '北斗', emoji: '🏴‍☠️' }, { name: '重雲', emoji: '🍦' },
+                { name: '雷澤', emoji: '🐺' }, { name: '砂糖', emoji: '🧪' },
+                { name: '羅莎莉亞', emoji: '🦇' }, { name: '煙緋', emoji: '⚖️' },
+                { name: '早柚', emoji: '🥷' }, { name: '托馬', emoji: '🧹' },
+                { name: '五郎', emoji: '🐕' }, { name: '雲堇', emoji: '🎭' },
+                { name: '久岐忍', emoji: '🥷' }, { name: '鹿野院平藏', emoji: '👊' },
+                { name: '柯萊', emoji: '🪃' }, { name: '多莉', emoji: '💰' },
+                { name: '萊依拉', emoji: '😴' }, { name: '琺露珊', emoji: '📐' },
+                { name: '瑤瑤', emoji: '🐇' }, { name: '卡維', emoji: '🏛️' },
+                { name: '綺良良', emoji: '📦' }, { name: '琳妮特', emoji: '🐈‍⬛' },
+                { name: '菲米尼', emoji: '🐧' }, { name: '夏洛蒂', emoji: '📸' },
+                { name: '夏沃蕾', emoji: '🔫' }, { name: '嘉明', emoji: '🦁' },
+                { name: '卡齊娜', emoji: '🛹' }, { name: '賽索斯', emoji: '🏜️' }
+            ],
+            star3: [
+                { name: '黎明神劍', emoji: '🗡️' }, { name: '討龍英傑譚', emoji: '📖' },
+                { name: '黑纓槍', emoji: '🎋' }, { name: '彈弓', emoji: '🏹' },
+                { name: '飛天御劍', emoji: '⚔️' }, { name: '冷刃', emoji: '🔪' },
+                { name: '魔導緒論', emoji: '📘' }, { name: '神射手之誓', emoji: '🎯' },
+                { name: '沐浴龍血的劍', emoji: '🗡️' }, { name: '鐵影闊劍', emoji: '🛡️' },
+                { name: '翡玉法球', emoji: '🔮' }, { name: '鴉羽弓', emoji: '🪶' }
+            ]
+        };
+
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function pullOne() {
+            const rand = Math.random() * 100;
+            if (rand < 3) return { ...getRandomItem(pool.star5), rarity: 5 };
+            else if (rand < 18) return { ...getRandomItem(pool.star4), rarity: 4 };
+            else return { ...getRandomItem(pool.star3), rarity: 3 };
+        }
+
+        // 更新資源畫面與按鈕狀態
+        function updateResources() {
+            document.getElementById('pull-count').innerText = remainingPulls;
+            document.getElementById('gem-count').innerText = remainingPulls * gemsPerPull;
+
+            document.getElementById('btn-single').disabled = (remainingPulls < 1);
+            document.getElementById('btn-multi').disabled = (remainingPulls < 10);
+        }
+
+        function gacha(times) {
+            // 檢查次數是否足夠
+            if (remainingPulls < times) {
+                alert('啊呀！原石不足了 ＞_＜ \n請重新整理網頁來獲得新的 300 抽！');
+                return;
+            }
+
+            // 扣除次數並更新畫面
+            remainingPulls -= times;
+            updateResources();
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = ''; // 清空上次結果
+
+            let pulls = [];
+            let hasFourStarOrHigher = false;
+
+            for (let i = 0; i < times; i++) {
+                let item = pullOne();
+                if (item.rarity >= 4) hasFourStarOrHigher = true;
+                pulls.push(item);
+            }
+
+            // 十連抽保底機制
+            if (times === 10 && !hasFourStarOrHigher) {
+                pulls[Math.floor(Math.random() * 10)] = { ...getRandomItem(pool.star4), rarity: 4 };
+            }
+
+            // 渲染結果與動畫
+            pulls.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `card star-${item.rarity}`;
+                
+                card.style.animationDelay = `${index * 0.1}s`; 
+
+                let starsHtml = '';
+                for(let s=0; s<item.rarity; s++) starsHtml += '★';
+
+                card.innerHTML = `
+                    <div class="emoji">${item.emoji}</div>
+                    <div class="name">${item.name}</div>
+                    <div class="stars">${starsHtml}</div>
+                `;
+
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // 載入時先更新一次數字
+        updateResources();
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 1：讓角色動起來</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🏃 單元 1 <em>讓角色動起來</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a class="on" href="unit1_student.html">單元1</a>
+      <a href="unit2_student.html">單元2</a>
+      <a href="unit3_student.html">單元3</a>
+      <a href="unit4_student.html">單元4</a>
+      <a href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>讓角色動起來</h1>
+    <p>這一課我們要學會用「動作類」的積木指揮角色：往前走、轉彎、跳到指定位置，還要讓它在舞台上彈來彈去。</p>
+    <div class="goals">
+      <div><b>目標 1</b>　看得懂舞台的座標：知道 x 是左右、y 是上下，中央是 (0, 0)。</div>
+      <div><b>目標 2</b>　會用「移動」和「右轉／左轉」讓角色照我想要的路線走。</div>
+      <div><b>目標 3</b>　能做出一個角色會自己跑、碰到邊緣會反彈的小作品。</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <section class="sec">
+        <h2><span class="n">1</span>座標大冒險</h2>
+        <p>舞台就像一張地圖：往右 x 變大、往上 y 變大，正中央是 x:0 y:0。試試看能不能把角色送到星星身上！</p>
+        <div class="quiz">
+          <div class="q" id="q1">按「出題」開始，星星會出現在舞台上。</div>
+          <div class="row">
+            <span class="sb motion">定位到 x: <input id="ax" type="number" value="0" class="nf"> y: <input id="ay" type="number" value="0" class="nf"></span>
+            <button class="btn sm" id="go">▶ 送出</button>
+            <button class="btn ghost sm" id="newq">🎲 出題</button>
+            <span class="score" id="sc" style="font-family:var(--f-num);font-weight:800;color:var(--ink2)"></span>
+          </div>
+          <div class="fb" id="fb"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>這一課的積木</h2>
+        <p>每一塊都可以改數字，按「試一試」右邊的角色就會做給你看。</p>
+        <div id="blocks1"></div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>跟著做</h2>
+
+        <div class="work">
+          <h3>🐭 作品 1：角色跟著滑鼠跑</h3>
+          <ol>
+            <li>先讓角色<b>面朝鼠標向</b>（轉頭看向滑鼠）。</li>
+            <li>再<b>移動</b>一點點，它就會朝滑鼠靠近。</li>
+            <li>真正做作品時，要把這兩塊放進「重複無限次」裡面，角色才會一直追。</li>
+          </ol>
+          <div id="demo1"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:8px 0 0">💡 把滑鼠移到右邊舞台的不同位置，再按一次示範，看看角色會不會轉向。</p>
+        </div>
+
+        <div class="work">
+          <h3>📐 作品 2：走出一個正方形</h3>
+          <ol>
+            <li>先回到中央，把方向擺正（面朝 90 度）。</li>
+            <li><b>移動 100 點 → 右轉 90 度</b>，重複四次，就會回到原點。</li>
+            <li>想一想：如果改成右轉 120 度、重複三次，會走出什麼形狀？</li>
+          </ol>
+          <div id="demo2"></div>
+        </div>
+
+        <div class="work">
+          <h3>🏓 作品 3：碰到邊緣就反彈</h3>
+          <ol>
+            <li>先把角色放到舞台邊邊，面朝斜斜的方向。</li>
+            <li><b>移動</b>之後馬上接<b>碰到邊緣就反彈</b>，角色撞到牆就會彈回來。</li>
+            <li>把「迴轉方式設為 左-右」，角色的頭就不會倒過來囉！</li>
+          </ol>
+          <div id="demo3"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">4</span>挑戰任務</h2>
+        <div class="mission">
+          <div><span>⭐</span><div>把作品 2 改成走出<b>三角形</b>（提示：轉的角度不是 90 度）。</div></div>
+          <div><span>⭐⭐</span><div>做一個角色，按下綠旗後就<b>自己在舞台裡跑來跑去</b>，碰到邊緣會彈開。</div></div>
+          <div><span>⭐⭐⭐</span><div>做一個「<b>抓星星</b>」遊戲：星星隨機出現，角色跟著滑鼠去碰它。</div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">5</span>我學會了嗎</h2>
+        <div class="self">
+          <label><input type="checkbox"><span>我知道舞台中央是 <b>x:0 y:0</b>，往右 x 變大、往上 y 變大。</span></label>
+          <label><input type="checkbox"><span>我知道「移動」是往<b>角色面對的方向</b>走，不一定是往右。</span></label>
+          <label><input type="checkbox"><span>我分得出「<b>x 改變</b>」和「<b>x 設為</b>」不一樣。</span></label>
+          <label><input type="checkbox"><span>我會用「碰到邊緣就反彈」讓角色不會卡在牆上。</span></label>
+          <label><input type="checkbox"><span>我完成了至少一個作品，而且它可以正常執行。</span></label>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台</h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">x 座標</div><div class="v" id="rx">0</div></div>
+          <div><div class="k">y 座標</div><div class="v" id="ry">0</div></div>
+          <div><div class="k">方向</div><div class="v" id="rd">90</div></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" id="optGrid" checked> 座標格線</label>
+          <label><input type="checkbox" id="optArrow" checked> 方向箭頭</label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設角色</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>🏃 單元 1・讓角色動起來　·　下一課：<a href="unit2_student.html">單元 2 說話與變裝</a></footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+Stage.init(document.getElementById('stage'));
+UI.bindReadout({x:'rx',y:'ry',dir:'rd'});
+Stage.reset();
+Stage.setGrid(true);
+document.getElementById('reset').addEventListener('click',function(){Stage.reset();});
+document.getElementById('optGrid').addEventListener('change',function(e){Stage.setGrid(e.target.checked);});
+document.getElementById('optArrow').addEventListener('change',function(e){Stage.setArrow(e.target.checked);});
+
+/* --- 這一課的積木 --- */
+var host=document.getElementById('blocks1');
+['move','turnright','turnleft','pointdir','gotoxy','setx','changey','bounce','rotstyle'].forEach(function(id){
+  UI.tryRow(id,host);
+});
+
+/* --- 示範腳本 --- */
+UI.script([
+  {id:'pointtowards',args:{TOWARDS:'鼠標'}},{id:'move',args:{STEPS:40}},
+  {id:'pointtowards',args:{TOWARDS:'鼠標'}},{id:'move',args:{STEPS:40}},
+  {id:'pointtowards',args:{TOWARDS:'鼠標'}},{id:'move',args:{STEPS:40}}
+],document.getElementById('demo1'));
+
+UI.script([
+  {id:'gotoxy',args:{X:-50,Y:-50}},{id:'pointdir',args:{DIR:90}},
+  {id:'move',args:{STEPS:100}},{id:'turnright',args:{DEG:90}},
+  {id:'move',args:{STEPS:100}},{id:'turnright',args:{DEG:90}},
+  {id:'move',args:{STEPS:100}},{id:'turnright',args:{DEG:90}},
+  {id:'move',args:{STEPS:100}},{id:'turnright',args:{DEG:90}}
+],document.getElementById('demo2'));
+
+UI.script([
+  {id:'gotoxy',args:{X:-120,Y:0}},{id:'rotstyle',args:{STYLE:'左-右'}},{id:'pointdir',args:{DIR:60}},
+  {id:'move',args:{STEPS:120}},{id:'bounce',args:{}},
+  {id:'move',args:{STEPS:120}},{id:'bounce',args:{}},
+  {id:'move',args:{STEPS:120}},{id:'bounce',args:{}},
+  {id:'move',args:{STEPS:120}}
+],document.getElementById('demo3'));
+
+/* --- 座標小測驗 --- */
+var target=null, right=0, total=0;
+function newQ(){
+  var tx=(Math.round(Math.random()*20)-10)*20;
+  var ty=(Math.round(Math.random()*14)-7)*20;
+  target={x:tx,y:ty};
+  Stage.setTarget(tx,ty);
+  document.getElementById('q1').textContent='⭐ 星星出現了！填入座標，把角色送到星星身上。';
+  document.getElementById('fb').textContent='';
+  document.getElementById('fb').className='fb';
+}
+document.getElementById('newq').addEventListener('click',newQ);
+document.getElementById('go').addEventListener('click',function(){
+  if(!target){document.getElementById('fb').textContent='請先按「出題」喔！';return;}
+  var x=Number(document.getElementById('ax').value)||0;
+  var y=Number(document.getElementById('ay').value)||0;
+  var fb=document.getElementById('fb');
+  Stage.run('gotoXY',{X:x,Y:y}).then(function(){
+    total++;
+    var d=Stage.distToTarget();
+    if(d!==null&&d<26){
+      right++;fb.textContent='🎉 太棒了，接到星星！星星的座標就是 x:'+target.x+' y:'+target.y;
+      fb.className='fb ok';
+      Stage.clearTarget();target=null;
+    }else{
+      fb.textContent='差一點點～現在距離星星還有 '+Math.round(d)+' 步。看看是左右還是上下猜錯了？';
+      fb.className='fb no';
+    }
+    document.getElementById('sc').textContent='答對 '+right+' / '+total;
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>貓咪盃 AI 互動組・學生學習頁</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@400;700;900&family=Nunito:wght@700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/comp.css">
+<style>
+body{min-height:100vh;display:grid;place-items:center;padding:34px 18px}
+.box{max-width:1000px;width:100%;text-align:center}
+h1{font-size:clamp(1.7rem,5vw,2.6rem);font-weight:800;margin:12px 0 6px}
+p.sub{color:var(--ink2);margin:0 auto 6px;max-width:40em}
+.road{margin-top:26px;background:var(--paper);border:3px dashed var(--line);border-radius:22px;padding:16px 20px;text-align:left}
+.road h3{font-size:1rem;margin-bottom:6px}
+.road ul{margin:6px 0 0;padding-left:1.2em;font-size:.9rem;color:var(--ink2)}
+.road li{margin:4px 0}
+.road li b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="badge">臺北市 115 年度國民中小學 Scratch 貓咪盃競賽・初賽</span>
+  <h1>國小 AI 互動組・學生學習頁</h1>
+  <p class="sub">兩組題目各有一份學習頁，把題目拆成可以一項一項完成的步驟，而且每一段都有<b>可以直接玩的示範</b>。先玩過一輪，再回頭讀題目。</p>
+
+  <div class="homecards">
+    <div class="hcard">
+      <a class="c" href="anim.html">
+        <span class="grp">國小動畫 AI 互動組</span>
+        <span class="ico" style="margin-top:8px">🌳</span>
+        <b>森林動物搬家記</b>
+        <span class="d">互動森林場景模擬器、三種生物的出現條件、手勢與頭部判定、兩種故事結局、說明文件指引。</span>
+      </a>
+    </div>
+
+    <div class="hcard">
+      <a class="c" href="game.html">
+        <span class="grp g">國小遊戲 AI 互動組</span>
+        <span class="ico" style="margin-top:8px">🎵</span>
+        <b>AI 節奏接龍大作戰</b>
+        <span class="d">可以真的玩的兩關節奏遊戲（含聲音）、預備姿勢狀態機、亂數節奏與清單記錄、計分與難度遞增。</span>
+      </a>
+    </div>
+
+    <div class="hcard">
+      <a class="c" href="ideas.html">
+        <span class="grp" style="background:var(--c-variables)">兩組通用</span>
+        <span class="ico" style="margin-top:8px">💡</span>
+        <b>十張情境選擇卡</b>
+        <span class="d">動畫組五個故事情境、遊戲組五種玩法，每一張都對照過題目任務，還附變數設計與結局建議。挑一張開始做。</span>
+      </a>
+    </div>
+
+    <div class="hcard">
+      <a class="c" href="plan.html">
+        <span class="grp" style="background:var(--no)">兩組通用</span>
+        <span class="ico" style="margin-top:8px">🗓️</span>
+        <b>五週進度表</b>
+        <span class="d">9/21 到 10/23 每週要做到什麼，附可勾選的檢核項目、連假回家任務與繳交前總檢核。功能 10/8 完成，第四週整週優化。</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="road">
+    <h3>📌 使用說明</h3>
+    <ul>
+      <li><b>先看進度表</b>：<b>五週進度表</b>列出每週該做到哪裡，繳交截止日是 10/23（五）。</li>
+      <li><b>不知道要做什麼主題</b>：先打開<b>十張情境選擇卡</b>，挑一張最想做的。</li>
+      <li><b>先玩再讀題</b>：兩份學習頁的第 2 段都是做好的互動示範，建議先玩過一輪再回頭看題目。</li>
+      <li><b>沒有攝影機也能用</b>：AI 判定區<b>用滑鼠位置模擬手或鼻尖</b>，座標範圍與「偵測不到回傳空字串」的行為都和真實情況一致。</li>
+      <li><b>示範不是範本</b>：頁面上的數值條件只是一組合理的例子，請自己訂一組並寫進程式說明文件。</li>
+      <li>真實環境請到 <b>stretch3.github.io</b> 載入擴充功能，兩個模組都只需要一支網路攝影機。</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

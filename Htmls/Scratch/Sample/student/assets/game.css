@@ -1,0 +1,83 @@
+/* ===== 爆炸頭節奏大師：本教材專用樣式（疊在 style.css、anim.css 之上） ===== */
+:root{--c-ext:#0FBD8C;--c-list:#FF661A}
+.sb.ext{background:var(--c-ext);box-shadow:0 3px 0 #0B9A72}
+.rp.ext,.bl.ext{background:var(--c-ext)}
+.rp.listtone,.bl.listtone{background:var(--c-list)}
+.cwrap.ext>.chead,.cwrap.ext>.cmid,.cwrap.ext>.cfoot{background:var(--c-ext)}
+
+.hands{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
+.hands figure{margin:0;flex:1 1 130px;background:var(--paper2);border:2px solid var(--line);border-radius:16px;padding:10px;text-align:center}
+.hands figure img{height:64px;width:auto;image-rendering:auto}
+.hands figure b{display:block;font-size:1.05rem;margin-top:4px}
+.hands figure small{color:var(--ink2);font-size:.8rem;line-height:1.5;display:block}
+.hands .fistico{font-size:48px;line-height:64px;height:64px}
+
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:12px}
+.rules div{background:var(--paper2);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
+.rules div b{display:block;color:var(--accent-d)}
+.rules div span{font-size:.88rem}
+
+table.tbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:.9rem}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.tbl th{background:var(--paper2)}
+.tblwrap{overflow-x:auto}
+code.v{background:var(--c-variables);color:#fff;border-radius:999px;padding:0 8px;font-size:.85em;font-family:inherit;font-weight:700;white-space:nowrap}
+code.l{background:var(--c-list);color:#fff;border-radius:6px;padding:0 8px;font-size:.85em;font-family:inherit;font-weight:700;white-space:nowrap}
+code.m{background:var(--c-events);color:#5a4200;border-radius:6px;padding:0 8px;font-size:.85em;font-family:inherit;font-weight:700;white-space:nowrap}
+
+/* 流程圖 */
+.flow2{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.flow2 .st{background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:8px 12px;font-weight:800;font-size:.9rem;text-align:center}
+.flow2 .st small{display:block;font-weight:500;color:var(--ink2);font-size:.76rem}
+.flow2 .ar{color:var(--ink2);font-weight:800}
+.flow2 .st.a{border-color:#9966FF}.flow2 .st.b{border-color:#FF8C1A}.flow2 .st.c{border-color:#2EAD6B}.flow2 .st.d{border-color:#E8607D}
+
+/* 手勢實驗室 */
+.glab{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;margin-top:12px;align-items:start}
+@media(max-width:760px){.glab{grid-template-columns:minmax(0,1fr)}}
+.glab svg{width:100%;height:auto;background:#1F2A3A;border-radius:16px;touch-action:none;display:block}
+.glab .pt{cursor:grab}
+.glab .readout2{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.glab .readout2 div{background:var(--paper2);border:2px solid var(--line);border-radius:12px;padding:6px 10px}
+.glab .readout2 .k{font-size:.78rem;color:var(--ink2)}
+.glab .readout2 .v{font-family:var(--f-num);font-weight:800;font-size:1.1rem}
+.steps3{margin:10px 0 0;padding:0;list-style:none}
+.steps3 li{border:2px solid var(--line);border-radius:12px;padding:6px 10px;margin-top:6px;font-size:.9rem;opacity:.5;transition:opacity .2s}
+.steps3 li.on{opacity:1;border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+.bigres{font-size:1.6rem;font-weight:900;margin-top:8px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+/* 上膛模擬 */
+.armlog{margin-top:10px;background:var(--paper2);border:2px solid var(--line);border-radius:12px;padding:8px 12px;min-height:90px;font-size:.88rem;max-height:180px;overflow:auto}
+.armlog div{border-bottom:1px dashed var(--line);padding:2px 0}
+.armlog .fire{color:var(--ok);font-weight:800}
+.armlog .no{color:var(--ink2)}
+.gun{display:inline-flex;align-items:center;gap:6px;font-weight:800;padding:4px 12px;border-radius:999px;background:var(--paper2);border:2px solid var(--line)}
+.gun.on{background:#FFE3C2;border-color:#FF8C1A}
+
+/* 節奏實驗室 */
+.slots{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin-top:10px}
+.slots button{aspect-ratio:1;border-radius:12px;border:3px solid var(--line);background:var(--paper);font-size:1.3rem;font-weight:900;color:var(--ink);cursor:pointer;padding:0;display:grid;place-items:center;position:relative}
+.slots button small{position:absolute;top:2px;left:5px;font-size:.62rem;color:var(--ink2);font-weight:700}
+.slots button.now{border-color:var(--accent);transform:scale(1.08);box-shadow:var(--shadow-s)}
+.slots button img{width:70%;height:auto}
+.tline2{position:relative;height:74px;margin-top:12px;background:var(--paper2);border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.tline2 .win{position:absolute;top:8px;bottom:26px;background:color-mix(in srgb,var(--ok) 22%,transparent);border-left:2px solid var(--ok);border-right:2px solid var(--ok);border-radius:6px}
+.tline2 .win span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:900}
+.tline2 .hit{position:absolute;top:4px;bottom:22px;width:3px;border-radius:2px}
+.tline2 .hit.g{background:#2EAD6B}.tline2 .hit.b{background:#E8607D}
+.tline2 .tick{position:absolute;bottom:2px;font-size:.66rem;color:var(--ink2);transform:translateX(-50%)}
+.tline2 .cursor{position:absolute;top:0;bottom:0;width:2px;background:var(--accent-d)}
+.rhy-status{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.rhy-status .big{font-size:1.4rem;font-weight:900;min-width:6em}
+.judge{font-family:var(--f-num);font-weight:900;font-size:1.5rem;min-width:4em}
+.judge.GOOD{color:#2EAD6B}.judge.BAD{color:#E8607D}.judge.MISS{color:#8A8A8A}
+.padbtns{display:flex;gap:8px;margin-top:10px}
+.padbtns button{flex:1;font-size:1.3rem;padding:12px 0}
+
+.dlcard{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--paper);border:3px solid var(--line);border-radius:18px;padding:12px 16px;margin-top:12px}
+.dlcard .ic{font-size:2.2rem}
+.dlcard b{display:block}
+.dlcard small{color:var(--ink2)}
+.dlcard .btn{margin-left:auto}
+.kbd{display:inline-block;border:2px solid var(--line);border-bottom-width:4px;border-radius:8px;padding:0 7px;font-family:var(--f-num);font-weight:800;background:var(--paper)}

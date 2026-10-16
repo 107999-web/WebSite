@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 堂｜活塞與黏性活塞：會動的機關</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="4">
+<main class="wrap">
+
+<section class="hero" style="--u:#E57373">
+  <span class="tag">第 4 堂 ／ 單元1　紅石入門</span>
+  <h1>活塞與黏性活塞：會動的機關 🟫</h1>
+  <p>活塞收到訊號就會把前面的方塊推出去，黏性活塞還能拉回來。有了活塞，紅石終於能讓「方塊動起來」：隱藏門、陷阱、升降台都靠它！</p>
+  <div class="chips"><span class="chip">🧱 活塞、黏性活塞、拉桿、紅石粉、石頭</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>分得出活塞和黏性活塞的差別。</li><li>知道活塞最多推 12 個方塊，有些方塊推不動。</li><li>做出 1 格隱藏門。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：猜猜看：活塞推得動多少方塊？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：網頁「活塞大力士」實驗：一直加方塊直到推不動</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：1 格隱藏門：選對活塞種類</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：陷阱地板：踩上壓力板，黏性活塞把地板拉走</div></div>
+<div class="slot" data-min="5" data-label="第2節 分享"><b>5 分</b><div><b>分享</b>：參觀別人的隱藏門，猜猜開關藏在哪</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">🟫</span><b>活塞</b>收到訊號就把前面的方塊推出去；沒訊號就縮回來，但<b>方塊留在原地</b>。</div><div class="lc"><span class="ic">🟩</span><b>黏性活塞</b>活塞＋史萊姆球。縮回來時會把方塊<b>一起拉回來</b>。</div><div class="lc"><span class="ic">💪</span><b>推的限制</b>最多一次推 <b>12 個</b>方塊。黑曜石、箱子這類方塊推不動；紅石粉、火把被推到會掉落。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>放活塞時，活塞的「臉」（木頭那一面）會朝向你，所以要站在「想推的方向的對面」放。</li><li>活塞的電可以從後面或側面來，但不能從臉那一面。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：1 格隱藏門 🚪</h3></header>
+  <div class="items">🎒 準備物品：黏性活塞、石頭（或跟牆一樣的方塊）、拉桿、紅石粉</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s04a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>蓋一面牆，留一個 1 格的門口。</li><li>在門口<b>上面</b>放一個朝下的黏性活塞，活塞前面黏一塊跟牆一樣的方塊。</li><li>從拉桿鋪紅石粉到活塞。</li><li>拉桿打開 → 方塊被推下來堵住門口；關掉 → 方塊被拉回去，門打開。</li></ol>
+  <div class="tip">💡 用普通活塞的話，方塊推出去就回不來了——這就是「黏性」的重要。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出 1 格隱藏門。</div><div class="lv f"><b>🦊 五、六年級</b>：把開關藏起來（例如藏在書櫃後面、用按鈕＋觀察者），讓別人找不到。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：陷阱地板 🕳️</h3></header>
+  <div class="items">🎒 準備物品：黏性活塞、壓力板、紅石粉、石頭</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s04b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>在走廊地板挖一格，下面放一個朝上的黏性活塞，活塞上面是地板方塊。</li><li>平常活塞是伸出去的（用拉桿或紅石火把一直供電）。</li><li>在前面放壓力板，接到「讓活塞縮回」的電路（用火把反相）。</li><li>有人踩到壓力板 → 地板被拉下去 → 掉進坑裡！（坑裡放水，不會受傷）</li></ol>
+  <div class="tip">💡 這個機關要用到上上堂的火把（NOT）：壓力板有電 → 火把熄 → 活塞縮回。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：先做「拉桿控制地板升降」。</div><div class="lv f"><b>🦊 五、六年級</b>：加上壓力板＋火把，做成真的陷阱。</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：活塞的方向、黏或不黏，要親手放、親眼看才會懂，這堂專心在遊戲裡實作。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>你想用活塞做什麼機關？畫畫看。</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>基岩版的黏性活塞收到很短的訊號時，仍會把方塊拉回來（Java 版會「吐出」方塊），所以網路上「丟方塊」的 Java 機關在這裡不能用。</li><li>陷阱坑底放水，避免學生摔傷後重生找不到位置；或乾脆關閉摔落傷害。</li><li>三年級學生可以只做「拉桿控制」版本，陷阱留給五六年級。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s04a": {"title": "🚪 應用 1：1 格隱藏門", "desc": "門口 G 在牆上。在黃色格子放活塞（朝向 ↑），再鋪紅石粉接到拉桿。要選「活塞」還是「黏性活塞」呢？", "rows": ["# # # .:G # # #", ". . . # . . .", ". . . ? . . .", ". L:A ? ? . . ."], "tools": ["piston", "sticky", "dust"], "names": {"A": "拉桿", "G": "門口"}, "challenges": [{"name": "拉桿開 → 門口被堵住；拉桿關 → 門口打開", "level": "🐣", "steps": [{"set": {"A": true}, "expect": {"G": true}}, {"set": {"A": false}, "expect": {"G": false}}, {"set": {"A": true}, "expect": {"G": true}}]}]}, "s04b": {"title": "💪 應用 2：活塞大力士", "desc": "活塞最多能推幾個方塊？用「石頭」在活塞前面一直加，再扳拉桿試試看。", "rows": ["L:A p> # # # . . . . . . . . . . . ."], "tools": ["block"], "names": {"A": "拉桿"}}};
+window.QUIZ = [{"q": "想讓方塊推出去又拉回來，要用哪一種？", "o": ["活塞", "黏性活塞", "中繼器"], "a": 1, "why": "黏性活塞縮回時會把方塊拉回來。"}, {"q": "活塞一次最多推幾個方塊？", "o": ["5 個", "12 個", "64 個"], "a": 1, "why": "最多 12 個，第 13 個就推不動。"}, {"q": "活塞前面是紅石粉，活塞伸出去時紅石粉會？", "o": ["被推走", "掉落", "變更亮"], "a": 1, "why": "紅石粉、火把這類東西被推到會掉落。"}, {"q": "黏性活塞要怎麼做？", "o": ["活塞＋史萊姆球", "活塞＋紅石粉", "活塞＋蜂蜜"], "a": 0, "why": "合成：活塞＋史萊姆球（創造模式直接拿就好）。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

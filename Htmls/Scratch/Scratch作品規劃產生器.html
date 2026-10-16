@@ -1,0 +1,1305 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scratch 作品規劃產生器</title>
+<style>
+:root{
+  --bg:#FFF5F8; --dot:#F8D7E0; --card:#FFFFFF; --ink:#5D4037; --ink2:#8D6E63;
+  --line:#FADADD; --pink:#FF8FAB; --pink2:#FF6F91; --orange:#FFB74D; --mint:#E8F8EE; --mint2:#5CB88A;
+  --cream:#FFFDE7; --sky:#E3F2FD; --sky2:#64B5F6; --red:#E57373; --shadow:0 6px 18px rgba(255,143,171,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#241C27; --dot:#342839; --card:#33283A; --ink:#F6E7EE; --ink2:#CDB6C2;
+    --line:#4A3A50; --cream:#3B3226; --mint:#25382E; --sky:#22303D; --shadow:0 6px 18px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#241C27; --dot:#342839; --card:#33283A; --ink:#F6E7EE; --ink2:#CDB6C2;
+  --line:#4A3A50; --cream:#3B3226; --mint:#25382E; --sky:#22303D; --shadow:0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0; background-color:var(--bg); background-image:radial-gradient(var(--dot) 1.5px, transparent 1.7px); background-size:22px 22px;
+  color:var(--ink); font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif; line-height:1.6}
+header{display:flex; gap:12px; align-items:center; padding:14px 16px; max-width:1200px; margin:0 auto; flex-wrap:wrap}
+.logo{width:50px; height:50px; border-radius:16px; background:var(--pink); display:grid; place-items:center; font-size:26px; box-shadow:var(--shadow); flex:none}
+header h1{font-size:1.35rem; margin:0}
+header p{margin:0; color:var(--ink2); font-size:.9rem}
+.tools{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+.layout{display:grid; grid-template-columns:240px 1fr; gap:16px; max-width:1200px; margin:0 auto; padding:0 16px 40px}
+@media (max-width:820px){ .layout{grid-template-columns:1fr} .side{position:static!important} #mini{display:none} }
+.side{position:sticky; top:12px; align-self:start; display:flex; flex-direction:column; gap:12px}
+.card{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:16px}
+.nav button{display:flex; width:100%; align-items:center; gap:8px; border:none; background:none; color:var(--ink); font:inherit; padding:7px 8px; border-radius:12px; cursor:pointer; text-align:left}
+.nav button:hover{background:var(--bg)}
+.nav button[aria-current="step"]{background:var(--pink); color:#fff; font-weight:800}
+.nav .dot{width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-size:.75rem; font-weight:800; background:var(--line); color:var(--ink); flex:none}
+.nav .dot.ok{background:var(--mint2); color:#fff}
+.nav button[aria-current="step"] .dot{background:#fff; color:var(--pink2)}
+.mini h3{margin:0 0 6px; font-size:.95rem}
+.mini ul{list-style:none; margin:0; padding:0; font-size:.84rem}
+.mini li{display:flex; gap:6px; padding:2px 0}
+.bar{height:10px; border-radius:10px; background:var(--line); overflow:hidden; margin:6px 0 2px}
+.bar i{display:block; height:100%; background:linear-gradient(90deg,var(--pink),var(--orange)); border-radius:10px}
+main .card{margin-bottom:14px}
+h2.step{margin:0 0 4px; font-size:1.3rem}
+.lead{color:var(--ink2); margin:0 0 12px}
+.why{background:var(--sky); border-radius:14px; padding:8px 12px; font-size:.88rem; margin:8px 0 12px}
+.why b{color:var(--sky2)}
+.fld{margin:10px 0}
+.fld>label,.lbl{display:block; font-weight:800; margin-bottom:3px}
+.req{color:var(--pink2); margin-left:3px}
+.hint{font-size:.83rem; color:var(--ink2); margin-bottom:4px}
+input[type=text],input[type=number],textarea,select{width:100%; font:inherit; border:2px solid var(--line); border-radius:12px; padding:8px 10px; background:var(--bg); color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:none; border-color:var(--pink)}
+input::placeholder,textarea::placeholder{color:var(--ink2); opacity:.6}
+textarea{resize:vertical}
+.chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:5px}
+.chip{border:2px dashed var(--pink); background:transparent; color:var(--ink); border-radius:50px; padding:2px 10px; font:inherit; font-size:.82rem; cursor:pointer}
+.chip:hover{background:var(--pink); color:#fff}
+.opts{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px}
+.opt{border:2px solid var(--line); border-radius:14px; padding:8px 10px; display:flex; gap:8px; align-items:flex-start; cursor:pointer; background:var(--bg)}
+.opt input{margin-top:5px; accent-color:var(--pink); width:17px; height:17px; flex:none}
+.opt:has(input:checked){border-color:var(--pink); background:var(--cream)}
+.opt small{display:block; color:var(--ink2); font-size:.8rem}
+.stars{color:var(--orange); letter-spacing:1px}
+.row{border:2px solid var(--line); border-radius:18px; padding:10px 12px 4px; margin:10px 0; background:var(--bg); position:relative}
+.row h4{margin:0 0 2px; font-size:1rem}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:0 12px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:0 12px}
+@media (max-width:600px){ .grid2,.grid3{grid-template-columns:1fr} }
+.btn{appearance:none; border:none; border-radius:50px; padding:9px 16px; font:inherit; font-weight:800; cursor:pointer; background:var(--pink); color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.btn:active{transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.btn.sec{background:var(--card); color:var(--ink); border:2px solid var(--line); box-shadow:none}
+.btn.small{padding:4px 12px; font-size:.85rem}
+.btn.del{position:absolute; top:8px; right:8px; background:transparent; color:var(--red); box-shadow:none; padding:2px 8px; border:2px solid var(--line)}
+.navbtns{display:flex; justify-content:space-between; gap:8px; margin-top:6px}
+table.sb{width:100%; border-collapse:collapse; font-size:.88rem}
+table.sb th,table.sb td{border:2px solid var(--line); padding:4px; vertical-align:top}
+table.sb th{background:var(--cream)}
+table.sb input,table.sb textarea{padding:5px 6px; border-radius:8px; font-size:.86rem}
+.sbwrap{overflow-x:auto}
+.sbwrap table{min-width:720px}
+.ok{color:var(--mint2)} .no{color:var(--red)}
+.lv{display:inline-block; border-radius:50px; padding:0 10px; font-weight:800; font-size:.82rem; color:#fff}
+.lv5{background:#43A047}.lv4{background:#7CB342}.lv3{background:#FFB300}.lv2{background:#FB8C00}.lv1{background:#E53935}.lv0{background:#9E9E9E}
+table.rub{width:100%; border-collapse:collapse; font-size:.88rem}
+table.rub td,table.rub th{border-bottom:2px solid var(--line); padding:6px 4px; vertical-align:top; text-align:left}
+table.rub ul{margin:2px 0; padding-left:18px}
+.notice{background:var(--cream); border-radius:14px; padding:8px 12px; font-size:.88rem}
+#toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--card); padding:8px 18px; border-radius:50px; opacity:0; transition:.3s; pointer-events:none; z-index:50}
+#toast.show{opacity:1}
+dialog{border:none; border-radius:22px; padding:0; width:min(960px,96vw); max-height:92vh; background:var(--card); color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlghead{display:flex; gap:8px; align-items:center; padding:12px 16px; border-bottom:2px solid var(--line); position:sticky; top:0; background:var(--card); flex-wrap:wrap}
+.dlghead h3{margin:0; margin-right:auto}
+#pv{padding:8px 22px 22px; overflow:auto}
+#pv table{border-collapse:collapse; width:100%; margin:8px 0; font-size:.9rem}
+#pv th,#pv td{border:1px solid var(--ink2); padding:4px 6px; vertical-align:top; text-align:left}
+#pv th{background:var(--cream)}
+#pv pre{background:var(--bg); border-radius:10px; padding:10px; overflow:auto; font-size:.82rem}
+#pv h1{font-size:1.4rem} #pv h2{font-size:1.2rem; border-left:6px solid var(--pink); padding-left:8px; margin-top:26px} #pv h3{font-size:1.05rem}
+#pv blockquote{margin:6px 0; padding:4px 12px; border-left:4px solid var(--orange); background:var(--cream)}
+@media print{
+  body{background:#fff; color:#000}
+  body>*:not(dialog){display:none!important}
+  dialog{position:static; width:auto; max-height:none; box-shadow:none; display:block}
+  .dlghead{display:none}
+  #pv{padding:0; overflow:visible; color:#000}
+  #pv th{background:#eee}
+  #pv h2{break-after:avoid}
+  #pv tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-hidden="true">🐱</div>
+  <div>
+    <h1>Scratch 作品規劃產生器</h1>
+    <p>臺北市 115 年貓咪盃初賽・國小 AI 互動組｜跟著步驟填空，做出完整的作品規劃</p>
+  </div>
+  <div class="tools">
+    <button class="btn sec small" id="bSave" title="把目前填的內容存成檔案，下次可以再載入">💾 存進度檔</button>
+    <button class="btn sec small" id="bLoad" title="載入之前存的進度檔">📂 載入進度</button>
+    <button class="btn sec small" id="bReset">🧹 全部清除</button>
+    <input type="file" id="fLoad" accept=".json,application/json" hidden>
+  </div>
+</header>
+<div class="layout">
+  <aside class="side">
+    <div class="card nav" id="nav"></div>
+    <div class="card mini" id="mini"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<dialog id="dlg">
+  <div class="dlghead">
+    <h3>📄 規劃書預覽</h3>
+    <button class="btn small" id="bPrint">🖨 列印／存成 PDF</button>
+    <button class="btn small" id="bMd2">⬇ 下載 .md</button>
+    <button class="btn sec small" id="bClose">關閉</button>
+  </div>
+  <div id="pv"></div>
+</dialog>
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* ================= 資料：AI 動作庫 ================= */
+// star：判斷穩定度（3＝很穩定，建議優先使用）
+const ACTIONS = {
+  handpose: [
+    {k:'hp_left',  n:'手往左移', star:3, how:'(手腕 x − 起始手腕 x) ÷ 手長 < −0.6', ready:'手回到中間：差的絕對值 ÷ 手長 < 0.25'},
+    {k:'hp_right', n:'手往右移', star:3, how:'(手腕 x − 起始手腕 x) ÷ 手長 > 0.6', ready:'手回到中間：差的絕對值 ÷ 手長 < 0.25'},
+    {k:'hp_up',    n:'手舉高',   star:3, how:'(手腕 y − 起始手腕 y) ÷ 手長 > 0.6（Scratch 的 y 往上是正）', ready:'手回到中間高度'},
+    {k:'hp_down',  n:'手放低',   star:2, how:'(手腕 y − 起始手腕 y) ÷ 手長 < −0.6（手太低容易出鏡頭）', ready:'手回到中間高度'},
+    {k:'hp_open',  n:'張開手掌', star:3, how:'五根手指都伸直（指尖比同一根手指第二關節更遠；拇指另外用 x 判斷，量到小指掌根）', ready:'手指不是全部伸直'},
+    {k:'hp_fist',  n:'握拳',     star:3, how:'五根手指都彎曲', ready:'張開手掌'},
+    {k:'hp_v',     n:'比 V（YA）', star:2, how:'只有食指、中指伸直', ready:'張開手掌'},
+    {k:'hp_one',   n:'比 1（食指）', star:2, how:'只有食指伸直', ready:'張開手掌'},
+    {k:'hp_pinch', n:'捏取（拇指碰食指）', star:2, how:'拇指尖到食指尖的距離 ÷ 手長 < 0.25', ready:'距離 ÷ 手長 > 0.45'},
+    {k:'hp_wave',  n:'揮手', star:2, how:'1 秒內手腕左右越過起始位置 2 次以上', ready:'手停住 0.5 秒'},
+    {k:'hp_point', n:'食指當游標（移動＋停留）', star:3, how:'游標角色跟著食指尖移動；碰到目標並停留 0.5 秒算一次', ready:'游標離開目標'},
+    // 生活動作（真實世界的操作方式）。只用 x、y 相減、比大小、乘比例，沒有平方根。
+    // 手高＝預備時 中指尖 y − 手腕 y；指尖左右寬＝五個指尖 x 最大 − 最小；指尖上下高＝y 最大 − 最小；指尖範圍＝左右寬＋上下高
+    {k:'hp_chop',   n:'手刀切下（切菜）', star:2, how:'手掌側過來當菜刀：五個指尖上下排成一直線（指尖左右寬 < 手高 × 0.15），記下這時中指尖的 y；中指尖往下降超過 手高 × 0.25 就是切菜', ready:'五指張開朝上（指尖左右寬 > 手高 × 0.45，中指伸直），記下手高'},
+    {k:'hp_gather', n:'五指內收（捏麵團）', star:2, how:'五指張開再往內收：指尖範圍 < 張開時的指尖範圍 × 0.5，而且停住 0.5 秒（沒有往上甩）', ready:'五指張開朝上'},
+    {k:'hp_toss',   n:'握拳往上甩（甩鍋）', star:3, how:'握拳（指尖範圍縮小）時記下手腕的 y；手腕往上升超過 手高 × 0.25 就是甩鍋', ready:'五指張開朝上'},
+  ],
+  facemesh: [
+    {k:'fm_left',  n:'向左轉頭', star:3, how:'(鼻尖 x − 臉中心 x) ÷ 臉寬 × 100 < −15', ready:'回到正面：絕對值 < 6'},
+    {k:'fm_right', n:'向右轉頭', star:3, how:'(鼻尖 x − 臉中心 x) ÷ 臉寬 × 100 > 15', ready:'回到正面：絕對值 < 6'},
+    {k:'fm_up',    n:'抬頭', star:2, how:'鼻尖相對兩眼中點往上的距離 ÷ 臉寬，比起始值大一個門檻', ready:'回到起始比例附近'},
+    {k:'fm_nod',   n:'點頭（低頭）', star:2, how:'鼻尖相對兩眼中點往下的比例，比起始值大一個門檻', ready:'回到起始比例附近'},
+    {k:'fm_mouth', n:'張開嘴巴', star:3, how:'上下唇距離 ÷ 臉寬 > 0.15', ready:'上下唇距離 ÷ 臉寬 < 0.06'},
+    {k:'fm_tiltL', n:'頭往左歪', star:2, how:'(左眼 y − 右眼 y) ÷ 臉寬 超過門檻', ready:'兩眼高度差回到很小'},
+    {k:'fm_tiltR', n:'頭往右歪', star:2, how:'(右眼 y − 左眼 y) ÷ 臉寬 超過門檻', ready:'兩眼高度差回到很小'},
+    {k:'fm_near',  n:'靠近鏡頭', star:2, how:'臉寬 > 起始臉寬 × 1.3', ready:'臉寬 < 起始臉寬 × 1.1'},
+    {k:'fm_blink', n:'閉眼睛', star:1, how:'上下眼皮距離 ÷ 臉寬 很小，維持 0.3 秒（容易誤判，不建議當主要動作）', ready:'眼睛張開'},
+    {k:'fm_move',  n:'臉左右移動當游標', star:3, how:'游標角色的 x 跟著鼻尖 x（乘上倍率）移動', ready:'—'},
+  ]
+};
+const MODULES = {handpose:'Handpose2Scratch（手部辨識 21 點）', facemesh:'Facemesh2Scratch（臉部辨識 468 點）'};
+const READY_DEFAULT = {handpose:'手掌張開、放在畫面中間不動', facemesh:'臉正對鏡頭、嘴巴閉上'};
+// 自訂動作：學生自己新增（只寫名稱＋說明），key 以 cu_ 開頭，存在 ai.custom，同時放進 ai.acts
+const isCustom = k => /^cu_/.test(k);
+function customOf(k){ for(const g of ['anim','game']){ const c=((S[g]||{}).ai||{}).custom||[]; const x=c.find(a=>a.k===k); if(x) return x; } }
+function actOf(mod,k){
+  if(isCustom(k)){ const x=customOf(k); return x?{k, n:filled(x.n)?x.n.trim():'自訂動作（還沒取名）', how:x.how||'', ready:x.ready||'', star:0, custom:true}:undefined; }
+  return (ACTIONS[mod]||[]).find(a=>a.k===k); }
+function actName(mod,k){ const a=actOf(mod,k); return a?a.n:''; }
+function starStr(a){ return a.custom?'自訂':'★'.repeat(a.star); }
+// 自訂動作要有名稱＋說明才算填好
+const customOk = ai => (ai.custom||[]).every(x=>filled(x.n)&&filled(x.how));
+// 穩定度：內建動作看星等；自訂動作無法預先評估，說明寫清楚即可（建置時再依說明設計門檻）
+const stableOk = (mod,k) => { const a=actOf(mod,k)||{}; return a.custom ? filled(a.how) : a.star>=2; };
+
+/* ================= 狀態 ================= */
+const LS_KEY = 'scratchPlanner.v1';
+const blankShot = ()=>({scene:'',role:'',act:'',caption:'',sound:''});
+const blankSB = ()=>({narr:'', shots:[blankShot(),blankShot(),blankShot()]});
+function defaults(){
+  return {
+    v:1, group:'', step:0,
+    basic:{grade:'',title:'',name:'',cls:'',learn:''},
+    anim:{
+      story:{place:'',narrator:'',opening:'',theme:''},
+      creatures:[{name:'',home:'',need:'',sad:'',happy:''},{name:'',home:'',need:'',sad:'',happy:''},{name:'',home:'',need:'',sad:'',happy:''}],
+      problems:[0,1,2].map(()=>({name:'',cause:'',affect:'',fix:'',goodAct:'',badWay:'',badAct:'',time:15,goodFx:'',badFx:''})),
+      ai:{module:'',acts:[],custom:[],whyAI:'',calib:'',ready:'',lost:'',keys:''},
+      branch:{meter:'森林健康值',start:50,plus:20,minus:15,aMin:70,useMid:true,bBelow:40,
+              aName:'',aDesc:'',bName:'',bDesc:'',cName:'',cDesc:''},
+      sb:{},
+      art:{style:'',stages:['','',''],effects:'',bgm:'',sfx:'',special:''}
+    },
+    game:{
+      goal:{name:'',host:'',goal:'',story:''},
+      ai:{module:'',acts:[],custom:[],map:{},ready:'',hold:0.15,calib:'',lost:'',keys:'',whyAI:''},
+      lv1:{minLen:3,maxLen:5,rounds:3,show:1,limit:3},
+      lv2:{start:3,add:1,pass:8,show:0.8,limit:3},
+      extra:'',
+      rand:{allowRepeat:'yes',how:''},
+      score:{base:'10 × 這一輪的動作數',combo:'',wrong:'retry',minus:5,lives:3,win:'',lose:'',diff:''},
+      screen:{style:'',start:'',howto:'',win:'',lose:'',bgm:'',okFx:'',badFx:'',idea:''}
+    }
+  };
+}
+let S = load() || defaults();
+function load(){ try{ const t=localStorage.getItem(LS_KEY); if(!t) return null; return merge(defaults(), JSON.parse(t)); }catch(e){ return null; } }
+function merge(d,s){ if(s==null) return d; if(Array.isArray(d)) return Array.isArray(s)?s:d;
+  if(typeof d==='object'&&d){ const o={...d}; for(const k in s){ o[k]= (k in d)? merge(d[k],s[k]) : s[k]; } return o; } return s; }
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){} },250); }
+function get(p){ return p.split('.').reduce((o,k)=>o==null?undefined:o[k], S); }
+function set(p,v){ const ks=p.split('.'); let o=S; for(let i=0;i<ks.length-1;i++){ if(o[ks[i]]==null) o[ks[i]]={}; o=o[ks[i]]; } o[ks.at(-1)]=v; save(); }
+
+/* ================= 小工具 ================= */
+const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const filled = v => v!=null && String(v).trim()!=='';
+const $ = s => document.querySelector(s);
+let uid=0;
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),1800); }
+function chipsHTML(p,chips,mode){ if(!chips||!chips.length) return '';
+  return `<div class="chips">${chips.map(c=>`<button type="button" class="chip" data-chip="${esc(p)}" data-mode="${mode||'set'}" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>`; }
+// 文字欄位：o = {ph 範例, hint, area, rows, num, req, chips, mode:'set'|'add'}
+function F(p,label,o={}){
+  const id='f'+(++uid); const v=get(p);
+  const ph = o.ph ? '例如：'+o.ph : '';
+  const input = o.area
+    ? `<textarea id="${id}" data-p="${p}" rows="${o.rows||3}" placeholder="${esc(ph)}">${esc(v??'')}</textarea>`
+    : `<input id="${id}" data-p="${p}" type="${o.num?'number':'text'}" ${o.num?'data-num="1" step="any"':''} value="${esc(v??'')}" placeholder="${esc(ph)}">`;
+  return `<div class="fld">${label?`<label for="${id}">${label}${o.req?'<span class="req">*</span>':''}</label>`:''}${o.hint?`<div class="hint">${o.hint}</div>`:''}${input}${chipsHTML(p,o.chips,o.mode)}</div>`;
+}
+function R(p,opts,o={}){ const v=get(p); const name='r'+(++uid);
+  return `<div class="opts">${opts.map(x=>`<label class="opt"><input type="radio" name="${name}" data-p="${p}" value="${esc(x.v)}" ${String(v)===String(x.v)?'checked':''} ${o.rr?'data-rr="1"':''}><span>${x.t}${x.d?`<small>${x.d}</small>`:''}</span></label>`).join('')}</div>`; }
+function SEL(p,opts,blank){ const v=get(p);
+  return `<select data-p="${p}" data-rr="1">${blank?`<option value="">${blank}</option>`:''}${opts.map(x=>`<option value="${esc(x.v)}" ${x.v===v?'selected':''}>${esc(x.t)}</option>`).join('')}</select>`; }
+const why = (t)=>`<div class="why">🎯 <b>評分重點：</b>${t}</div>`;
+
+/* ================= 步驟定義 ================= */
+const STEPS = {
+  anim:[
+    {t:'基本資料', f:stepBasic, done:()=>doneBasic()},
+    {t:'森林與動物', f:animCreatures, done:()=>S.anim.creatures.filter(c=>filled(c.name)&&filled(c.need)).length>=3 && filled(S.anim.story.opening)},
+    {t:'AI 互動方式', f:animAI, done:()=>filled(S.anim.ai.module)&&S.anim.ai.acts.length>=1&&customOk(S.anim.ai)&&filled(S.anim.ai.whyAI)},
+    {t:'環境問題與任務', f:animProblems, done:()=>S.anim.problems.filter(p=>filled(p.name)&&p.goodAct&&filled(p.goodFx)&&filled(p.badFx)).length>=3},
+    {t:'故事分支與結局', f:animBranch, done:()=>filled(S.anim.branch.aDesc)&&filled(S.anim.branch.bDesc)},
+    {t:'分鏡表', f:animSB, done:()=>sbRatio()>=0.8},
+    {t:'美術與音效', f:animArt, done:()=>filled(S.anim.art.style)&&S.anim.art.stages.every(filled)&&filled(S.anim.art.bgm)},
+    {t:'檢核與輸出', f:stepFinal, done:()=>false},
+  ],
+  game:[
+    {t:'基本資料', f:stepBasic, done:()=>doneBasic()},
+    {t:'遊戲目標', f:gameGoal, done:()=>filled(S.game.goal.goal)&&filled(S.game.goal.host)},
+    {t:'AI 動作與聲音', f:gameAI, done:()=>S.game.ai.acts.length>=3&&customOk(S.game.ai)&&S.game.ai.acts.every(k=>filled((S.game.ai.map[k]||{}).sound))&&filled(S.game.ai.ready)},
+    {t:'關卡設計', f:gameLevels, done:()=>filled(S.game.rand.how)},
+    {t:'計分與勝負', f:gameScore, done:()=>filled(S.game.score.combo)&&filled(S.game.score.win)&&filled(S.game.score.lose)},
+    {t:'畫面與音效', f:gameScreen, done:()=>['style','start','howto','win','lose','okFx','badFx'].every(k=>filled(S.game.screen[k]))},
+    {t:'檢核與輸出', f:stepFinal, done:()=>false},
+  ]
+};
+function steps(){ return S.group? STEPS[S.group] : [STEPS.anim[0]]; }
+function doneBasic(){ const b=S.basic; return !!S.group && ['grade','title','name','cls','learn'].every(k=>filled(b[k])); }
+
+/* ---------- 第 1 步：基本資料 ---------- */
+function stepBasic(){
+  return `<h2 class="step">第 1 步：選組別、寫基本資料</h2>
+  <p class="lead">先選你要參加哪一組，網頁會帶你一步一步把作品想清楚。每一格都有灰色的「例如」可以參考，也可以按下面的虛線小按鈕直接填入。</p>
+  <div class="lbl">我要參加的組別<span class="req">*</span></div>
+  ${R('group',[
+    {v:'anim',t:'🎬 國小動畫 AI 互動組',d:'題目：森林動物搬家記｜用頭或手參與故事，讓森林變回動物的家'},
+    {v:'game',t:'🎵 國小遊戲 AI 互動組',d:'題目：AI 節奏接龍大作戰｜用身體動作記住並接龍節奏'}],{rr:1})}
+  <div class="grid2" style="margin-top:8px">
+    ${F('basic.grade','年級',{ph:'五年級',req:1,chips:['三年級','四年級','五年級','六年級']})}
+    ${F('basic.cls','班級',{ph:'501',req:1})}
+    ${F('basic.name','學生姓名',{ph:'王小明',req:1})}
+    ${F('basic.title','作品名稱（請依主題自己取名）',{ph:S.group==='game'?'精靈節奏大冒險':'小松鼠回家記',req:1})}
+  </div>
+  <div class="lbl">Scratch 學習時間<span class="req">*</span></div>
+  ${R('basic.learn',[{v:'半年（1 學期）以下',t:'半年（1 學期）以下'},{v:'半年（1 學期）以上，未滿 1 年',t:'半年以上，未滿 1 年'},{v:'1 年以上，未滿 2 年',t:'1 年以上，未滿 2 年'},{v:'2 年（含）以上',t:'2 年（含）以上'}])}`;
+}
+
+/* ---------- 動畫組 ---------- */
+function animCreatures(){
+  const a=S.anim;
+  return `<h2 class="step">第 2 步：森林裡住著誰？</h2>
+  <p class="lead">題目要求：動畫裡至少要有 <b>3 種森林生物</b>，而且要讓人看懂「生物和森林的關係」——牠住在哪裡、需要森林的什麼。</p>
+  ${why('劇情完整流暢，角色與場景交代清楚（劇情 5%）；角色設計鮮明有特色（創意表達 25%）')}
+  <div class="grid2">
+    ${F('anim.story.place','故事發生的地方',{ph:'山上的小溪旁邊有一片森林',chips:['溪流旁的森林','山腳下的森林','學校後山的小森林']})}
+    ${F('anim.story.narrator','誰來帶觀眾看故事（說書人）',{ph:'貓頭鷹爺爺',chips:['貓頭鷹爺爺','森林精靈','小松鼠自己','一隻小貓']})}
+  </div>
+  ${F('anim.story.opening','故事開頭：森林原本是什麼樣子？後來發生了什麼事？',{area:1,req:1,ph:'森林原本很熱鬧，鳥兒在樹上唱歌、青蛙在溪裡游泳。可是最近垃圾越來越多、樹被砍掉、溪水變臭，動物們開始收拾行李準備搬家……'})}
+  ${F('anim.story.theme','你想讓看的人學到什麼？',{ph:'每個人做一點小事，就能讓動物留下來',chips:['不亂丟垃圾就能保護動物','森林是大家共同的家','小小行動也能改變環境']})}
+  <h3>森林生物（至少 3 種）</h3>
+  ${a.creatures.map((c,i)=>`<div class="row"><h4>生物 ${i+1}</h4>${a.creatures.length>3?`<button class="btn del" data-del="anim.creatures.${i}">✕ 刪除</button>`:''}
+    <div class="grid2">
+    ${F(`anim.creatures.${i}.name`,'是什麼生物',{req:1,ph:['小松鼠','藍鵲','青蛙'][i]||'螢火蟲',chips:['松鼠','鳥兒','青蛙','蝴蝶','螢火蟲','獨角仙','蜜蜂','兔子','魚']})}
+    ${F(`anim.creatures.${i}.home`,'牠住在森林的哪裡',{ph:['大樹的樹洞','樹枝上的鳥巢','溪邊的石頭下'][i]||'草叢'})}
+    ${F(`anim.creatures.${i}.need`,'牠需要森林的什麼（和森林的關係）',{req:1,ph:['大樹的果實和樹洞','乾淨的天空和大樹','乾淨的溪水'][i]||'花和乾淨的空氣'})}
+    ${F(`anim.creatures.${i}.sad`,'環境變差時，牠會怎樣',{ph:['抱著空空的果子哭','飛走不回來','咳嗽、跳離溪邊'][i]||'躲起來'})}
+    </div>
+    ${F(`anim.creatures.${i}.happy`,'環境變好時，牠會怎樣（重新出現的樣子）',{ph:['回到樹洞、開心地跳來跳去','飛回來唱歌','在乾淨的水裡游泳、呱呱叫'][i]||'在花間飛舞'})}
+  </div>`).join('')}
+  <button class="btn sec small" data-add="anim.creatures">＋ 再加一種生物</button>`;
+}
+
+function aiPicker(base, ctx){
+  const g=get(base); const mod=g.module;
+  let h = `<div class="lbl">要用哪一種 AI 擴充功能<span class="req">*</span></div>
+  ${R(base+'.module',[{v:'handpose',t:'✋ '+MODULES.handpose,d:'用手勢、手的位置互動'},{v:'facemesh',t:'🙂 '+MODULES.facemesh,d:'用轉頭、點頭、張嘴互動'}],{rr:1})}`;
+  if(mod){
+    h += `<div class="lbl" style="margin-top:12px">要用哪些動作${ctx==='game'?'（至少 3 種）':'（至少 1 種，可以多選）'}<span class="req">*</span></div>
+    <div class="hint">⭐ 越多越容易穩定判斷。題目建議「優先選擇容易穩定判斷的動作」。${ctx==='game'?'同時選的動作最好不要太像（例如「握拳」和「比 1」容易互相誤判）。':''}</div>
+    <div class="opts">${ACTIONS[mod].map(a=>`<label class="opt"><input type="checkbox" data-act="${base}" value="${a.k}" ${g.acts.includes(a.k)?'checked':''}><span><b>${a.n}</b> <span class="stars">${'★'.repeat(a.star)}${'☆'.repeat(3-a.star)}</span><small>${esc(a.how)}</small></span></label>`).join('')}</div>
+    <h3>✏️ 自訂動作（上面沒有你想要的動作，可以自己新增，數量不限）</h3>
+    <div class="hint">只要把「動作名稱」和「怎麼做」說明清楚就好，判斷公式之後做作品時再設計。自訂動作會算進動作數量（目前共 ${g.acts.length} 種）。${mod==='handpose'?'例如：比愛心、比讚、手畫圓圈、雙手拍手。':'例如：吐舌頭、鼓起臉頰、眨一隻眼睛、挑眉毛。'}</div>
+    ${(g.custom||[]).map((c,i)=>`<div class="row custom"><h4>自訂動作 ${i+1}</h4><button class="btn del" data-delcustom="${base}.${i}">✕ 刪除</button>
+      <div class="grid2">
+      ${F(`${base}.custom.${i}.n`,'動作名稱',{req:1,ph:mod==='handpose'?'比愛心':'吐舌頭'})}
+      ${F(`${base}.custom.${i}.ready`,'做完要回到什麼姿勢（可不填）',{ph:READY_DEFAULT[mod]})}
+      </div>
+      ${F(`${base}.custom.${i}.how`,'說明：這個動作怎麼做？電腦可以看哪裡知道你做了？',{req:1,area:1,rows:2,ph:mod==='handpose'?'拇指和食指交叉比出小愛心；電腦可以看拇指尖和食指尖是不是靠得很近、其他三指是不是彎起來':'把舌頭伸出來停 1 秒；電腦可以看嘴巴張開的大小'})}
+    </div>`).join('')}
+    <button class="btn sec small" data-addcustom="${base}">＋ 新增自訂動作</button>`;
+  }
+  return h;
+}
+function animAI(){
+  const ai=S.anim.ai;
+  return `<h2 class="step">第 3 步：觀看的人要怎麼參與故事？</h2>
+  <p class="lead">先想「我希望看的人怎麼幫助森林」，再選最適合的 AI 動作。例如：用手揮走垃圾、張嘴吹走烏雲、轉頭選擇要不要幫忙。</p>
+  ${why('AI 感知結果與劇情發展形成創意連動、觸發點設計具巧思、在不同情境下反應穩定（創意表達 25%）；會應用指定 AI 視訊模組積木（程式設計 30%）')}
+  ${aiPicker('anim.ai','anim')}
+  ${F('anim.ai.whyAI','為什麼這個故事要用 AI 動作，而不是按按鍵？',{area:1,req:1,hint:'評審想看到「AI 有必要用」，而不是「為了 AI 而 AI」。',ph:'用手真的做出「撿起來」的動作，看的人會覺得自己親手救了森林'})}
+  ${ai.module?`<div class="grid2">
+  ${F('anim.ai.calib','開始前怎麼「記錄起始狀態」（校正）',{ph:'開場時請觀看者把手放在畫面中間 2 秒，記下手的位置和手長',chips:[ai.module==='handpose'?'請把手掌張開放在畫面中間 2 秒，記下手腕位置與手長':'請正面看鏡頭 2 秒，記下鼻尖位置與臉寬']})}
+  ${F('anim.ai.ready','預備姿勢（每次動作完要回到這裡才算下一次）',{ph:READY_DEFAULT[ai.module],chips:[READY_DEFAULT[ai.module]]})}
+  ${F('anim.ai.lost','鏡頭抓不到手/臉的時候怎麼辦',{ph:'連續 0.4 秒都抓不到才顯示「請把手放回畫面」，故事暫停等待',chips:['連續 0.4 秒抓不到才顯示提示「請回到鏡頭前」，故事暫停等待']})}
+  ${F('anim.ai.keys','鍵盤備用操作（現場測試或攝影機出問題時用）',{ph:'空白鍵＝開始，方向鍵＝模擬手往左右',chips:['空白鍵開始故事；方向鍵模擬 AI 動作（方便老師測試）']})}
+  </div>`:''}`;
+}
+
+function problemActOptions(){ const ai=S.anim.ai; return ai.acts.map(k=>({v:k,t:actName(ai.module,k)})); }
+function animProblems(){
+  const a=S.anim, cr=a.creatures.filter(c=>filled(c.name)).map(c=>c.name);
+  const actOpts=problemActOptions();
+  return `<h2 class="step">第 4 步：森林遇到哪些問題？觀看者要怎麼幫忙？</h2>
+  <p class="lead">題目要求：至少 <b>3 種不同環境問題</b>。每一個問題就是故事裡的一個「任務」：做對了森林要<b>變好</b>，做了不適當的選擇森林要<b>變差</b>。</p>
+  ${why('觀看者每完成一項行動，場景要有對應變化（植物增加、水變乾淨、動物回來）；不適當的選擇要讓環境惡化（題目任務三）')}
+  ${!actOpts.length?'<p class="notice">⚠ 請先到「第 3 步」選好 AI 動作，這裡才能指定每個任務要用哪個動作。</p>':''}
+  ${a.problems.map((p,i)=>`<div class="row"><h4>任務 ${i+1}：環境問題</h4>${a.problems.length>3?`<button class="btn del" data-del="anim.problems.${i}">✕ 刪除</button>`:''}
+    <div class="grid2">
+    ${F(`anim.problems.${i}.name`,'環境問題',{req:1,ph:['垃圾越來越多','樹木被砍掉','溪水被污染'][i]||'空氣變髒',chips:['垃圾增加','樹木減少','水源污染','空氣污染','噪音太大','野火','外來種入侵']})}
+    ${F(`anim.problems.${i}.cause`,'問題是怎麼來的（畫面上看得到什麼）',{ph:['遊客丟下寶特瓶和塑膠袋','樹被砍得只剩樹樁','工廠排出黑黑的髒水'][i]||'煙霧飄進森林'})}
+    <div class="fld"><label>哪個生物最受影響</label>${SEL(`anim.problems.${i}.affect`,cr.map(n=>({v:n,t:n})),'（請選擇）')}</div>
+    ${F(`anim.problems.${i}.fix`,'觀看者的復育行動',{req:1,ph:['把垃圾撿起來放進回收桶','種下新的樹苗','把髒水擋住、放進淨水石'][i]||'',chips:['移除垃圾','種植樹苗','保護水源','阻止破壞行為','清理河道']})}
+    <div class="fld"><label>用哪個 AI 動作完成<span class="req">*</span></label>${SEL(`anim.problems.${i}.goodAct`,actOpts,'（請選擇）')}</div>
+    ${F(`anim.problems.${i}.time`,'限時幾秒',{num:1,hint:'時間到還沒完成，也會算成「沒有幫忙」。'})}
+    </div>
+    ${F(`anim.problems.${i}.badWay`,'怎樣算「不適當的選擇」',{req:1,ph:'時間到了還沒完成，或做出另一個動作（手往右＝把垃圾丟進溪裡）',chips:['時間到了還沒完成','做出另一個動作（例如把垃圾丟進溪裡）','選了錯誤的選項']})}
+    <div class="fld"><label>不適當選擇用哪個 AI 動作（沒有就留空，只用「時間到」）</label>${SEL(`anim.problems.${i}.badAct`,actOpts,'（不使用，只看時間到）')}</div>
+    <div class="grid2">
+    ${F(`anim.problems.${i}.goodFx`,'✅ 做對了：場景怎麼變好',{area:1,rows:2,req:1,ph:['垃圾一個一個消失，草地變綠，松鼠跑回樹洞','樹苗長成大樹，鳥兒飛回來築巢','溪水從灰色變成藍色，青蛙跳回水裡'][i]||''})}
+    ${F(`anim.problems.${i}.badFx`,'❌ 不適當：環境怎麼變差',{area:1,rows:2,req:1,ph:['垃圾越堆越多，松鼠提著行李走掉','樹樁變多，天空變暗','溪水變更黑，魚翻肚子'][i]||''})}
+    </div>
+  </div>`).join('')}
+  <button class="btn sec small" data-add="anim.problems">＋ 再加一個環境問題</button>`;
+}
+
+function animBranch(){
+  const b=S.anim.branch, n=S.anim.problems.length;
+  const max=b.start + b.plus*n, min=b.start - b.minus*n;
+  return `<h2 class="step">第 5 步：故事分支——不同的選擇，不同的結局</h2>
+  <p class="lead">題目要求：不同選擇要形成<b>至少兩種</b>不同的故事發展。我們用一個「分數變數」記錄森林的狀況，最後依分數決定結局。</p>
+  ${why('說明文件須寫出故事分支條件；流程規劃順序嚴謹合理、與敘事完全契合（流程規劃 5%）')}
+  <div class="grid3">
+    ${F('anim.branch.meter','記錄森林狀況的變數名稱',{ph:'森林健康值'})}
+    ${F('anim.branch.start','一開始是幾分',{num:1})}
+    ${F('anim.branch.plus','每做對一個任務 ＋幾分',{num:1})}
+    ${F('anim.branch.minus','每次不適當選擇 －幾分',{num:1})}
+    ${F('anim.branch.aMin','好結局：分數至少要幾分',{num:1})}
+  </div>
+  <label class="opt" style="max-width:420px"><input type="checkbox" data-p="anim.branch.useMid" data-bool="1" data-rr="1" ${b.useMid?'checked':''}><span>我要做第三種「中間結局」<small>分數在中間時出現的結局</small></span></label>
+  ${b.useMid?F('anim.branch.bBelow','壞結局：分數低於幾分',{num:1}):''}
+  <p class="notice">📊 你有 ${n} 個任務：全部做對會是 <b>${max}</b> 分，全部做錯會是 <b>${min}</b> 分。
+  好結局要 ≥ ${b.aMin} 分${b.useMid?`；壞結局是 < ${b.bBelow} 分；中間的是中間結局`:`；低於 ${b.aMin} 分就是壞結局`}。
+  ${max<b.aMin?'<b class="no">⚠ 全部做對也到不了好結局，請調整分數！</b>':''}${min>=(b.useMid?b.bBelow:b.aMin)?'<b class="no">⚠ 全部做錯也不會走到壞結局，請調整分數！</b>':''}</p>
+  <div class="row"><h4>🌈 好結局</h4>${F('anim.branch.aName','結局名稱',{ph:'動物回家了'})}${F('anim.branch.aDesc','結局畫面',{area:1,req:1,ph:'森林變得綠油油，所有動物回到家，一起開派對，說書人說：「謝謝你！」'})}</div>
+  <div class="row"><h4>🌧 壞結局</h4>${F('anim.branch.bName','結局名稱',{ph:'空蕩蕩的森林'})}${F('anim.branch.bDesc','結局畫面',{area:1,req:1,ph:'動物都搬走了，森林變得灰灰的，說書人問：「還有機會重來嗎？」並出現「再試一次」'})}</div>
+  ${b.useMid?`<div class="row"><h4>⛅ 中間結局</h4>${F('anim.branch.cName','結局名稱',{ph:'還差一點點'})}${F('anim.branch.cDesc','結局畫面',{area:1,ph:'有些動物回來了，但青蛙還在等乾淨的溪水，提醒觀眾還可以做得更好'})}</div>`:''}`;
+}
+
+function sbTasks(){
+  const a=S.anim, b=a.branch;
+  const t=[{id:'intro',t:'序幕',hint:'森林原本的樣子 → 問題出現 → 動物準備搬家 → 校正 AI'}];
+  a.problems.forEach((p,i)=>t.push({id:'p'+i,t:`任務${i+1}${filled(p.name)?'：'+p.name:''}`,hint:`${p.cause||'問題出現'} → 觀看者用「${actName(a.ai.module,p.goodAct)||'AI 動作'}」幫忙 → 做對/做錯的畫面`}));
+  t.push({id:'endA',t:'好結局'+(filled(b.aName)?'：'+b.aName:''),hint:b.aDesc});
+  if(b.useMid) t.push({id:'endC',t:'中間結局'+(filled(b.cName)?'：'+b.cName:''),hint:b.cDesc});
+  t.push({id:'endB',t:'壞結局'+(filled(b.bName)?'：'+b.bName:''),hint:b.bDesc});
+  t.forEach(x=>{ if(!S.anim.sb[x.id]) S.anim.sb[x.id]=blankSB(); });
+  return t;
+}
+function sbRatio(){ const t=sbTasks(); let tot=0, ok=0;
+  t.forEach(x=>{ const s=S.anim.sb[x.id]; tot++; if(filled(s.narr)) ok++; s.shots.forEach(sh=>{ tot++; if(filled(sh.scene)&&filled(sh.role)&&filled(sh.act)) ok++; }); });
+  return tot?ok/tot:0; }
+function animSB(){
+  const tasks=sbTasks();
+  return `<h2 class="step">第 6 步：分鏡表（說明文件附件 3）</h2>
+  <p class="lead">把每個任務拆成 3 個以上的「分鏡」，像漫畫一格一格：<b>場景</b>（背景）、<b>角色</b>（誰出現）、<b>動作</b>（角色做什麼）。再加上<b>字幕</b>和<b>音效</b>，故事會更清楚。</p>
+  ${why('每個場景角色明確、動作規劃完整清楚（動作與表現 5%）；場景轉換自然、音效字幕美術有效輔助理解（故事呈現 30%）')}
+  ${tasks.map(x=>{ const s=S.anim.sb[x.id];
+    return `<div class="row"><h4>${esc(x.t)}</h4><div class="hint">${esc(x.hint||'')}</div>
+    ${F(`anim.sb.${x.id}.narr`,'敘事設計（用一兩句話說這段劇情）',{area:1,rows:2,req:1,ph:x.hint||''})}
+    <div class="sbwrap"><table class="sb"><tr><th style="width:60px">分鏡</th><th>場景</th><th>角色</th><th>動作</th><th>字幕／旁白</th><th>音效</th><th style="width:34px"></th></tr>
+    ${s.shots.map((sh,j)=>`<tr><td>分鏡${j+1}</td>${['scene','role','act','caption','sound'].map(k=>`<td><textarea rows="2" data-p="anim.sb.${x.id}.shots.${j}.${k}" placeholder="${esc(sbPh(x.id,j,k))}">${esc(sh[k])}</textarea></td>`).join('')}
+      <td>${s.shots.length>3?`<button class="btn sec small" data-del="anim.sb.${x.id}.shots.${j}" title="刪除分鏡">✕</button>`:''}</td></tr>`).join('')}
+    </table></div>
+    <button class="btn sec small" style="margin:6px 0" data-addshot="${x.id}">＋ 加一個分鏡</button></div>`; }).join('')}`;
+}
+function sbPh(id,j,k){
+  const a=S.anim, mod=a.ai.module, nar=a.story.narrator||'說書人';
+  let P;
+  if(id==='intro') P={scene:['乾淨的森林','森林（問題出現）','森林（校正畫面）'],role:[nar+'、'+(a.creatures[0].name||'松鼠'),(a.creatures[0].name||'松鼠')+'、'+(a.creatures[1].name||'鳥兒'),nar],act:['動物們開心地玩','動物們嘆氣、收拾行李',nar+'請觀看者擺好預備姿勢'],caption:['「這裡原本是動物的家」','「我們的家越來越不適合住了…」','「請你幫幫森林！先把手放在畫面中間」'],sound:['鳥叫聲','難過的音樂','提示音']};
+  else if(id[0]==='p'){ const pr=a.problems[+id.slice(1)]||{}; const cr=pr.affect||'動物'; const act=actName(mod,pr.goodAct)||'AI 動作';
+    P={scene:['森林（'+(pr.name||'問題')+'）','森林（'+(pr.name||'問題')+'）','森林（變好或變差）'],role:[cr+'、'+nar,'觀看者（AI 游標）、'+(pr.name||'問題物件'),cr],act:[pr.cause||cr+'很難過',(pr.fix||'幫助森林')+'：觀看者做「'+act+'」',(pr.goodFx||'森林變好')+'／'+(pr.badFx||'森林變差')],caption:['「'+cr+'：我的家怎麼了？」','「請用『'+act+'』幫忙！還剩 '+(pr.time||15)+' 秒」','「謝謝你！」或「森林變得更糟了…」'],sound:['緊張的音樂','倒數音效','成功或失敗音效']}; }
+  else { const d=id==='endA'?a.branch.aDesc:id==='endB'?a.branch.bDesc:a.branch.cDesc;
+    P={scene:['森林_'+(id==='endA'?'很棒':id==='endB'?'很糟':'普通'),'結局畫面','結局畫面'],role:['所有動物',nar,nar],act:[d||'動物們的反應',nar+'說出結局的意義','顯示「再看一次」'],caption:['「'+(id==='endA'?'大家都回家了！':id==='endB'?'動物們都搬走了…':'還差一點點！')+'」','「'+(a.story.theme||'每個人都能保護森林')+'」','「按空白鍵再看一次」'],sound:[id==='endB'?'難過的音樂':'歡樂的音樂','旁白','提示音']}; }
+  return '例如：'+(P[k][j]??P[k][2]);
+}
+
+function animArt(){
+  const a=S.anim.art;
+  return `<h2 class="step">第 7 步：美術、音效與特效</h2>
+  <p class="lead">讓看的人一眼就看得出「森林變好了」或「森林變差了」。</p>
+  ${why('音效、字幕、美術精緻並有效輔助故事理解（故事呈現 30%）；畫面表現巧思豐富、音效/特效新穎突出（創意表達 25%）')}
+  ${F('anim.art.style','整體美術風格',{req:1,ph:'溫暖的繪本風，森林用綠色和黃色',chips:['溫暖繪本風','可愛卡通風','像素風','剪紙風','水彩風']})}
+  <div class="lbl">森林的三種狀態（背景會跟著「${esc(S.anim.branch.meter||'森林健康值')}」改變）<span class="req">*</span></div>
+  <div class="grid3">
+    ${F('anim.art.stages.0','😢 很糟（分數低）',{area:1,rows:2,ph:'灰色天空、樹樁、黑色溪水'})}
+    ${F('anim.art.stages.1','😐 普通（分數中間）',{area:1,rows:2,ph:'有點綠、一點點垃圾'})}
+    ${F('anim.art.stages.2','😄 很棒（分數高）',{area:1,rows:2,ph:'藍天、大樹、花、清澈溪水'})}
+  </div>
+  ${F('anim.art.effects','特效（可以點多個）',{area:1,rows:2,mode:'add',ph:'垃圾消失時冒出星星，樹苗用「尺寸」慢慢長大',chips:['淡入淡出轉場','星星／愛心粒子（分身）','樹苗慢慢長大（尺寸變大）','水的顏色漸變（顏色特效）','畫面震動（做錯時）','動物跳出來的彈跳動畫']})}
+  ${F('anim.art.bgm','背景音樂',{req:1,ph:'序幕輕快、問題出現時變緊張、好結局歡樂',chips:['依場景換音樂：輕快→緊張→歡樂','整段輕柔的森林音樂']})}
+  ${F('anim.art.sfx','音效',{mode:'add',ph:'鳥叫、溪水聲、成功「叮」、失敗「咚」',chips:['鳥叫聲','溪水聲','成功音效','失敗音效','風聲','動物叫聲']})}
+  ${F('anim.art.special','我的作品最特別的巧思（評審最該注意的地方）',{area:1,ph:'青蛙會跟著觀看者的手跳；森林健康值用一棵會長大的樹來表示，不是用數字'})}`;
+}
+
+/* ---------- 遊戲組 ---------- */
+function gameGoal(){
+  return `<h2 class="step">第 2 步：遊戲目標與情境</h2>
+  <p class="lead">題目：舞臺上的音樂精靈要進行「節奏接龍」。玩家要看提示、記住動作順序，再用身體動作完成挑戰。</p>
+  ${why('遊戲目標非常清楚具體，玩家能立即理解並可依任務完成操作（遊戲目標說明 5%）')}
+  <div class="grid2">
+  ${F('game.goal.name','音樂精靈的名字和樣子',{ph:'叮咚精靈，一顆會跳舞的音符',chips:['叮咚精靈（會跳舞的音符）','鼓鼓小精靈','彩虹琴精靈']})}
+  ${F('game.goal.host','舞臺／遊戲場景',{req:1,ph:'森林音樂會的舞臺，有燈光和觀眾',chips:['森林音樂會舞臺','星空演唱會','海底音樂廳','學校禮堂']})}
+  </div>
+  ${F('game.goal.goal','1、玩家在這個遊戲的目標是',{req:1,area:1,rows:2,ph:'記住音樂精靈的動作順序，用手勢跟著演奏，通過「節奏記憶」和「節奏接龍」兩關，拿到最高分',chips:['記住音樂精靈示範的動作順序，用身體動作照順序演奏，通過兩個關卡並拿到高分']})}
+  ${F('game.goal.story','遊戲的小故事（玩家為什麼要做這件事）',{area:1,rows:2,ph:'音樂精靈的音樂會快開始了，可是樂譜被風吹亂了，要請你用動作把節奏找回來'})}`;
+}
+function gameAI(){
+  const ai=S.game.ai; const mod=ai.module;
+  return `<h2 class="step">第 3 步：AI 動作與對應的聲音</h2>
+  <p class="lead">題目要求：至少 <b>3 種</b>手部或頭部動作；每個動作要對應<b>不同</b>的音符、樂器聲或舞臺動畫；動作之間要回到<b>預備姿勢</b>，才不會被重複判定。</p>
+  ${why('AI 操控反應靈敏且穩定、誤操作率低、與必要的傳統輸入自然搭配（互動平衡性 20%）；AI 辨識項目選擇、觸發機制、回饋形式具原創性（獨特創意性 20%）')}
+  ${aiPicker('game.ai','game')}
+  ${ai.acts.length?`<h3>每個動作對應什麼效果</h3>
+  ${ai.acts.map((k,i)=>`<div class="row"><h4>動作 ${i+1}：${esc(actName(mod,k))}</h4><div class="grid3">
+    ${F(`game.ai.map.${k}.sound`,'聲音（音符／樂器）',{req:1,ph:['小鼓','鋼琴 Do','鈴鐺'][i%3],chips:['小鼓','大鼓','拍手','鈴鐺','鋼琴 Do','鋼琴 Mi','鋼琴 Sol','木琴','吉他','喇叭']})}
+    ${F(`game.ai.map.${k}.anim`,'舞臺動畫',{req:1,ph:['左邊的燈亮起','精靈跳起來','右邊冒出星星'][i%3]})}
+    ${F(`game.ai.map.${k}.color`,'提示顏色／圖示',{ph:['紅色左箭頭','黃色手掌','藍色右箭頭'][i%3]})}
+  </div></div>`).join('')}`:''}
+  ${mod?`<h3>穩定判斷</h3><div class="grid2">
+  ${F('game.ai.ready','預備姿勢（每個動作做完要回到這裡）',{req:1,ph:READY_DEFAULT[mod],chips:[READY_DEFAULT[mod]]})}
+  ${F('game.ai.hold','動作要維持幾秒才算數',{num:1,hint:'建議 0.15～0.3 秒，太短會抖、太長會覺得慢。'})}
+  ${F('game.ai.calib','開始前怎麼記錄起始狀態（校正）',{ph:'開始畫面請玩家擺出預備姿勢 2 秒，記下位置與手長/臉寬',chips:['開始前請玩家擺出預備姿勢 2 秒，記下位置與'+(mod==='handpose'?'手長':'臉寬')]})}
+  ${F('game.ai.lost','鏡頭抓不到時怎麼辦',{ph:'連續 0.4 秒抓不到才暫停並提示，不算錯',chips:['連續 0.4 秒抓不到才暫停計時並提示「請回到鏡頭前」，不算錯']})}
+  ${F('game.ai.keys','搭配的傳統輸入（鍵盤／滑鼠）',{ph:'滑鼠點「開始」按鈕；數字鍵 1～3 可以模擬動作（測試用）',chips:['滑鼠點按鈕開始／重玩；鍵盤 1、2、3… 模擬各個動作（測試用）']})}
+  ${F('game.ai.whyAI','為什麼這個遊戲用 AI 動作比按鍵更好玩？',{req:1,ph:'用身體跟著節奏動，就像真的在舞臺上演奏，比按鍵盤更像跳舞'})}
+  </div>`:''}`;
+}
+function gameLevels(){
+  const g=S.game;
+  return `<h2 class="step">第 4 步：關卡設計</h2>
+  <p class="lead">題目規定至少兩關：第一關「節奏記憶」、第二關「節奏接龍」。數字都可以自己決定。</p>
+  ${why('規則與任務高度連貫且可執行、勝負條件清楚、具有明顯挑戰性（遊戲機制設計 10%）')}
+  <div class="row"><h4>🎼 第一關「節奏記憶」</h4><div class="hint">系統用亂數產生 3～5 個動作的節奏，依序播放提示，玩家照著做。</div>
+  <div class="grid3">
+    ${F('game.lv1.minLen','節奏最少幾個動作',{num:1})}
+    ${F('game.lv1.maxLen','節奏最多幾個動作',{num:1})}
+    ${F('game.lv1.rounds','答對幾輪就過關',{num:1})}
+    ${F('game.lv1.show','每個提示顯示幾秒',{num:1})}
+    ${F('game.lv1.limit','每個動作限時幾秒',{num:1})}
+  </div>${(+g.lv1.minLen<3||+g.lv1.maxLen>5||+g.lv1.minLen>+g.lv1.maxLen)?'<p class="no">⚠ 題目規定第一關是 3～5 個動作。</p>':''}</div>
+  <div class="row"><h4>🐉 第二關「節奏接龍」</h4><div class="hint">先產生一段節奏，玩家答對後，系統在後面<b>多接一個</b>新動作，節奏越來越長。</div>
+  <div class="grid3">
+    ${F('game.lv2.start','一開始幾個動作',{num:1})}
+    ${F('game.lv2.add','每答對一輪多加幾個',{num:1})}
+    ${F('game.lv2.pass','接到幾個動作就過關',{num:1})}
+    ${F('game.lv2.show','每個提示顯示幾秒',{num:1})}
+    ${F('game.lv2.limit','每個動作限時幾秒',{num:1})}
+  </div></div>
+  ${F('game.extra','（可以不填）第三關或特別關卡',{area:1,rows:2,ph:'第三關「精靈加速」：提示秒數每輪減少 0.1 秒'})}
+  <h3>亂數節奏怎麼產生</h3>
+  <div class="lbl">同一個動作可以連續出現嗎？</div>
+  ${R('game.rand.allowRepeat',[{v:'yes',t:'可以',d:'例如「左、左、右」——比較難，要回到預備姿勢再做一次'},{v:'no',t:'不可以',d:'新動作若和前一個一樣就重新抽'}])}
+  ${F('game.rand.how','用你的話說說亂數怎麼做',{area:1,rows:2,req:1,ph:'每次從 1 到 3 隨機選一個數字，1＝手往左、2＝手往右、3＝手舉高，加到「節奏」清單裡',chips:['每次從 1 到「動作數量」隨機選一個數字，對應到一個動作，依序加進「節奏」清單']})}`;
+}
+function gameScore(){
+  const sc=S.game.score;
+  return `<h2 class="step">第 5 步：計分、錯誤與勝負</h2>
+  <p class="lead">題目要求：每完成一輪得分；<b>連續正確</b>要有加分；動作錯誤要<b>重新挑戰該輪或扣分</b>。</p>
+  ${why('功能完整、無明顯錯誤、流程開始與結束順利（功能完整性 25%）；勝負條件清楚（遊戲機制設計 10%）')}
+  <div class="grid2">
+  ${F('game.score.base','每完成一輪得幾分',{ph:'10 × 這一輪的動作數',chips:['10 × 這一輪的動作數','每輪 10 分']})}
+  ${F('game.score.combo','連續正確的加分方法',{req:1,ph:'連續答對 2 輪起，每輪多加 5 × 連續次數',chips:['連續答對 2 輪起，每輪再加「5 × 連續次數」','連續答對 3 輪，分數 × 2']})}
+  </div>
+  <div class="lbl">動作做錯時</div>
+  ${R('game.score.wrong',[{v:'retry',t:'重新挑戰這一輪',d:'連續正確歸零'},{v:'minus',t:'扣分',d:'扣分後繼續'},{v:'both',t:'扣分＋重新挑戰',d:'最有挑戰性'}])}
+  <div class="grid2">
+  ${sc.wrong!=='retry'?F('game.score.minus','扣幾分',{num:1}):''}
+  ${F('game.score.lives','有幾條命（錯幾次遊戲結束；0＝不限）',{num:1})}
+  </div>
+  ${F('game.score.win','🏆 怎樣算贏（遊戲結束條件）',{req:1,ph:'第二關接到 8 個動作，顯示總分與「演奏大師」稱號',chips:['第二關的節奏接到過關長度，顯示總分與稱號']})}
+  ${F('game.score.lose','💔 怎樣算輸（遊戲結束條件）',{req:1,ph:'生命用完，顯示「再試一次」按鈕',chips:['生命用完就結束，顯示分數與「再玩一次」按鈕']})}
+  ${F('game.score.diff','難度怎麼慢慢提高',{mode:'add',ph:'每過一輪，提示秒數減少 0.1 秒',chips:['每過一輪提示時間縮短 0.1 秒','第二關限時變短','動作數量越來越多','加入新的動作']})}`;
+}
+function gameScreen(){
+  return `<h2 class="step">第 6 步：畫面、音效與回饋</h2>
+  <p class="lead">一個完整的遊戲要有：開始畫面 → 遊戲說明 → 關卡 → 結束畫面（贏／輸），還能重玩。</p>
+  ${why('內容豐富且充滿變化，音效與美術表現精緻（遊戲趣味性 20%）；流程開始與結束順利（功能完整性 25%）')}
+  ${F('game.screen.style','整體美術風格',{req:1,ph:'霓虹燈舞臺風，深藍背景加亮色燈光',chips:['霓虹舞臺風','可愛卡通風','像素風','童話繪本風']})}
+  <div class="grid2">
+  ${F('game.screen.start','開始畫面有什麼',{area:1,rows:2,req:1,ph:'遊戲名稱、音樂精靈跳舞、「開始」按鈕'})}
+  ${F('game.screen.howto','遊戲說明畫面怎麼教玩家',{area:1,rows:2,req:1,ph:'用圖示示範三個動作和預備姿勢，並先校正'})}
+  ${F('game.screen.win','贏的畫面',{area:1,rows:2,req:1,ph:'彩帶、掌聲、總分和稱號'})}
+  ${F('game.screen.lose','輸的畫面',{area:1,rows:2,req:1,ph:'精靈打瞌睡、顯示分數、「再玩一次」'})}
+  ${F('game.screen.okFx','答對時的回饋',{req:1,ph:'燈光閃一下、「Great!」字樣、加分飄字',chips:['燈光閃爍＋「Great!」＋加分數字往上飄']})}
+  ${F('game.screen.badFx','答錯時的回饋',{req:1,ph:'畫面震動、「哎呀」音效、顯示正確答案',chips:['畫面輕輕震動＋「哎呀」音效＋顯示正確的動作']})}
+  </div>
+  ${F('game.screen.bgm','背景音樂',{ph:'開始畫面輕快、關卡中只有節拍、贏了播放完整歌曲'})}
+  ${F('game.screen.idea','我的遊戲最特別的巧思（評審最該注意的地方）',{area:1,ph:'玩家做完整段節奏後，精靈會把玩家的動作「演奏」成一首完整的歌'})}`;
+}
+
+/* ---------- 題目檢核與評分自我檢核 ---------- */
+function topicChecks(){
+  if(S.group==='anim'){ const a=S.anim, b=a.branch;
+    const cr=a.creatures.filter(c=>filled(c.name)).length, pr=a.problems.filter(p=>filled(p.name)).length;
+    const fx=a.problems.filter(p=>filled(p.name)&&filled(p.goodFx)&&filled(p.badFx)).length;
+    return [
+      [cr>=3,`至少 3 種森林生物（目前 ${cr}）`],
+      [pr>=3,`至少 3 種環境問題（目前 ${pr}）`],
+      [filled(a.ai.module)&&a.ai.acts.length>=1&&a.problems.every(p=>!filled(p.name)||p.goodAct),'至少 1 種頭部或手部動作，每個任務都指定了動作'],
+      [pr>0&&fx===pr,'每個行動都有「變好」畫面，不適當選擇有「變差」畫面'],
+      [filled(b.aDesc)&&filled(b.bDesc),'至少兩種不同的故事發展（結局）'],
+      [filled(a.ai.ready)&&filled(a.ai.calib),'說明文件：寫出互動方式（校正、預備姿勢）'],
+    ];
+  }
+  if(S.group==='game'){ const g=S.game, ai=g.ai;
+    const sounds=ai.acts.map(k=>((ai.map[k]||{}).sound||'').trim()).filter(Boolean);
+    return [
+      [ai.acts.length>=3,`至少 3 種手部或頭部動作（目前 ${ai.acts.length}）`],
+      [filled(ai.ready),'有預備姿勢，避免同一動作被重複判定'],
+      [sounds.length===ai.acts.length&&ai.acts.length>0&&new Set(sounds).size===sounds.length,'每個動作對應「不同」的聲音或效果'],
+      [+g.lv1.minLen>=3&&+g.lv1.maxLen<=5&&+g.lv1.minLen<=+g.lv1.maxLen&&filled(g.rand.how),'第一關：亂數產生 3～5 個動作'],
+      [+g.lv2.add>=1&&+g.lv2.pass>+g.lv2.start,'第二關：答對後節奏逐漸變長'],
+      [filled(g.score.base)&&filled(g.score.combo),'每輪得分，連續正確有加分'],
+      [!!g.score.wrong,'動作錯誤會重新挑戰或扣分'],
+      [filled(g.score.win)&&filled(g.score.lose),'自訂關卡通過與遊戲結束條件'],
+    ];
+  }
+  return [];
+}
+const LEVELS=['未填寫','待加強','尚可','良','優','極優'];
+const RUBRIC = {
+  anim:[
+    {sec:'程式說明文件 15%', n:'敘事設計－劇情', pct:5, pts:['0','1','2','3','4','5'], goal:'劇情完整流暢，角色與場景交代清楚，呈現完整故事', c:()=>{const a=S.anim;return[
+      [filled(a.story.opening),'寫出故事開頭（森林原本的樣子、發生什麼事）'],
+      [filled(a.story.narrator)&&filled(a.story.place),'交代說書人和故事地點'],
+      [a.creatures.filter(c=>filled(c.name)&&filled(c.need)&&filled(c.home)).length>=3,'3 種生物都寫出住處和需要什麼'],
+      [a.problems.filter(p=>filled(p.name)&&filled(p.cause)).length>=3,'3 個環境問題都寫出原因'],
+      [filled(a.branch.aDesc)&&filled(a.branch.bDesc),'寫出不同結局'],
+      [filled(a.story.theme),'寫出想傳達的意義']];}},
+    {sec:'程式說明文件 15%', n:'場景規劃－流程規劃', pct:5, pts:['0','1','2','3','4','5'], goal:'流程規劃完整，順序嚴謹合理，與敘事設計完全契合', c:()=>{const t=sbTasks();return[
+      [t.every(x=>filled(S.anim.sb[x.id].narr)),'每個任務都寫了敘事設計'],
+      [t.every(x=>S.anim.sb[x.id].shots.filter(s=>filled(s.scene)).length>=3),'每個任務都至少有 3 個分鏡場景'],
+      [S.anim.problems.every(p=>!filled(p.name)||(p.goodAct&&filled(p.badWay))),'每個任務都有做對／不適當的條件'],
+      [(()=>{const b=S.anim.branch,n=S.anim.problems.length;return b.start+b.plus*n>=b.aMin && b.start-b.minus*n<(b.useMid?b.bBelow:b.aMin);})(),'分數設定讓每種結局都走得到']];}},
+    {sec:'程式說明文件 15%', n:'場景規劃－動作與表現', pct:5, pts:['0','1','2','3','4','5'], goal:'每個場景角色明確，動作規劃完整清楚，表現流暢到位', c:()=>{const t=sbTasks();const shots=t.flatMap(x=>S.anim.sb[x.id].shots);const r=k=>shots.filter(s=>filled(s[k])).length/Math.max(1,shots.length);return[
+      [r('role')>=0.9,`分鏡都寫了角色（${Math.round(r('role')*100)}%）`],
+      [r('act')>=0.9,`分鏡都寫了動作（${Math.round(r('act')*100)}%）`],
+      [S.anim.creatures.filter(c=>filled(c.sad)&&filled(c.happy)).length>=3,'每種生物都有「變差／變好」時的表現']];}},
+    {sec:'動畫作品 85%', n:'程式設計', pct:30, pts:['0','1~6','7~12','13~18','19~24','25~30'], goal:'程式結構清楚完整，運用多種控制積木（事件、廣播、迴圈、條件），會應用指定 AI 視訊模組積木', c:()=>{const a=S.anim;return[
+      [filled(a.ai.module)&&a.ai.acts.length>=1,'選定 AI 模組與動作（會用到 AI 視訊積木）'],
+      [filled(a.ai.calib),'有起始狀態校正'],
+      [filled(a.ai.ready),'有預備姿勢（避免重複觸發）'],
+      [filled(a.ai.lost),'有處理鏡頭抓不到的情況'],
+      [a.problems.every(p=>!filled(p.name)||+p.time>0),'每個任務有限時（用計時器＋條件）'],
+      [filled(a.branch.meter),'用變數記錄森林狀況並用條件判斷結局'],
+      [filled(a.ai.keys),'有鍵盤備用操作（方便測試、穩定演出）']];}},
+    {sec:'動畫作品 85%', n:'故事呈現', pct:30, pts:['0','1~6','7~12','13~18','19~24','25~30'], goal:'場景轉換自然流暢，節奏清楚，音效、字幕、美術精緻並有效輔助理解', c:()=>{const t=sbTasks();const shots=t.flatMap(x=>S.anim.sb[x.id].shots);const r=k=>shots.filter(s=>filled(s[k])).length/Math.max(1,shots.length);const a=S.anim.art;return[
+      [r('caption')>=0.8,`分鏡都有字幕／旁白（${Math.round(r('caption')*100)}%）`],
+      [r('sound')>=0.6,`分鏡有安排音效（${Math.round(r('sound')*100)}%）`],
+      [a.stages.every(filled),'森林三種狀態的畫面都設計了'],
+      [filled(a.bgm),'安排背景音樂'],
+      [/淡|轉場/.test(a.effects),'有轉場效果（例如淡入淡出）'],
+      [filled(a.style),'決定美術風格']];}},
+    {sec:'動畫作品 85%', n:'創意表達', pct:25, pts:['0','1~5','6~10','11~15','16~20','21~25'], goal:'角色場景鮮明有特色、音效/特效新穎；AI 感知結果與劇情形成創意連動、觸發點巧思、不同情境下反應穩定', c:()=>{const a=S.anim;const acts=new Set(a.problems.map(p=>p.goodAct).filter(Boolean));return[
+      [filled(a.ai.whyAI),'說明 AI 動作和劇情的關係（為什麼要用 AI）'],
+      [acts.size>=2||a.problems.some(p=>p.badAct),'任務用了不同動作，或用動作做出「選擇」（不只是切換場景）'],
+      [String(a.art.effects||'').split(/[、,，\n]/).filter(s=>s.trim()).length>=2,'至少 2 種特效'],
+      [filled(a.art.special),'寫出作品最特別的巧思'],
+      [filled(a.ai.ready)&&filled(a.ai.lost),'考慮了穩定反應（預備姿勢、抓不到時）'],
+      [a.ai.acts.every(k=>stableOk(a.ai.module,k)),'選用的動作都容易穩定判斷（自訂動作要說明清楚）']];}},
+  ],
+  game:[
+    {sec:'程式說明文件 15%', n:'遊戲目標說明', pct:5, pts:['0','1','2','3','4','5'], goal:'遊戲目標非常清楚具體，玩家能立即理解並可依任務完成操作', c:()=>{const g=S.game;return[
+      [filled(g.goal.goal),'寫出玩家的目標'],[filled(g.goal.story),'有小故事說明為什麼要挑戰'],[filled(g.goal.name)&&filled(g.goal.host),'交代音樂精靈和舞臺'],[filled(g.screen.howto),'有說明畫面教玩家怎麼玩']];}},
+    {sec:'程式說明文件 15%', n:'遊戲機制設計', pct:10, pts:['0','1~2','3~4','5~6','7~8','9~10'], goal:'規則與任務高度連貫且可執行，勝負條件清楚，具有明顯挑戰性', c:()=>{const g=S.game;return[
+      [+g.lv1.minLen>=3&&+g.lv1.maxLen<=5&&+g.lv1.rounds>0,'第一關規則與過關條件'],
+      [+g.lv2.pass>+g.lv2.start&&+g.lv2.add>0,'第二關規則與過關條件'],
+      [filled(g.score.win)&&filled(g.score.lose),'勝負（遊戲結束）條件'],
+      [filled(g.score.combo),'連續正確加分規則'],
+      [filled(g.score.diff),'難度逐漸提高（挑戰性）']];}},
+    {sec:'遊戲作品 85%', n:'遊戲趣味性', pct:20, pts:['0','1~4','5~8','9~12','13~16','17~20'], goal:'內容豐富且充滿變化，音效與美術表現精緻，具高度吸引力', c:()=>{const g=S.game,ai=g.ai;return[
+      [ai.acts.length>0&&ai.acts.every(k=>filled((ai.map[k]||{}).sound)&&filled((ai.map[k]||{}).anim)),'每個動作都有聲音和舞臺動畫'],
+      [filled(g.screen.style),'決定美術風格'],[filled(g.screen.bgm),'安排背景音樂'],
+      [filled(g.screen.okFx)&&filled(g.screen.badFx),'答對、答錯有不同回饋'],[filled(g.extra)||filled(g.score.diff),'有變化（第三關或難度提升）']];}},
+    {sec:'遊戲作品 85%', n:'互動平衡性', pct:20, pts:['0','1~4','5~8','9~12','13~16','17~20'], goal:'互動性佳、操作順暢；AI 操控反應靈敏且穩定，誤操作率低，與必要的傳統輸入自然搭配', c:()=>{const ai=S.game.ai;return[
+      [ai.acts.length>=3,'至少 3 種動作'],
+      [ai.acts.length>0&&ai.acts.every(k=>stableOk(ai.module,k)),'選用的動作都容易穩定判斷（自訂動作要說明清楚）'],
+      [filled(ai.ready),'有預備姿勢'],[+ai.hold>0,'動作要維持一小段時間才算數（防抖動）'],
+      [filled(ai.calib),'有起始狀態校正'],[filled(ai.lost),'處理鏡頭抓不到'],[filled(ai.keys),'搭配傳統輸入（按鈕／鍵盤）']];}},
+    {sec:'遊戲作品 85%', n:'獨特創意性', pct:20, pts:['0','1~4','5~8','9~12','13~16','17~20'], goal:'遊戲具高度創新與驚喜；AI 應用設計（辨識項目選擇、觸發機制、回饋形式）具原創性且與情境高度契合', c:()=>{const g=S.game,ai=g.ai;return[
+      [filled(ai.whyAI),'說明為什麼用 AI 動作更適合'],[filled(g.goal.story),'動作和遊戲故事有連結'],
+      [ai.acts.length>0&&ai.acts.every(k=>filled((ai.map[k]||{}).color)),'每個動作有自己的提示圖示／顏色'],
+      [filled(g.screen.idea),'寫出遊戲最特別的巧思']];}},
+    {sec:'遊戲作品 85%', n:'功能完整性', pct:25, pts:['0','1~5','6~10','11~15','16~20','21~25'], goal:'功能完整、無明顯錯誤，流程開始與結束順利', c:()=>{const g=S.game;return[
+      [filled(g.screen.start),'開始畫面'],[filled(g.screen.howto),'說明／校正畫面'],[filled(g.screen.win)&&filled(g.screen.lose),'結束畫面（贏／輸）'],
+      [!!g.score.wrong,'錯誤處理（重來或扣分）'],[filled(g.rand.how),'亂數節奏的產生方法'],[filled(g.score.lose),'可以重新開始']];}},
+  ]
+};
+function evalRubric(){
+  return (RUBRIC[S.group]||[]).map(r=>{ const cs=r.c(); const ok=cs.filter(x=>x[0]).length; const ratio=ok/cs.length;
+    const lv = ok===0?0: ratio>=0.99?5: ratio>=0.75?4: ratio>=0.5?3: ratio>=0.25?2:1;
+    return {...r, cs, lv, pt:r.pts[lv]}; });
+}
+
+function stepFinal(){
+  const tc=topicChecks(), rb=evalRubric();
+  const missing = tc.filter(x=>!x[0]).length;
+  return `<h2 class="step">最後一步：檢查、預覽、下載</h2>
+  <p class="lead">先看看題目要求是不是都做到了，再看評分自我檢核還缺什麼。都綠色了就可以下載 <b>.md 規劃書</b>，交給老師或 Claude 幫你做成 Scratch 作品。</p>
+  <div class="card" style="box-shadow:none;border:2px solid var(--line)"><h3 style="margin-top:0">📋 題目要求檢核</h3>
+    <ul style="list-style:none;padding:0;margin:0">${tc.map(x=>`<li>${x[0]?'<span class="ok">✅</span>':'<span class="no">⬜</span>'} ${esc(x[1])}</li>`).join('')}</ul>
+    ${missing?`<p class="no">還有 ${missing} 項題目要求沒完成，下載的檔案會標示「未完成」。</p>`:'<p class="ok"><b>題目要求全部完成！</b></p>'}
+  </div>
+  <div class="card" style="box-shadow:none;border:2px solid var(--line)"><h3 style="margin-top:0">⭐ 評分自我檢核（規劃完整度）</h3>
+  <p class="hint">這是依照評分規準檢查「規劃有沒有想到」，不是真正的分數；真正的分數要看作品做出來的樣子。</p>
+  <table class="rub"><tr><th>評分項目</th><th>比重</th><th>規劃等級</th><th>檢查項目</th></tr>
+  ${rb.map(r=>`<tr><td><b>${r.n}</b><div class="hint">極優：${esc(r.goal)}</div></td><td>${r.pct}%</td><td><span class="lv lv${r.lv}">${LEVELS[r.lv]}</span><div class="hint">${r.pt} 分</div></td>
+    <td><ul>${r.cs.map(x=>`<li class="${x[0]?'ok':'no'}">${x[0]?'✓':'✗'} ${esc(x[1])}</li>`).join('')}</ul></td></tr>`).join('')}
+  </table></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <button class="btn" id="bPreview">👀 預覽規劃書（可列印）</button>
+    <button class="btn" id="bMd">⬇ 下載 .md 規劃書</button>
+    <button class="btn sec" id="bCopy">📋 複製 .md 內容</button>
+  </div>`;
+}
+
+/* ================= Markdown 產生 ================= */
+const cell = s => filled(s)? String(s).replace(/\|/g,'／').replace(/\r?\n/g,'<br>') : '（未填）';
+const val = s => filled(s)? String(s).trim() : '（未填）';
+function mdHeader(){
+  const b=S.basic, grp=S.group==='anim'?'國小動畫 AI 互動組':'國小遊戲 AI 互動組', topic=S.group==='anim'?'森林動物搬家記':'AI 節奏接龍大作戰';
+  const tc=topicChecks(); const miss=tc.filter(x=>!x[0]);
+  return `# ${val(b.title)}｜Scratch 作品規劃書
+
+> 臺北市 115 年國中小學生 Scratch 貓咪盃創意競賽初賽・**${grp}**・題目「${topic}」
+> 產生日期：${new Date().toLocaleDateString('zh-TW')}　｜　由「Scratch 作品規劃產生器」產生
+${miss.length?`> ⚠ **規劃尚未完成**：${miss.map(x=>x[1]).join('；')}`:'> ✅ 題目要求檢核：全部完成'}
+
+本文件分成兩部分：
+- **第一部分**：程式說明文件內容（依${S.group==='anim'?'附件 3':'附件 4'} 格式），可直接整理成參賽的說明文件。
+- **第二部分**：Scratch 建置規格，給老師或 AI（例如 Claude）依照規格製作 \`.sb3\`。
+
+---
+
+# 第一部分　程式說明文件
+
+## 【基本參賽資料】
+
+| 項目 | 內容 |
+|---|---|
+| 年級 | ${cell(b.grade)} |
+| 作品名稱 | ${cell(b.title)} |
+| 學生姓名 | ${cell(b.name)} |
+| 班級 | ${cell(b.cls)} |
+| Scratch 學習時間 | ${['半年（1 學期）以下','半年（1 學期）以上，未滿 1 年','1 年以上，未滿 2 年','2 年（含）以上'].map(x=>(x===b.learn?'☑ ':'☐ ')+x).join('　')} |
+`;
+}
+function mdTopicCheck(){
+  return `## 題目要求檢核\n\n| 題目要求 | 狀態 |\n|---|---|\n${topicChecks().map(x=>`| ${x[1]} | ${x[0]?'✅ 已規劃':'⬜ 未完成'} |`).join('\n')}\n`;
+}
+function mdRubric(){
+  return `## 評分自我檢核（規劃完整度）\n\n> 依評分規準檢查規劃是否涵蓋各項重點；實際分數以作品表現為準。\n\n| 評分項目 | 比重 | 規劃等級 | 尚未規劃的重點 |\n|---|---|---|---|\n${evalRubric().map(r=>`| ${r.n} | ${r.pct}% | ${LEVELS[r.lv]} | ${r.cs.filter(x=>!x[0]).map(x=>x[1]).join('；')||'—'} |`).join('\n')}\n`;
+}
+function aiActRows(mod,acts){
+  return acts.map(k=>{const a=actOf(mod,k);return a?`| ${a.n} | ${starStr(a)} | ${cell(a.how)} | ${cell(a.ready)} |`:''}).join('\n');
+}
+// 有自訂動作時，提醒建置者依學生的說明設計比例式判斷
+function customNoteMD(mod,ai){ const cs=(ai.custom||[]).filter(x=>filled(x.n));
+  if(!cs.length) return '';
+  const N='\n';
+  return N+`**自訂動作（學生自己新增，動作庫沒有現成公式）**：${cs.map(x=>x.n.trim()).join('、')}。請依「判斷方式」欄的說明，選出要看的${mod==='facemesh'?'臉部':'手部'}關鍵點，`+
+    `沿用上面的原則設計判斷：距離除以${mod==='facemesh'?'臉寬':'手長／手高'}（比例）、門檻做成變數、維持一小段時間才確定、要回到預備姿勢；`+
+    `做好後先開關節點與即時數值讓學生真人試做，再調門檻。若說明的動作攝影機很難分辨（例如手指朝鏡頭、和其他動作形狀太像），請和學生討論改成相近但較穩定的做法。`+N; }
+const PITFALLS = `### 建置注意事項（實際踩過的坑，請務必遵守）
+
+1. **攝影機設為鏡像**：影像選單用「開啟（鏡像）」，左右才不會相反；另外設一個變數「左右相反」（1 或 −1），現場改一個數字就能對調。
+2. **偵測不到時回傳空字串，不是 0**：讀座標前先確認「看得到」（例如手腕 x 不是空字串、> −250），否則角色會跳到畫面中央。
+3. **用比例，不要用絕對座標**：距離要除以「手長」或「臉寬」再和門檻比較；直向比較用直向的尺，橫向比較用橫向的尺。
+4. **門檻全部做成變數**（例如「門檻_左右」），放在舞台上，現場可以直接調整。
+5. **防抖動用計時器，不要用次數**：「重複無限次」裡只有變數運算時，一個畫面會跑好幾百次；請用「同一個判斷結果維持超過 N 秒才寫進『確定動作』」。迴圈尾巴加「等待 0.02 秒」。
+6. **抓不到不要馬上清空**：連續 0.4 秒都抓不到才算離開鏡頭，避免攝影機漏一格就沒反應。
+7. **預備姿勢旗標**：動作被確定後，必須偵測到「回到預備姿勢」才接受下一個動作，避免同一動作被重複判定。
+8. **讀到玩家動作先搬走再歸零**：把「確定動作」複製到另一個變數並立刻歸零，再去播動畫，否則動畫期間玩家的下一個動作會被一起清掉。
+9. **先改變數再廣播**：廣播後收到的角色要等目前程式讓出執行權才開始，所以要先把變數設好再廣播。
+10. **計時用計時器**：「等待直到 計時器 > 開始時間 ＋ 秒數」，不要重複累加「等待」，否則越跑越慢。
+11. **造型名稱不要用純數字**：「造型換成（數字變數）」會被當成第幾個造型；造型取名「動作_左」這類文字，必要時用「字串組合」轉成文字。
+12. **廣播要登記在舞台**（用程式產生 project.json 時）：否則廣播積木會靜靜地什麼都不做。
+13. **同一塊報告積木不能插在兩個地方**（用程式產生時）：每個輸入都要產生新的積木。
+14. **驗證要分開「電腦以為的」和「玩家看到的」**：除了讀變數，也要確認畫面上的造型、字幕真的正確。
+`;
+const REFS = `### 參考資源（在本工作空間中）
+
+- \`01_專案/20260923_Scratch專案產生器/\`：用 Python 產生 .sb3（\`sb3lib.py\`、\`svgkit.py\`），產生後執行 \`lint.py\`，並用 \`verify.js\` 以 headless scratch-vm 實際執行。
+- \`01_專案/20260925_手勢辨識模組教學_Web/\`：手勢判斷的 10 個自訂積木模組（手指伸直、遲滯、維持時間、抓不到手）。
+- \`01_專案/20260915_Handpose2Scratch教學_Web/\`、\`20260915_Facemesh2Scratch教學_Web/\`：關鍵點編號。
+- \`01_專案/20260926_Scratch函式庫_Web/\`：打字機字幕、淡入淡出、倒數等動畫積木。
+`;
+
+function mdAnim(){
+  const a=S.anim, b=a.branch, mod=a.ai.module, tasks=sbTasks();
+  const cr=a.creatures.filter(c=>filled(c.name));
+  const pr=a.problems.filter(p=>filled(p.name));
+  const endCond = b.useMid
+    ? `- **好結局**：${b.meter} ≥ ${b.aMin}\n- **中間結局**：${b.bBelow} ≤ ${b.meter} < ${b.aMin}\n- **壞結局**：${b.meter} < ${b.bBelow}`
+    : `- **好結局**：${b.meter} ≥ ${b.aMin}\n- **壞結局**：${b.meter} < ${b.aMin}`;
+  let m = mdHeader();
+  m += `
+## 題目：${val(S.basic.title)}
+
+### 故事大綱
+
+- **故事地點**：${val(a.story.place)}
+- **說書人**：${val(a.story.narrator)}
+- **故事開頭**：${val(a.story.opening)}
+- **想傳達的意義**：${val(a.story.theme)}
+
+### 森林生物與森林的關係
+
+| 生物 | 住在哪裡 | 需要森林的什麼 | 環境變差時 | 環境變好時 |
+|---|---|---|---|---|
+${cr.map(c=>`| ${cell(c.name)} | ${cell(c.home)} | ${cell(c.need)} | ${cell(c.sad)} | ${cell(c.happy)} |`).join('\n')}
+
+### 環境問題與復育任務
+
+| 任務 | 環境問題 | 原因／畫面 | 受影響生物 | 復育行動 | AI 動作 | 限時 | 做對了（變好） | 不適當選擇 → 惡化 |
+|---|---|---|---|---|---|---|---|---|
+${pr.map((p,i)=>`| 任務${i+1} | ${cell(p.name)} | ${cell(p.cause)} | ${cell(p.affect)} | ${cell(p.fix)} | ${cell(actName(mod,p.goodAct))} | ${p.time} 秒 | ${cell(p.goodFx)} | ${cell(p.badWay)}${p.badAct?`（動作：${actName(mod,p.badAct)}）`:''} → ${cell(p.badFx)} |`).join('\n')}
+
+### 頭部／手部互動方式
+
+- **AI 擴充功能**：${mod?MODULES[mod]:'（未選）'}
+- **為什麼用 AI**：${val(a.ai.whyAI)}
+- **起始狀態校正**：${val(a.ai.calib)}
+- **預備姿勢**：${val(a.ai.ready)}（每個動作確定後，要回到預備姿勢才接受下一次動作，避免重複觸發）
+- **抓不到手／臉時**：${val(a.ai.lost)}
+- **鍵盤備用操作**：${val(a.ai.keys)}
+
+| 動作 | 穩定度 | 判斷方式（比例＋門檻） | 回到預備姿勢的判斷 |
+|---|---|---|---|
+${aiActRows(mod,a.ai.acts)}
+
+### 故事分支條件
+
+- 用變數「**${b.meter}**」記錄森林狀況，一開始 = **${b.start}**。
+- 每個任務：做對 → ${b.meter} **＋${b.plus}**，畫面變好；不適當選擇（或時間到）→ ${b.meter} **−${b.minus}**，環境惡化。
+- 所有任務結束後判斷結局：
+${endCond.replace(/^- /gm,'  - ')}
+
+| 結局 | 名稱 | 結局畫面 |
+|---|---|---|
+| 好結局 | ${cell(b.aName)} | ${cell(b.aDesc)} |
+${b.useMid?`| 中間結局 | ${cell(b.cName)} | ${cell(b.cDesc)} |\n`:''}| 壞結局 | ${cell(b.bName)} | ${cell(b.bDesc)} |
+
+### 任務與場景規劃（附件 3 分鏡表）
+
+| 任務 | 敘事設計 | 分鏡 | 場景 | 角色 | 動作 | 字幕／旁白 | 音效 |
+|---|---|---|---|---|---|---|---|
+${tasks.map(x=>{const s=a.sb[x.id];return s.shots.map((sh,j)=>`| ${j===0?x.t:''} | ${j===0?cell(s.narr):''} | 分鏡${j+1} | ${cell(sh.scene)} | ${cell(sh.role)} | ${cell(sh.act)} | ${cell(sh.caption)} | ${cell(sh.sound)} |`).join('\n');}).join('\n')}
+
+### 美術與音效
+
+- **美術風格**：${val(a.art.style)}
+- **森林三種狀態**：很糟＝${val(a.art.stages[0])}；普通＝${val(a.art.stages[1])}；很棒＝${val(a.art.stages[2])}
+- **特效**：${val(a.art.effects)}
+- **背景音樂**：${val(a.art.bgm)}
+- **音效**：${val(a.art.sfx)}
+- **作品巧思**：${val(a.art.special)}
+
+${mdTopicCheck()}
+${mdRubric()}
+---
+
+# 第二部分　Scratch 建置規格
+
+> **給製作者（老師或 AI）的指示**：請依照本規格製作一個 Scratch 3 專案（\`.sb3\`）。
+> 內容以第一部分的故事、分鏡為準；規格沒寫到的細節可以自行補足，但**不可刪減任何題目要求**。
+> 程式要適合國小學生閱讀：變數、廣播、角色名稱都用中文，每段程式最上面放一個註解說明用途。
+
+## 1. 專案設定
+
+- 舞台 480 × 360。
+- 擴充功能：**${mod?MODULES[mod]:'（未選）'}**；影像設為**開啟（鏡像）**，影像透明度 50～70（看得到自己又不擋畫面）。
+- 也加入「音樂」或使用內建音效皆可。
+- 執行流程：綠旗 → 片頭 → **校正** → 序幕 → 任務 1～${pr.length} → 判斷結局 → 結局畫面（可按空白鍵或做動作重新開始）。
+
+## 2. 背景（舞台造型）
+
+| 背景名稱 | 用途 |
+|---|---|
+| 片頭 | 作品名稱、開始提示 |
+| 校正 | 提示「${val(a.ai.calib)}」 |
+| 森林_很糟 | ${cell(a.art.stages[0])} |
+| 森林_普通 | ${cell(a.art.stages[1])} |
+| 森林_很棒 | ${cell(a.art.stages[2])} |
+${[...new Set(tasks.flatMap(x=>a.sb[x.id].shots.map(s=>(s.scene||'').trim())).filter(Boolean))].map(s=>`| ${cell(s)} | 分鏡中用到的場景（若和上面森林狀態相同可共用） |`).join('\n')}
+| 結局_好 | ${cell(b.aDesc)} |
+${b.useMid?`| 結局_中 | ${cell(b.cDesc)} |\n`:''}| 結局_壞 | ${cell(b.bDesc)} |
+
+> 森林背景要**依「${b.meter}」即時切換**：< ${b.useMid?b.bBelow:Math.round((b.start+b.aMin)/2)} 用「森林_很糟」、≥ ${b.aMin} 用「森林_很棒」，其餘用「森林_普通」。
+
+## 3. 角色
+
+| 角色 | 用途 | 造型（名稱用文字，不要用純數字） |
+|---|---|---|
+| 說書人（${val(a.story.narrator)}） | 旁白、字幕對話 | 說話、開心、擔心 |
+${cr.map(c=>`| ${cell(c.name)} | 住在 ${cell(c.home)}；需要 ${cell(c.need)} | 正常、難過（${cell(c.sad)}）、開心（${cell(c.happy)}）、搬走 |`).join('\n')}
+${pr.map((p,i)=>`| 任務${i+1}物件 | 「${cell(p.name)}」：${cell(p.cause)}（可用分身做出多個） | 問題狀態、解決後 |`).join('\n')}
+| AI 游標 | 顯示 AI 偵測到的手／臉位置，讓觀看者知道自己被偵測到 | 一般、偵測到動作（發亮） |
+| 字幕條 | 畫面下方的字幕 | 字幕底板 |
+| ${b.meter}條 | 顯示森林狀況（可以用會長大的樹或進度條） | 依分數變化 |
+| 提示 | 顯示「請做○○動作」與倒數秒數 | 每個動作一個提示造型 |
+
+## 4. 變數與門檻
+
+| 變數 | 範圍 | 初始值 | 用途 |
+|---|---|---|---|
+| ${b.meter} | 全域 | ${b.start} | 森林狀況，決定背景與結局 |
+| 目前任務 | 全域 | 0 | 正在進行第幾個任務 |
+| 任務結果 | 全域 | 空 | 「成功」或「失敗」 |
+| 結局 | 全域 | 空 | 好／${b.useMid?'中／':''}壞 |
+| 看得到 | 全域 | 0 | AI 是否偵測到手／臉（抓不到連續 0.4 秒才變 0） |
+| 偵測動作 | 全域 | 空 | 每一刻判斷出來的動作 |
+| 確定動作 | 全域 | 空 | 維持 0.15 秒以上才寫入；程式讀完立刻歸零 |
+| 回到預備 | 全域 | 1 | 1＝已回到預備姿勢，可以接受下一個動作 |
+| 起始X、起始Y | 全域 | 校正時記錄 | 起始狀態 |
+| ${mod==='facemesh'?'臉寬':'手長'} | 全域 | 校正時記錄 | 比例的「尺」 |
+| 門檻_動作 | 全域 | 依下表 | 判斷動作的門檻（可現場調整） |
+| 門檻_預備 | 全域 | 依下表 | 判斷回到預備姿勢的門檻 |
+| 左右相反 | 全域 | 1 | 鏡像出問題時改成 −1 |
+| 任務開始時間 | 全域 | — | 用計時器計算限時 |
+
+## 5. AI 動作判斷規格
+
+- 校正：${val(a.ai.calib)}
+- 預備姿勢：${val(a.ai.ready)}
+- 抓不到時：${val(a.ai.lost)}
+- 備用鍵盤：${val(a.ai.keys)}
+
+| 動作 | 判斷方式（建議起始門檻，現場再調） | 回到預備姿勢 |
+|---|---|---|
+${a.ai.acts.map(k=>{const x=actOf(mod,k);return x?`| ${x.n} | ${cell(x.how)} | ${cell(x.ready)} |`:''}).join('\n')}
+${customNoteMD(mod,a.ai)}
+
+判斷流程（放在一個「AI 偵測」角色或舞台的「重複無限次」裡）：
+1. 檢查看得到 → 2. 計算比例 → 3. 得到「偵測動作」→ 4. 同一個偵測動作維持 0.15 秒且「回到預備」= 1 → 寫入「確定動作」、「回到預備」設為 0 → 5. 偵測到預備姿勢時「回到預備」設為 1 → 6. 等待 0.02 秒。
+
+## 6. 廣播訊息
+
+| 廣播 | 誰發出 | 誰接收、做什麼 |
+|---|---|---|
+| 開始故事 | 舞台（綠旗或空白鍵） | 所有角色重設、播放片頭 |
+| 開始校正 | 舞台 | 提示角色顯示校正說明，記錄起始狀態 |
+| 播放序幕 | 舞台 | 說書人與生物演出序幕分鏡 |
+${pr.map((p,i)=>`| 任務${i+1}開始 | 舞台 | 任務${i+1}物件出現、提示「${actName(mod,p.goodAct)}」、開始計時 |
+| 任務${i+1}成功 | 舞台 | ${cell(p.goodFx)} |
+| 任務${i+1}失敗 | 舞台 | ${cell(p.badFx)} |`).join('\n')}
+| 更新森林 | 任何改變分數的程式 | 舞台依「${b.meter}」切換背景、生物換造型 |
+| 播放結局 | 舞台 | 依「結局」變數播放對應結局 |
+
+## 7. 主流程（舞台程式）
+
+\`\`\`
+當綠旗被點擊
+  重設所有變數（${b.meter} = ${b.start}）
+  廣播「開始故事」並等待
+  廣播「開始校正」並等待
+  廣播「播放序幕」並等待
+${pr.map((p,i)=>`  ── 任務${i+1}：${p.name} ──
+  目前任務 = ${i+1}；任務結果 = 空；任務開始時間 = 計時器
+  廣播「任務${i+1}開始」
+  等待直到〈確定動作 = ${actName(mod,p.goodAct)||'正確動作'}〉${p.badAct?` 或〈確定動作 = ${actName(mod,p.badAct)}〉`:''} 或〈計時器 − 任務開始時間 > ${p.time}〉
+  本次動作 = 確定動作；確定動作 = 空          ← 先搬走再歸零
+  如果〈本次動作 = ${actName(mod,p.goodAct)||'正確動作'}〉那麼
+    ${b.meter} 改變 ${b.plus}；任務結果 = 成功
+    廣播「更新森林」；廣播「任務${i+1}成功」並等待
+  否則（${String(p.badWay||'時間到').replace(/\s*\n\s*/g,' ')}）
+    ${b.meter} 改變 −${b.minus}；任務結果 = 失敗
+    廣播「更新森林」；廣播「任務${i+1}失敗」並等待`).join('\n')}
+  ── 判斷結局 ──
+  如果 ${b.meter} ≥ ${b.aMin} 那麼 結局 = 好
+${b.useMid?`  否則如果 ${b.meter} < ${b.bBelow} 那麼 結局 = 壞\n  否則 結局 = 中`:'  否則 結局 = 壞'}
+  廣播「播放結局」並等待
+  顯示「按空白鍵再看一次」
+\`\`\`
+
+## 8. 分鏡演出清單
+
+每一列都要做出來：「場景」是背景，「角色」要出現，「動作」要用動畫（移動、換造型、尺寸、特效）表現，「字幕」用字幕條或說話顯示，「音效」要播放。
+
+| 段落 | 分鏡 | 場景 | 角色 | 動作 | 字幕 | 音效 |
+|---|---|---|---|---|---|---|
+${tasks.map(x=>a.sb[x.id].shots.map((sh,j)=>`| ${j===0?x.t:''} | ${j+1} | ${cell(sh.scene)} | ${cell(sh.role)} | ${cell(sh.act)} | ${cell(sh.caption)} | ${cell(sh.sound)} |`).join('\n')).join('\n')}
+
+- 美術風格：${val(a.art.style)}
+- 特效：${val(a.art.effects)}
+- 背景音樂：${val(a.art.bgm)}；音效：${val(a.art.sfx)}
+
+## 9. 驗收清單（做完請逐項確認）
+
+- [ ] 畫面中出現至少 3 種森林生物：${cr.map(c=>c.name).join('、')||'（未填）'}
+- [ ] 出現至少 3 種環境問題：${pr.map(p=>p.name).join('、')||'（未填）'}
+- [ ] 使用 ${mod?MODULES[mod]:'AI'} 的積木完成互動，觀看者可用 ${a.ai.acts.map(k=>actName(mod,k)).join('、')||'（未填）'} 參與
+- [ ] 每個任務做對後場景立刻變好；不適當選擇或時間到，環境變差
+- [ ] 全部做對 → 好結局；全部做錯 → 壞結局${b.useMid?'；部分做對 → 中間結局':''}（三種路線都實際跑過）
+- [ ] 同一個動作維持不動時只觸發一次（預備姿勢有效）
+- [ ] 手／臉離開鏡頭時不會誤判，回來後可以繼續
+- [ ] 鍵盤備用操作可以完整看完故事
+- [ ] 每個分鏡都有字幕；轉場自然（淡入淡出）
+- [ ] 用到事件、廣播、迴圈、條件判斷等多種控制積木
+
+${PITFALLS}
+${REFS}`;
+  return m;
+}
+
+function mdGame(){
+  const g=S.game, ai=g.ai, mod=ai.module, sc=g.score;
+  const acts=ai.acts.map((k,i)=>({k,i:i+1,n:actName(mod,k),m:ai.map[k]||{}}));
+  const wrongTxt={retry:'重新挑戰這一輪（連續正確歸零）',minus:`扣 ${sc.minus} 分後繼續`,both:`扣 ${sc.minus} 分並重新挑戰這一輪（連續正確歸零）`}[sc.wrong]||'（未選）';
+  let m=mdHeader();
+  m+=`
+## 題目：${val(S.basic.title)}
+
+### 1、玩家在這個遊戲的目標是
+
+${val(g.goal.goal)}
+
+- **遊戲故事**：${val(g.goal.story)}
+- **音樂精靈**：${val(g.goal.name)}
+- **舞臺**：${val(g.goal.host)}
+
+### 2、這個遊戲的規則條件及玩家任務挑戰是
+
+**任務一：第一關「節奏記憶」**
+規則一：系統用亂數產生 ${g.lv1.minLen}～${g.lv1.maxLen} 個動作組成的節奏，每個提示顯示 ${g.lv1.show} 秒依序播放；玩家照順序做出動作，每個動作限時 ${g.lv1.limit} 秒。答對 ${g.lv1.rounds} 輪即過關。
+
+**任務二：第二關「節奏接龍」**
+規則二：系統先產生 ${g.lv2.start} 個動作的節奏；玩家完整做對後，系統在節奏最後再接上 ${g.lv2.add} 個新動作，節奏越來越長。接到 ${g.lv2.pass} 個動作即過關。每個提示顯示 ${g.lv2.show} 秒，每個動作限時 ${g.lv2.limit} 秒。
+${filled(g.extra)?`\n**（自行增加任務）**：${val(g.extra)}\n`:''}
+**計分與勝負規則**
+- 每完成一輪：${val(sc.base)}
+- 連續正確加分：${val(sc.combo)}
+- 動作錯誤：${wrongTxt}
+- 生命：${+sc.lives>0?sc.lives+' 條（錯一次少一條）':'不限'}
+- 遊戲結束（贏）：${val(sc.win)}
+- 遊戲結束（輸）：${val(sc.lose)}
+- 難度提升：${val(sc.diff)}
+
+### 動作判定方式（含如何避免重複判定）
+
+- **AI 擴充功能**：${mod?MODULES[mod]:'（未選）'}
+- **為什麼用 AI**：${val(ai.whyAI)}
+- **起始狀態校正**：${val(ai.calib)}
+- **預備姿勢**：${val(ai.ready)}
+- **避免重複判定**：動作要維持 ${ai.hold} 秒才算數；動作被確定後，玩家必須回到預備姿勢，才會接受下一個動作。所以手一直停在同一個位置，只會算一次。
+- **抓不到時**：${val(ai.lost)}
+- **傳統輸入搭配**：${val(ai.keys)}
+
+| 編號 | 動作 | 穩定度 | 判斷方式（比例＋門檻） | 回到預備姿勢 | 聲音 | 舞臺動畫 | 提示圖示 |
+|---|---|---|---|---|---|---|---|
+${acts.map(x=>{const a=actOf(mod,x.k);return `| ${x.i} | ${x.n} | ${starStr(a)} | ${cell(a.how)} | ${cell(a.ready)} | ${cell(x.m.sound)} | ${cell(x.m.anim)} | ${cell(x.m.color)} |`;}).join('\n')}
+
+### 亂數節奏產生方法
+
+- ${val(g.rand.how)}
+- 同一個動作${g.rand.allowRepeat==='yes'?'**可以**連續出現（玩家要先回到預備姿勢再做一次）':'**不可以**連續出現（抽到和前一個相同就重抽）'}。
+
+### 動作序列的記錄方式
+
+- 清單「**節奏**」：存系統產生的動作編號（1～${acts.length||'N'}），第幾項就是第幾拍。
+- 清單「**玩家**」：存玩家確定的每個動作編號。
+- 變數「**第幾拍**」：玩家目前做到第幾個；每確定一個動作，就和「節奏」的第「第幾拍」項比較，不同就是錯誤。
+- 第二關答對後只在「節奏」清單**最後加入**新動作，前面的保留，形成接龍。
+
+### 畫面與音效
+
+- 美術風格：${val(g.screen.style)}
+- 開始畫面：${val(g.screen.start)}
+- 說明畫面：${val(g.screen.howto)}
+- 贏的畫面：${val(g.screen.win)}
+- 輸的畫面：${val(g.screen.lose)}
+- 答對回饋：${val(g.screen.okFx)}
+- 答錯回饋：${val(g.screen.badFx)}
+- 背景音樂：${val(g.screen.bgm)}
+- 遊戲巧思：${val(g.screen.idea)}
+
+${mdTopicCheck()}
+${mdRubric()}
+---
+
+# 第二部分　Scratch 建置規格
+
+> **給製作者（老師或 AI）的指示**：請依照本規格製作一個 Scratch 3 專案（\`.sb3\`）。
+> 規格沒寫到的細節可以自行補足，但**不可刪減任何題目要求**。
+> 程式要適合國小學生閱讀：變數、清單、廣播、角色名稱都用中文，每段程式最上面放一個註解說明用途。
+
+## 1. 專案設定
+
+- 舞台 480 × 360。
+- 擴充功能：**${mod?MODULES[mod]:'（未選）'}**（影像設為**開啟（鏡像）**，透明度 50～70）、**音樂**（樂器與打擊樂器）。
+- 流程：開始畫面 → 說明＋校正 → 第一關 → 過關畫面 → 第二關 → 結束畫面（贏／輸）→ 可重玩。
+
+## 2. 背景
+
+| 背景名稱 | 內容 |
+|---|---|
+| 開始 | ${cell(g.screen.start)} |
+| 說明 | ${cell(g.screen.howto)} |
+| 舞臺 | ${cell(g.goal.host)}（關卡進行中） |
+| 過關 | 第一關過關，準備進入第二關 |
+| 結束_贏 | ${cell(g.screen.win)} |
+| 結束_輸 | ${cell(g.screen.lose)} |
+
+## 3. 角色
+
+| 角色 | 用途 | 造型（用文字命名） |
+|---|---|---|
+| 音樂精靈 | ${cell(g.goal.name)}；示範節奏、對答案做反應 | 待機、示範、開心、難過、${acts.map(x=>'動作_'+x.n).join('、')} |
+| 提示 | 依序顯示節奏中的每個動作 | ${acts.map(x=>`動作_${x.n}（${x.m.color||'自訂'}）`).join('、')} |
+| 回饋 | 顯示答對／答錯 | Great、哎呀 |
+| 計分板 | 分數、連續正確、生命、關卡 | — |
+| 開始按鈕／再玩按鈕 | 滑鼠點擊開始或重玩 | — |
+| 進度點 | 顯示這一輪做到第幾拍（可用分身） | 未完成、完成 |
+
+## 4. 變數、清單與門檻
+
+| 名稱 | 種類 | 初始值 | 用途 |
+|---|---|---|---|
+| 節奏 | 清單 | 空 | 系統產生的動作編號 |
+| 玩家 | 清單 | 空 | 玩家做出的動作編號 |
+| 關卡 | 變數 | 1 | 1＝節奏記憶、2＝節奏接龍 |
+| 輪 | 變數 | 0 | 這一關答對幾輪 |
+| 第幾拍 | 變數 | 1 | 玩家目前做到第幾個動作 |
+| 分數 | 變數 | 0 | 總分 |
+| 連續正確 | 變數 | 0 | 連續答對的輪數（加分用） |
+| 生命 | 變數 | ${sc.lives} | ${+sc.lives>0?'錯一次減 1，0 時遊戲結束':'不使用'} |
+| 提示秒數 | 變數 | ${g.lv1.show} | 每個提示顯示秒數（難度提升時調整） |
+| 限時 | 變數 | ${g.lv1.limit} | 每個動作的限制時間 |
+| 拍開始時間 | 變數 | — | 用計時器計算限時 |
+| 看得到 | 變數 | 0 | 是否偵測到手／臉（連續 0.4 秒抓不到才變 0） |
+| 偵測動作 | 變數 | 0 | 每一刻判斷出的動作編號（0＝預備姿勢或無） |
+| 確定動作 | 變數 | 0 | 維持 ${ai.hold} 秒才寫入；讀完立刻歸零 |
+| 回到預備 | 變數 | 1 | 1＝可接受下一個動作 |
+| 起始X、起始Y、${mod==='facemesh'?'臉寬':'手長'} | 變數 | 校正時記錄 | 起始狀態與比例的尺 |
+| 維持秒數 | 變數 | ${ai.hold} | 防抖動時間 |
+| 門檻_動作、門檻_預備 | 變數 | 依下表 | 可現場調整 |
+| 左右相反 | 變數 | 1 | 鏡像問題時改成 −1 |
+
+## 5. 動作與效果對照
+
+| 編號 | 動作 | 判斷方式（建議起始門檻，現場再調） | 回到預備姿勢 | 聲音 | 舞臺動畫 | 鍵盤模擬 |
+|---|---|---|---|---|---|---|
+${acts.map(x=>{const a=actOf(mod,x.k);return `| ${x.i} | ${x.n} | ${cell(a.how)} | ${cell(a.ready)} | ${cell(x.m.sound)} | ${cell(x.m.anim)} | 數字鍵 ${x.i} |`;}).join('\n')}
+${customNoteMD(mod,ai)}
+
+- 預備姿勢：${val(ai.ready)}
+- 校正：${val(ai.calib)}
+- 抓不到時：${val(ai.lost)}
+- 傳統輸入：${val(ai.keys)}
+
+AI 偵測迴圈（獨立角色或舞台的「重複無限次」）：
+1. 檢查看得到 → 2. 依上表算出「偵測動作」編號 → 3. 同一編號維持「維持秒數」且「回到預備」= 1 → 寫入「確定動作」並播放該動作的聲音與動畫、「回到預備」設為 0 → 4. 偵測到預備姿勢時「回到預備」設為 1 → 5. 等待 0.02 秒。
+
+## 6. 廣播訊息
+
+| 廣播 | 用途 |
+|---|---|
+| 顯示開始畫面 | 顯示標題與開始按鈕 |
+| 開始校正 | 說明動作、記錄起始狀態 |
+| 新的一輪 | 依關卡產生或延長「節奏」清單 |
+| 播放提示 | 依序顯示「節奏」中每個動作（提示＋聲音），播完才輪到玩家 |
+| 輪到玩家 | 清空「玩家」清單、第幾拍 = 1，開始接收動作 |
+| 答對 | ${cell(g.screen.okFx)} |
+| 答錯 | ${cell(g.screen.badFx)} |
+| 過關 | 進入下一關 |
+| 遊戲結束 | 依輸贏顯示結束畫面 |
+
+## 7. 主流程（虛擬碼）
+
+\`\`\`
+當綠旗被點擊：分數=0、連續正確=0、生命=${sc.lives}、關卡=1；廣播「顯示開始畫面」
+當按下開始按鈕（或空白鍵）：廣播「開始校正」並等待；開始第 1 關
+
+產生亂數動作：
+  重複：新動作 = 在 1 到 ${acts.length||'動作數量'} 間隨機選一個數
+  ${g.rand.allowRepeat==='yes'?'（允許與前一個相同）':'直到 新動作 ≠ 「節奏」的最後一項'}
+  把 新動作 加到「節奏」
+
+第一關「節奏記憶」（每一輪）：
+  刪除「節奏」全部；長度 = 在 ${g.lv1.minLen} 到 ${g.lv1.maxLen} 間隨機選一個數
+  重複 長度 次：產生亂數動作
+  廣播「播放提示」並等待；廣播「輪到玩家」
+  玩家回合（見下方）
+  如果答對：輪 + 1；如果 輪 = ${g.lv1.rounds} → 廣播「過關」，進入第二關
+
+第二關「節奏接龍」：
+  刪除「節奏」全部；重複 ${g.lv2.start} 次：產生亂數動作
+  每一輪：廣播「播放提示」並等待 → 玩家回合
+    答對：如果「節奏」長度 ≥ ${g.lv2.pass} → 遊戲結束（贏）
+          否則 重複 ${g.lv2.add} 次：產生亂數動作（只加在最後面）
+    答錯：${wrongTxt}（節奏不變，重播同一段）
+
+玩家回合：
+  第幾拍 = 1；拍開始時間 = 計時器
+  重複直到 第幾拍 > 「節奏」的長度 或 答錯：
+    如果 確定動作 ≠ 0：
+      動作 = 確定動作；確定動作 = 0          ← 先搬走再歸零
+      把 動作 加到「玩家」
+      如果 動作 = 「節奏」的第（第幾拍）項：第幾拍 + 1；拍開始時間 = 計時器
+      否則：答錯
+    如果 計時器 − 拍開始時間 > 限時：答錯
+  答對 → 分數 + （${sc.base}）；連續正確 + 1；連擊加分：${sc.combo}；廣播「答對」
+  答錯 → 連續正確 = 0；${sc.wrong!=='retry'?`分數 − ${sc.minus}；`:''}${+sc.lives>0?'生命 − 1；如果 生命 = 0 → 遊戲結束（輸）；':''}廣播「答錯」
+
+難度提升：${val(sc.diff)}
+\`\`\`
+
+## 8. 驗收清單（做完請逐項確認）
+
+- [ ] 至少 3 種動作：${acts.map(x=>x.n).join('、')||'（未填）'}，每個動作的聲音／動畫都不同
+- [ ] 手（或頭）停在同一個動作不動，只會判定一次；回到預備姿勢後才能再判定
+- [ ] 第一關節奏長度確實在 ${g.lv1.minLen}～${g.lv1.maxLen} 之間且每次不同（亂數）
+- [ ] 第二關答對後節奏多 ${g.lv2.add} 個，前面的動作不變
+- [ ] 每輪得分、連續答對有額外加分、答錯${wrongTxt}
+- [ ] 贏和輸兩種結束都實際玩到過，且可以重玩
+- [ ] 提示播放時玩家的動作不會被計入
+- [ ] 手／臉離開鏡頭時不會誤判；回來可繼續
+- [ ] 鍵盤數字鍵可以模擬每個動作，完整玩完一局
+- [ ] 開始、說明、結束畫面都有，流程開始與結束順利
+
+${PITFALLS}
+${REFS}`;
+  return m;
+}
+function buildMD(){ return S.group==='anim'? mdAnim() : S.group==='game'? mdGame() : ''; }
+
+/* ================= 簡易 Markdown → HTML（預覽用） ================= */
+function inline(s){ return esc(s).replace(/&lt;br&gt;/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>'); }
+function md2html(md){
+  const L=md.split('\n'); let h='', i=0;
+  while(i<L.length){ const l=L[i];
+    if(l.startsWith('```')){ let c=[]; i++; while(i<L.length&&!L[i].startsWith('```')) c.push(L[i++]); i++; h+=`<pre>${esc(c.join('\n'))}</pre>`; continue; }
+    if(/^\|/.test(l)){ const rows=[]; while(i<L.length&&/^\|/.test(L[i])) rows.push(L[i++]);
+      const cells=r=>r.replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+      h+='<table><tr>'+cells(rows[0]).map(c=>`<th>${inline(c)}</th>`).join('')+'</tr>'+rows.slice(2).map(r=>'<tr>'+cells(r).map(c=>`<td>${inline(c)}</td>`).join('')+'</tr>').join('')+'</table>'; continue; }
+    let m;
+    if((m=l.match(/^(#{1,4}) (.*)/))){ h+=`<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`; i++; continue; }
+    if(l.startsWith('> ')){ let c=[]; while(i<L.length&&L[i].startsWith('> ')) c.push(inline(L[i++].slice(2))); h+=`<blockquote>${c.join('<br>')}</blockquote>`; continue; }
+    if(/^\s*- /.test(l)){ let c=[]; while(i<L.length&&/^\s*- /.test(L[i])) c.push(L[i++].replace(/^\s*- /,'')); h+='<ul>'+c.map(x=>`<li>${inline(x.replace(/^\[ \] /,'☐ '))}</li>`).join('')+'</ul>'; continue; }
+    if(/^\d+\. /.test(l)){ let c=[]; while(i<L.length&&/^\d+\. /.test(L[i])) c.push(L[i++].replace(/^\d+\. /,'')); h+='<ol>'+c.map(x=>`<li>${inline(x)}</li>`).join('')+'</ol>'; continue; }
+    if(l.trim()==='---'){ h+='<hr>'; i++; continue; }
+    if(!l.trim()){ i++; continue; }
+    let c=[]; while(i<L.length&&L[i].trim()&&!/^(#|\||\s*- |> |```|\d+\. )/.test(L[i])) c.push(inline(L[i++])); h+=`<p>${c.join('<br>')}</p>`;
+  }
+  return h;
+}
+
+/* ================= 畫面 ================= */
+function render(){
+  uid=0;
+  const st=steps(); if(S.step>=st.length) S.step=st.length-1; if(S.step<0) S.step=0;
+  $('#main').innerHTML = `<div class="card">${st[S.step].f()}
+    <div class="navbtns" style="margin-top:16px">
+      ${S.step>0?'<button class="btn sec" data-go="-1">← 上一步</button>':'<span></span>'}
+      ${S.step<st.length-1?`<button class="btn" data-go="1" ${!S.group?'disabled title="請先選組別"':''}>下一步 →</button>`:''}
+    </div></div>`;
+  side();
+}
+function side(){
+  const st=steps();
+  $('#nav').innerHTML = `<div class="lbl" style="margin-bottom:4px">${S.group==='anim'?'🎬 動畫組':S.group==='game'?'🎵 遊戲組':'請先選組別'}</div>`+
+    st.map((x,i)=>{ const ok=x.done(); return `<button data-step="${i}" ${i===S.step?'aria-current="step"':''}><span class="dot ${ok?'ok':''}">${ok?'✓':i+1}</span>${x.t}</button>`; }).join('');
+  const tc=topicChecks();
+  if(!tc.length){ $('#mini').innerHTML='<h3>📋 題目檢核</h3><p class="hint">選好組別後會顯示題目要求。</p>'; return; }
+  const ok=tc.filter(x=>x[0]).length;
+  $('#mini').innerHTML = `<h3>📋 題目要求 ${ok}/${tc.length}</h3><div class="bar"><i style="width:${ok/tc.length*100}%"></i></div>
+   <ul>${tc.map(x=>`<li><span>${x[0]?'✅':'⬜'}</span><span>${esc(x[1])}</span></li>`).join('')}</ul>`;
+}
+let sideT=null;
+function sideSoon(){ clearTimeout(sideT); sideT=setTimeout(side,200); }
+
+document.addEventListener('input', e=>{
+  const p=e.target.dataset.p; if(!p||e.target.type==='radio'||e.target.type==='checkbox'||e.target.tagName==='SELECT') return;
+  set(p, e.target.dataset.num? (e.target.value===''?'':+e.target.value) : e.target.value); sideSoon();
+});
+document.addEventListener('change', e=>{
+  const t=e.target;
+  if(t.dataset.act){ const base=t.dataset.act, g=get(base); const k=t.value;
+    g.acts = t.checked? [...g.acts.filter(x=>x!==k), k] : g.acts.filter(x=>x!==k); save(); render(); return; }
+  const p=t.dataset.p; if(!p) return;
+  // 自訂動作改名：離開欄位時重畫，讓效果列、任務下拉選單換成新名稱
+  if(/\.custom\.\d+\.n$/.test(p)){ render(); return; }
+  if(t.type==='radio'){ if(!t.checked) return;
+    if(p==='group'){ S.group=t.value; save(); render(); return; }
+    if(/\.module$/.test(p) && get(p)!==t.value){ const base=p.replace(/\.module$/,''); get(base).acts=get(base).acts.filter(isCustom); }
+    set(p,t.value); } else if(t.type==='checkbox'&&t.dataset.bool){ set(p,t.checked); } else if(t.tagName==='SELECT'){ set(p,t.value); } else return;
+  if(t.dataset.rr) render(); else side();
+});
+document.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.chip){ const p=b.dataset.chip, v=b.dataset.v, cur=get(p)||'';
+    const nv = b.dataset.mode==='add' && filled(cur) ? (cur.includes(v)?cur:cur+'、'+v) : v;
+    set(p,nv); const inp=document.querySelector(`[data-p="${CSS.escape(p)}"]`); if(inp){ inp.value=nv; } side(); return; }
+  if(b.dataset.go){ S.step+= +b.dataset.go; save(); render(); scrollTo({top:0,behavior:'smooth'}); return; }
+  if(b.dataset.step){ S.step=+b.dataset.step; save(); render(); return; }
+  if(b.dataset.add){ const arr=get(b.dataset.add); arr.push(JSON.parse(JSON.stringify(b.dataset.add.endsWith('creatures')?defaults().anim.creatures[0]:defaults().anim.problems[0]))); save(); render(); return; }
+  if(b.dataset.addcustom){ const g=get(b.dataset.addcustom); if(!g.custom) g.custom=[];
+    const k='cu_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    g.custom.push({k,n:'',how:'',ready:''}); g.acts.push(k); save(); render(); return; }
+  if(b.dataset.delcustom){ const ks=b.dataset.delcustom.split('.'); const idx=+ks.pop(); const base=ks.join('.'), g=get(base);
+    const k=(g.custom[idx]||{}).k; g.custom.splice(idx,1); g.acts=g.acts.filter(x=>x!==k);
+    if(g.map) delete g.map[k];
+    if(base==='anim.ai') S.anim.problems.forEach(p=>{ if(p.goodAct===k) p.goodAct=''; if(p.badAct===k) p.badAct=''; });
+    save(); render(); return; }
+  if(b.dataset.addshot){ S.anim.sb[b.dataset.addshot].shots.push(blankShot()); save(); render(); return; }
+  if(b.dataset.del){ const ks=b.dataset.del.split('.'); const idx=+ks.pop(); const arr=get(ks.join('.')); arr.splice(idx,1);
+    if(ks.join('.')==='anim.problems'){ // 任務順序改變，分鏡跟著移動
+      const sb=S.anim.sb, n=arr.length; for(let i=idx;i<n;i++) sb['p'+i]=sb['p'+(i+1)]||blankSB(); delete sb['p'+n]; }
+    save(); render(); return; }
+  if(b.id==='bPreview'){ $('#pv').innerHTML=md2html(buildMD()); $('#dlg').showModal(); return; }
+  if(b.id==='bMd'||b.id==='bMd2'){ download(buildMD(), fileBase()+'_規劃書.md','text/markdown'); return; }
+  if(b.id==='bCopy'){ navigator.clipboard.writeText(buildMD()).then(()=>toast('已複製 .md 內容')).catch(()=>toast('無法複製，請改用下載')); return; }
+  if(b.id==='bPrint'){ window.print(); return; }
+  if(b.id==='bClose'){ $('#dlg').close(); return; }
+  if(b.id==='bSave'){ download(JSON.stringify(S,null,1), fileBase()+'_進度.json','application/json'); return; }
+  if(b.id==='bLoad'){ $('#fLoad').click(); return; }
+  if(b.id==='bReset'){ if(confirm('確定要清除全部內容、從頭開始嗎？（建議先按「存進度檔」）')){ S=defaults(); save(); render(); } return; }
+});
+$('#fLoad').addEventListener('change', e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ S=merge(defaults(), JSON.parse(r.result)); save(); render(); toast('已載入進度'); }catch(err){ toast('檔案格式不正確'); } e.target.value=''; };
+  r.readAsText(f,'utf-8'); });
+function fileBase(){ return (S.basic.title||'Scratch作品').replace(/[\\/:*?"<>|]/g,'_'); }
+function download(text,name,type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:type+';charset=utf-8'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); toast('已下載 '+name); }
+
+render();
+</script>
+</body>
+</html>

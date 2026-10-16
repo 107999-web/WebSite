@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極簡 2D 開放世界冒險</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #ui-panel {
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        canvas {
+            border: 4px solid #fff;
+            background-color: #3a5f0b; /* 草地綠 */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        #instructions {
+            margin-top: 10px;
+            color: #aaa;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-panel">
+        等級: <span id="level">1</span> | 
+        生命值: <span id="hp">100</span>/100 | 
+        經驗值: <span id="exp">0</span>/50 | 
+        擊殺數: <span id="kills">0</span>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <div id="instructions">
+        操作方式：WASD 或 方向鍵移動 | 靠近怪物會自動戰鬥（碰撞） | 世界是無限延伸的！
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // UI 元素
+        const uiLevel = document.getElementById("level");
+        const uiHp = document.getElementById("hp");
+        const uiExp = document.getElementById("exp");
+        const uiKills = document.getElementById("kills");
+
+        // 遊戲世界設定（世界大小：2000 x 2000 像素）
+        const WORLD_WIDTH = 2000;
+        const WORLD_HEIGHT = 2000;
+
+        // 玩家資料
+        const player = {
+            x: WORLD_WIDTH / 2,
+            y: WORLD_HEIGHT / 2,
+            size: 20,
+            speed: 4,
+            level: 1,
+            hp: 100,
+            maxHp: 100,
+            exp: 0,
+            maxExp: 50,
+            kills: 0
+        };
+
+        // 按鍵監聽
+        const keys = {};
+        window.addEventListener("keydown", e => keys[e.key] = true);
+        window.addEventListener("keyup", e => keys[e.key] = false);
+
+        // 隨機生成世界地標（樹木與石頭）
+        const environment = [];
+        for (let i = 0; i < 60; i++) {
+            environment.push({
+                x: Math.random() * WORLD_WIDTH,
+                y: Math.random() * WORLD_HEIGHT,
+                type: Math.random() > 0.3 ? 'tree' : 'rock',
+                size: Math.random() * 15 + 15
+            });
+        }
+
+        // 隨機生成怪物
+        const enemies = [];
+        function spawnEnemy() {
+            enemies.push({
+                x: Math.random() * WORLD_WIDTH,
+                y: Math.random() * WORLD_HEIGHT,
+                size: 15,
+                hp: 20 + player.level * 5,
+                maxHp: 20 + player.level * 5,
+                speed: 1 + Math.random() * 1.5,
+                color: '#e74c3c'
+            });
+        }
+        // 初始化 15 隻怪
+        for (let i = 0; i < 15; i++) spawnEnemy();
+
+        // 傷害文字特效
+        const damageTexts = [];
+
+        // 更新 UI
+        function updateUI() {
+            uiLevel.innerText = player.level;
+            uiHp.innerText = player.hp;
+            uiExp.innerText = player.exp;
+            uiKills.innerText = player.kills;
+        }
+
+        // 碰撞偵測（圓形或方形的簡化版）
+        function checkCollision(obj1, obj2) {
+            const dist = Math.hypot(obj1.x - obj2.x, obj1.y - obj2.y);
+            return dist < (obj1.size + obj2.size) / 2;
+        }
+
+        // 遊戲核心邏輯更新
+        function update() {
+            // 1. 玩家移動與邊界限制
+            if (keys["ArrowUp"] || keys["w"] || keys["W"]) player.y -= player.speed;
+            if (keys["ArrowDown"] || keys["s"] || keys["S"]) player.y += player.speed;
+            if (keys["ArrowLeft"] || keys["a"] || keys["A"]) player.x -= player.speed;
+            if (keys["ArrowRight"] || keys["d"] || keys["D"]) player.x += player.speed;
+
+            // 限制在開放世界邊界內
+            player.x = Math.max(player.size, Math.min(WORLD_WIDTH - player.size, player.x));
+            player.y = Math.max(player.size, Math.min(WORLD_HEIGHT - player.size, player.y));
+
+            // 2. 怪物 AI（簡單追蹤玩家）與戰鬥
+            enemies.forEach((enemy, index) => {
+                // 怪物朝玩家移動
+                const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                enemy.x += Math.cos(angle) * enemy.speed;
+                enemy.y += Math.sin(angle) * enemy.speed;
+
+                // 戰鬥判定（碰到了就互相傷害）
+                if (checkCollision(player, enemy)) {
+                    // 玩家打怪
+                    enemy.hp -= 1;
+                    // 怪打玩家
+                    player.hp -= 0.5; 
+
+                    // 死亡判定
+                    if (enemy.hp <= 0) {
+                        enemies.splice(index, 1);
+                        player.kills++;
+                        player.exp += 20;
+                        
+                        // 升級判定
+                        if (player.exp >= player.maxExp) {
+                            player.level++;
+                            player.exp -= player.maxExp;
+                            player.maxExp = Math.floor(player.maxExp * 1.5);
+                            player.maxHp += 20;
+                            player.hp = player.maxHp; // 補滿血
+                        }
+                        // 補一隻新怪
+                        spawnEnemy();
+                    }
+
+                    // 遊戲結束判定
+                    if (player.hp <= 0) {
+                        alert("你被怪物擊敗了！遊戲結束。點擊確定重新開始。");
+                        document.location.reload();
+                    }
+                }
+            });
+
+            updateUI();
+        }
+
+        // 畫面渲染
+        function draw() {
+            // 清空畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 【核心：攝影機鎖定玩家】
+            // 計算攝影機偏移量，讓玩家始終保持在畫布中央
+            const camX = player.x - canvas.width / 2;
+            const camY = player.y - canvas.height / 2;
+
+            ctx.save();
+            // 將畫布矩陣平移，達到「世界在動，玩家不動」的視覺效果
+            ctx.translate(-camX, -camY);
+
+            // 畫世界邊界線
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+            // 畫環境（樹木與石頭）
+            environment.forEach(item => {
+                ctx.fillStyle = item.type === 'tree' ? '#2e7d32' : '#757575';
+                ctx.beginPath();
+                ctx.arc(item.x, item.y, item.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // 畫怪物
+            enemies.forEach(enemy => {
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                ctx.arc(enemy.x, enemy.y, enemy.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 怪物血條
+                ctx.fillStyle = "red";
+                ctx.fillRect(enemy.x - enemy.size, enemy.y - enemy.size - 10, enemy.size * 2, 4);
+                ctx.fillStyle = "green";
+                ctx.fillRect(enemy.x - enemy.size, enemy.y - enemy.size - 10, (enemy.size * 2) * (enemy.hp / enemy.maxHp), 4);
+            });
+
+            // 畫玩家（藍色勇者）
+            ctx.fillStyle = "#3498db";
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 玩家面朝方向的小眼睛（裝飾）
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(player.x + 5, player.y - 4, 3, 0, Math.PI * 2);
+            ctx.arc(player.x + 5, player.y + 4, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 遊戲主迴圈（Game Loop）
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 啟動遊戲
+        gameLoop();
+    </script>
+</body>
+</html>

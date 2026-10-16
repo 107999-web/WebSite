@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>3D 中國跳棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:100vw;height:100vh;overflow:hidden;background:#06040A;font-family:'Microsoft JhengHei',sans-serif}
+#c{display:block;width:100%;height:100%}
+
+/* ── Dialog ── */
+#dlg{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.88);z-index:100}
+.box{
+  background:linear-gradient(145deg,#10061C,#1C0C30);
+  border:2px solid #6040A0;border-radius:18px;
+  padding:36px 44px;color:#E0D0FF;text-align:center;
+  box-shadow:0 0 60px rgba(120,60,200,.35),inset 0 0 30px rgba(0,0,0,.5);
+  min-width:360px
+}
+.box h1{font-size:1.85em;margin-bottom:4px;letter-spacing:2px}
+.box .sub{color:#8060C0;font-size:.88em;margin-bottom:22px}
+.sect{font-size:.92em;color:#B090E0;margin:16px 0 8px;text-align:left}
+.n-btns{display:flex;gap:10px;margin-bottom:4px}
+.n-btn{
+  flex:1;padding:9px;border-radius:8px;border:2px solid #40306080;
+  background:#10061C;color:#9070C0;font-size:1em;cursor:pointer;transition:.2s
+}
+.n-btn.sel{background:#40306080;color:#E8D8FF;border-color:#A080D0}
+.n-btn:hover:not(.sel){border-color:#7050B0}
+
+.p-row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px}
+.p-label{width:48px;text-align:left;font-size:.9em;font-weight:bold}
+.t-btns{display:flex;gap:6px;flex:1}
+.t-btn{
+  flex:1;padding:6px;border-radius:6px;border:1.5px solid #40306060;
+  background:#10061C;color:#8070B0;cursor:pointer;transition:.2s;font-size:.88em
+}
+.t-btn.sel{background:#3A2858;color:#EED8FF;border-color:#9070C0}
+.t-btn:hover:not(.sel){border-color:#6050A0}
+
+.go-btn{
+  margin-top:24px;padding:13px 54px;font-size:1.1em;border-radius:10px;
+  background:linear-gradient(135deg,#5030A0,#9060D0);
+  color:#EEE8FF;border:none;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:.2s
+}
+.go-btn:hover{transform:scale(1.04);box-shadow:0 4px 24px rgba(140,80,220,.5)}
+
+/* ── HUD ── */
+#hud{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  pointer-events:none;text-align:center;z-index:10
+}
+#hud-turn{font-size:1.15em;color:#E0D0FF;text-shadow:0 1px 8px rgba(0,0,0,1)}
+#hud-info{font-size:.78em;color:#9070C0;margin-top:3px}
+#hud-scores{display:flex;gap:14px;justify-content:center;margin-top:8px}
+.score-tag{
+  font-size:.76em;padding:3px 11px;border-radius:20px;
+  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.1)
+}
+
+/* ── Win ── */
+#win-dlg{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.82);z-index:200
+}
+#win-dlg .box{min-width:280px}
+#win-dlg h1{font-size:1.9em;margin-bottom:8px}
+#win-dlg p{font-size:1em;margin-bottom:20px;color:#9070C0}
+
+#hint{
+  position:fixed;bottom:12px;right:14px;
+  color:#403060;font-size:.7em;text-align:right;pointer-events:none
+}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+<canvas id="c"></canvas>
+
+<!-- Start dialog -->
+<div id="dlg">
+  <div class="box">
+    <h1>⭐ 3D 中國跳棋</h1>
+    <p class="sub">Chinese Checkers · 六角星棋盤</p>
+    <p class="sect">玩家人數</p>
+    <div class="n-btns">
+      <button class="n-btn sel" id="nb2" onclick="setN(2)">2 人</button>
+      <button class="n-btn"     id="nb3" onclick="setN(3)">3 人</button>
+    </div>
+    <p class="sect">玩家設定</p>
+    <div id="p-rows"></div>
+    <button class="go-btn" onclick="startGame()">開始遊戲</button>
+    <p style="margin-top:14px;font-size:0.78em;color:#7fff88;background:rgba(0,180,80,0.12);border-radius:6px;padding:6px 12px;">✅ 已修復 (2026-07-04) — 若您看到此訊息，代表修復成功，按鈕可正常使用。</p>
+  </div>
+</div>
+
+<!-- Win dialog -->
+<div id="win-dlg">
+  <div class="box">
+    <h1 id="win-title"></h1>
+    <p id="win-sub"></p>
+    <button class="go-btn" onclick="resetToMenu()">再玩一局</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-turn"></div>
+  <div id="hud-info"></div>
+  <div id="hud-scores"></div>
+</div>
+<div id="hint">拖曳旋轉 · 滾輪縮放</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════
+
+const PLR_COLORS = [0xDD2200, 0x2255EE, 0x22BB55];
+const PLR_CSS    = ['#DD2200','#2255EE','#22BB55'];
+const PLR_NAMES  = ['紅方','藍方','綠方'];
+
+// Cube coordinate 6-directions (dx,dy,dz), x+y+z=0
+const HEX_DIRS = [
+  [ 1,-1, 0],[-1, 1, 0],
+  [ 1, 0,-1],[-1, 0, 1],
+  [ 0, 1,-1],[ 0,-1, 1]
+];
+
+// Tip identifiers: pz=+z, nz=-z, px=+x, nx=-x, py=+y, ny=-y
+// 2-player: p0=+z→-z, p1=-z→+z (opposite corners, swap)
+// 3-player: p0=+z→-z, p1=+x→-x, p2=+y→-y (alternating corners)
+const HOME_2P = ['pz','nz'];
+const GOAL_2P = ['nz','pz'];
+const HOME_3P = ['pz','px','py'];
+const GOAL_3P = ['nz','nx','ny'];
+
+const HEX_SIZE = 0.62;   // spacing between hex centres
+
+// ═══════════════════════════════════════════
+//  BOARD GEOMETRY
+// ═══════════════════════════════════════════
+
+function isStarPos(x,y,z){
+  // Each 10-cell tip uses BOTH a minimum AND a maximum bound on the
+  // other two cube axes (max(|y|,|z|)≤4 for the +x tip, etc.)
+  // Without the ≤4 bound the "gaps" between star arms are included.
+  const ax=Math.abs(x),ay=Math.abs(y),az=Math.abs(z);
+  if(Math.max(ax,ay,az)<=4) return true;       // central hexagon (61 cells)
+  if(x>=5 &&y>=-4&&z>=-4)  return true;        // +x tip (10 cells)
+  if(x<=-5&&y<= 4&&z<= 4)  return true;        // -x tip
+  if(y>=5 &&x>=-4&&z>=-4)  return true;        // +y tip
+  if(y<=-5&&x<= 4&&z<= 4)  return true;        // -y tip
+  if(z>=5 &&x>=-4&&y>=-4)  return true;        // +z tip
+  if(z<=-5&&x<= 4&&y<= 4)  return true;        // -z tip
+  return false;
+}
+
+function inTip(x,y,z,which){
+  switch(which){
+    case 'px': return x>=5 &&y>=-4&&z>=-4;
+    case 'nx': return x<=-5&&y<= 4&&z<= 4;
+    case 'py': return y>=5 &&x>=-4&&z>=-4;
+    case 'ny': return y<=-5&&x<= 4&&z<= 4;
+    case 'pz': return z>=5 &&x>=-4&&y>=-4;
+    case 'nz': return z<=-5&&x<= 4&&y<= 4;
+  }
+  return false;
+}
+
+function getHomeTip(p,n){ return n===2?HOME_2P[p]:HOME_3P[p]; }
+function getGoalTip(p,n){ return n===2?GOAL_2P[p]:GOAL_3P[p]; }
+
+// Pre-generate all 121 star positions
+const ALL_POS = (()=>{
+  const arr=[];
+  for(let x=-8;x<=8;x++) for(let z=-8;z<=8;z++){
+    const y=-x-z;
+    if(y<-8||y>8) continue;
+    if(isStarPos(x,y,z)) arr.push([x,y,z]);
+  }
+  return arr;
+})();
+
+function posKey(x,y,z){ return `${x},${y},${z}`; }
+function parseKey(k){ return k.split(',').map(Number); }
+
+// Cube → 3D world (X, Z)
+function hexTo3D(x,z){
+  return [
+    HEX_SIZE*Math.sqrt(3)*(x+z/2),
+    HEX_SIZE*1.5*z
+  ];
+}
+
+// ═══════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════
+
+let gBoard;        // Map<key, playerIdx|null>
+let gTurn;         // 0|1|2
+let gNumPlayers;
+let gPlayerTypes;  // ['human'|'ai', ...]
+let gSelected;     // key of selected piece or null
+let gReachable;    // Map<key, {x,y,z,path,isJump}>
+let gBusy;
+let gWon;          // -1 or winning playerIdx
+
+// ═══════════════════════════════════════════
+//  MOVE GENERATION
+// ═══════════════════════════════════════════
+
+function getReachable(board, sx, sy, sz){
+  const sk = posKey(sx,sy,sz);
+  const reach = new Map();
+
+  // ── single-step moves ──
+  for(const [dx,dy,dz] of HEX_DIRS){
+    const nx=sx+dx, ny=sy+dy, nz=sz+dz;
+    const k=posKey(nx,ny,nz);
+    if(board.has(k)&&board.get(k)===null)
+      reach.set(k,{x:nx,y:ny,z:nz,path:[[nx,ny,nz]],isJump:false});
+  }
+
+  // ── jump chains (BFS) ──
+  // State: current position + set of positions visited in THIS chain
+  const queue=[{x:sx,y:sy,z:sz, cv:new Set([sk]), path:[]}];
+  const bfsSeen=new Set([sk]);
+
+  while(queue.length>0){
+    const {x,y,z,cv,path}=queue.shift();
+    for(const [dx,dy,dz] of HEX_DIRS){
+      const mx=x+dx, my=y+dy, mz=z+dz;
+      const lx=x+2*dx, ly=y+2*dy, lz=z+2*dz;
+      const mk=posKey(mx,my,mz), lk=posKey(lx,ly,lz);
+      if(!board.has(mk)||board.get(mk)===null) continue; // middle must have piece
+      if(!board.has(lk)||board.get(lk)!==null) continue; // landing must be empty
+      if(cv.has(lk)) continue;                            // no revisit in chain
+
+      const newPath=[...path,[lx,ly,lz]];
+      const newCV=new Set([...cv,lk]);
+
+      if(!reach.has(lk))
+        reach.set(lk,{x:lx,y:ly,z:lz,path:newPath,isJump:true});
+
+      if(!bfsSeen.has(lk)){
+        bfsSeen.add(lk);
+        queue.push({x:lx,y:ly,z:lz,cv:newCV,path:newPath});
+      }
+    }
+  }
+
+  reach.delete(sk);
+  return reach;
+}
+
+function getAllMoves(board, playerIdx){
+  const moves=[];
+  for(const [key,val] of board){
+    if(val!==playerIdx) continue;
+    const [x,y,z]=parseKey(key);
+    for(const [tk,info] of getReachable(board,x,y,z))
+      moves.push({fromKey:key,toKey:tk,...info});
+  }
+  return moves;
+}
+
+function applyMove(board,fromKey,toKey,p){
+  const nb=new Map(board);
+  nb.set(fromKey,null);
+  nb.set(toKey,p);
+  return nb;
+}
+
+function checkWin(board,p){
+  const gt=getGoalTip(p,gNumPlayers);
+  let total=0,inGoal=0;
+  for(const [k,v] of board){
+    if(v!==p) continue;
+    total++;
+    const [x,y,z]=parseKey(k);
+    if(inTip(x,y,z,gt)) inGoal++;
+  }
+  return total>0&&total===inGoal;
+}
+
+// ═══════════════════════════════════════════
+//  AI
+// ═══════════════════════════════════════════
+
+function advancementScore(x,y,z,p){
+  // How advanced a piece is toward its goal (higher = better)
+  const gt=getGoalTip(p,gNumPlayers);
+  switch(gt){
+    case 'nz': return -z;
+    case 'pz': return  z;
+    case 'nx': return -x;
+    case 'px': return  x;
+    case 'ny': return -y;
+    case 'py': return  y;
+  }
+  return 0;
+}
+
+function evalBoard(board,p){
+  const gt=getGoalTip(p,gNumPlayers);
+  let sc=0;
+  for(const [k,v] of board){
+    if(v!==p) continue;
+    const [x,y,z]=parseKey(k);
+    sc += advancementScore(x,y,z,p)*2;
+    if(inTip(x,y,z,gt)) sc+=18; // bonus for pieces already in goal
+  }
+  return sc;
+}
+
+function aiPickMove(board,p){
+  const moves=getAllMoves(board,p);
+  if(!moves.length) return null;
+  // Shuffle for variety among equal moves
+  for(let i=moves.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [moves[i],moves[j]]=[moves[j],moves[i]];
+  }
+  let best=null, bestSc=-Infinity;
+  for(const mv of moves){
+    const nb=applyMove(board,mv.fromKey,mv.toKey,p);
+    const sc=evalBoard(nb,p);
+    if(sc>bestSc){bestSc=sc;best=mv;}
+  }
+  return best;
+}
+
+// ═══════════════════════════════════════════
+//  THREE.JS SCENE
+// ═══════════════════════════════════════════
+
+let scene,camera,renderer,raycaster,mouse;
+let boardGrp,piecesGrp,hiGrp;
+let camR=22,camTheta=0,camPhi=0.64;
+let isDrag=false,lmx=0,lmy=0;
+
+// Shared geometries
+const GEO_HOLE   = new THREE.CylinderGeometry(0.225,0.225,0.1,18);
+const GEO_SPHERE = new THREE.SphereGeometry(0.27,22,16);
+const GEO_RIM    = new THREE.TorusGeometry(0.195,0.042,8,22);
+const GEO_HI     = new THREE.CylinderGeometry(0.265,0.265,0.07,20);
+const GEO_SEL    = new THREE.CylinderGeometry(0.30,0.30,0.06,20);
+
+// Materials
+let matBoard, matNeutral, matUnused;
+let matHome=[], matGoal=[], matPiece=[];
+let matHiStep, matHiJump, matHiSel;
+
+let holeMap   = new Map();  // key → hole mesh
+let piecesMap = new Map();  // key → piece group
+
+function initScene(){
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x06040A);
+  scene.fog=new THREE.FogExp2(0x06040A,0.04);
+
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+  camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,0.1,100);
+  updateCamera();
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xDDD0FF,0.45));
+  const sun=new THREE.DirectionalLight(0xFFEEDD,1.1);
+  sun.position.set(4,18,9);
+  sun.castShadow=true;
+  sun.shadow.mapSize.set(2048,2048);
+  sun.shadow.camera.near=0.5;sun.shadow.camera.far=50;
+  sun.shadow.camera.left=-14;sun.shadow.camera.right=14;
+  sun.shadow.camera.top=14;sun.shadow.camera.bottom=-14;
+  scene.add(sun);
+  const fill=new THREE.DirectionalLight(0x6060FF,0.25);
+  fill.position.set(-5,12,-4);scene.add(fill);
+  const rim=new THREE.PointLight(0xCC99FF,0.5,30);
+  rim.position.set(0,10,0);scene.add(rim);
+
+  raycaster=new THREE.Raycaster();
+  mouse=new THREE.Vector2();
+
+  boardGrp =new THREE.Group();scene.add(boardGrp);
+  piecesGrp=new THREE.Group();scene.add(piecesGrp);
+  hiGrp    =new THREE.Group();scene.add(hiGrp);
+
+  buildMaterials();
+
+  // ── Camera / input event listeners (needs renderer to exist) ──
+  renderer.domElement.addEventListener('pointerdown',e=>{
+    isDrag=true; lmx=e.clientX; lmy=e.clientY;
+  });
+  renderer.domElement.addEventListener('pointermove',e=>{
+    if(!isDrag) return;
+    camTheta-=(e.clientX-lmx)*.006;
+    camPhi=Math.max(.12,Math.min(1.48,camPhi+(e.clientY-lmy)*.006));
+    updateCamera(); lmx=e.clientX; lmy=e.clientY;
+  });
+  renderer.domElement.addEventListener('pointerup',()=>isDrag=false);
+  renderer.domElement.addEventListener('pointercancel',()=>isDrag=false);
+  renderer.domElement.addEventListener('wheel',e=>{
+    camR=Math.max(10,Math.min(38,camR+e.deltaY*.022));
+    updateCamera();
+  },{passive:true});
+  renderer.domElement.addEventListener('click',onCanvasClick);
+
+  window.addEventListener('resize',()=>{
+    renderer.setSize(innerWidth,innerHeight);
+    camera.aspect=innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  });
+}
+
+function buildMaterials(){
+  matBoard  = new THREE.MeshPhongMaterial({color:0x1A0830,shininess:30});
+  matNeutral= new THREE.MeshPhongMaterial({color:0x100520,shininess:6});
+  matUnused = new THREE.MeshPhongMaterial({color:0x0A0215,shininess:4});
+
+  const homeCol=[0x3A0800,0x00083A,0x00300A];
+  const goalCol=[0x200400,0x000420,0x001808];
+  for(let p=0;p<3;p++){
+    matHome.push(new THREE.MeshPhongMaterial({color:homeCol[p],shininess:12}));
+    matGoal.push(new THREE.MeshPhongMaterial({color:goalCol[p],shininess:12}));
+    matPiece.push(new THREE.MeshPhongMaterial({color:PLR_COLORS[p],shininess:160,specular:0xFFFFFF}));
+  }
+
+  matHiStep=new THREE.MeshPhongMaterial({color:0xFFFF40,emissive:0x303000,transparent:true,opacity:.85});
+  matHiJump=new THREE.MeshPhongMaterial({color:0x40FFFF,emissive:0x003030,transparent:true,opacity:.85});
+  matHiSel =new THREE.MeshPhongMaterial({color:0xFFFFFF,emissive:0x505050,transparent:true,opacity:.9});
+}
+
+function buildBoard(){
+  boardGrp.clear();
+  holeMap.clear();
+
+  // Board base plate
+  const baseGeo=new THREE.CylinderGeometry(9.2,9.2,0.32,64);
+  const base=new THREE.Mesh(baseGeo,matBoard);
+  base.position.y=-0.16;
+  base.receiveShadow=true;
+  boardGrp.add(base);
+
+  // Cell holes
+  for(const [x,y,z] of ALL_POS){
+    const [X3D,Z3D]=hexTo3D(x,z);
+    const mat=cellMat(x,y,z);
+    const hole=new THREE.Mesh(GEO_HOLE,mat);
+    hole.position.set(X3D,0.02,Z3D);
+    hole.receiveShadow=true;
+    const k=posKey(x,y,z);
+    hole.userData={key:k,x,y,z};
+    boardGrp.add(hole);
+    holeMap.set(k,hole);
+  }
+
+  // Zone labels (sprites with player colour glow dots)
+  addZoneMarkers();
+}
+
+function cellMat(x,y,z){
+  // Home zones take priority over goal zones (important for 2-player overlap)
+  for(let p=0;p<gNumPlayers;p++){
+    if(inTip(x,y,z,getHomeTip(p,gNumPlayers))) return matHome[p];
+  }
+  for(let p=0;p<gNumPlayers;p++){
+    if(inTip(x,y,z,getGoalTip(p,gNumPlayers))) return matGoal[p];
+  }
+  // Any remaining tip → unused in this player count
+  const allTips=['pz','nz','px','nx','py','ny'];
+  for(const t of allTips) if(inTip(x,y,z,t)) return matUnused;
+  return matNeutral;
+}
+
+function addZoneMarkers(){
+  // Small glowing ring at centre of each home zone
+  const ringGeo=new THREE.TorusGeometry(0.5,0.07,8,24);
+  for(let p=0;p<gNumPlayers;p++){
+    const ht=getHomeTip(p,gNumPlayers);
+    const gt=getGoalTip(p,gNumPlayers);
+    const hc=tipCentre(ht), gc=tipCentre(gt);
+    const mat=new THREE.MeshPhongMaterial({
+      color:PLR_COLORS[p],emissive:PLR_COLORS[p],
+      emissiveIntensity:.4,transparent:true,opacity:.55
+    });
+    const hRing=new THREE.Mesh(ringGeo,mat);
+    hRing.position.set(hc[0],0.05,hc[1]);
+    hRing.rotation.x=Math.PI/2;
+    boardGrp.add(hRing);
+
+    const gMat=new THREE.MeshPhongMaterial({
+      color:PLR_COLORS[p],emissive:PLR_COLORS[p],
+      emissiveIntensity:.2,transparent:true,opacity:.3
+    });
+    const gRing=new THREE.Mesh(ringGeo,gMat);
+    gRing.position.set(gc[0],0.05,gc[1]);
+    gRing.rotation.x=Math.PI/2;
+    boardGrp.add(gRing);
+  }
+}
+
+function tipCentre(tip){
+  // Average cube coords of each 10-cell tip, then convert to 3D
+  // +z tip: avg cube (-3,_,6); +x: (6,_,-3); +y: (-3,_,-3)
+  // -z tip: avg cube (3,_,-6); -x: (-6,_,3); -y: (3,_,3)
+  switch(tip){
+    case 'pz': return hexTo3D(-3, 6);
+    case 'nz': return hexTo3D( 3,-6);
+    case 'px': return hexTo3D( 6,-3);
+    case 'nx': return hexTo3D(-6, 3);
+    case 'py': return hexTo3D(-3,-3);
+    case 'ny': return hexTo3D( 3, 3);
+  }
+  return [0,0];
+}
+
+function syncPieces(){
+  piecesGrp.clear();
+  piecesMap.clear();
+  for(const [key,val] of gBoard){
+    if(val===null) continue;
+    const [x,,z]=parseKey(key);
+    const [X3D,Z3D]=hexTo3D(x,z);
+    const grp=new THREE.Group();
+    grp.position.set(X3D,0.36,Z3D);
+
+    const sphere=new THREE.Mesh(GEO_SPHERE,matPiece[val]);
+    sphere.castShadow=true;
+    sphere.userData={key,player:val};
+    grp.add(sphere);
+
+    const rim=new THREE.Mesh(GEO_RIM,new THREE.MeshPhongMaterial({
+      color:0xFFFFFF,transparent:true,opacity:.22
+    }));
+    rim.rotation.x=Math.PI/2;
+    grp.add(rim);
+
+    grp.userData={key,player:val};
+    piecesGrp.add(grp);
+    piecesMap.set(key,grp);
+  }
+}
+
+function showHighlights(){
+  hiGrp.clear();
+  if(!gSelected) return;
+
+  const [sx,,sz]=parseKey(gSelected);
+  const [sX,sZ]=hexTo3D(sx,sz);
+  const selRing=new THREE.Mesh(GEO_SEL,matHiSel.clone());
+  selRing.position.set(sX,0.36,sZ);
+  selRing.userData={isSel:true};
+  hiGrp.add(selRing);
+
+  for(const [k,info] of gReachable){
+    const [rx,,rz]=parseKey(k);
+    const [rX,rZ]=hexTo3D(rx,rz);
+    const mat=info.isJump?matHiJump.clone():matHiStep.clone();
+    const hi=new THREE.Mesh(GEO_HI,mat);
+    hi.position.set(rX,0.07,rZ);
+    hi.userData={key:k,isTarget:true,...info};
+    hiGrp.add(hi);
+  }
+}
+
+function clearHighlights(){
+  hiGrp.clear();
+  gSelected=null;
+  gReachable=new Map();
+}
+
+// ═══════════════════════════════════════════
+//  ANIMATION
+// ═══════════════════════════════════════════
+
+function execMove(fromKey,toKey,path){
+  gBusy=true;
+  clearHighlights();
+
+  // fullPath: [from, ...intermediate+final positions from path]
+  const fullPath=[parseKey(fromKey),...path];
+  const grp=piecesMap.get(fromKey);
+  if(!grp){ finishMove(fromKey,toKey); return; }
+
+  let seg=0;
+  function animSeg(){
+    if(seg>=fullPath.length-1){ finishMove(fromKey,toKey); return; }
+    const [ax,,az]=fullPath[seg];
+    const [bx,,bz]=fullPath[seg+1];
+    const [aX,aZ]=hexTo3D(ax,az);
+    const [bX,bZ]=hexTo3D(bx,bz);
+    let t=0;
+    const FRAMES=16;
+    function frame(){
+      t++;
+      const f=t/FRAMES;
+      const ef=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; // ease in-out
+      grp.position.set(
+        aX+(bX-aX)*ef,
+        0.36+Math.sin(Math.PI*f)*0.7,
+        aZ+(bZ-aZ)*ef
+      );
+      if(t<FRAMES) requestAnimationFrame(frame);
+      else{ seg++; animSeg(); }
+    }
+    frame();
+  }
+  animSeg();
+}
+
+function finishMove(fromKey,toKey){
+  const p=gBoard.get(fromKey);
+  gBoard.set(fromKey,null);
+  gBoard.set(toKey,p);
+  syncPieces();
+  clearHighlights();
+  gBusy=false;
+  endTurn();
+}
+
+// ═══════════════════════════════════════════
+//  GAME FLOW
+// ═══════════════════════════════════════════
+
+function initGame(){
+  gBoard=new Map();
+  gWon=-1;
+  gBusy=false;
+  gSelected=null;
+  gReachable=new Map();
+
+  for(const [x,y,z] of ALL_POS){
+    let piece=null;
+    for(let p=0;p<gNumPlayers;p++){
+      if(inTip(x,y,z,getHomeTip(p,gNumPlayers))){ piece=p; break; }
+    }
+    gBoard.set(posKey(x,y,z),piece);
+  }
+
+  gTurn=0;
+  buildBoard();
+  syncPieces();
+  updateHUD();
+  if(gPlayerTypes[0]==='ai') setTimeout(doAITurn,700);
+}
+
+function piecesInGoal(p){
+  const gt=getGoalTip(p,gNumPlayers);
+  let n=0;
+  for(const [k,v] of gBoard){
+    if(v!==p) continue;
+    const [x,y,z]=parseKey(k);
+    if(inTip(x,y,z,gt)) n++;
+  }
+  return n;
+}
+
+function updateHUD(){
+  if(gWon>=0) return;
+  const isHuman=gPlayerTypes[gTurn]==='human';
+  document.getElementById('hud-turn').innerHTML=
+    `<span style="color:${PLR_CSS[gTurn]}">${PLR_NAMES[gTurn]}</span> 的回合`;
+  document.getElementById('hud-info').textContent=
+    isHuman?'點擊棋子選取，再點目標格移動':'電腦思考中⋯';
+
+  // Score bar
+  let html='';
+  for(let p=0;p<gNumPlayers;p++){
+    const n=piecesInGoal(p);
+    html+=`<div class="score-tag" style="border-color:${PLR_CSS[p]}60;color:${PLR_CSS[p]}">
+      ${PLR_NAMES[p]} ${n}/10</div>`;
+  }
+  document.getElementById('hud-scores').innerHTML=html;
+}
+
+function endTurn(){
+  if(checkWin(gBoard,gTurn)){ showWin(gTurn); return; }
+  gTurn=(gTurn+1)%gNumPlayers;
+  updateHUD();
+  if(gPlayerTypes[gTurn]==='ai') setTimeout(doAITurn,420);
+}
+
+function doAITurn(){
+  if(gBusy||gWon>=0) return;
+  gBusy=true;
+  const mv=aiPickMove(gBoard,gTurn);
+  if(!mv){ gBusy=false; endTurn(); return; }
+  execMove(mv.fromKey,mv.toKey,mv.path);
+}
+
+function showWin(p){
+  gWon=p;
+  document.getElementById('win-title').innerHTML=
+    `<span style="color:${PLR_CSS[p]}">🏆 ${PLR_NAMES[p]} 勝！</span>`;
+  document.getElementById('win-sub').textContent=
+    `${gPlayerTypes[p]==='human'?'恭喜玩家':'電腦'}率先將所有棋子移至對角！`;
+  document.getElementById('win-dlg').style.display='flex';
+}
+
+// ═══════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════
+
+function onCanvasClick(e){
+  if(gBusy||gWon>=0) return;
+  if(gPlayerTypes[gTurn]!=='human') return;
+
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+
+  // Check highlight targets first
+  if(gSelected){
+    const hits=raycaster.intersectObjects(hiGrp.children,false);
+    for(const h of hits){
+      if(h.object.userData.isTarget){
+        const info=gReachable.get(h.object.userData.key);
+        if(info){ execMove(gSelected,h.object.userData.key,info.path); return; }
+      }
+    }
+  }
+
+  // Check pieces
+  const phits=raycaster.intersectObjects(piecesGrp.children,true);
+  for(const h of phits){
+    const ud=h.object.userData;
+    const key=ud.key||(h.object.parent&&h.object.parent.userData.key);
+    const player=ud.player!==undefined?ud.player:(h.object.parent&&h.object.parent.userData.player);
+    if(key===undefined||player===undefined) continue;
+    if(player!==gTurn) continue;
+    if(gSelected===key){ clearHighlights(); return; }
+    gSelected=key;
+    const [x,y,z]=parseKey(key);
+    gReachable=getReachable(gBoard,x,y,z);
+    showHighlights();
+    return;
+  }
+
+  // Click empty area – deselect
+  clearHighlights();
+}
+
+// ═══════════════════════════════════════════
+//  CAMERA CONTROLS
+// ═══════════════════════════════════════════
+
+function updateCamera(){
+  const x=camR*Math.sin(camPhi)*Math.sin(camTheta);
+  const y=camR*Math.cos(camPhi);
+  const z=camR*Math.sin(camPhi)*Math.cos(camTheta);
+  camera.position.set(x,y,z);
+  camera.lookAt(0,0,0);
+}
+
+// ═══════════════════════════════════════════
+//  DIALOG LOGIC
+// ═══════════════════════════════════════════
+
+let dlgN=2;
+let dlgTypes=['human','ai','ai'];
+
+function setN(n){
+  dlgN=n;
+  document.getElementById('nb2').classList.toggle('sel',n===2);
+  document.getElementById('nb3').classList.toggle('sel',n===3);
+  renderRows();
+}
+
+function setType(p,t){
+  dlgTypes[p]=t; renderRows();
+}
+
+function renderRows(){
+  const el=document.getElementById('p-rows');
+  el.innerHTML='';
+  for(let p=0;p<dlgN;p++){
+    const row=document.createElement('div');
+    row.className='p-row';
+    row.innerHTML=`
+      <div class="dot" style="background:${PLR_CSS[p]};box-shadow:0 0 8px ${PLR_CSS[p]}"></div>
+      <div class="p-label" style="color:${PLR_CSS[p]}">${PLR_NAMES[p]}</div>
+      <div class="t-btns">
+        <button class="t-btn ${dlgTypes[p]==='human'?'sel':''}" onclick="setType(${p},'human')">人類</button>
+        <button class="t-btn ${dlgTypes[p]==='ai'?'sel':''}"    onclick="setType(${p},'ai')">電腦</button>
+      </div>`;
+    el.appendChild(row);
+  }
+}
+
+function startGame(){
+  gNumPlayers=dlgN;
+  gPlayerTypes=dlgTypes.slice(0,gNumPlayers).map(t=>t);
+  document.getElementById('dlg').style.display='none';
+  initGame();
+}
+
+function resetToMenu(){
+  document.getElementById('win-dlg').style.display='none';
+  document.getElementById('dlg').style.display='flex';
+  renderRows();
+}
+
+// ═══════════════════════════════════════════
+//  RENDER LOOP
+// ═══════════════════════════════════════════
+
+const clock=new THREE.Clock();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+
+  // Pulse highlight dots
+  for(const m of hiGrp.children){
+    if(m.userData.isTarget && m.material){
+      m.material.opacity=0.68+Math.sin(t*4.5)*0.2;
+    }
+  }
+
+  // Bob selected piece
+  if(gSelected && piecesMap.has(gSelected) && !gBusy){
+    const grp=piecesMap.get(gSelected);
+    if(grp) grp.position.y=0.36+Math.sin(t*4.8)*0.06;
+  }
+
+  // Slowly rotate zone marker rings
+  boardGrp.children.forEach(m=>{
+    if(m.geometry&&m.geometry.type==='TorusGeometry'){
+      m.rotation.z+=0.006;
+    }
+  });
+
+  renderer.render(scene,camera);
+}
+
+// ═══════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════
+
+initScene();
+renderRows();
+animate();
+
+</script>
+</body>
+</html>

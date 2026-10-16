@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 3 教師手冊：讓程式自己跑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📕 單元 3 教師手冊 <em>讓程式自己跑</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit3_student.html">學生版</a>
+      <a href="unit1_teacher.html">單元1</a>
+      <a href="unit2_teacher.html">單元2</a>
+      <a href="unit4_teacher.html">單元4</a>
+      <a href="unit5_teacher.html">單元5</a>
+      <a href="unit6_teacher.html">單元6</a>
+      <a href="unit7_teacher.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>單元 3 教師手冊</h1>
+    <p>對象：國小中高年級　·　時間：2 節（40 分鐘）　·　範圍：事件類 8 塊 ＋ 控制類 11 塊（核心 7 塊）　·　搭配：<a href="unit3_student.html">學生版實作單</a>、<a href="guide.html">積木圖鑑</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、教學目標</h3>
+    <ul class="tidy" style="font-size:.94rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>認知</b>：說明事件、循序、重複、選擇四種程式結構的差別。</li>
+      <li><b>技能</b>：把一串重複的積木改寫成迴圈，並用條件積木讓角色自己判斷。</li>
+      <li><b>思維</b>：能預測程式的執行順序，並在結果不符預期時說出可能原因。</li>
+    </ul>
+    <div class="note" style="margin-top:12px">這是整套教材的<b>轉捩點</b>：前兩課學生是「操作積木」，這一課才真正開始「<b>寫程式</b>」。建議放慢速度，寧可少做一個作品，也要確認學生理解迴圈。</div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、節次流程（兩節課）</h3>
+    <div class="tline"><div class="t">第1節<br>0–10′</div><div><b>對比引入</b>：投影學生版第 1 段。先跑「沒有重複」的十塊積木，再跑「有重複」的三塊，請學生說出差別。提問：「如果要走 100 步，哪一種比較好改？」</div></div>
+    <div class="tline"><div class="t">10–20′</div><div><b>認識 C 型積木</b>：強調積木要<b>夾在凹槽裡面</b>。用學生版第 4 段「自己拼拼看」現場示範放進去與放在外面的差別。</div></div>
+    <div class="tline"><div class="t">20–40′</div><div><b>完成作品 1</b>：會自己走路的角色（綠旗＋重複無限次）。這是本單元的核心產出。</div></div>
+    <div class="tline"><div class="t">第2節<br>0–10′</div><div><b>重複 N 次 vs 無限次</b>：跑作品 2 的倒數計時，讓學生看到「重複跑完之後才會執行下面的積木」。</div></div>
+    <div class="tline"><div class="t">10–30′</div><div><b>條件判斷</b>：完成作品 3。重點在「如果」要放進「重複無限次」裡面才會一直檢查。</div></div>
+    <div class="tline"><div class="t">30–40′</div><div><b>自由創作與分享</b>：完成挑戰任務，並請學生說明自己的迴圈裡放了什麼、為什麼。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、關鍵概念與學生迷思</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:24%">概念</th><th style="width:38%">學生常見迷思</th><th>教學建議</th></tr></thead>
+      <tbody>
+        <tr><td><b>事件是起跑線</b></td><td>寫好了一長串積木，按綠旗卻沒反應。</td><td>檢查最上面有沒有事件積木。強調事件積木<b>自己不做事</b>，只負責啟動。</td></tr>
+        <tr><td><b>積木要放進凹槽</b></td><td>把積木接在 C 型積木<b>下面</b>而不是<b>裡面</b>，所以只執行一次。</td><td>用學生版的「＋ 放進這裡面」示範兩者差異，這是本課最常見的錯誤。</td></tr>
+        <tr><td><b>兩種重複</b></td><td>用「重複無限次」做倒數計時，程式永遠停不了。</td><td>次數確定用「重複 N 次」，要一直做用「重複無限次」。並指出<b>無限次下面接不了積木</b>。</td></tr>
+        <tr><td><b>如果只檢查一次</b></td><td>單獨放一塊「如果」，以為它會一直監看。</td><td>「如果」是一個瞬間的判斷。要持續檢查，必須包在「重複無限次」裡。</td></tr>
+        <tr><td><b>等待的必要</b></td><td>動畫快到看不出來，以為程式沒跑。</td><td>請學生把等待從 0.2 秒改成 1 秒再改成 0.05 秒，親眼比較。</td></tr>
+        <tr><td><b>重複直到</b></td><td>以為條件成立時「立刻」跳出。</td><td>說明它是<b>每跑完一圈才檢查一次</b>；若一開始條件就成立，裡面一次都不會執行。</td></tr>
+        <tr><td><b>分身是另一個</b></td><td>以為分身會跟著本尊一起動。</td><td>分身有自己的程式（當分身產生），本尊的動作不會影響它。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、三個作品的教學提示</h3>
+    <div class="tline"><div class="t">作品 1<br>自己走路</div><div><b>教學重點</b>：迴圈＝動畫的引擎。四塊積木缺一不可（換造型、移動、反彈、等待）。<b>易錯</b>：忘記「碰到邊緣就反彈」，角色卡在牆邊；忘記「等待」，動畫快到看不清。<b>差異化</b>：進階者可加入「如果碰到邊緣就換背景」。</div></div>
+    <div class="tline"><div class="t">作品 2<br>倒數計時</div><div><b>教學重點</b>：有限迴圈<b>會結束</b>，結束後才輪到下面的積木。<b>易錯</b>：把「開始！」也放進迴圈裡，結果喊了三次。這個錯誤很好用，可以刻意示範讓學生找出原因。</div></div>
+    <div class="tline"><div class="t">作品 3<br>自己做決定</div><div><b>教學重點</b>：迴圈＋條件＝角色有了「反應能力」，這是遊戲 AI 的雛形。<b>易錯</b>：「如果」放在迴圈外面，只在一開始檢查一次；或忘了轉身導致角色卡在邊緣不斷觸發。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>五、差異化與延伸</h3>
+    <ul class="tidy" style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢</b>：只要求把「移動＋等待」放進「重複無限次」，看到角色會自己動就算達標。</li>
+      <li><b>提早完成</b>：挑戰「按空白鍵才前進」（重複無限次＋如果按下空白鍵），或用分身做子彈。</li>
+      <li><b>跨領域</b>：數學的規律與週期；生活中的循環（紅綠燈、洗衣機行程）；體育的節奏動作。</li>
+      <li><b>不插電</b>：用「動作卡片」排出一段舞蹈，把重複的段落圈起來寫成「重複 4 次」，體會迴圈的縮寫功能。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>六、評量規準</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:22%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>結構理解</b></td><td>能說明事件、重複、條件各自的角色與執行順序</td><td>能正確使用重複與條件完成作品</td><td>積木常放錯位置（凹槽外／迴圈外）</td></tr>
+        <tr><td><b>問題解決</b></td><td>程式不如預期時能自行定位到哪一塊出錯</td><td>經提示後能找到問題</td><td>需要逐步協助</td></tr>
+        <tr><td><b>創作表現</b></td><td>能自行設計並完成有互動的作品</td><td>能依步驟完成指定作品</td><td>僅能複製示範</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>七、關於小舞台的說明（與真實 Scratch 的差異）</h3>
+    <ul class="tidy" style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li>執行時<b>正在跑的積木會亮起來</b>，迴圈會顯示第幾圈，這是真實 Scratch 沒有的教學輔助。</li>
+      <li>右上角可調<b>執行速度</b>（慢／中／快），講解時建議用「慢」。</li>
+      <li><b>條件的六角形欄位</b>：小舞台提供四個現成條件（碰到邊緣、角色在右半邊、角色在上半邊、按下空白鍵）供快速試玩；
+        完成<a href="unit4_teacher.html">單元 4</a> 之後，也可以像真實 Scratch 一樣把<b>偵測或運算類積木放進這個欄位</b>。</li>
+      <li><b>事件積木</b>在小舞台裡是「標示起跑線」的作用，按綠旗執行整段腳本；按鍵、點擊、廣播、聲音響度等真實觸發請到 Scratch 裡體驗。</li>
+      <li><b>廣播</b>會在舞台上顯示一則提示橫幅，但因為只有一個角色，不會真的有其他角色回應。</li>
+      <li><b>分身</b>會在舞台上留下半透明的靜態複製品，用來理解「分身是另一個自己」；小舞台的分身<b>不會自己執行程式</b>。</li>
+      <li>無限迴圈有安全上限（2000 圈）並可隨時按紅色停止鈕中斷。</li>
+    </ul>
+  </div>
+
+  <footer>📕 單元 3 教師手冊　·　<a href="unit1_teacher.html">單元 1</a>　·　<a href="unit2_teacher.html">單元 2</a></footer>
+</div>
+</body>
+</html>

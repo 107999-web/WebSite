@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人工後製構想單｜AI 環保小創客</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .part-title { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; }
+    .part-title .n {
+      width: 32px; height: 32px; border-radius: 10px; background: var(--task); color: #fff;
+      display: grid; place-items: center; font-weight: 900;
+    }
+    .layouts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .layout-opt {
+      border: 2px solid var(--line); border-radius: 12px; padding: 8px; background: var(--surface);
+      cursor: pointer; font: inherit; font-size: .8rem; text-align: center;
+    }
+    .layout-opt.on { border-color: var(--task); background: color-mix(in srgb, var(--task) 8%, white); color: var(--ink); font-weight: 700; }
+    .mini { aspect-ratio: 3 / 4; border-radius: 6px; background: #f1f4f1; position: relative; overflow: hidden; margin-bottom: 6px; }
+    .mini i { position: absolute; display: block; border-radius: 3px; }
+    .mini .img { background: #9ed8bd; }
+    .mini .txt { background: #ff9d63; }
+    .mini .sub { background: #c5ccc7; }
+    .colors { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .colors input[type=color] { width: 54px; height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 3px; background: #fff; cursor: pointer; }
+    .scene-table input, .scene-table select, .scene-table textarea { padding: 6px 8px; font-size: .9rem; }
+    .scene-table textarea { min-height: 44px; }
+    .scene-table td { padding: 6px; }
+    .ratio-bar { display: flex; height: 34px; border-radius: 10px; overflow: hidden; font-size: .85rem; font-weight: 700; color: #fff; }
+    .ratio-bar div { display: flex; align-items: center; justify-content: center; transition: width .2s; white-space: nowrap; overflow: hidden; }
+    .ratio-bar .ai { background: #6b7bd6; }
+    .ratio-bar .me { background: var(--primary); }
+    input[type=range] { width: 100%; accent-color: var(--primary); }
+    .label-box { background: var(--surface-2); border: 1px dashed var(--line); border-radius: 10px; padding: 12px; font-size: .95rem; }
+    .asset-chips .chip { font-size: .82rem; }
+    @media (max-width: 700px) { .layouts { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+<header id="topnav"></header>
+
+<main class="page">
+  <div class="page-head">
+    <h1>✂️ 人工後製構想單</h1>
+    <p>AI 給的是素材，你的創意才能讓它變成作品。進 Canva 前先規劃，完成後說明「AI 做了什麼、我做了什麼」。</p>
+  </div>
+
+  <div class="tabs" id="workTabs"></div>
+
+  <div class="split">
+    <div id="planForm">
+      <!-- A. 進 Canva 前 -->
+      <div class="card card-top-bar">
+        <h3 class="part-title"><span class="n">A</span>進 Canva 前：我的構想</h3>
+
+        <div class="field">
+          <label>🤖 AI 給我的素材</label>
+          <div class="chips asset-chips" id="assetChips"></div>
+          <textarea data-p="aiAssets" rows="3" placeholder="例如：Gemini 第 3 版海報插圖（海龜和淨灘的孩子）"></textarea>
+          <span class="hint">點上面的按鈕，可以把歷程本裡評價最高的版本加進來。</span>
+        </div>
+
+        <div class="field">
+          <label>✋ 我要親手加入的元素 <span class="hint">（至少選 2 項）</span></label>
+          <div class="chips" data-p="myElements" data-multi="1" id="elementChips"></div>
+          <input type="text" data-p="otherElements" placeholder="其他：">
+        </div>
+
+        <!-- 海報專用 -->
+        <div data-only="poster">
+          <div class="row-2">
+            <div class="field"><label>📣 主標語 <span class="hint">（自己想的！）</span></label><input type="text" data-p="mainText" maxlength="30" placeholder="例如：少一個塑膠袋，多一片藍色海洋"></div>
+            <div class="field"><label>副標語／行動呼籲</label><input type="text" data-p="subText" maxlength="40" placeholder="例如：從自備購物袋開始"></div>
+          </div>
+          <div class="field">
+            <label>📐 版面配置</label>
+            <div class="layouts" id="layouts"></div>
+          </div>
+          <div class="field">
+            <label>🎨 配色 <span class="hint">（從 AI 圖片中挑出主色，讓文字和圖片搭配）</span></label>
+            <div class="colors">
+              <input type="color" data-p="color1" value="#0f9466" aria-label="主色">
+              <input type="color" data-p="color2" value="#38bdf8" aria-label="輔助色">
+              <input type="color" data-p="color3" value="#ff8a3d" aria-label="強調色">
+              <span class="small muted">主色 · 輔助色 · 強調色</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MV 專用 -->
+        <div data-only="mv">
+          <div class="field">
+            <label>🎬 MV 分鏡表</label>
+            <div class="table-wrap scene-table">
+              <table>
+                <thead><tr><th style="width:15%">段落</th><th>歌詞重點</th><th>畫面內容</th><th style="width:20%">素材來源</th><th></th></tr></thead>
+                <tbody id="scenes"></tbody>
+              </table>
+            </div>
+            <div class="btn-row" style="margin-top:8px"><button type="button" class="btn ghost sm" id="addScene">＋ 新增一段</button></div>
+          </div>
+          <div class="field"><label>🔤 字幕設計</label><input type="text" data-p="subtitle" placeholder="例如：白色粗體字、下方置中、跟著節拍一句一句出現"></div>
+        </div>
+
+        <!-- 網頁程式專用 -->
+        <div data-only="webapp">
+          <div class="field"><label>🧠 哪些是我自己決定的？</label><textarea data-p="decisions" rows="3" placeholder="例如：遊戲規則、題目內容、要有 5 個回收桶、答錯要出現說明……"></textarea></div>
+          <div class="field"><label>🧪 同學試玩的建議，我怎麼處理？</label><textarea data-p="testing" rows="3" placeholder="例如：同學說時間太短 → 我請 Gemini 把時間改成 90 秒"></textarea></div>
+        </div>
+      </div>
+
+      <!-- B. 完成後 -->
+      <div class="card card-top-bar" style="margin-top:16px">
+        <h3 class="part-title"><span class="n">B</span>完成後：誰做了什麼？</h3>
+        <div class="field">
+          <label>作品中 AI 的貢獻大約佔多少？</label>
+          <input type="range" min="0" max="100" step="5" data-p="aiPercent" value="50">
+          <div class="ratio-bar"><div class="ai" id="barAi"></div><div class="me" id="barMe"></div></div>
+        </div>
+        <div class="field">
+          <label class="req">我的貢獻</label>
+          <textarea data-p="myPart" rows="3" placeholder="具體說出你做了什麼，例如：自己想標語、重新排版、加入自己畫的手繪地球、調整配色"></textarea>
+        </div>
+        <div class="field">
+          <label>🔗 作品連結 <span class="hint">（Canva 或 Gemini 的分享連結）</span></label>
+          <input type="url" data-p="link" placeholder="https://">
+        </div>
+        <div class="field">
+          <label>🏷️ AI 使用標示 <span class="hint">（放在作品上，可以自己修改）</span></label>
+          <div class="label-box" id="aiLabel"></div>
+          <div class="btn-row" style="margin-top:8px"><button type="button" class="btn ghost sm" id="copyLabel">📋 複製標示文字</button></div>
+        </div>
+        <div class="field">
+          <label>💭 後製前後，作品最大的差別是什麼？</label>
+          <textarea data-p="reflect" rows="3"></textarea>
+        </div>
+        <p class="small" id="planSaved" style="color:var(--primary);min-height:1.2em"></p>
+      </div>
+    </div>
+
+    <!-- 右側小幫手 -->
+    <div class="sticky">
+      <div class="card" id="tipsCard"></div>
+      <div class="card tinted" style="margin-top:16px">
+        <h3>🧭 檢查清單</h3>
+        <div id="checklist" class="small"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  const E = window.Eco;
+  E.renderNav('postplan.html');
+  E.footer();
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const params = new URLSearchParams(location.search);
+  let work = E.WORKS[params.get('work')] ? params.get('work') : 'poster';
+
+  const TASK_COLOR = { poster: 'var(--t-poster)', mv: 'var(--t-suno)', webapp: 'var(--t-webapp)' };
+  const RELATED = { poster: ['poster'], mv: ['lyrics', 'suno', 'poster'], webapp: ['webapp'] };
+
+  const ELEMENTS = {
+    poster: ['自己想的標語', '重新排版', '調整配色', '自己畫的插圖或圖示', '自己拍的照片', '環保小知識或數據', '行動呼籲（QR code、口號）', 'AI 使用標示'],
+    mv: ['歌詞字幕', '自己拍的影片或照片', '自己畫的圖', '海報作品', '轉場效果', '片頭片尾', '剪輯節奏對拍', 'AI 使用標示'],
+    webapp: ['自己設計的遊戲規則', '自己出的題目', '自己畫的畫面草圖', '依試玩回饋修改', '調整難度', '修正錯誤內容', '加入操作說明', 'AI 使用標示']
+  };
+
+  const LAYOUTS = [
+    { id: 'top', name: '上標語・中大圖', html: '<i class="txt" style="left:12%;right:12%;top:6%;height:12%"></i><i class="img" style="left:8%;right:8%;top:24%;bottom:20%"></i><i class="sub" style="left:20%;right:20%;bottom:7%;height:7%"></i>' },
+    { id: 'full', name: '滿版圖・字壓圖', html: '<i class="img" style="inset:0"></i><i class="txt" style="left:10%;right:10%;top:10%;height:12%"></i><i class="sub" style="left:18%;right:18%;bottom:10%;height:7%;background:#fff"></i>' },
+    { id: 'side', name: '左圖・右文字', html: '<i class="img" style="left:6%;top:6%;bottom:6%;width:52%"></i><i class="txt" style="right:6%;top:18%;width:30%;height:22%"></i><i class="sub" style="right:6%;top:48%;width:30%;height:28%"></i>' },
+    { id: 'frame', name: '置中圖・外框', html: '<i class="sub" style="inset:4%;background:none;border:3px solid #9ed8bd"></i><i class="img" style="left:20%;right:20%;top:26%;height:40%;border-radius:50%"></i><i class="txt" style="left:14%;right:14%;top:9%;height:10%"></i><i class="sub" style="left:22%;right:22%;bottom:12%;height:7%"></i>' }
+  ];
+
+  const TIPS = {
+    poster: `<h3>🎨 Canva 海報小技巧</h3>
+      <ol class="small" style="padding-left:18px;margin:0">
+        <li>建立設計 → 選「海報」尺寸。</li>
+        <li>左側「上傳」→ 上傳 Gemini 的圖片，拖到頁面上。</li>
+        <li>用「文字」加入你的主標語，<strong>標語要夠大</strong>，3 公尺外也看得到。</li>
+        <li>字的顏色從圖片裡挑，看起來比較協調。</li>
+        <li>加入至少一樣<strong>自己做的元素</strong>（手繪、照片、圖示）。</li>
+        <li>角落放上 AI 使用標示，字小一點但要看得清楚。</li>
+      </ol>`,
+    mv: `<h3>🎬 Canva 音樂影片小技巧</h3>
+      <ol class="small" style="padding-left:18px;margin:0">
+        <li>建立設計 → 選「影片」。</li>
+        <li>上傳 Suno 下載的歌曲，拖到下方時間軸。</li>
+        <li>照著分鏡表，每一段歌詞放一頁畫面。</li>
+        <li>調整每頁的長度，讓畫面換場跟著<strong>節拍</strong>。</li>
+        <li>用「文字」加字幕，選好讀的字型和對比強的顏色。</li>
+        <li>片尾放上製作名單與 AI 使用標示。</li>
+      </ol>`,
+    webapp: `<h3>💻 網頁程式的「人工後製」</h3>
+      <ol class="small" style="padding-left:18px;margin:0">
+        <li>網頁程式的後製，就是<strong>測試、決定、修改</strong>。</li>
+        <li>自己玩三遍，把問題寫下來。</li>
+        <li>請兩位同學試玩，記下他們的建議。</li>
+        <li>內容（題目、說明）要自己檢查是否正確。</li>
+        <li>在 Gemini Canvas 按「分享」取得連結。</li>
+        <li>在程式畫面加上製作者與 AI 使用標示。</li>
+      </ol>`
+  };
+
+  // ---------- 分頁 ----------
+  $('#workTabs').innerHTML = Object.entries(E.WORKS).map(([k, w]) => `<button class="tab" data-work="${k}">${w.icon} ${w.name}</button>`).join('');
+  $('#workTabs').addEventListener('click', ev => {
+    const t = ev.target.closest('.tab');
+    if (!t) return;
+    flush();
+    work = t.dataset.work;
+    history.replaceState(null, '', `postplan.html?work=${work}`);
+    render();
+  });
+
+  // ---------- 讀寫 ----------
+  function collect() {
+    const d = {};
+    $$('#planForm [data-p]').forEach(el => {
+      if (el.closest('[data-only]') && el.closest('[data-only]').dataset.only !== work) return;
+      const k = el.dataset.p;
+      if (el.classList.contains('chips')) d[k] = E.getChips(el, true);
+      else if (el.type === 'range') d[k] = Number(el.value);
+      else d[k] = el.value;
+    });
+    if (work === 'poster') d.layout = E.getChips($('#layouts'));
+    if (work === 'mv') d.scenes = readScenes();
+    return d;
+  }
+  function fill(d) {
+    $$('#planForm [data-p]').forEach(el => {
+      const k = el.dataset.p;
+      if (el.classList.contains('chips')) E.setChips(el, d[k] || []);
+      else if (el.type === 'range') el.value = d[k] ?? 50;
+      else if (el.type === 'color') el.value = d[k] || el.defaultValue;
+      else el.value = d[k] || '';
+    });
+    if (work === 'poster') E.setChips($('#layouts'), d.layout || '');
+    if (work === 'mv') renderScenes(d.scenes);
+  }
+
+  let timer = null;
+  function flush() {
+    if (!timer) return;
+    clearTimeout(timer);
+    timer = null;
+    E.setPlan(work, collect());
+    $('#planSaved').textContent = `✅ 已自動儲存（${E.fmtTime(new Date().toISOString())}）`;
+    renderChecklist();
+  }
+  function autosave() {
+    clearTimeout(timer);
+    timer = setTimeout(flush, 500);
+    updateRatio();
+    updateLabel();
+  }
+  window.addEventListener('pagehide', flush);
+  $('#planForm').addEventListener('input', autosave);
+  $('#planForm').addEventListener('change', autosave);
+
+  // 版面配置
+  $('#layouts').innerHTML = LAYOUTS.map(l => `<button type="button" class="layout-opt chip" data-value="${l.id}"><div class="mini">${l.html}</div>${l.name}</button>`).join('');
+  E.bindChips($('#layouts'), { onChange: autosave });
+  E.bindChips($('#elementChips'), { multi: true, onChange: autosave });
+
+  // 分鏡表
+  const SOURCES = ['AI 生成圖片', '我的海報', '自己拍攝', '自己繪製', 'Canva 素材'];
+  const DEFAULT_SCENES = ['前奏', '主歌 1', '副歌', '主歌 2', '副歌', '結尾'].map(part => ({ part, lyric: '', visual: '', source: '' }));
+  function renderScenes(list) {
+    list = list && list.length ? list : DEFAULT_SCENES;
+    $('#scenes').innerHTML = list.map(s => `<tr>
+      <td><input type="text" data-s="part" value="${E.esc(s.part)}"></td>
+      <td><textarea data-s="lyric" rows="2">${E.esc(s.lyric)}</textarea></td>
+      <td><textarea data-s="visual" rows="2">${E.esc(s.visual)}</textarea></td>
+      <td><select data-s="source"><option value="">—</option>${SOURCES.map(o => `<option ${o === s.source ? 'selected' : ''}>${o}</option>`).join('')}</select></td>
+      <td><button type="button" class="btn ghost sm" data-del title="刪除這一段">✕</button></td></tr>`).join('');
+  }
+  function readScenes() {
+    return [...$('#scenes').rows].map(tr => {
+      const o = {};
+      tr.querySelectorAll('[data-s]').forEach(el => { o[el.dataset.s] = el.value; });
+      return o;
+    });
+  }
+  $('#addScene').addEventListener('click', () => {
+    const list = readScenes();
+    list.push({ part: '', lyric: '', visual: '', source: '' });
+    renderScenes(list);
+    autosave();
+  });
+  $('#scenes').addEventListener('click', ev => {
+    if (!ev.target.closest('[data-del]')) return;
+    ev.target.closest('tr').remove();
+    autosave();
+  });
+
+  // AI 素材：從歷程本挑選
+  function renderAssetChips() {
+    const tasks = RELATED[work];
+    const best = [];
+    tasks.forEach(t => {
+      const list = E.state.entries.filter(e => e.task === t);
+      if (!list.length) return;
+      const top = list.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0) || (b.version || 0) - (a.version || 0))[0];
+      best.push(top);
+    });
+    $('#assetChips').innerHTML = best.length ? best.map(e =>
+      `<button type="button" class="chip" data-id="${E.esc(e.id)}">＋ ${E.TASKS[e.task].name} 第 ${E.esc(e.version)} 版 ${e.rating ? E.starsText(e.rating) : ''}</button>`).join('')
+      : '<span class="small muted">歷程本裡還沒有相關紀錄</span>';
+  }
+  $('#assetChips').addEventListener('click', ev => {
+    const b = ev.target.closest('.chip');
+    if (!b) return;
+    const e = E.state.entries.find(x => x.id === b.dataset.id);
+    if (!e) return;
+    const ta = $('[data-p="aiAssets"]');
+    const line = `${e.platform}：${E.TASKS[e.task].name} 第 ${e.version} 版${e.response ? `（${e.response.slice(0, 40)}${e.response.length > 40 ? '…' : ''}）` : ''}`;
+    if (!ta.value.includes(line)) ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + line;
+    autosave();
+  });
+
+  // 比例條
+  function updateRatio() {
+    const ai = Number($('[data-p="aiPercent"]').value);
+    $('#barAi').style.width = ai + '%';
+    $('#barMe').style.width = (100 - ai) + '%';
+    $('#barAi').textContent = ai >= 15 ? `🤖 AI ${ai}%` : '';
+    $('#barMe').textContent = ai <= 85 ? `🙋 我 ${100 - ai}%` : '';
+  }
+
+  // AI 使用標示
+  function labelText() {
+    const p = E.state.profile;
+    const me = p.name ? `${p.cls ? p.cls + ' 班 ' : ''}${p.name}` : '（我的名字）';
+    return {
+      poster: `本海報插圖由 Google Gemini 生成；標語、版面與後製設計：${me}（Canva）`,
+      mv: `歌詞：${me} 與 Google Gemini 共同創作｜音樂：Suno AI 生成｜影片剪輯：${me}（Canva）`,
+      webapp: `遊戲設計與內容規劃：${me}｜程式由 Google Gemini Canvas 協助撰寫`
+    }[work];
+  }
+  function updateLabel() { $('#aiLabel').textContent = labelText(); }
+  $('#copyLabel').addEventListener('click', async () => {
+    E.toast(await E.copyText(labelText()) ? '📋 已複製標示文字' : '複製失敗，請手動選取', 'ok');
+  });
+
+  // 檢查清單
+  function renderChecklist() {
+    const d = E.getPlan(work);
+    const items = [
+      [!!(d.aiAssets || '').trim(), '列出 AI 給的素材'],
+      [((d.myElements || []).length + ((d.otherElements || '').trim() ? 1 : 0)) >= 2, '選出至少 2 項自己加入的元素'],
+      ...(work === 'poster' ? [[!!(d.mainText || '').trim(), '想好自己的主標語'], [!!d.layout, '選好版面配置']] : []),
+      ...(work === 'mv' ? [[(d.scenes || []).some(s => (s.visual || '').trim()), '完成分鏡表']] : []),
+      ...(work === 'webapp' ? [[!!(d.decisions || '').trim(), '寫下自己的設計決定'], [!!(d.testing || '').trim(), '記錄試玩回饋']] : []),
+      [!!(d.myPart || '').trim(), '說明我的貢獻'],
+      [!!(d.link || '').trim(), '貼上作品連結'],
+      [!!(d.reflect || '').trim(), '寫下後製反思']
+    ];
+    const done = items.filter(i => i[0]).length;
+    $('#checklist').innerHTML = `<p><b>${done} / ${items.length}</b> 完成</p>` +
+      items.map(([ok, t]) => `<div>${ok ? '✅' : '⬜'} ${t}</div>`).join('');
+  }
+
+  function render() {
+    $$('#workTabs .tab').forEach(t => t.classList.toggle('on', t.dataset.work === work));
+    $$('[data-only]').forEach(el => el.classList.toggle('hidden', el.dataset.only !== work));
+    document.querySelector('main').style.setProperty('--task', TASK_COLOR[work]);
+    $('#elementChips').innerHTML = ELEMENTS[work].map(x => `<button type="button" class="chip" data-value="${x}">${x}</button>`).join('');
+    $('#tipsCard').innerHTML = TIPS[work];
+    fill(E.getPlan(work));
+    renderAssetChips();
+    updateRatio();
+    updateLabel();
+    renderChecklist();
+    $('#planSaved').textContent = '';
+  }
+
+  document.addEventListener('eco:profile', updateLabel);
+  render();
+  if (!E.profileReady()) setTimeout(() => E.openProfile(), 400);
+})();
+</script>
+</body>
+</html>

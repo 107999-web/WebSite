@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>森林動物搬家記・教師版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/comp.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">📗 森林動物搬家記 <em>教師版</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">教師首頁</a>
+      <a class="on" href="anim.html">動畫組</a>
+      <a href="game.html">遊戲組</a>
+      <a href="../student/anim.html">↗ 學生版</a>
+      <a href="../student/ideas.html">↗ 情境卡</a>
+      <a href="../student/plan.html">↗ 進度表</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge">臺北市 115 年度貓咪盃・初賽　國小動畫 AI 互動組</span>
+    <h1>森林動物搬家記・教師手冊</h1>
+    <p>對象：國小高年級　·　建議時數：<b>6～8 節</b>（含作品產出）　·　先備：Scratch 基礎積木、變數與條件判斷　·　搭配：<a href="../student/anim.html">學生版</a></p>
+  </section>
+
+  <div class="tsec">
+    <h3>一、這一題在考什麼</h3>
+    <p style="font-size:.94rem;margin-top:6px">表面上是一部環境教育動畫，實際上四項任務各對應一個明確的程式能力。備課時建議直接用這張對照表來安排進度。</p>
+    <table class="rubric">
+      <thead><tr><th style="width:20%">題目任務</th><th style="width:26%">對應的程式能力</th><th>課堂上要確認學生會的事</th></tr></thead>
+      <tbody>
+        <tr><td><b>一</b>　三種生物＋三種環境問題</td><td>造型、背景、角色管理</td><td>會用<b>造型</b>和<b>背景</b>表現同一個場景的不同狀態，而不是做三張完全獨立的圖。</td></tr>
+        <tr><td><b>二</b>　頭部或手部互動</td><td>Handpose2Scratch／Facemesh2Scratch、條件判斷</td><td>知道積木<b>偵測不到時回傳空字串</b>，並且會先檢查再判斷。</td></tr>
+        <tr><td><b>三</b>　場景產生對應變化</td><td><b>變數</b>＋條件判斷</td><td>會把「森林狀態」抽象成幾個變數，再依變數改畫面——這是本題最核心的能力。</td></tr>
+        <tr><td><b>四</b>　至少兩種故事發展</td><td>如果…否則、廣播、自訂積木</td><td>會用一個數值把結局分流，而不是用一堆平行的「如果」。</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:12px">
+      <b>最容易被扣分的地方是任務三。</b>很多作品做得出「按了手勢有反應」，卻是把畫面寫死成幾張圖片切換，
+      沒有真正的狀態變數，於是「不適當的選擇要讓環境惡化」就做不出來。第一節課就把變數設計講清楚，後面會順很多。
+    </div>
+  </div>
+
+  <div class="tsec">
+    <h3>二、建議教學流程</h3>
+    <div class="tline"><div class="t">第1節</div><div><b>讀題與體驗</b>：先讓學生玩學生版第 2 段的森林模擬器，再回頭讀題目。<b>提問</b>：「為什麼種了三棵樹鳥才回來？這個 3 是誰決定的？」引出「條件要用數字寫」。接著完成四張任務檢核卡的討論。</div></div>
+    <div class="tline"><div class="t">第2節</div><div><b>變數設計（關鍵節）</b>：全班一起決定要幾個變數、範圍多少、每種生物的出現條件。<b>建議直接在黑板上畫一張表</b>，學生照抄進說明文件。這一節不寫程式也沒關係。</div></div>
+    <div class="tline"><div class="t">第3節</div><div><b>場景與造型</b>：把「樹木 0～6」做成六棵樹角色的顯示／隱藏，或做成一個角色的六個造型。水質用背景或造型變化表現。先做到<b>改變數 → 畫面就變</b>。</div></div>
+    <div class="tline"><div class="t">第4節</div><div><b>AI 互動（一）</b>：裝好擴充模組，先做最單純的「角色跟著食指尖跑」，確認鏡頭、光線、座位距離都沒問題。<b>務必先示範偵測不到手時會發生什麼事</b>。</div></div>
+    <div class="tline"><div class="t">第5節</div><div><b>AI 互動（二）</b>：加上門檻判斷與<b>旗標變數</b>（避免重複觸發）。學生版第 4 段的程式可以直接照抄改數字。這一節要留時間讓學生<b>實測門檻值</b>。</div></div>
+    <div class="tline"><div class="t">第6節</div><div><b>故事分支</b>：用健康度分出兩個結局，各做一個背景。行有餘力可再加中間結局。</div></div>
+    <div class="tline"><div class="t">第7～8節</div><div><b>完稿與說明文件</b>：對照學生版第 6 段的五張卡片逐項寫。<b>建議留一整節寫文件</b>，這是很多隊伍失分的地方。最後互相試玩、互評。</div></div>
+  </div>
+
+  <div class="tsec">
+    <h3>三、學生最常卡住的地方</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:24%">狀況</th><th style="width:34%">原因</th><th>處理方式</th></tr></thead>
+      <tbody>
+        <tr><td>角色突然飛到畫面中間</td><td>手離開鏡頭時積木回傳<b>空字串</b>，被當成 0</td><td>所有判斷前先確認偵測得到。臉部用「人數 ＞ 0」；手部可先存進變數再檢查是否等於空白。</td></tr>
+        <tr><td>手一舉起來就加了幾十棵樹</td><td>「重複無限次」每圈都成立，<b>同一個動作被重複判定</b></td><td>加旗標變數：觸發後設 1，回到預備姿勢才設回 0。學生版第 4 段有完整程式。</td></tr>
+        <tr><td>左右判斷相反</td><td>攝影機<b>鏡像</b>設定被改過</td><td>統一用預設的「鏡像開啟」，並在說明文件寫清楚。</td></tr>
+        <tr><td>在家裡好好的，到學校就不準</td><td>光線、鏡頭高度、背景雜物不同</td><td>門檻值不要寫死在腦中，<b>到比賽場地要再測一次</b>。可把門檻做成變數，方便現場調整。</td></tr>
+        <tr><td>兩個結局長得幾乎一樣</td><td>只改了一句台詞</td><td>要求兩條路<b>背景、角色、音效至少各差一項</b>，評審才看得出是兩種發展。</td></tr>
+        <tr><td>環境只會變好不會變壞</td><td>沒做「不適當的選擇」</td><td>題目明文要求。至少要有一個會讓數值往下掉的行動。</td></tr>
+        <tr><td>電腦很卡、動畫會頓</td><td>手部偵測吃資源</td><td>關掉其他分頁與程式；把攝影機透明度調高不會變快，但畫面比較看得清楚。</td></tr>
+        <tr><td>旁邊同學入鏡被偵測到</td><td>Facemesh 會抓到多張臉</td><td>拉開座位或加隔板；程式只取「第 1 人」。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>四、評分自檢表（可影印給學生互評）</h3>
+    <table class="rubric">
+      <thead><tr><th style="width:24%">向度</th><th>優秀</th><th>良好</th><th>待加強</th></tr></thead>
+      <tbody>
+        <tr><td><b>題目完整度</b></td><td>四項任務全部達成，且每一項都看得出用心</td><td>四項都有做到基本要求</td><td>有任務未完成（最常見是任務四）</td></tr>
+        <tr><td><b>互動穩定度</b></td><td>動作判定穩定，不會重複觸發，偵測不到也不會出錯</td><td>大致能操作，偶爾誤判</td><td>要試很多次才會成功，或會當掉</td></tr>
+        <tr><td><b>場景回饋</b></td><td>每個行動都有明顯且合理的畫面變化，惡化也做得出來</td><td>好的行動有變化</td><td>畫面幾乎沒變，或只有文字提示</td></tr>
+        <tr><td><b>故事完整性</b></td><td>兩條故事線都有鋪陳與結局，能傳達環境教育的意義</td><td>有兩種結局但差異小</td><td>只有一種結局</td></tr>
+        <tr><td><b>說明文件</b></td><td>互動方式、門檻值、分支條件都寫成具體數字，看得懂怎麼做的</td><td>有寫但偏簡略</td><td>只抄題目或空白</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tsec">
+    <h3>五、差異化與延伸</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li><b>進度較慢的組別</b>：只做<b>一種</b>互動動作（建議「手舉高＝種樹」），兩個結局，其餘用按鈕代替。仍然符合題目最低要求。</li>
+      <li><b>提早完成的組別</b>：加入第三種結局（中間值）、加入音效、把三種行動各做一個自訂積木讓主程式更好讀。</li>
+      <li><b>跨領域</b>：自然與生活科技的生態系與棲地概念；社會的環境保護議題；國語的故事結構（起承轉合）。</li>
+      <li><b>不插電</b>：先用紙卡做一次。三張「森林狀態卡」（樹木／水質／垃圾）放在黑板上，學生輪流出牌，全班一起更新數字並判斷動物回來了沒——這個活動能讓變數設計一次講清楚。</li>
+      <li><b>資訊倫理</b>：使用攝影機的作品，順便討論<b>影像不會被上傳</b>（模型在瀏覽器本機執行），以及為什麼要先徵得被拍攝者同意。</li>
+    </ul>
+  </div>
+
+  <div class="tsec">
+    <h3>六、課前環境檢查</h3>
+    <div class="self" id="chk"></div>
+  </div>
+
+  <div class="tsec">
+    <h3>七、關於這份教材的模擬</h3>
+    <ul style="font-size:.93rem;margin:6px 0 0;padding-left:1.2em">
+      <li>學生版的森林場景是<b>本教材自製的示範</b>，不是比賽作品範本。數值條件（樹 ≥ 3 等）也只是一組合理的例子，請要求學生<b>自己訂一組並寫進說明文件</b>。</li>
+      <li>AI 判定區<b>用滑鼠位置模擬手或鼻尖</b>（小舞台沒有攝影機）。座標範圍、空字串行為都與真實一致，可以直接拿來講解邏輯。</li>
+      <li>積木中文字沿用先前 <b>Handpose2Scratch／Facemesh2Scratch 教材</b>已驗證的介面用詞；擴充模組的積木顏色為近似值。</li>
+      <li>真實環境請到 <b>stretch3.github.io</b> 載入擴充功能，兩個模組都只需要一支網路攝影機。</li>
+    </ul>
+  </div>
+
+  <footer>📗 森林動物搬家記・教師版　·　臺北市 115 年度國民中小學 Scratch 貓咪盃競賽 初賽題目</footer>
+</div>
+
+<script>
+var CHK=[
+ '每台電腦都能開啟 <b>stretch3.github.io</b> 並成功載入擴充功能。',
+ '攝影機權限已允許，畫面出得來。',
+ '教室光線充足，學生臉部與手部不會逆光。',
+ '座位間距夠，隔壁同學不會入鏡。',
+ '已先用自己的電腦跑過一次，記下門檻值的大概範圍。',
+ '已準備好作品存檔與繳交的方式（.sb3 檔）。',
+ '已提醒學生攝影機影像<b>只在自己電腦上處理</b>，不會被上傳。'
+];
+(function(){
+  var h=document.getElementById('chk');
+  CHK.forEach(function(t){
+    var l=document.createElement('label');
+    l.innerHTML='<input type="checkbox"><span>'+t+'</span>';
+    h.appendChild(l);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 堂｜幽匿感測器：聽聲音的機關</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="14">
+<main class="wrap">
+
+<section class="hero" style="--u:#81C784">
+  <span class="tag">第 14 堂 ／ 單元3　感測與自動化</span>
+  <h1>幽匿感測器：聽聲音的機關 👂</h1>
+  <p>幽匿感測器（Sculk Sensor）會「聽」附近 8 格內的震動：走路、跳、扳拉桿、開門、活塞動作都算。聽到就發電，越近越強。今天做聲控門，也做一個「請保持安靜」的圖書館警報！</p>
+  <div class="chips"><span class="chip">🧱 幽匿感測器、羊毛、紅石粉、鐵門、音符盒、銅燈</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>知道幽匿感測器會偵測 8 格內的震動，越近訊號越強。</li><li>知道羊毛可以擋住震動、蹲下走路不會被聽到。</li><li>做出聲控門和安靜警報。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：全班安靜 10 秒挑戰：誰會先發出聲音？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：網頁：點不同位置發出聲音，訊號強度怎麼變？</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：聲控門：走近門就打開</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="20" data-label="第2節 應用 2"><b>20 分</b><div><b>應用 2</b>：圖書館安靜警報＋羊毛隔音實驗</div></div>
+<div class="slot" data-min="10" data-label="第2節 🦊 挑戰"><b>10 分</b><div><b>🦊 挑戰</b>：拍一下開、再拍一下關（感測器＋銅燈＋比較器）</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">👂</span><b>幽匿感測器</b>聽到 8 格內的震動就送出訊號約 1.5 秒；距離越近訊號越強。</div><div class="lc"><span class="ic">🧶</span><b>羊毛</b>震動碰到羊毛會被擋住；把感測器用羊毛圍起來就聽不到那一邊。</div><div class="lc"><span class="ic">🤫</span><b>偷偷走</b>蹲下（Shift）走路不會發出震動。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>感測器自己的電路（例如門打開的聲音）也會被它聽到，可能讓門一直開開關關——把門和感測器之間用羊毛隔開。</li><li>幽匿感測器在遊戲中要 1.19 以上版本才有；Minecraft Education 目前的版本都有。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：聲控門 🚪</h3></header>
+  <div class="items">🎒 準備物品：幽匿感測器、紅石粉、鐵門</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s14a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>放一扇鐵門，門前地板下面藏一個幽匿感測器。</li><li>感測器鋪紅石粉接到鐵門。</li><li>走近門 → 門自動打開；1.5 秒後關上。</li><li>試試蹲下走過去：門還會開嗎？</li></ol>
+  <div class="tip">💡 感測器聽到的範圍是圓形的，8 格內任何方向都聽得到。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出聲控門。</div><div class="lv f"><b>🦊 五、六年級</b>：用羊毛圍住感測器，只讓它聽到「門前面」的聲音。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：拍一下開、再拍一下關 👏</h3></header>
+  <div class="items">🎒 準備物品：幽匿感測器、銅燈、紅石比較器、紅石粉、鐵門、音符盒</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s14b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>先做「圖書館安靜警報」：感測器接音符盒，有人亂跑就響。</li><li>🦊 進階：感測器 → 紅石粉 → <b>銅燈</b> → 比較器 → 鐵門。</li><li>發出一次聲音（例如丟一顆雪球），門打開並保持；再一次聲音門才關。</li><li>想一想：為什麼需要上一堂的銅燈？</li></ol>
+  <div class="tip">💡 感測器訊號只有 1.5 秒，所以要有「記憶」（銅燈）門才能一直開著。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出安靜警報。</div><div class="lv f"><b>🦊 五、六年級</b>：做出拍一下開、拍一下關的門。</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：幽匿感測器要在遊戲裡「真的發出聲音」測試才有感覺，這堂專心實作和隔音實驗。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>生活中有哪些「聲控」的東西？（聲控燈、智慧音箱……）</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>網頁中用 🖐️ 點任何格子都算一次震動；距離越近訊號越強（簡化公式）。</li><li>幽匿感測器在深暗之域附近找得到，創造模式直接從物品欄拿即可；<b>不要</b>在社團世界放伏守者相關方塊（幽匿尖嘯體）。</li><li>全班同時測試時聲音很多，感測器會互相觸發，建議每人的建地相隔 10 格以上，或用羊毛圍牆。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s14a": {"title": "👂 應用 1：聲控門", "desc": "幽匿感測器聽到聲音會發電。鋪紅石粉接到鐵門，再用 🖐️ 點地上任何地方「走路發出聲音」。", "rows": ["Q:Q ? ? D:M . .", ". . . . . .", ". . . . . .", ". . . .:V . ."], "tools": ["dust"], "names": {"Q": "感測器", "M": "鐵門", "V": "腳步聲"}, "challenges": [{"name": "有聲音門就打開", "level": "🐣", "steps": [{"wait": 10}, {"vib": "V", "wait": 3, "settle": 0, "expect": {"M": true}}]}]}, "s14b": {"title": "🦊 挑戰：拍一下開、再拍一下關", "desc": "幽匿感測器的訊號只有 1.5 秒。接上銅燈（會記住）和比較器，讓門維持開著，下次有聲音才關。", "rows": ["Q:Q ? ? ? ? ? D:M", ". . . . . . .", ". . . . . . .", ". . . .:V . . ."], "tools": ["dust", "bulb", "comp"], "names": {"Q": "感測器", "M": "鐵門", "V": "拍手聲"}, "challenges": [{"name": "拍一下開門、再拍一下關門", "level": "🦊", "steps": [{"wait": 10}, {"vib": "V", "wait": 40, "expect": {"M": true}, "say": "拍手 → 過 4 秒門還開著"}, {"vib": "V", "wait": 40, "expect": {"M": false}, "say": "再拍手 → 門關上"}]}]}};
+window.QUIZ = [{"q": "幽匿感測器能聽到多遠的震動？", "o": ["3 格", "8 格", "64 格"], "a": 1, "why": "8 格內都聽得到。"}, {"q": "怎麼走路才不會被幽匿感測器聽到？", "o": ["跑步", "蹲下走", "跳著走"], "a": 1, "why": "蹲下走路不會發出震動。"}, {"q": "哪一種方塊可以擋住震動？", "o": ["羊毛", "玻璃", "石頭"], "a": 0, "why": "羊毛會擋住震動。"}, {"q": "想讓聲控門「一直開著」直到下一次聲音，要加什麼？", "o": ["銅燈＋比較器", "更多紅石粉", "中繼器"], "a": 0, "why": "要有記憶（銅燈）才能保持。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>單元 3：讓程式自己跑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🔁 單元 3 <em>讓程式自己跑</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="index.html">首頁</a>
+      <a href="guide.html">積木圖鑑</a>
+      <a href="unit1_student.html">單元1</a>
+      <a href="unit2_student.html">單元2</a>
+      <a class="on" href="unit3_student.html">單元3</a>
+      <a href="unit4_student.html">單元4</a>
+      <a href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>讓程式自己跑</h1>
+    <p>前兩課我們都是<b>按一下、動一下</b>。這一課要讓程式<b>按一次綠旗就自己跑完</b>：會重複、會等待、還會自己做判斷。</p>
+    <div class="goals">
+      <div><b>目標 1</b>　知道「事件積木」是程式的起跑線，會用綠旗和按鍵啟動程式。</div>
+      <div><b>目標 2</b>　會用「重複」把一串動作變成自動播放的動畫。</div>
+      <div><b>目標 3</b>　會用「如果…那麼」讓角色自己做決定。</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <section class="sec">
+        <h2><span class="n">1</span>一塊一塊按 vs 按一次就好</h2>
+        <p>下面兩段程式做的事情<b>一模一樣</b>，差別只在有沒有用「重複」。按按看，感受一下差別。</p>
+        <div class="work">
+          <h3>😩 沒有重複：要寫很多塊</h3>
+          <div id="demoA"></div>
+        </div>
+        <div class="work">
+          <h3>😎 有重複：三塊就搞定</h3>
+          <div id="demoB"></div>
+          <p style="font-size:.92rem;margin:8px 0 0">這就是<b>迴圈</b>的威力：把重複的事情交給電腦，程式又短又好改。想改成走 20 步？只要改一個數字。</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>這一課的積木</h2>
+        <p>事件積木是<b>啟動</b>用的、控制積木是<b>安排順序</b>用的。C 型積木（有凹槽的）要把別的積木<b>夾在裡面</b>才有用。</p>
+        <div id="blocks3"></div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>跟著做</h2>
+
+        <div class="work">
+          <h3>🚶 作品 1：會自己走路的角色</h3>
+          <ol>
+            <li>用<b>綠旗</b>啟動，先把角色歸位、方向擺正。</li>
+            <li>用<b>重複無限次</b>把「換造型、移動、碰到邊緣就反彈、等待」包起來。</li>
+            <li>角色就會自己在舞台上走來走去，永遠不停。</li>
+          </ol>
+          <div id="demo1"></div>
+          <p style="font-size:.9rem;color:var(--ink2);margin:8px 0 0">⏱ 這是無限迴圈，看夠了就按<b>紅色的停止</b>。</p>
+        </div>
+
+        <div class="work">
+          <h3>⏳ 作品 2：倒數計時</h3>
+          <ol>
+            <li>用<b>重複 3 次</b>，裡面放「說出…持續 1 秒」。</li>
+            <li>重複跑完之後，才會執行下面的積木。</li>
+            <li>這就是「重複幾次」和「重複無限次」最大的差別 —— 它<b>會結束</b>。</li>
+          </ol>
+          <div id="demo2"></div>
+        </div>
+
+        <div class="work">
+          <h3>🤔 作品 3：讓角色自己做決定</h3>
+          <ol>
+            <li>一直往前走，同時<b>一直檢查</b>有沒有碰到邊緣。</li>
+            <li><b>如果</b>碰到邊緣，<b>那麼</b>就轉身、說一句話。</li>
+            <li>「如果」一定要放在「重複無限次」裡面，才會一直檢查喔！</li>
+          </ol>
+          <div id="demo3"></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">4</span>自己拼拼看</h2>
+        <p>點下面的積木把它加進腳本，C 型積木加進去之後，記得點它裡面的「<b>＋ 放進這裡面</b>」再加下一塊。</p>
+        <div class="note" style="margin-bottom:12px">🔧 放錯位置別擔心！每塊積木右邊有四個小按鈕：<br>
+          <b>▲▼</b> 上下調整順序　·　<b>✥ 搬家</b>：先點它，再點想放的位置（可以搬進迴圈裡、也可以搬出來）　·　<b>✕</b> 刪除。</div>
+        <div class="quiz">
+          <div class="q">🧱 積木箱</div>
+          <div class="row" id="palette"></div>
+          <div class="list" id="mylist" style="max-height:none;margin-top:12px"></div>
+          <div class="runbar">
+            <button class="btn flag" id="run">🏳 執行</button>
+            <button class="btn stopb" id="stop">■ 停止</button>
+            <button class="btn ghost" id="clear">清空</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">5</span>挑戰任務</h2>
+        <div class="mission">
+          <div><span>⭐</span><div>把作品 1 的「等待」改成 0.05 秒和 1 秒，觀察走路速度的差別。</div></div>
+          <div><span>⭐⭐</span><div>做一個<b>按空白鍵才前進</b>的角色（提示：重複無限次 ＋ 如果按下空白鍵）。</div></div>
+          <div><span>⭐⭐⭐</span><div>做一個<b>會自己巡邏的守衛</b>：走到邊緣就轉身，碰到邊緣時說「站住！」。</div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">6</span>我學會了嗎</h2>
+        <div class="self">
+          <label><input type="checkbox"><span>我知道<b>事件積木</b>（當綠旗被點擊）是程式的起跑線，一定要放在最上面。</span></label>
+          <label><input type="checkbox"><span>我知道積木要<b>放進 C 型的凹槽裡面</b>才會被重複。</span></label>
+          <label><input type="checkbox"><span>我分得出「<b>重複 10 次</b>」會結束、「<b>重複無限次</b>」不會結束。</span></label>
+          <label><input type="checkbox"><span>我知道「<b>如果…那麼</b>」只檢查一次，要一直檢查就得放進重複裡。</span></label>
+          <label><input type="checkbox"><span>我知道動畫沒有「<b>等待</b>」會快到看不清楚。</span></label>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台</h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">x 座標</div><div class="v" id="rx">0</div></div>
+          <div><div class="k">y 座標</div><div class="v" id="ry">0</div></div>
+          <div><div class="k">方向</div><div class="v" id="rd">90</div></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" id="optArrow" checked> 方向箭頭</label>
+          <label style="display:flex;align-items:center;gap:5px">速度
+            <select id="speed" style="border:2px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--paper);color:var(--ink);font-family:var(--f-round);font-weight:700">
+              <option value="480">慢</option><option value="260" selected>中</option><option value="90">快</option>
+            </select>
+          </label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設角色</button>
+        </div>
+        <div class="note">執行時，正在跑的那一塊積木會<b>亮起來</b>，迴圈還會顯示現在是第幾圈。</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>🔁 單元 3・讓程式自己跑　·　上一課：<a href="unit2_student.html">單元 2 說話與變裝</a>　·　下一課：<a href="unit4_student.html">單元 4 讓角色有感覺</a></footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+Stage.init(document.getElementById('stage'));
+UI.bindReadout({x:'rx',y:'ry',dir:'rd'});
+Stage.reset();
+document.getElementById('reset').addEventListener('click',function(){UI.stopAll();Stage.reset();});
+document.getElementById('optArrow').addEventListener('change',function(e){Stage.setArrow(e.target.checked);});
+document.getElementById('speed').addEventListener('change',function(e){UI.setSpeed(Number(e.target.value));});
+
+/* 1. 對比示範 */
+UI.script([
+  {id:'gotoxy',args:{X:-150,Y:0}},{id:'pointdir',args:{DIR:90}},
+  {id:'move',args:{STEPS:20}},{id:'move',args:{STEPS:20}},{id:'move',args:{STEPS:20}},
+  {id:'move',args:{STEPS:20}},{id:'move',args:{STEPS:20}},{id:'move',args:{STEPS:20}},
+  {id:'move',args:{STEPS:20}},{id:'move',args:{STEPS:20}},{id:'move',args:{STEPS:20}},
+  {id:'move',args:{STEPS:20}}
+],document.getElementById('demoA'),'▶ 看示範');
+
+UI.script([
+  {id:'gotoxy',args:{X:-150,Y:0}},{id:'pointdir',args:{DIR:90}},
+  {id:'repeat',args:{N:10},body:[{id:'move',args:{STEPS:20}}]}
+],document.getElementById('demoB'),'▶ 看示範');
+
+/* 2. 積木試玩 */
+var host=document.getElementById('blocks3');
+['whenflag','whenkey','wait','repeat','forever','ifthen','stop','createclone','deleteclone']
+  .forEach(function(id){UI.tryRow(id,host);});
+
+/* 3. 三個作品 */
+UI.script([
+  {id:'whenflag'},
+  {id:'gotoxy',args:{X:-120,Y:-40}},{id:'rotstyle',args:{STYLE:'左-右'}},{id:'pointdir',args:{DIR:90}},
+  {id:'forever',body:[
+    {id:'nextcostume'},{id:'move',args:{STEPS:12}},{id:'bounce'},{id:'wait',args:{SECS:0.2}}
+  ]}
+],document.getElementById('demo1'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'repeat',args:{N:3},body:[
+    {id:'sayfor',args:{MSG:'預備…',SECS:1}}
+  ]},
+  {id:'sayfor',args:{MSG:'開始！',SECS:1}}
+],document.getElementById('demo2'),'🏳 執行');
+
+UI.script([
+  {id:'whenflag'},
+  {id:'gotoxy',args:{X:0,Y:0}},{id:'pointdir',args:{DIR:90}},{id:'rotstyle',args:{STYLE:'左-右'}},
+  {id:'forever',body:[
+    {id:'move',args:{STEPS:15}},
+    {id:'ifthen',args:{COND:'碰到邊緣'},body:[
+      {id:'turnright',args:{DEG:180}},
+      {id:'sayfor',args:{MSG:'換邊！',SECS:0.6}}
+    ]}
+  ]}
+],document.getElementById('demo3'),'🏳 執行');
+
+/* 4. 自己拼拼看 */
+var builder=UI.Builder(document.getElementById('mylist'),'積木箱點一下就會加進來。');
+var PAL=['whenflag','forever','repeat','ifthen','move','turnright','nextcostume','wait','bounce','sayfor'];
+var pal=document.getElementById('palette');
+PAL.forEach(function(id){
+  var b=UI.byId(id); if(!b)return;
+  var btn=document.createElement('button');
+  btn.className='btn ghost sm';
+  btn.textContent=b.parts.map(function(p){
+    return (p.t==='txt'||p.t==='ico')?p.v:(p.t==='num'||p.t==='drop'||p.t==='str'||p.t==='cond')?String(p.v):'';
+  }).join(' ').replace(/\s+/g,' ').trim();
+  btn.style.borderColor='var(--c-'+(b.cat==='control'?'control':b.cat==='events'?'events':b.cat)+')';
+  btn.addEventListener('click',function(){
+    var args={};
+    b.parts.forEach(function(p){if(p.k)args[p.k]=p.v;});
+    builder.add(b,args);
+  });
+  pal.appendChild(btn);
+});
+document.getElementById('run').addEventListener('click',function(){
+  var t=this;t.disabled=true;builder.run(function(){t.disabled=false;});
+});
+document.getElementById('stop').addEventListener('click',function(){
+  builder.stop();document.getElementById('run').disabled=false;
+});
+document.getElementById('clear').addEventListener('click',function(){builder.clear();});
+</script>
+</body>
+</html>

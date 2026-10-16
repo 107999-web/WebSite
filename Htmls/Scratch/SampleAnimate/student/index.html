@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>森林動物搬家記・溪流上游 製作教學</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/forest.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🐸 森林動物搬家記 <em>溪流上游・製作教學</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="doc.html">📄 程式說明文件</a>
+      <a href="#ch9">自我檢核</a>
+      <a href="森林動物搬家記_溪流上游.sb3" download>⬇ 範例 .sb3</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge" style="display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:999px;margin-bottom:10px">貓咪盃・國小動畫 AI 互動組　情境 1</span>
+    <h1>溪流上游，最後一窪水</h1>
+    <p>用<b>青蛙的視角</b>說故事：牠住的水潭一天比一天淺，同伴一隻隻不見了。<br>
+      觀看者用<b>手部動作</b>參與復育——撈起垃圾、種回溪邊的樹、張開手掌擋住偷倒的廢水。
+      做得好，水變清、動物回來；來不及擋住，水質就會變差。</p>
+    <div class="warn" style="max-width:48em"><b class="t">這份教學怎麼用　</b>每一章都先說「<b>為什麼要這樣做</b>」，再給積木，中間有可以動手玩的小實驗。
+      卡片上的<b>數值都可以改</b>，但改完要寫進<a href="doc.html">程式說明文件</a>。</div>
+  </section>
+
+  <div class="layout">
+    <nav class="toc" id="toc" aria-label="目錄">
+      <h3>目錄</h3>
+      <a href="#ch0">0　故事與題目對照</a>
+      <a href="#ch1">1　流程、角色與變數</a>
+      <a href="#ch2">2　準備與座標測試</a>
+      <a href="#ch3">3　三個動作怎麼判斷</a>
+      <a href="#ch4">4　預備姿勢：不重複判定</a>
+      <a href="#ch5">5　行動會改變什麼</a>
+      <a href="#ch6">6　兩種事件：環境惡化</a>
+      <a href="#ch7">7　畫面跟著變</a>
+      <a href="#ch8">8　主流程與三種結局</a>
+      <a href="#ch9">9　測試、挑戰與檢核</a>
+      <a class="sub" href="doc.html">📄 程式說明文件</a>
+      <div class="prog">自我檢核進度</div>
+      <div class="pbar"><i id="pbar"></i></div>
+    </nav>
+
+    <main>
+<!-- ============ 0 ============ -->
+<section class="chap" id="ch0">
+  <div class="ch"><span class="cn" style="background:#CFEFE2">第 0 章</span><h2>故事與題目對照</h2></div>
+  <p class="lead">先確認：題目要求的每一項，我們的故事裡都有。這一頁可以直接抄進說明文件。</p>
+
+  <div class="topic">
+    <h3>三種生物、三種環境問題</h3>
+    <div class="cards3">
+      <div><b>🐸 青蛙</b><span>故事的主角，水潭越來越淺，同伴一隻隻離開</span></div>
+      <div><b>🐦 翠鳥</b><span>水乾淨、岸上有樹才會回來停棲</span></div>
+      <div><b>🦟 水蠆（蜻蜓幼蟲）</b><span>對水質最敏感，被廢水污染就消失</span></div>
+      <div><b>🗑️ 垃圾淤積</b><span>寶特瓶、塑膠袋、罐頭卡在溪床；遊戲中還會有人再丟進來</span></div>
+      <div><b>🌳 溪邊的樹被砍</b><span>沒有遮蔭，太陽直曬、水溫升高、水變少</span></div>
+      <div><b>🏭 偷倒廢水</b><span>半夜有人把廢水排進溪裡，水質一次掉很多</span></div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <h3>三個互動動作（全部用手部）</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>動作</th><th>怎麼判斷</th><th>做了會怎樣</th></tr>
+      <tr><td><b>手放低</b>（預備姿勢）</td><td>手腕 y &lt; −40</td><td>把 <code class="v">可以觸發</code> 設回 1，才能做下一個動作</td></tr>
+      <tr><td><b>手舉高</b>＝種樹</td><td>手腕 y &gt; 80</td><td><code class="v">遮蔭</code> +1（最多 8；種滿了青蛙會說「樹已經夠多了」）</td></tr>
+      <tr><td><b>從左揮到右</b>＝撈垃圾</td><td>手腕 x &lt; −80 之後再 &gt; 80（2 秒內；手掌張開、中途手掉下來或掃過舉高都還算）</td><td><code class="v">垃圾</code> −1、<code class="v">水質</code> +5；已經撈乾淨時青蛙會說一句話</td></tr>
+      <tr><td><b>張開手掌</b>＝擋住廢水</td><td><b>手在畫面中間</b>，而且食指尖 x 與小指尖 x 相差 &gt; 90</td><td>偷倒事件中擋下來，水質不會掉</td></tr>
+    </table></div>
+    <div class="why"><b class="t">為什麼選這三個動作　</b>題目建議「優先選擇容易穩定判斷的動作」。
+      手舉高、左右揮、張開手掌都是<b>大動作</b>，只要比大小就分得出來，不需要複雜的數學。</div>
+  </div>
+
+  <div class="topic">
+    <h3>逐條對照題目</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>題目任務</th><th>我們的做法</th></tr>
+      <tr><td>一、至少三種森林生物＋三種環境問題</td><td>青蛙、翠鳥、水蠆；垃圾（會有人亂丟）、沒有樹蔭、偷倒廢水——三個問題在遊戲中都會「動起來」</td></tr>
+      <tr><td>二、至少一種頭部或手部互動參與復育</td><td>三種手部動作：撈垃圾、種樹、擋住廢水</td></tr>
+      <tr><td>三、完成行動後場景要變化；不適當的選擇要讓環境惡化</td><td>水質高 → 水變清、水草變多、水蠆與翠鳥回來；沒擋下偷倒 → 水質 −20、垃圾 +1、水蠆消失；有人亂丟垃圾 → 垃圾 +2、水質 −3</td></tr>
+      <tr><td>四、至少兩種故事發展</td><td>好結局、普通結局、壞結局共三種</td></tr>
+      <tr><td>程式說明文件</td><td>見 <a href="doc.html">程式說明文件</a>（可填寫、可列印）</td></tr>
+      <tr><td>動作之間要能判斷回到預備姿勢</td><td><code class="v">可以觸發</code> 旗標，見第 4 章</td></tr>
+    </table></div>
+  </div>
+
+  <div class="dlcard">
+    <div class="ic">📦</div>
+    <div><b>完成版範例：森林動物搬家記_溪流上游.sb3</b><small>所有角色、造型、音效與程式都做好了，重要的程式旁邊都有中文註解。<br>請用 stretch3.github.io 開啟（檔案 → 從你的電腦挑選）。</small></div>
+    <a class="btn" href="森林動物搬家記_溪流上游.sb3" download>下載範例</a>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="ch1">
+  <div class="ch"><span class="cn" style="background:#FFE7C7">第 1 章</span><h2>流程、角色與變數</h2></div>
+
+  <div class="topic">
+    <h3>故事流程</h3>
+    <div class="flow2">
+      <div class="st">開場<small>青蛙說故事</small></div><span class="ar">→</span>
+      <div class="st a">說明<small>三個動作</small></div><span class="ar">→</span>
+      <div class="st b">4 個回合<small>每回合 12 秒<br>隨機 2 個回合偷倒<br>另 1 個回合亂丟垃圾</small></div><span class="ar">→</span>
+      <div class="st c">回合結束<small>自然變化</small></div><span class="ar">→</span>
+      <div class="st d">結局<small>好／普通／壞</small></div>
+    </div>
+    <p>用變數 <code class="v">階段</code> 記住現在是「開場、行動、結局」，角色就知道自己要不要動。</p>
+  </div>
+
+  <div class="topic">
+    <h3>角色分工</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>角色</th><th>負責什麼</th></tr>
+      <tr><td><b>舞台</b></td><td>主流程、抽事件回合、回合計時、三個動作的結果、兩種事件、回合結束的自然變化</td></tr>
+      <tr><td><b>手勢偵測</b></td><td>把手的座標變成「預備／舉高／左／右／張開」，並廣播動作</td></tr>
+      <tr><td><b>青蛙</b></td><td>開場旁白、回合提示、依水質換表情、三種結局的台詞</td></tr>
+      <tr><td><b>翠鳥・水蠆</b></td><td>依水質與遮蔭決定出現或消失</td></tr>
+      <tr><td><b>水面・水草</b></td><td>水質越好，水潭越大越清澈、水草越多</td></tr>
+      <tr><td><b>垃圾</b></td><td>6 個分身，「垃圾」是多少就顯示幾個</td></tr>
+      <tr><td><b>小樹</b></td><td>8 個分身，位置用編號算出來；「遮蔭」是多少就顯示幾棵，遮蔭 ≥ 3 換成大樹</td></tr>
+      <tr><td><b>廢水管・防護罩</b></td><td>偷倒事件；擋下來時出現防護罩</td></tr>
+      <tr><td><b>提示・結局卡</b></td><td>文字卡：說明、快擋住、擋下了、太慢了、三種結局</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic">
+    <h3>變數表（數值可以自己改，但要寫進說明文件）</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>變數</th><th>範圍</th><th>一開始</th><th>意思</th></tr>
+      <tr><td><code class="v">水質</code></td><td>0～100</td><td>45</td><td>水乾不乾淨，決定畫面與結局</td></tr>
+      <tr><td><code class="v">垃圾</code></td><td>0～6</td><td>5</td><td>溪床上的垃圾數量</td></tr>
+      <tr><td><code class="v">遮蔭</code></td><td>0～8</td><td>1</td><td>溪邊的樹，越多水溫越低</td></tr>
+      <tr><td><code class="v">手勢</code> <code class="v">可以觸發</code> <code class="v">揮動階段</code> <code class="v">揮動時間</code></td><td>—</td><td>無／0／0／0</td><td>第 3、4 章的動作判斷；<code class="v">揮動時間</code> 用來判斷揮動有沒有超過 2 秒</td></tr>
+      <tr><td><code class="v">偷倒中</code> <code class="v">擋下成功</code> <code class="v">擋下次數</code></td><td>0／1</td><td>0</td><td>偷倒事件用</td></tr>
+      <tr><td><code class="v">水蠆在</code></td><td>0／1</td><td>1</td><td>水蠆有沒有被污染趕走</td></tr>
+      <tr><td><code class="v">偷倒回合A</code> <code class="v">偷倒回合B</code> <code class="v">垃圾回合</code></td><td>1～4</td><td>開始時抽</td><td>這一局哪幾個回合會發生事件，每次玩都不一樣</td></tr>
+      <tr><td><code class="v">階段</code> <code class="v">回合</code> <code class="v">結局</code></td><td>—</td><td>開場／0／空白</td><td>流程控制</td></tr>
+      <tr><td><code class="v">編號</code> <code class="v">計數</code>（僅適用當前角色）</td><td>—</td><td>0</td><td>垃圾、小樹的分身各自記住自己是第幾個</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="ch2">
+  <div class="ch"><span class="cn" style="background:#D6F5E8">第 2 章</span><h2>準備與座標測試</h2></div>
+  <div class="topic">
+    <h3>① 開啟環境</h3>
+    <ol>
+      <li>用 <b>Chrome</b> 打開 <b>stretch3.github.io</b>（不是 Scratch 官網）。</li>
+      <li>左下角「添加擴展」→ 選有一隻手的 <b>Handpose2Scratch</b>。</li>
+      <li>瀏覽器問攝影機權限 → 按「<b>允許</b>」。</li>
+    </ol>
+  </div>
+  <div class="topic">
+    <h3>② 先看懂座標：手舉高，y 會變大</h3>
+    <div class="bscript" data-blk="setupTest"></div>
+    <p>舞台的 y 座標從下面的 −180 到上面的 180。把手舉到頭旁邊，y 大約會是 <b>80～150</b>；
+      手放到胸口以下，大約是 <b>−60 以下</b>。這就是我們門檻的由來。</p>
+    <div class="warn"><b class="t">每個人的攝影機高度不一樣　</b>請先照上面的程式測一次，把自己的數字記下來，
+      再把第 3 章的 <b>−40</b> 和 <b>80</b> 換成適合自己的值，並寫進說明文件。</div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="ch3">
+  <div class="ch"><span class="cn" style="background:#E3DBFF">第 3 章</span><h2>三個動作怎麼判斷</h2></div>
+  <p class="lead">AI 只給我們 21 個點的座標，「看懂動作」的規則要自己寫。這裡只用<b>加減和比大小</b>。</p>
+
+  <div class="topic lab" id="lab-h">
+    <div class="lh"><h3>🔬 動作判斷實驗室</h3><span class="tag">拖曳黃色的手</span></div>
+    <p>拖曳畫面上的手（那是<b>手腕</b>的位置），再拉下面的「張開幅度」，看看電腦會判斷成哪一個動作。</p>
+    <div class="hlab">
+      <div class="hstage" id="hStage">
+        <div class="zone" id="zHigh"><span>手腕 y = 80：再上去就是「舉高」</span></div>
+        <div class="zone" id="zLow"><span>手腕 y = −40：再下去就是「預備」</span></div>
+        <div class="hand" id="hHand">手腕</div>
+        <div class="lab" id="hLab">中間</div>
+      </div>
+      <div>
+        <div class="readout2">
+          <div><div class="k">手腕 x</div><div class="v" id="hx">0</div></div>
+          <div><div class="k">手腕 y</div><div class="v" id="hy">0</div></div>
+          <div><div class="k">張開幅度</div><div class="v" id="hs">40</div></div>
+        </div>
+        <div class="ctrl"><label>張開幅度（食指尖 x － 小指尖 x）
+          <input type="range" id="hSpread" min="10" max="180" step="5" value="40"> <output id="hSpreadO">40</output></label></div>
+        <ul class="steps3" id="hSteps">
+          <li data-s="1">① 手腕 y &lt; −40 → <b>預備</b></li>
+          <li data-s="2">② 手腕 y &gt; 80 → <b>舉高</b>（種樹）</li>
+          <li data-s="3">③ 手腕 x &lt; −100 → <b>左</b>；x &gt; 100 → <b>右</b>（左揮到右＝撈垃圾）</li>
+          <li data-s="4">④ 手在中間，而且張開幅度 &gt; 90 → <b>張開</b>（擋住）</li>
+          <li data-s="5">⑤ 其他 → <b>中間</b>（不做事）</li>
+        </ul>
+        <div class="bigres">判斷結果：<span id="hRes">中間</span></div>
+      </div>
+    </div>
+    <div class="why"><b class="t">判斷順序很重要　</b>先問「是不是預備」，再問「是不是舉高」，接著看「在左邊還是右邊」，
+      <b>都不是（手在中間）才看手掌有沒有張開</b>。<br>
+      順序如果排錯，程式就會怪怪的：把「張開」排在左右前面，玩家<b>張著手掌揮手</b>時會一路被判成「張開」，
+      揮到右邊也不會被認成「右」，<b>垃圾就永遠撈不起來</b>——這是我們實測到的真實災情。
+      把「預備」排到最後也一樣會出事：手放低時可能被當成「左」或「右」而亂觸發。</div>
+    <div class="warn"><b class="t">自己驗證一次　</b>在上面的實驗室把手拖到最左邊，然後把「張開幅度」拉到 180（手掌全開）——
+      結果應該還是<b>左</b>。如果變成「張開」，就表示判斷順序排錯了。</div>
+  </div>
+
+  <div class="topic">
+    <h3>積木：定義「辨識手勢」</h3>
+    <div class="bscript" data-blk="classify"></div>
+    <div class="warn"><b class="t">偵測不到手時是「空白」，不是 0　</b>手離開鏡頭時，積木回傳空字串。
+      所以最外面要先用「<b>手腕 (1) 的 x 座標 &gt; −250</b>」確認看得到手，再做後面的判斷。</div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="ch4">
+  <div class="ch"><span class="cn" style="background:#FFE3C2">第 4 章</span><h2>預備姿勢：避免同一個動作被重複判定</h2></div>
+  <p class="lead">這是題目<b>明文要求</b>的事。電腦每秒判斷很多次，手舉著不動就會種出幾十棵樹。</p>
+
+  <div class="topic">
+    <h3>做法：用一個旗標變數 <code class="v">可以觸發</code></h3>
+    <ul>
+      <li>看到<b>預備</b>（手放低）→ <code class="v">可以觸發</code> 設為 1</li>
+      <li>做完一個動作 → <code class="v">可以觸發</code> 設為 0</li>
+      <li>所以手一直舉著也只會種一棵樹，要<b>把手放低再舉一次</b>才會種第二棵</li>
+    </ul>
+    <div class="warn"><b class="t">不要用「等待 2 秒」代替　</b>那不是狀態機，說明文件寫不出判斷方式，而且玩家會不知道要等多久。</div>
+  </div>
+
+  <div class="topic">
+    <h3>⚠️ 揮手要「撐得住」：真人不會揮出一條直線</h3>
+    <p>這是我們實際測出來、最容易卡住學生的一個坑。用真人的揮手軌跡去跑，電腦看到的手勢是這樣：</p>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>揮手方式</th><th>電腦實際看到的手勢</th><th>舊寫法的結果</th></tr>
+      <tr><td>水平直線揮過去</td><td>預備 → 左 → 中間 → 右</td><td>✅ 撈得到</td></tr>
+      <tr><td>揮到一半手自然往下掉</td><td>預備 → 左 → <b>預備</b> → 中間 → 右</td><td>❌ 撈不到（揮動階段被歸零）</td></tr>
+      <tr><td>揮成一個向上的弧形</td><td>預備 → 左 → <b>舉高</b> → 中間 → 右</td><td>❌ 撈不到，還<b>多種了一棵樹</b></td></tr>
+    </table></div>
+    <p>手臂揮過去本來就會畫弧線，中間掃過「舉高」或掉到「預備」幾乎一定會發生。
+      所以要讓「正在揮動」這件事撐得住中途的雜訊，做三件事：</p>
+    <ol>
+      <li>看到<b>預備</b>時只把 <code class="v">可以觸發</code> 設為 1，<b>不要</b>把 <code class="v">揮動階段</code> 歸零。</li>
+      <li>看到<b>左</b>時除了 <code class="v">揮動階段</code> 設為 1，再用 <code class="v">揮動時間</code> 記下現在的計時器；
+        超過 <b>2 秒</b>還沒揮到右邊，才把這次揮動作廢。</li>
+      <li><b>揮動階段 ＝ 1 的時候不接受種樹和擋住</b>，這樣弧形揮手掃過「舉高」也不會誤種樹、不會把揮動打斷。</li>
+    </ol>
+    <div class="why"><b class="t">這樣還符合題目規則嗎　</b>符合。撈到垃圾之後 <code class="v">可以觸發</code> 一樣會設回 0，
+      還是要<b>回到預備姿勢</b>才能做下一個動作，同一個動作不會被重複判定。
+      我們只是不讓「揮動途中的一瞬間」被當成另一個動作。</div>
+    <div class="warn"><b class="t">左右門檻也放寬了　</b>手腕 x 的門檻從 ±100 改成 <b>±80</b>，手不必伸到畫面最邊邊。
+      如果教室的攝影機視角比較窄，可以再往下調。</div>
+  </div>
+
+  <div class="topic lab">
+    <div class="lh"><h3>🚦 預備姿勢模擬器</h3><span class="tag">按按鈕假裝比動作</span></div>
+    <p>試試看：連按兩次「舉高」會怎樣？中間先按一次「預備」又會怎樣？<br>再試一次「左 → 預備 → 右」和「左 → 舉高 → 右」——<b>都要撈得到</b>，這就是上面那三個保護的效果。</p>
+    <div class="btnrow" id="armBtns">
+      <button class="btn sm ghost" data-g="預備">🙌 預備（手放低）</button>
+      <button class="btn sm ghost" data-g="舉高">☝️ 舉高</button>
+      <button class="btn sm ghost" data-g="左">👈 左</button>
+      <button class="btn sm ghost" data-g="右">👉 右</button>
+      <button class="btn sm ghost" data-g="張開">🖐 張開</button>
+      <button class="btn sm ghost" data-g="無">🙈 手離開畫面</button>
+    </div>
+    <p style="margin-top:10px"><span class="gun" id="armGun">可以觸發 ＝ 0</span>
+      <span class="gun" id="armWave">揮動階段 ＝ 0</span>　觸發次數：<b id="armCnt">0</b></p>
+    <div class="armlog" id="armLog"><div class="no">（還沒有動作）</div></div>
+  </div>
+
+  <div class="topic">
+    <h3>積木：手勢偵測的主程式</h3>
+    <div class="bscript" data-blk="detectLoop"></div>
+    <p>再做三組鍵盤觸發，沒有攝影機時也能測試故事流程：</p>
+    <div class="bscript" data-blk="keys"></div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="ch5">
+  <div class="ch"><span class="cn" style="background:#D8ECFF">第 5 章</span><h2>三個行動會改變什麼</h2></div>
+  <p class="lead">每個動作都要讓畫面「看得出來有變」，這是題目任務三的要求。</p>
+
+  <div class="topic">
+    <h3>積木：三個廣播的處理</h3>
+    <div class="two">
+      <div class="pane"><h4>撈垃圾</h4><div class="bscript" data-blk="actPick"></div></div>
+      <div class="pane"><h4>種樹</h4><div class="bscript" data-blk="actTree"></div></div>
+    </div>
+    <div class="bscript" data-blk="actBlock" style="margin-top:12px"></div>
+    <div class="bscript" data-blk="clamp" style="margin-top:12px"></div>
+    <div class="why"><b class="t">做不到的時候也要回話　</b>撈垃圾如果溪裡已經沒有垃圾，程式什麼都不做，
+      玩家會以為「我的動作沒被認出來」。所以加一個 <code class="m">沒垃圾了</code> 廣播讓青蛙說
+      「溪裡的垃圾都撈乾淨了，謝謝你！」——<b>有回話 ＝ 動作有被認出來</b>，這是除錯時最重要的線索。</div>
+    <div class="why"><b class="t">上限一定要給回饋　</b>種樹最多 8 棵（因為樹的位置只排了 8 個）。
+      種滿了如果什麼事都沒發生，玩家會以為程式壞了，所以要廣播 <code class="m">樹滿了</code> 讓青蛙說一句
+      「樹已經夠多了！看看溪裡還有沒有垃圾。」——把玩家帶去做另一件有用的事。</div>
+  </div>
+
+  <div class="topic">
+    <h3>每個回合結束的自然變化</h3>
+    <div class="bscript" data-blk="roundEnd"></div>
+    <div class="why"><b class="t">為什麼要有自然變化　</b>如果玩家什麼都不做，環境就應該慢慢變糟，故事才有壓力。
+      種到 3 棵樹剛好打平，種到 4～5 棵水質每回合 +3，種到 6 棵以上 +5——這就是「<b>樹蔭讓水溫下降</b>」在程式裡的樣子。
+      樹越多效果越好，8 棵才有意義。</div>
+  </div>
+
+  <div class="topic lab" id="lab-sim">
+    <div class="lh"><h3>🌊 溪流模擬器</h3><span class="tag">先在這裡試，再去寫程式</span></div>
+    <p>按按鈕就會照上面的規則算一次。右邊的數字和畫面會跟著變，最下面會顯示「如果現在就結束，會是哪一種結局」。</p>
+    <div class="sim">
+      <div class="simscene" id="simScene"></div>
+      <div>
+        <div class="bars">
+          <div class="bar q"><div class="lab"><span>水質</span><b id="bQv">45</b></div><div class="track"><i id="bQ"></i></div></div>
+          <div class="bar t"><div class="lab"><span>垃圾</span><b id="bTv">5</b></div><div class="track"><i id="bT"></i></div></div>
+          <div class="bar s"><div class="lab"><span>遮蔭</span><b id="bSv">1</b></div><div class="track"><i id="bS"></i></div></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn sm" data-sim="撈">🗑️ 撈垃圾</button>
+          <button class="btn sm" data-sim="樹">🌳 種樹</button>
+          <button class="btn sm ghost" data-sim="擋">🖐 擋下偷倒</button>
+          <button class="btn sm ghost" data-sim="沒擋">💧 沒擋到偷倒</button>
+          <button class="btn sm ghost" data-sim="亂丟">🥤 有人亂丟垃圾</button>
+          <button class="btn sm ghost" data-sim="回合">⏭ 回合結束</button>
+          <button class="btn sm ghost" data-sim="重來">↺ 重來</button>
+        </div>
+        <div class="simend" id="simEnd">現在的狀態：普通結局</div>
+        <div class="simlog" id="simLog"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="ch6">
+  <div class="ch"><span class="cn" style="background:#FFD6E3">第 6 章</span><h2>兩種事件：不當的結果就是環境惡化</h2></div>
+  <p class="lead">題目說「不適當的選擇則須使環境狀況惡化」。我們用兩個<b>會突然發生的事件</b>來做：偷倒廢水（可以擋）與亂丟垃圾（要去撈）。</p>
+  <div class="topic">
+    <h3>事件怎麼跑</h3>
+    <ol>
+      <li>抽到的偷倒回合，第 5 秒時廢水管出現、播放警告聲，提示卡寫「張開手掌擋住」。</li>
+      <li>玩家有 <b>4 秒</b>可以張開手掌。擋下來 → 水質不變，出現防護罩。</li>
+      <li>沒擋到 → <b>水質 −20、垃圾 +1</b>，水面變濁、<b>水蠆消失</b>，青蛙說「好臭……」。</li>
+    </ol>
+    <div class="bscript" data-blk="pipe"></div>
+    <div class="why"><b class="t">「等待直到」是這段的關鍵　</b>等待直到「擋下成功 ＝ 1」<b>或</b>「時間超過 4 秒」——
+      兩個條件哪一個先成立都會往下走，這樣才能同時處理「擋到」和「來不及」。</div>
+  </div>
+
+  <div class="topic">
+    <h3>第二個事件：有人亂丟垃圾</h3>
+    <p>只有偷倒廢水一個事件的話，「垃圾」這個問題從開始到結束都只會變少，故事就沒有張力。
+      所以另外抽一個回合，讓有人把垃圾丟進溪裡：<b>垃圾 +2、水質 −3</b>，玩家要趕快用「從左揮到右」撈起來。</p>
+    <div class="bscript" data-blk="litter"></div>
+    <div class="why"><b class="t">為什麼要分兩個「如果」　</b>垃圾的分身只做了 6 個，所以垃圾最多 6。
+      垃圾是 4 的時候 +2 剛好 6；垃圾是 5 的時候只能 +1，不然會有一件垃圾看不到卻撈不完。
+      這種「不要超過上限」的檢查，在做分身的遊戲裡很常用。</div>
+  </div>
+
+  <div class="topic">
+    <h3>事件在哪幾個回合？用「隨機取數」抽</h3>
+    <p>如果每次都是第 2、4 回合偷倒，玩第二次就知道答案了。改成一開始先抽：兩個回合偷倒廢水、一個回合亂丟垃圾，
+      而且三個回合<b>不可以重複</b>。</p>
+    <div class="bscript" data-blk="pickRounds"></div>
+    <div class="why"><b class="t">「重複直到」怎麼想　</b>抽到一樣的就重抽，直到不一樣為止——這就是「重複直到 <b>兩個不一樣</b>」。
+      國小的說法：像抽籤，抽到已經抽過的號碼就放回去再抽一次。<br>
+      四個回合裡有三個回合有事件，所以一定會剩下一個「安靜的回合」，玩家可以趁那個回合安心種樹。</div>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>變數</th><th>抽法</th><th>條件</th></tr>
+      <tr><td><code class="v">偷倒回合A</code></td><td>隨機取數 1 到 4</td><td>沒有限制</td></tr>
+      <tr><td><code class="v">偷倒回合B</code></td><td>隨機取數 1 到 4</td><td>不能和 A 一樣</td></tr>
+      <tr><td><code class="v">垃圾回合</code></td><td>隨機取數 1 到 4</td><td>不能和 A、B 一樣</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="ch7">
+  <div class="ch"><span class="cn" style="background:#D6F5E8">第 7 章</span><h2>畫面跟著變</h2></div>
+  <p class="lead">所有角色都聽同一個廣播 <code class="m">重畫</code>，各自決定要長什麼樣子。這樣只要數字一改，整個畫面就同步更新。</p>
+  <div class="topic">
+    <div class="two">
+      <div class="pane"><h4>水面：越乾淨越大越藍</h4><div class="bscript" data-blk="water"></div></div>
+      <div class="pane"><h4>青蛙的表情</h4><div class="bscript" data-blk="frogFace"></div></div>
+    </div>
+    <div class="two" style="margin-top:12px">
+      <div class="pane"><h4>水蠆：對水質最敏感</h4><div class="bscript" data-blk="nymph"></div></div>
+      <div class="pane"><h4>翠鳥：水乾淨又有樹才回來</h4><div class="bscript" data-blk="bird"></div></div>
+    </div>
+    <div class="two" style="margin-top:12px">
+      <div class="pane"><h4>本體：做出 6 個分身</h4><div class="bscript" data-blk="trashMain"></div></div>
+      <div class="pane"><h4>分身：先認自己的編號</h4><div class="bscript" data-blk="trashBorn"></div></div>
+    </div>
+    <div class="bscript" data-blk="trashClone" style="margin-top:12px"></div>
+    <div class="topic" style="padding:0;margin:14px 0 0">
+      <h4 style="margin:0 0 6px">小樹的分身：位置用「編號」算出來</h4>
+      <div class="bscript" data-blk="treeClone"></div>
+      <div class="why"><b class="t">用乘法排位置，不用一棵一棵拖　</b>
+        8 棵樹如果一棵一棵手動定位，改間距就要改 8 次。用公式只要改一個數字：<br>
+        <b>x ＝ 編號 × 52 − 236</b>　→　第 1 棵 −184、第 2 棵 −132、…、第 8 棵 180（剛好排滿舞台又不會蓋到水潭）<br>
+        <b>y ＝ 編號 × 2 ＋ 6</b>　→　讓每棵樹高低差一點點，看起來比較自然。<br>
+        想排得更密就把 52 改小，想往左移就把 236 改大——這就是「乘法是等間距」的用法。</div>
+    </div>
+    <div class="warn"><b class="t">分身常見的坑：最後一個垃圾撈不掉　</b>如果本體直接用「編號」來數數（編號 +1 → 建立分身），
+      那麼在做分身的那一瞬間，<b>本體的編號也變成 1、2、3…</b>。這時如果剛好收到「重畫」，本體會以為自己也是一個垃圾而顯示出來，
+      而且它的編號最後又被設回 0，所以不管怎麼撈都不會消失。<br>
+      解法：本體改用另一個變數 <code class="v">計數</code> 數數，<b>編號永遠保持 0</b>；分身產生後再把自己的編號設成計數。
+      （<code class="v">編號</code> 和 <code class="v">計數</code> 都要選「僅適用當前角色」。）</div>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>看到什麼</th><th>條件</th></tr>
+      <tr><td>水潭混濁、變小；青蛙難過</td><td>水質 &lt; 40</td></tr>
+      <tr><td>水潭清澈、變大；青蛙開心</td><td>水質 ≥ 70</td></tr>
+      <tr><td>水草出現（少→中→多）</td><td>水質 ≥ 50／≥ 70／≥ 85</td></tr>
+      <tr><td>水蠆出現</td><td>水蠆在 ＝ 1 且 水質 ≥ 45 且 垃圾 ≤ 3</td></tr>
+      <tr><td>翠鳥出現</td><td>水質 ≥ 65 且 遮蔭 ≥ 2</td></tr>
+      <tr><td>小樹變大樹</td><td>遮蔭 ≥ 3</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="ch8">
+  <div class="ch"><span class="cn" style="background:#E3DBFF">第 8 章</span><h2>主流程與三種故事發展</h2></div>
+  <div class="topic">
+    <h3>舞台的主程式</h3>
+    <div class="bscript" data-blk="main"></div>
+  </div>
+  <div class="topic lab">
+    <div class="lh"><h3>🎬 結局判定器</h3><span class="tag">拉拉看</span></div>
+    <p>題目要求「<b>至少兩種</b>不同的故事發展」，我們做了三種。拉動下面的數值，看看會走到哪一個結局。</p>
+    <div class="ctrl">
+      <label>水質 <input type="range" id="eQ" min="0" max="100" value="45"> <output id="eQo">45</output></label>
+      <label>垃圾 <input type="range" id="eT" min="0" max="6" value="5"> <output id="eTo">5</output></label>
+    </div>
+    <div class="endlab">
+      <div class="endcard g" id="ecG"><h4>好結局</h4><p style="font-size:.88rem;margin:0">水質 ≥ 70 <b>且</b> 垃圾 ≤ 2<br>蛙卵孵化、翠鳥回來築巢</p></div>
+      <div class="endcard m" id="ecM"><h4>普通結局</h4><p style="font-size:.88rem;margin:0">水質 40～69，或垃圾還有 3 個以上<br>水潭保住了，但翠鳥沒回來</p></div>
+      <div class="endcard b" id="ecB"><h4>壞結局</h4><p style="font-size:.88rem;margin:0">水質 &lt; 40<br>青蛙沿著乾涸的溪床離開</p></div>
+    </div>
+    <div class="bscript" data-blk="ending" style="margin-top:12px"></div>
+  </div>
+  <div class="topic">
+    <h3>青蛙的開場旁白</h3>
+    <div class="bscript" data-blk="opening"></div>
+    <div class="why"><b class="t">旁白就是「生物與森林的關係」　</b>題目任務一要求透過故事呈現生物與森林的關係。
+      開場的五句話已經把三種生物、三種問題都說完了，評審一看就懂。</div>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="ch9">
+  <div class="ch"><span class="cn" style="background:#FFE7C7">第 9 章</span><h2>測試、挑戰與檢核</h2></div>
+  <div class="topic">
+    <h3>建議的測試順序</h3>
+    <ol>
+      <li><b>只測動作</b>：看畫面下方的牌子，做四個動作，名稱都對嗎？</li>
+      <li><b>用鍵盤測故事</b>：↑ 種樹、← 撈垃圾、B 擋住，確認數字和畫面都會變。</li>
+      <li><b>三種結局都跑一次</b>：什麼都不做 → 壞結局；只撈垃圾 → 普通；撈垃圾＋種樹＋擋住 → 好結局。</li>
+      <li><b>用三種方式各揮一次</b>：水平直線、揮到一半手往下掉、揮成向上的弧形——<b>三種都要撈得起來</b>，而且弧形那次不可以多種出一棵樹。</li>
+      <li><b>張著手掌揮一次</b>：手掌全開從左揮到右，一樣要撈得起來（牌子要顯示「左」再顯示「右」）。</li>
+      <li><b>連玩兩次</b>：兩次的事件回合應該不一樣（偷倒兩個回合、亂丟垃圾一個回合，都不重複）。</li>
+      <li><b>種到滿</b>：一直種樹到第 8 棵以後再種，青蛙要說「樹已經夠多了」。</li>
+      <li><b>換人玩</b>：請同學來玩，看看他們看不看得懂提示。</li>
+    </ol>
+  </div>
+  <div class="topic">
+    <h3>可以調整的數字</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>數字</th><th>預設</th><th>調大會怎樣</th></tr>
+      <tr><td>預備門檻（手腕 y）</td><td>−40</td><td>要把手放得更低才算預備</td></tr>
+      <tr><td>舉高門檻（手腕 y）</td><td>80</td><td>要舉得更高才算種樹</td></tr>
+      <tr><td>張開門檻（張開幅度）</td><td>90</td><td>手要張得更開才算擋住</td></tr>
+      <tr><td>撈垃圾的水質 +</td><td>5</td><td>撈垃圾更有效，遊戲變簡單</td></tr>
+      <tr><td>偷倒的水質 −</td><td>20</td><td>沒擋到的後果更嚴重</td></tr>
+      <tr><td>回合長度</td><td>12 秒</td><td>玩家有更多時間做事</td></tr>
+      <tr><td>種樹上限（遮蔭）</td><td>8</td><td>可以種更多樹（要記得同時多做幾個分身、改位置公式）</td></tr>
+      <tr><td>樹的間距</td><td>52</td><td>樹排得更開（公式 x ＝ 編號 × 52 − 236）</td></tr>
+      <tr><td>亂丟垃圾的垃圾 +</td><td>2</td><td>一次丟更多，玩家要撈得更快</td></tr>
+    </table></div>
+    <p>改完之後，記得到<a href="doc.html">程式說明文件</a>把數字更新。</p>
+  </div>
+  <div class="topic">
+    <h3>🔧 遇到問題先看這裡</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>症狀</th><th>先看什麼</th><th>常見原因</th></tr>
+      <tr><td>垃圾撈不掉</td><td>左上角的 <code class="v">可以觸發</code> 與 <code class="v">揮動階段</code> 監看視窗</td>
+        <td>揮到左邊時 <code class="v">揮動階段</code> 沒有變 1 → 手不夠左（門檻 −80）；變 1 之後又變回 0 → 中途被「預備／舉高」打斷，要做第 4 章的三個保護；
+          <code class="v">可以觸發</code> 一直是 0 → 沒有被判到「預備」，手要放更低一點</td></tr>
+      <tr><td>垃圾越撈越多</td><td>是不是剛好遇到「有人亂丟垃圾」的回合</td>
+        <td>那個回合垃圾會 +2；另外「亂丟垃圾」要用<b>如果否則</b>，寫成兩個「如果」會一次加 3 件</td></tr>
+      <tr><td>做動作完全沒反應</td><td>牌子是不是「看不到手」</td><td>手離開鏡頭、光線太暗，或忘了把攝影機打開</td></tr>
+      <tr><td>一個動作連做好幾次</td><td><code class="v">可以觸發</code> 有沒有在動作後設回 0</td><td>少了回到預備姿勢的旗標（第 4 章）</td></tr>
+      <tr><td>種樹沒反應</td><td>遮蔭是不是已經 8</td><td>種滿了，青蛙會說「樹已經夠多了」</td></tr>
+    </table></div>
+    <p>最快的除錯方法：先用<b>鍵盤</b>（↑ 種樹、← 撈垃圾、B 擋住）測一次。
+      鍵盤有效但手勢沒效 → 問題在<b>動作判斷</b>；鍵盤也沒效 → 問題在<b>舞台的處理程式</b>。</p>
+  </div>
+
+  <div class="topic">
+    <h3>挑戰任務</h3>
+    <div class="cards3">
+      <div><b>⭐ 換自己的故事</b><span>改成學校旁邊的小溪，生物換成自己看過的</span></div>
+      <div><b>⭐⭐ 加第四個動作</b><span>例如「手往下壓＝把落葉留在原地」</span></div>
+      <div><b>⭐⭐ 讓事件的強度也隨機</b><span>例如偷倒的水質 − 改成「隨機取數 15 到 25」</span></div>
+      <div><b>⭐⭐⭐ 加上分數與評語</b><span>結束時依照擋下次數給不同的評語</span></div>
+    </div>
+  </div>
+  <div class="topic">
+    <h3>✅ 自我檢核（對照題目）</h3>
+    <div class="chklist" id="chk">
+      <label><input type="checkbox"> 動畫裡看得到三種生物：青蛙、翠鳥、水蠆</label>
+      <label><input type="checkbox"> 三種環境問題都有出現在畫面或旁白裡</label>
+      <label><input type="checkbox"> 三個手部動作都能穩定判斷（牌子顯示正確）</label>
+      <label><input type="checkbox"> 手一直舉著只會種一棵樹（有回到預備姿勢的判斷）</label>
+      <label><input type="checkbox"> 每做一個行動，畫面看得出變化</label>
+      <label><input type="checkbox"> 沒擋下偷倒廢水時，環境確實惡化（水質 −20、水蠆消失）</label>
+      <label><input type="checkbox"> 至少兩種故事發展，而且都實際跑過一次</label>
+      <label><input type="checkbox"> 程式說明文件已經填好（互動方式、分支條件、數值門檻）</label>
+      <label><input type="checkbox"> 作品已存成 .sb3，並用 stretch3 重新打開確認可以執行</label>
+    </div>
+    <p class="savenote" id="chkNote"></p>
+  </div>
+</section>
+
+<footer style="margin-top:36px">森林動物搬家記・溪流上游　·　臺北市貓咪盃 國小動畫 AI 互動組 情境 1　·　Handpose2Scratch by Junya Ishihara (champierre)，於 stretch3.github.io 使用</footer>
+    </main>
+  </div>
+</div>
+<script src="assets/blk.js"></script>
+<script src="assets/lesson.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-layout="kawaii" data-palette="strawberry">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="WebIndexGenerator 1.0.0">
+<title>ScratchIndex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&amp;family=Nunito:wght@400;700;800&amp;display=swap">
+<style>
+:root{--bg:#fff0f5;--deco:#ffd9e6;--surface:#ffffff;--surface2:#fff0f5;--text:#5d4037;--muted:#a1887f;--accent:#ff8fab;--accent2:#ffb74d;--on-accent:#ffffff;--border:#fadadd;--shadow:rgba(255,143,171,.28);--font:'Nunito','M PLUS Rounded 1c','jf-openhuninn','Microsoft JhengHei',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.hero{padding:48px 0 28px}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.8rem);line-height:1.25;overflow-wrap:anywhere}
+.hero .sub{margin-top:10px;color:var(--muted);font-size:1.05rem}
+.stats{margin-top:14px;color:var(--muted);font-size:.9rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:26px}
+.search{flex:1 1 260px;min-width:0;display:flex;align-items:center;gap:8px}
+.search input{flex:1;min-width:0;border:0;background:transparent;outline:none;padding:4px 0}
+.sortbox{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.92rem}
+.sortbox select{cursor:pointer}
+.group{margin-bottom:38px}
+.group-title{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:1.25rem}
+.group-title .count{font-size:.8rem;font-weight:600}
+.items{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.item{position:relative;display:flex;gap:14px;align-items:flex-start;min-width:0}
+.item .icon{flex:none;display:grid;place-items:center}
+.item .main{flex:1;min-width:0}
+.item .title{display:block;font-weight:700;overflow-wrap:anywhere}
+.item .meta{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:6px;font-size:.8rem;color:var(--muted)}
+.item .file{overflow-wrap:anywhere}
+.list-head{display:none}
+.no-meta .item .meta{display:none}
+.empty{padding:60px 0;text-align:center;color:var(--muted)}
+.hidden{display:none!important}
+footer{padding:30px 0 40px;text-align:center;color:var(--muted);font-size:.82rem}
+mark{background:var(--accent);color:var(--on-accent);border-radius:3px;padding:0 2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:560px){.hero{padding:32px 0 20px}.items{grid-template-columns:1fr}}
+body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px,transparent 2.5px);background-size:26px 26px}
+.hero{text-align:center}
+.hero h1{color:var(--accent);font-weight:800;letter-spacing:.02em;text-shadow:3px 3px 0 var(--surface)}
+.hero h1::before{content:"🎀 "}.hero h1::after{content:" 🎀"}
+.stats>span{display:inline-block;padding:4px 16px;border-radius:50px;background:var(--surface);border:3px solid var(--border)}
+.search,.sortbox select{background:var(--surface);border:3px solid var(--border);border-radius:50px;padding:10px 20px;box-shadow:0 6px 14px var(--shadow)}
+.search::before{content:"🔍"}
+.search:focus-within{border-color:var(--accent)}
+.sortbox select{padding:10px 16px}
+.group-title{font-weight:800;color:var(--text)}
+.group-title::before{content:"🌸"}
+.group-title .count{background:var(--accent);color:var(--on-accent);border-radius:50px;padding:2px 12px}
+.item{background:var(--surface);border:3px solid var(--border);border-radius:26px;padding:18px;box-shadow:0 8px 16px var(--shadow);transition:transform .2s ease,box-shadow .2s ease,border-color .2s}
+.item:hover,.item:focus-visible{transform:translateY(-4px) scale(1.03);border-color:var(--accent);box-shadow:0 14px 26px var(--shadow);outline:none}
+.item:hover .icon{animation:bounce .6s ease}
+.item .icon{width:52px;height:52px;border-radius:50%;background:var(--surface2);border:3px solid var(--border);font-size:1.6rem}
+.item .title{font-size:1.05rem;color:var(--text)}
+.item .meta span{background:var(--surface2);border-radius:50px;padding:0 8px}
+.empty::before{content:"🥺";display:block;font-size:3rem}
+@keyframes bounce{0%,100%{transform:translateY(0)}35%{transform:translateY(-8px)}65%{transform:translateY(2px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>ScratchIndex</h1>
+    <p class="stats"><span>共 <b id="total">0</b> 個網頁<span id="shown"></span></span></p>
+  </header>
+  <div class="toolbar">
+    <label class="search"><input id="q" type="search" placeholder="搜尋名稱或檔名…（按 / 快速搜尋）" autocomplete="off" aria-label="搜尋"></label>
+    <label class="sortbox">排序
+      <select id="sort">
+        <option value="name">名稱（A→Z）</option>
+        <option value="newest">最新修改在前</option>
+        <option value="oldest">最舊修改在前</option>
+        <option value="size">檔案大小（大→小）</option>
+      </select>
+    </label>
+  </div>
+  <main id="list"></main>
+  <p id="empty" class="empty hidden"></p>
+  <noscript>
+    <ul>
+      <li><a href="Scratch/CatCupGenDoc.html" target="_blank" rel="noopener">貓咪盃程式說明文件產生器</a></li>
+      <li><a href="Scratch/FM2S_Stu.html" target="_blank" rel="noopener">Facemesh2Scratch 學生實作單</a></li>
+      <li><a href="Scratch/FM2S_Thr.html" target="_blank" rel="noopener">Facemesh2Scratch 教師手冊</a></li>
+      <li><a href="Scratch/HP2S_Stu.html" target="_blank" rel="noopener">Handpose2Scratch 學生實作單</a></li>
+      <li><a href="Scratch/HP2S_Thr.html" target="_blank" rel="noopener">Handpose2Scratch 教師手冊</a></li>
+      <li><a href="Scratch/index.html" target="_blank" rel="noopener">Scratch</a></li>
+      <li><a href="Scratch/ML2S_Stu.html" target="_blank" rel="noopener">ML2Scratch 學生實作單</a></li>
+      <li><a href="Scratch/ML2S_Thr.html" target="_blank" rel="noopener">ML2Scratch 教師手冊</a></li>
+      <li><a href="Scratch/ScratchAnalyze.html" target="_blank" rel="noopener">Scratch 作品分析小幫手（離線版）</a></li>
+      <li><a href="Scratch/Scratch%E4%BD%9C%E5%93%81%E8%A6%8F%E5%8A%83%E7%94%A2%E7%94%9F%E5%99%A8.html" target="_blank" rel="noopener">Scratch 作品規劃產生器</a></li>
+    </ul>
+  </noscript>
+  <footer>更新時間 <span id="gen"></span> · 由「網頁索引產生器」產生</footer>
+</div>
+<script type="application/json" id="index-data">{"v":1,"target":"_blank","sort":"name","icon":"emoji","showMeta":true,"generated":1791433199208,"groups":[{"name":"Scratch","items":[{"t":"貓咪盃程式說明文件產生器","f":"CatCupGenDoc.html","h":"Scratch/CatCupGenDoc.html","m":1790736521875,"s":235121},{"t":"Facemesh2Scratch 學生實作單","f":"FM2S_Stu.html","h":"Scratch/FM2S_Stu.html","m":1789434677125,"s":30620},{"t":"Facemesh2Scratch 教師手冊","f":"FM2S_Thr.html","h":"Scratch/FM2S_Thr.html","m":1789434677863,"s":36428},{"t":"Handpose2Scratch 學生實作單","f":"HP2S_Stu.html","h":"Scratch/HP2S_Stu.html","m":1789432523004,"s":27459},{"t":"Handpose2Scratch 教師手冊","f":"HP2S_Thr.html","h":"Scratch/HP2S_Thr.html","m":1789432202088,"s":33485},{"t":"Scratch","f":"index.html","h":"Scratch/index.html","m":1790695354348,"s":19924},{"t":"ML2Scratch 學生實作單","f":"ML2S_Stu.html","h":"Scratch/ML2S_Stu.html","m":1789441583443,"s":33409},{"t":"ML2Scratch 教師手冊","f":"ML2S_Thr.html","h":"Scratch/ML2S_Thr.html","m":1789441583896,"s":37205},{"t":"Scratch 作品分析小幫手（離線版）","f":"ScratchAnalyze.html","h":"Scratch/ScratchAnalyze.html","m":1790736521033,"s":178848},{"t":"Scratch 作品規劃產生器","f":"Scratch作品規劃產生器.html","h":"Scratch/Scratch%E4%BD%9C%E5%93%81%E8%A6%8F%E5%8A%83%E7%94%A2%E7%94%9F%E5%99%A8.html","m":1791261934288,"s":102179}]}]}</script>
+<script>(function(){
+  var D = JSON.parse(document.getElementById('index-data').textContent);
+  var EMOJI = ['🎀','🍓','🧁','🌸','🍭','⭐','🐰','🍩','🌈','🎈','🍰','🐱','🦄','🍡','🐣','🍒'];
+  var list = document.getElementById('list');
+  var q = document.getElementById('q');
+  var sortSel = document.getElementById('sort');
+  var empty = document.getElementById('empty');
+  var total = 0;
+  D.groups.forEach(function(g){ total += g.items.length; });
+  document.getElementById('total').textContent = total;
+  if (D.showMeta === false) document.body.classList.add('no-meta');
+  sortSel.value = D.sort || 'name';
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function fmtDate(ms){ var d = new Date(ms); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()); }
+  function fmtSize(b){ if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
+  function hash(s){ var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) % 9973; }
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  var collator = window.Intl && Intl.Collator ? new Intl.Collator('zh-Hant', {numeric: true, sensitivity: 'base'}) : null;
+  function cmpName(a, b){ return collator ? collator.compare(a.t, b.t) : (a.t < b.t ? -1 : a.t > b.t ? 1 : 0); }
+  var SORTS = {
+    name: cmpName,
+    newest: function(a, b){ return b.m - a.m || cmpName(a, b); },
+    oldest: function(a, b){ return a.m - b.m || cmpName(a, b); },
+    size: function(a, b){ return b.s - a.s || cmpName(a, b); }
+  };
+  function iconText(it, i){
+    if (D.icon === 'emoji') return EMOJI[hash(it.t) % EMOJI.length];
+    if (D.icon === 'initial') return (Array.from ? Array.from(it.t)[0] : it.t.charAt(0)) || '•';
+    if (D.icon === 'index') return pad(i + 1);
+    return '';
+  }
+  function highlight(node, text, kw){
+    if (!kw) { node.textContent = text; return; }
+    var low = text.toLowerCase(), pos = 0, idx;
+    while ((idx = low.indexOf(kw, pos)) !== -1) {
+      node.appendChild(document.createTextNode(text.slice(pos, idx)));
+      node.appendChild(el('mark', null, text.slice(idx, idx + kw.length)));
+      pos = idx + kw.length;
+    }
+    node.appendChild(document.createTextNode(text.slice(pos)));
+  }
+  function render(){
+    var kw = q.value.trim().toLowerCase();
+    var cmp = SORTS[sortSel.value] || cmpName;
+    var shown = 0;
+    list.textContent = '';
+    D.groups.forEach(function(g){
+      var items = g.items.filter(function(it){
+        return !kw || it.t.toLowerCase().indexOf(kw) !== -1 || it.f.toLowerCase().indexOf(kw) !== -1;
+      }).sort(cmp);
+      if (!items.length) return;
+      shown += items.length;
+      var sec = el('section', 'group');
+      if (D.groups.length > 1) {
+        var h = el('h2', 'group-title');
+        h.appendChild(el('span', 'gname', g.name));
+        h.appendChild(el('span', 'count', items.length + (kw ? ' / ' + g.items.length : '')));
+        sec.appendChild(h);
+      }
+      var box = el('div', 'items');
+      var head = el('div', 'list-head');
+      ['#', '名稱', '檔案', '修改日期', '大小'].forEach(function(t){ head.appendChild(el('span', null, t)); });
+      box.appendChild(head);
+      items.forEach(function(it, i){
+        var a = el('a', 'item');
+        a.href = it.h;
+        a.title = it.t;
+        if (D.target === '_blank') { a.target = '_blank'; a.rel = 'noopener'; }
+        a.appendChild(el('span', 'icon', iconText(it, i))).setAttribute('aria-hidden', 'true');
+        var main = el('span', 'main');
+        var t = el('span', 'title'); highlight(t, it.t, kw); main.appendChild(t);
+        var meta = el('span', 'meta');
+        var f = el('span', 'file'); highlight(f, it.f, kw); meta.appendChild(f);
+        meta.appendChild(el('span', 'date', fmtDate(it.m)));
+        meta.appendChild(el('span', 'size', fmtSize(it.s)));
+        main.appendChild(meta);
+        a.appendChild(main);
+        box.appendChild(a);
+      });
+      sec.appendChild(box);
+      list.appendChild(sec);
+    });
+    document.getElementById('shown').textContent = kw ? '，符合 ' + shown + ' 個' : '';
+    empty.classList.toggle('hidden', shown > 0);
+    empty.textContent = total ? '找不到符合「' + q.value.trim() + '」的網頁' : '這裡還沒有任何網頁';
+  }
+  q.addEventListener('input', render);
+  sortSel.addEventListener('change', render);
+  document.addEventListener('keydown', function(e){
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; render(); }
+  });
+  var gen = document.getElementById('gen');
+  if (gen && D.generated) gen.textContent = fmtDate(D.generated);
+  render();
+})();</script>
+</body>
+</html>

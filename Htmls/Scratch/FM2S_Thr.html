@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>Facemesh2Scratch 教師手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --cream:#FFFCF0; --paper:#FFFFFF; --paper2:#FDF3DC; --ink:#584A38; --ink2:#948468; --line:#EDDFBE;
+  --gold:#D9A441; --gold-d:#B8842A; --blue:#4FA8E0; --pink:#FF8FAB; --mint:#5FC9A4; --lilac:#BFA3E8;
+  --block:#0FBD8C; --block-d:#0BA277; --block-op:#4C97FF; --block-op-d:#3373CC;
+  --shadow:0 10px 24px rgba(217,164,65,.16); --shadow-s:0 4px 12px rgba(217,164,65,.14);
+  --f-round:'M PLUS Rounded 1c','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --f-num:'Nunito','M PLUS Rounded 1c',sans-serif;
+  --c-out:#A1887F; --c-brow:#BFA3E8; --c-eye:#4FA8E0; --c-nose:#FFA94D; --c-mouth:#FF8FAB; --c-cheek:#5FC9A4;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cream:#262119; --paper:#332C22; --paper2:#3E3627; --ink:#F4ECDD; --ink2:#C3B59B; --line:#544937;
+  --gold:#E8BC6B; --gold-d:#F2D093; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --cream:#262119; --paper:#332C22; --paper2:#3E3627; --ink:#F4ECDD; --ink2:#C3B59B; --line:#544937;
+  --gold:#E8BC6B; --gold-d:#F2D093; --shadow:0 10px 26px rgba(0,0,0,.45); --shadow-s:0 4px 14px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-round);font-size:16px;line-height:1.82;
+  background-image:radial-gradient(var(--line) 1.3px,transparent 1.3px);background-size:28px 28px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px;padding-block:0 64px}
+h1,h2,h3{text-wrap:balance;line-height:1.4;margin:0}
+a{color:var(--gold-d)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in srgb,var(--cream) 85%,transparent);border-bottom:2px solid var(--line)}
+nav .inner{max-width:1060px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--paper);border:2px solid var(--line);
+  border-radius:50px;padding:5px 15px;font-size:.86rem;font-weight:700;transition:transform .18s,background .18s}
+nav a:hover{transform:translateY(-2px);background:var(--paper2)}
+header.hero{padding-block:40px 24px}
+.badge{display:inline-block;background:var(--gold);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:50px;box-shadow:var(--shadow-s)}
+header.hero h1{font-size:clamp(1.8rem,5vw,2.7rem);font-weight:800;margin:14px 0 8px}
+header.hero p{color:var(--ink2);max-width:46em;margin:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
+.fact{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-s)}
+.fact .k{font-size:.76rem;letter-spacing:.08em;color:var(--ink2);font-weight:700}
+.fact .v{font-weight:800;font-size:1rem}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;text-decoration:none;font-weight:800;
+  border-radius:50px;padding:10px 22px;margin-top:18px;box-shadow:0 5px 14px rgba(79,168,224,.38);transition:transform .18s}
+.cta:hover{transform:scale(1.05);color:#fff}
+section{margin-top:44px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-head .dot{width:14px;height:14px;border-radius:4px;background:var(--gold);flex:0 0 auto;transform:rotate(45deg)}
+.sec-head h2{font-size:clamp(1.25rem,3.2vw,1.6rem);font-weight:800}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tablewrap{overflow-x:auto;border-radius:20px;border:2px solid var(--line);background:var(--paper);box-shadow:var(--shadow-s)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:600px}
+table th{text-align:left;background:var(--paper2);font-size:.8rem;color:var(--ink2);padding:10px 12px;font-weight:800;white-space:nowrap}
+table td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.face-layout{display:grid;grid-template-columns:minmax(250px,.9fr) minmax(280px,1.1fr);gap:18px;align-items:start}
+@media(max-width:760px){.face-layout{grid-template-columns:1fr}}
+.face-box{background:linear-gradient(170deg,var(--paper2),var(--paper));border:2px solid var(--line);border-radius:22px;padding:10px;box-shadow:var(--shadow)}
+svg.face{width:100%;height:auto;display:block}
+svg.face .feat{fill:none;stroke:var(--line);stroke-width:3;stroke-linecap:round}
+svg.face .mesh{fill:var(--line);opacity:.6}
+svg.face g.kp{cursor:pointer}
+svg.face g.kp circle.core{stroke:var(--paper);stroke-width:2.5;transition:r .18s}
+svg.face g.kp text.lab{font-family:var(--f-num);font-size:10px;font-weight:800;fill:var(--ink);text-anchor:middle;pointer-events:none}
+svg.face g.kp:hover circle.core,svg.face g.kp.on circle.core{r:13}
+svg.face g.kp circle.halo{fill:none;stroke:none}
+svg.face g.kp.on circle.halo{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:4 5;opacity:.8}
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;padding:0 6px 6px}
+.legend span{font-size:.79rem;font-weight:700;border-radius:50px;padding:3px 11px;color:#4A4030;border:2px solid var(--paper)}
+.info{background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+.info .no{font-family:var(--f-num);font-size:1.8rem;font-weight:800;line-height:1.1}
+.info .zh{font-size:1.1rem;font-weight:800}
+.info .meta{color:var(--ink2);font-size:.86rem}
+.finder{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.finder input{font-family:var(--f-num);font-size:1rem;font-weight:800;width:110px;padding:8px 14px;border-radius:50px;
+  border:2px solid var(--line);background:var(--paper);color:var(--ink)}
+.finder button{background:var(--gold);color:#fff;border:none;border-radius:50px;padding:9px 20px;font-family:var(--f-round);
+  font-weight:800;cursor:pointer;transition:transform .18s}
+.finder button:hover{transform:scale(1.05)}
+.finder .msg{font-size:.86rem;color:var(--ink2)}
+.kptable{max-height:360px;overflow:auto}
+.kptable table{min-width:0;font-size:.87rem}
+.kptable tr.row{cursor:pointer}
+.kptable tr.row:hover,.kptable tr.row.on{background:var(--paper2)}
+.kptable td.kn{font-family:var(--f-num);font-weight:800;width:3.4em}
+.blk{display:inline-flex;align-items:center;gap:6px;background:var(--block);color:#fff;font-weight:700;font-size:.92rem;
+  padding:6px 13px;border-radius:9px;box-shadow:0 3px 0 var(--block-d);margin:2px 0;line-height:1.5}
+.blk.rep{border-radius:50px}
+.blk.ctl{background:#FFC86B;box-shadow:0 3px 0 #E0A63F;color:#4A3530}
+.blk.mot{background:var(--block-op);box-shadow:0 3px 0 var(--block-op-d)}
+.blk.op{background:#59C059;box-shadow:0 3px 0 #389438}
+.blk .drop{background:rgba(0,0,0,.18);border-radius:50px;padding:1px 9px}
+.blk .num{background:#fff;color:#4A3530;border-radius:50px;padding:0 9px;font-family:var(--f-num);font-weight:800}
+.code{background:var(--paper2);border:2px dashed var(--line);border-radius:16px;padding:11px 13px;display:grid;gap:2px;margin-top:8px}
+.code .ind1{margin-left:18px}.code .ind2{margin-left:36px}
+.formula{background:var(--paper2);border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-family:var(--f-num);font-weight:700}
+.note{background:color-mix(in srgb,var(--gold) 18%,var(--paper));border:2px solid color-mix(in srgb,var(--gold) 45%,var(--line));
+  border-radius:18px;padding:12px 16px;font-size:.93rem}
+.warn{background:color-mix(in srgb,var(--pink) 16%,var(--paper));border:2px solid color-mix(in srgb,var(--pink) 42%,var(--line));
+  border-radius:18px;padding:12px 16px;font-size:.93rem}
+.lesson{display:grid;gap:10px}
+.lesson .row{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;background:var(--paper);
+  border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-s)}
+.lesson .t{font-family:var(--f-num);font-weight:800;background:var(--paper2);border-radius:12px;text-align:center;padding:4px;font-size:.84rem}
+details{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:2px 16px;box-shadow:var(--shadow-s)}
+details+details{margin-top:9px}
+details summary{cursor:pointer;font-weight:800;padding:10px 0;list-style:none;display:flex;gap:8px;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'▸';color:var(--gold-d);font-weight:800}
+details[open] summary::before{content:'▾'}
+details .body{padding:0 0 12px;font-size:.93rem}
+ul.tidy{margin:8px 0 0;padding-left:1.2em}ul.tidy li{margin:3px 0}
+.chk{display:grid;gap:8px}
+.chk label{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:2px solid var(--line);
+  border-radius:16px;padding:10px 14px;cursor:pointer;font-size:.94rem;transition:border-color .2s,background .2s}
+.chk input{margin-top:6px;width:18px;height:18px;accent-color:var(--gold);flex:0 0 auto}
+.chk label:has(input:checked){border-color:var(--gold);background:var(--paper2)}
+footer{margin-top:50px;text-align:center;color:var(--ink2);font-size:.85rem}
+:focus-visible{outline:3px solid var(--gold-d);outline-offset:3px;border-radius:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media print{nav,.cta{display:none}body{background:#fff}.card,.fact,.tablewrap,details{box-shadow:none}}
+</style>
+
+<nav><div class="inner">
+  <a href="#about">教材定位</a>
+  <a href="#spec">積木規格</a>
+  <a href="#face">部位速查</a>
+  <a href="#coord">編號與座標</a>
+  <a href="#flow">教學流程</a>
+  <a href="#demo">範例與易錯點</a>
+  <a href="#ready">課前檢查</a>
+  <a href="#faq">問題排除</a>
+  <a href="#assess">評量與延伸</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">教師手冊</span>
+  <h1>Facemesh2Scratch 教師手冊</h1>
+  <p>本手冊整理 Facemesh2Scratch 的完整技術規格、常用臉部關鍵點編號速查、兩節課教學流程、學生易錯點與問題排除。臉部偵測涉及生物特徵，教學前請一併閱讀第一節的隱私提醒。</p>
+  <div class="facts">
+    <div class="fact"><div class="k">關鍵點數</div><div class="v">468 點／選單 32 部位</div></div>
+    <div class="fact"><div class="k">可偵測人數</div><div class="v">多人（選單 1–10）</div></div>
+    <div class="fact"><div class="k">積木總數</div><div class="v">6 個（無 z 座標）</div></div>
+    <div class="fact"><div class="k">建議時數</div><div class="v">2 節（各 40 分鐘）</div></div>
+  </div>
+  <a class="cta" href="https://claude.ai/artifact/UzQZcQordG8QRvfALMiqeY">👉 開啟學生版實作單</a>
+  <span style="font-size:.84rem;color:var(--ink2);margin-left:8px">（本機檔案版：<a href="student.html">student.html</a>）</span>
+</header>
+
+<section id="about">
+  <div class="sec-head"><span class="dot"></span><h2>一、教材定位與技術原理</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>這是什麼</h3>
+      <p style="font-size:.94rem">Facemesh2Scratch 是 Junya Ishihara（champierre）開發的開源 Scratch 3 擴充功能，使用 <b>TensorFlow.js 的 facemesh 模型</b>（源自 MediaPipe Face Mesh），只用一支網路攝影機就能在每張臉上取得 <b>468 個關鍵點</b>的座標，其中 <b>32 個常用部位</b>已在積木選單中命名，可直接以名稱選取。</p>
+      <ul class="tidy" style="font-size:.93rem">
+        <li>使用平台：<b>stretch3.github.io</b>，非 Scratch 官方網站。</li>
+        <li>模型在<b>瀏覽器本機執行</b>，影像不會上傳伺服器。</li>
+        <li><b>需要 WebGL</b>：若學生電腦停用硬體加速會無法執行（見第八節）。</li>
+      </ul>
+      <div class="warn" style="margin-top:12px">🔒 <b>隱私提醒：</b>臉部資料屬於生物特徵。雖然本擴充不上傳影像，仍建議課前依校內規定取得家長同意，並明確告知學生「不要錄影或截圖同學的臉」。</div>
+    </div>
+    <div class="card">
+      <h3>與 Handpose2Scratch 的差異</h3>
+      <div class="tablewrap" style="box-shadow:none;border:none">
+        <table style="min-width:0">
+          <thead><tr><th></th><th>Handpose</th><th>Facemesh</th></tr></thead>
+          <tbody>
+            <tr><td>關鍵點</td><td>21 點</td><td><b>468 點</b></td></tr>
+            <tr><td>選取方式</td><td>下拉部位名稱<br>21 個</td><td>下拉部位名稱<br><b>32 個</b></td></tr>
+            <tr><td>多人</td><td>實質單手</td><td><b>支援多人</b></td></tr>
+            <tr><td>z 座標</td><td>有</td><td><b>沒有</b></td></tr>
+            <tr><td>人數積木</td><td>無</td><td><b>有</b></td></tr>
+            <tr><td>效能負擔</td><td>中</td><td><b>較高</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.92rem;margin-top:10px">已教過 Handpose2Scratch 的班級，操作方式幾乎一致，可直接從「部位變成臉部五官」與「多了人數積木、可多人」兩點切入，學習遷移很快。</p>
+    </div>
+  </div>
+</section>
+
+<section id="spec">
+  <div class="sec-head"><span class="dot"></span><h2>二、六個積木完整規格</h2></div>
+  <p style="margin:0 0 12px;color:var(--ink2)">下表的中文積木文字以 stretch3 介面顯示為準，英文原文為 <span style="font-family:var(--f-num)">x of person no: ( ) , keypoint no: ( )</span>。</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>積木</th><th>類型</th><th>回傳／參數</th><th>教學提醒</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="blk rep">第 (1) 人的 (鼻尖 (2)) 的 x 座標</span></td><td>數值</td>
+          <td>舞台左右座標<br><b>約 −240 ～ 240</b></td>
+          <td>兩個下拉：人數 1–10、部位選單 32 個命名部位（括號內為原始編號）。偵測不到時回傳空白。</td>
+        </tr>
+        <tr>
+          <td><span class="blk rep">第 (1) 人的 (鼻尖 (2)) 的 y 座標</span></td><td>數值</td>
+          <td>舞台上下座標<br><b>約 −180 ～ 180</b></td>
+          <td>臉抬高 y 變大。比較兩點 y 值即可偵測張嘴、眨眼。</td>
+        </tr>
+        <tr>
+          <td><span class="blk rep">人數</span></td><td>數值</td>
+          <td>目前偵測到的臉數<br><b>0 起算</b></td>
+          <td>最實用的守門積木。<b>務必</b>先判斷人數再讀取第 N 人的座標。</td>
+        </tr>
+        <tr>
+          <td><span class="blk">將攝影機 <span class="drop">鏡像開啟 ▾</span></span></td><td>執行</td>
+          <td>關閉／開啟／鏡像開啟<br><b>預設：鏡像開啟</b></td>
+          <td>「開啟」不翻轉，學生會覺得左右相反；「關閉」會停止偵測。</td>
+        </tr>
+        <tr>
+          <td><span class="blk">將攝影機的透明度設為 <span class="num">50</span></span></td><td>執行</td>
+          <td>0（清楚）～ 100（全透明）</td>
+          <td>除錯時設 0～30，做遊戲時設 70～100。不影響效能。</td>
+        </tr>
+        <tr>
+          <td><span class="blk">將倍率設為 <span class="drop">0.75 ▾</span></span></td><td>執行</td>
+          <td>0.5／0.75／1／1.5／2.0<br><b>預設：0.75</b></td>
+          <td>0.75 剛好把 640×480 換算成 480×360 舞台。臉部應用多半維持預設。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note" style="margin-top:14px">📌 沒有任何事件（hat）積木，也<b>沒有 z 座標</b>。所有偵測都要放在「重複無限次」內持續讀取。</div>
+</section>
+
+<section id="face">
+  <div class="sec-head"><span class="dot"></span><h2>三、常用部位編號速查</h2></div>
+  <p style="margin:0 0 14px;color:var(--ink2)">模型每張臉輸出 468 點，但積木的下拉選單已挑出 <b>32 個命名部位</b>（鼻尖 (2) 起、臉部左緣 (455) 止），下表即為完整清單。點選圖上圓點或表格可查看用途，也可直接輸入編號查詢。</p>
+  <div class="face-layout">
+    <div>
+      <div class="face-box">
+        <svg class="face" id="svg" viewBox="0 0 400 480" role="img" aria-label="臉部常用關鍵點編號圖">
+                    <ellipse cx="200" cy="245" rx="132" ry="168" style="fill:color-mix(in srgb,var(--gold) 12%,var(--paper));stroke:var(--line);stroke-width:3"></ellipse>
+          <g id="meshdots"></g>
+          <g class="feat">
+            <path d="M126 170 q26 -14 52 -4"></path>
+            <path d="M274 170 q-26 -14 -52 -4"></path>
+            <path d="M120 205 q30 -22 58 3 q-30 20 -58 -3 z"></path>
+            <path d="M280 205 q-30 -22 -58 3 q30 20 58 -3 z"></path>
+            <path d="M200 200 l0 58 q-14 10 -24 12"></path>
+            <path d="M200 270 q22 6 24 -6"></path>
+            <path d="M154 328 q46 -22 92 0 q-46 26 -92 0 z"></path>
+          </g>
+          <g id="kps"></g>
+        </svg>
+        <div class="legend">
+          <span style="background:var(--c-out)">額頭與輪廓</span>
+          <span style="background:var(--c-brow)">眉毛</span>
+          <span style="background:var(--c-eye)">眼睛</span>
+          <span style="background:var(--c-nose)">鼻子</span>
+          <span style="background:var(--c-mouth)">嘴巴</span>
+          <span style="background:var(--c-cheek)">臉頰</span>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px">📐 圖上左右以<b>預設「鏡像開啟」</b>下學生看到的方向為準（圖的右側＝學生自己的右側）。若改為「開啟」，左右會相反，請提醒學生實測確認。</div>
+    </div>
+    <div>
+      <div class="finder">
+        <input id="q" type="number" min="1" max="468" placeholder="1–468" aria-label="輸入部位編號">
+        <button id="go">查詢編號</button>
+        <span class="msg" id="msg"></span>
+      </div>
+      <div class="info">
+        <div class="no" id="i-no">2</div>
+        <div class="zh" id="i-zh">鼻尖（鼻子）</div>
+        <div class="meta" id="i-mp"></div>
+        <div class="meta" id="i-desc">全臉最穩定的追蹤點，適合作為「整張臉在哪裡」的代表。</div>
+      </div>
+      <div class="tablewrap kptable">
+        <table>
+          <thead><tr><th>編號</th><th>部位</th><th>主要用途</th></tr></thead>
+          <tbody id="kbody"></tbody>
+        </table>
+      </div>
+      <p style="font-size:.84rem;color:var(--ink2);margin-top:8px">※ 括號內數字為積木選單顯示的編號（<b>1 起算</b>）；TensorFlow／MediaPipe 官方文件為 <b>0 起算</b>，兩者相差 1。</p>
+    </div>
+  </div>
+</section>
+
+<section id="coord">
+  <div class="sec-head"><span class="dot"></span><h2>四、編號與座標原理</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>換算公式</h3>
+      <p style="font-size:.93rem">模型在 640×480 的攝影機影像上取得像素座標，再換算為舞台座標：</p>
+      <div class="formula">
+        x = 240 −（像素 x × 倍率）　<span style="opacity:.7">鏡像開啟時</span><br>
+        x = −(240 −（像素 x × 倍率))　<span style="opacity:.7">一般開啟時</span><br>
+        y = 180 −（像素 y × 倍率）
+      </div>
+      <p style="font-size:.93rem;margin-top:10px">倍率 0.75 時，640×0.75＝480、480×0.75＝360，恰為舞台尺寸。本擴充<b>不提供 z 座標</b>，若要表現遠近，可用「兩眼距離」或「臉的寬度」當作替代指標 —— 這是很好的比例概念延伸。</p>
+    </div>
+    <div class="card">
+      <h3>務必先用「人數」守門</h3>
+      <p style="font-size:.93rem">若指定的人不存在（例如畫面只有 1 人卻讀「第 2 人」），座標會是空白、甚至讓程式停住。標準寫法：</p>
+      <div class="code">
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">(人數) &gt; 0</span> 那麼</span></div>
+        <div class="ind2"><span class="blk mot">定位到 x: <span class="num">1人・鼻尖 x</span> y: <span class="num">1人・鼻尖 y</span></span></div>
+      </div>
+      <p style="font-size:.9rem;margin-top:8px">兩人對戰的專案則寫成「如果（人數）＞ 1 才讀第 2 人」。這是本單元最重要的程式習慣。</p>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="sec-head"><span class="dot"></span><h2>五、兩節課教學流程</h2></div>
+  <div class="lesson">
+    <div class="row"><div class="t">第 1 節<br>0–10′</div><div><b>引起動機</b>：示範手機的臉部貼圖或濾鏡，提問「電腦怎麼知道鼻子在哪裡？」引出 468 個關鍵點的概念，並說明這是「找特徵點」不是「認識你是誰」。</div></div>
+    <div class="row"><div class="t">10–20′</div><div><b>環境設定</b>：開 stretch3 → 添加擴展 → 允許攝影機 → 用「人數」積木驗證是否偵測成功。<span style="color:var(--ink2)">（此段最易卡關，預留緩衝時間。）</span></div></div>
+    <div class="row"><div class="t">20–40′</div><div><b>完成範例 1</b>：角色定位到鼻尖。延伸讓學生改用眉心 (10) 做眼鏡、額頭頂端 (11) 做帽子。</div></div>
+    <div class="row"><div class="t">第 2 節<br>0–10′</div><div><b>複習部位</b>：用學生版的「臉部點點小測驗」搶答，熟悉 32 個部位的位置。</div></div>
+    <div class="row"><div class="t">10–30′</div><div><b>完成範例 2 或 3</b>：張嘴偵測（14 與 15）或眨眼偵測（160 與 146），帶入「兩點距離」與閾值調整的概念。</div></div>
+    <div class="row"><div class="t">30–40′</div><div><b>分享與省思</b>：作品展示，討論臉部辨識的應用與隱私界線（手機解鎖、監視器、濾鏡），完成 AI 倫理討論。</div></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="sec-head"><span class="dot"></span><h2>六、範例程式與學生易錯點</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>👃 範例 1：角色跟著鼻尖</h3>
+      <div class="code">
+        <div><span class="blk ctl">當 🏳 被點擊</span></div>
+        <div><span class="blk">將攝影機的透明度設為 <span class="num">50</span></span></div>
+        <div><span class="blk ctl">重複無限次</span></div>
+        <div class="ind1"><span class="blk mot">定位到 x: <span class="num">1人・鼻尖 x</span> y: <span class="num">1人・鼻尖 y</span></span></div>
+      </div>
+      <p style="font-size:.92rem"><b>易錯點：</b>忘記加「重複無限次」，角色只動一次就停住；或誤以為要自己記編號 —— 選單直接選名稱即可。</p>
+    </div>
+    <div class="card">
+      <h3>😮 範例 2：張嘴偵測</h3>
+      <div class="code">
+        <div><span class="blk ctl">將 [嘴巴開合] 設為（上唇內緣中央 y − 下唇內緣中央 y）</span></div>
+        <div><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">嘴巴開合 &gt; 15</span> 那麼 …</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>教學重點：</b>閾值必須實測，並提醒臉離鏡頭遠近會改變數值。<b>進階：</b>除以「臉高度（額頭頂端 y − 下巴 y）」做正規化，就不受遠近影響 —— 很好的比例教學素材。</p>
+    </div>
+    <div class="card">
+      <h3>😉 範例 3：眨眼偵測</h3>
+      <div class="code">
+        <div><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">(右眼上緣 y − 右眼下緣 y) &lt; 4</span> 那麼 …</span></div>
+      </div>
+      <p style="font-size:.92rem"><b>易錯點：</b>沿用張嘴的閾值（15）導致永遠不成立。眼睛開合的數值遠小於嘴巴，約 3～6，需要學生自己觀察數值後決定。</p>
+    </div>
+    <div class="card">
+      <h3>👥 範例 4：多人應用</h3>
+      <div class="code">
+        <div><span class="blk ctl">如果 <span class="blk op" style="box-shadow:none;padding:2px 10px">(人數) &gt; 1</span> 那麼</span></div>
+        <div class="ind1"><span class="blk mot">角色 2 定位到 x: <span class="num">2人・鼻尖 x</span> y: <span class="num">2人・鼻尖 y</span></span></div>
+      </div>
+      <p style="font-size:.92rem"><b>提醒：</b>人的編號會隨偵測順序改變，兩人交換位置時角色可能互換，這是模型限制，適合作為「AI 的不確定性」討論素材。</p>
+    </div>
+  </div>
+</section>
+
+<section id="ready">
+  <div class="sec-head"><span class="dot"></span><h2>七、課前環境檢查清單</h2></div>
+  <div class="chk">
+    <label><input type="checkbox"><span>所有電腦安裝 <b>Chrome</b> 並可連外；已在教師機完整跑過一次流程。</span></label>
+    <label><input type="checkbox"><span>確認 Chrome <b>硬體加速（WebGL）已啟用</b>：網址列輸入 chrome://gpu 檢查，或至設定 → 系統開啟。</span></label>
+    <label><input type="checkbox"><span>攝影機驅動正常、未被其他程式占用；瀏覽器權限未被群組原則封鎖。</span></label>
+    <label><input type="checkbox"><span>已知學生電腦效能；老舊機型改為兩人一組或只做單人範例。</span></label>
+    <label><input type="checkbox"><span>教室光線由前方照向學生，避免背光；提醒學生撥開瀏海露出五官。</span></label>
+    <label><input type="checkbox"><span>已依校內規定取得攝影機使用同意，並準備好隱私議題的討論提問。</span></label>
+    <label><input type="checkbox"><span>準備 .sb3 範例檔備援，避免部分電腦無法偵測時學生無事可做。</span></label>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="sec-head"><span class="dot"></span><h2>八、常見問題排除</h2></div>
+  <details open><summary>完全沒有畫面，或擴充功能載入失敗</summary><div class="body">① 檢查攝影機權限是否被封鎖；② 其他 Chrome 擴充功能（廣告攔截、隱私保護）可能與之衝突，可用<b>無痕／訪客模式</b>開啟測試；③ 確認網路可連外以下載模型。</div></details>
+  <details><summary>「人數」一直是 0</summary><div class="body">臉未被偵測。檢查：正面對鏡頭、光線充足不背光、瀏海或口罩是否遮擋、距離約 40～80 公分。模型剛載入的前幾秒屬正常延遲。</div></details>
+  <details><summary>畫面嚴重延遲、瀏覽器變慢</summary><div class="body">468 點的臉部偵測運算量高於手部偵測。建議：關閉其他分頁與程式、避免多角色同時跑重複無限次、只偵測單人。若仍過慢，可改用 Handpose 或 PoseNet 的專案作為替代。</div></details>
+  <details><summary>出現 WebGL 相關錯誤</summary><div class="body">Chrome 停用了硬體加速。至「設定 → 系統 → 使用硬體加速（可用時）」開啟後重新啟動瀏覽器；學校統一派送的原則檔若停用該項，需請資訊組協助。</div></details>
+  <details><summary>選了「第 2 人」卻沒反應或程式停住</summary><div class="body">指定的人不存在時座標為空白，部分情況會中斷腳本。請務必先用「人數」判斷（見第四節）。</div></details>
+  <details><summary>兩個人靠太近，角色會互換</summary><div class="body">人的編號依偵測順序給定，並非固定身分。請讓學生保持距離，或設計成「不在意誰是誰」的玩法。</div></details>
+  <details><summary>作品在 Scratch 官網打不開</summary><div class="body">stretch3 的擴充積木非官方積木。請存成 .sb3 並以 stretch3 開啟；繳交作品時建議同時錄製操作影片。</div></details>
+</section>
+
+<section id="assess">
+  <div class="sec-head"><span class="dot"></span><h2>九、評量指標與跨域延伸</h2></div>
+  <div class="grid3">
+    <div class="card"><h3>📝 評量指標</h3><ul class="tidy" style="font-size:.92rem">
+      <li><b>知識</b>：能說出至少 5 個常用部位的名稱及其位置。</li>
+      <li><b>理解</b>：能說明為何要先用「人數」判斷再讀座標。</li>
+      <li><b>技能</b>：能自行實測並決定張嘴／眨眼的閾值。</li>
+      <li><b>態度</b>：能說明臉部資料的隱私風險與使用界線。</li>
+    </ul></div>
+    <div class="card"><h3>🔗 跨域連結</h3><ul class="tidy" style="font-size:.92rem">
+      <li><b>數學</b>：座標、差值、比例與正規化。</li>
+      <li><b>健體</b>：五官名稱與臉部肌肉表情。</li>
+      <li><b>藝術</b>：AR 濾鏡與臉部比例（三庭五眼）。</li>
+      <li><b>資訊倫理</b>：生物特徵辨識與個資保護。</li>
+    </ul></div>
+    <div class="card"><h3>🚀 延伸主題</h3><ul class="tidy" style="font-size:.92rem">
+      <li>自製 AR 濾鏡（帽子、眼鏡、動物耳朵）。</li>
+      <li>張嘴接蘋果、眨眼射擊等無接觸遊戲。</li>
+      <li>臉部比例測量與美術課的三庭五眼對照。</li>
+      <li>比較 Facemesh／Handpose／PoseNet 三者的適用情境。</li>
+    </ul></div>
+  </div>
+</section>
+
+<footer>
+  <p>教材整理　·　Facemesh2Scratch by Junya Ishihara（champierre）　·　模型：TensorFlow.js facemesh（MediaPipe Face Mesh，468 點）</p>
+  <p><a href="https://github.com/champierre/facemesh2scratch">GitHub 原始碼</a>　·　<a href="https://stretch3.github.io/">stretch3 線上編輯器</a></p>
+</footer>
+</div>
+
+<script>
+var C={o:'var(--c-out)',b:'var(--c-brow)',e:'var(--c-eye)',n:'var(--c-nose)',m:'var(--c-mouth)',c:'var(--c-cheek)'};
+var GN={o:'額頭與輪廓',b:'眉毛',e:'眼睛',n:'鼻子',m:'嘴巴',c:'臉頰'};
+var KP=[
+ [2,'鼻尖',200,262,'n',17,-4,'全臉最穩定的追蹤點，適合作為「整張臉在哪裡」的代表。'],
+ [3,'鼻子下緣',200,282,'n',-17,4,'鼻基底、人中上方。'],
+ [99,'右鼻翼',224,274,'n',17,10,'右側鼻翼；與 328 合用可估鼻寬。'],
+ [328,'左鼻翼',176,274,'n',-17,10,'左側鼻翼。'],
+ [34,'右眼外角',282,205,'e',18,4,'右眼外眥；與 134 合用可算眼睛寬度。'],
+ [134,'右眼內角',222,207,'e',4,17,'右眼內眥，靠近鼻梁側。'],
+ [160,'右眼上緣',252,191,'e',0,-11,'眨眼偵測主力：與 146 的 y 差值小於約 4 即判定閉眼。'],
+ [146,'右眼下緣',252,219,'e',0,17,'右眼下眼瞼中央。'],
+ [363,'左眼內角',178,207,'e',-4,17,'左眼內眥。'],
+ [264,'左眼外角',118,205,'e',-18,4,'左眼外眥。'],
+ [387,'左眼上緣',148,191,'e',0,-11,'左眼上眼瞼，與 375 合用偵測左眼眨眼。'],
+ [375,'左眼下緣',148,219,'e',0,17,'左眼下眼瞼。'],
+ [71,'右眉外側',276,168,'b',16,-6,'眉尾；與眉心 10 合用可判斷眉毛角度。'],
+ [106,'右眉中央',250,157,'b',0,-11,'挑眉偵測：與右眼上緣 160 的距離變大即為挑眉。'],
+ [108,'右眉內側',226,165,'b',8,-12,'眉頭；皺眉時兩側眉頭會互相靠近（108 與 337 的 x 差變小）。'],
+ [337,'左眉內側',174,165,'b',-8,-12,'左側眉頭，與 108 成對使用。'],
+ [335,'左眉中央',150,157,'b',0,-11,'左眉中央，用途同右眉。'],
+ [301,'左眉外側',124,168,'b',-16,-6,'左側眉尾。'],
+ [10,'眉心',200,180,'b',0,-10,'兩眉正中；AR 眼鏡與額飾的最佳定位點。'],
+ [62,'右嘴角',248,330,'m',18,2,'右嘴角；(62 x − 292 x) 變大代表嘴角橫向拉開＝微笑。'],
+ [292,'左嘴角',152,330,'m',-18,2,'左嘴角。'],
+ [1,'上唇中央',200,306,'m',0,-10,'上唇最上緣（外緣）。'],
+ [18,'下唇中央',200,350,'m',0,16,'下唇最下緣（外緣）；與 1 合用可算嘴唇整體厚度。'],
+ [14,'上唇內緣中央',200,318,'m',-18,0,'張嘴偵測主力：與 15 的 y 差值即嘴巴開合程度。'],
+ [15,'下唇內緣中央',200,338,'m',18,6,'下唇內緣，與 14 成對使用。'],
+ [11,'額頭頂端',200,82,'o',0,-14,'帽子、皇冠等頭頂配件的定位點；與下巴合用可算臉高。'],
+ [152,'額頭中央',200,124,'o',0,-13,'額頭中心；適合貼額飾，或作為頭部傾斜的參考點。'],
+ [153,'下巴',200,404,'o',0,17,'臉的最下緣；(11 y − 153 y) 可作為臉高度，用於正規化。'],
+ [206,'右臉頰',268,290,'c',18,8,'右頰中央；微笑時相對上抬，可做笑容偵測。'],
+ [426,'左臉頰',132,290,'c',-18,8,'左頰中央。'],
+ [235,'臉部右緣',328,252,'o',17,4,'臉右側輪廓；與 455 合用可算臉寬，亦可估測遠近。'],
+ [455,'臉部左緣',72,252,'o',-17,4,'臉左側輪廓。']
+];
+var NS='http://www.w3.org/2000/svg';
+function at(el,o){for(var k in o){el.setAttribute(k,o[k]);}return el;}
+var kpg=document.getElementById('kps'),kbody=document.getElementById('kbody');
+(function(){
+  var g=document.getElementById('meshdots'),seed=11;
+  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+  for(var i=0;i<230;i++){
+    var a=rnd()*Math.PI*2,r=Math.sqrt(rnd());
+    var x=200+Math.cos(a)*r*126,y=245+Math.sin(a)*r*160;
+    g.appendChild(at(document.createElementNS(NS,'circle'),{cx:x.toFixed(1),cy:y.toFixed(1),r:1.6,'class':'mesh'}));
+  }
+})();
+KP.forEach(function(d){
+  var g=at(document.createElementNS(NS,'g'),{'class':'kp',tabindex:'0',role:'button','aria-label':d[0]+' '+d[1],'data-n':d[0]});
+  g.appendChild(at(document.createElementNS(NS,'circle'),{'class':'halo',cx:d[2],cy:d[3],r:18}));
+  g.appendChild(at(document.createElementNS(NS,'circle'),{'class':'core',cx:d[2],cy:d[3],r:8,fill:C[d[4]]}));
+  var t=at(document.createElementNS(NS,'text'),{'class':'lab',x:d[2]+d[5],y:d[3]+d[6]});
+  t.textContent=d[0];g.appendChild(t);
+  ['click','mouseenter','focus'].forEach(function(ev){g.addEventListener(ev,function(){pick(d[0]);});});
+  kpg.appendChild(g);
+  var tr=document.createElement('tr');
+  tr.className='row';tr.dataset.n=d[0];
+  tr.innerHTML='<td class="kn" style="color:'+C[d[4]]+'">'+d[0]+'</td><td><b>'+d[1]+'</b></td><td style="color:var(--ink2);font-size:.84rem">'+d[7]+'</td>';
+  ['click','mouseenter'].forEach(function(ev){tr.addEventListener(ev,function(){pick(d[0]);});});
+  kbody.appendChild(tr);
+});
+function idx(n){for(var i=0;i<KP.length;i++){if(KP[i][0]===n)return i;}return -1;}
+function pick(n){
+  var i=idx(n);if(i<0)return;
+  var d=KP[i];
+  var olds=document.querySelectorAll('.kp.on,.kptable tr.on');
+  for(var k=0;k<olds.length;k++){olds[k].classList.remove('on');}
+  document.querySelector('.kp[data-n="'+n+'"]').classList.add('on');
+  document.querySelector('.kptable tr[data-n="'+n+'"]').classList.add('on');
+  var no=document.getElementById('i-no');
+  no.textContent=n;no.style.color=C[d[4]];
+  document.getElementById('i-zh').textContent=d[1]+'（'+GN[d[4]]+'）';
+  document.getElementById('i-mp').textContent='積木編號 '+n+'　·　MediaPipe 索引 '+(n-1);
+  document.getElementById('i-desc').textContent=d[7];
+}
+pick(2);
+var qEl=document.getElementById('q'),msg=document.getElementById('msg');
+function find(){
+  var v=parseInt(qEl.value,10);
+  if(!v||v<1||v>468){msg.textContent='請輸入 1 到 468 之間的編號。';return;}
+  if(idx(v)>=0){pick(v);msg.textContent='已定位到第 '+v+' 號。';}
+  else{msg.textContent='第 '+v+' 號不在積木的部位選單中。';}
+}
+document.getElementById('go').addEventListener('click',find);
+qEl.addEventListener('keydown',function(e){if(e.key==='Enter')find();});
+</script>
+
+</body>
+</html>

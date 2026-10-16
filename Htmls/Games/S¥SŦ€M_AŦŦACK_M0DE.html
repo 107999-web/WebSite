@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S¥SŦ€M_AŦŦACK_M0DE</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #030000;
+            color: #ff3333;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        /* CRT 螢幕老舊濾鏡 */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            z-index: 5;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        #game-container {
+            width: 800px;
+            height: 650px;
+            border: 3px solid #ff0000;
+            background-color: #080000;
+            box-shadow: 0 0 25px #ff0000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 頂部狀態列 */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .hp-container {
+            width: 45%;
+        }
+
+        .hp-label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hp-bar-outer {
+            width: 100%;
+            height: 18px;
+            border: 1px solid #ff0000;
+            background: #200;
+            padding: 2px;
+        }
+
+        .hp-bar-inner {
+            height: 100%;
+            background: #ff0000;
+            width: 100%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        #enemy-hp { background: #9900ff; box-shadow: 0 0 10px #9900ff; }
+        #enemy-border { border-color: #9900ff; }
+
+        /* 即時動作戰場 */
+        .arena-wrapper {
+            flex: 1;
+            position: relative;
+            border: 1px dashed #ff0000;
+            background: #000;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 操作說明 */
+        .instructions {
+            display: flex;
+            justify-content: space-around;
+            background: #110000;
+            border: 1px solid #330000;
+            padding: 8px;
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+        }
+        .instructions span { color: #ff3333; font-weight: bold; }
+
+        /* 系統終端日誌 */
+        #log-console {
+            height: 75px;
+            border: 1px solid #220000;
+            background: #020000;
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 11px;
+            overflow-y: hidden;
+            color: #8a1a1a;
+        }
+
+        /* 畫面特效類 */
+        .shake { animation: screen-shake 0.15s infinite; }
+        @keyframes screen-shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-1px, -2px) rotate(-1deg); }
+            40% { transform: translate(-3px, 0px) rotate(1deg); }
+            60% { transform: translate(0px, 2px) rotate(0deg); }
+            80% { transform: translate(2px, 1px) rotate(-1deg); }
+            100% { transform: translate(-1px, -2px) rotate(0deg); }
+        }
+
+        .flash-red { animation: flash 0.2s ease-out; }
+        @keyframes flash {
+            0% { background-color: rgba(255, 0, 0, 0.5); }
+            100% { background-color: #080000; }
+        }
+
+        /* 結局畫面 */
+        #overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        #overlay h1 { font-size: 42px; margin-bottom: 15px; letter-spacing: 4px; }
+        #overlay button {
+            background: #1a0000; border: 1px solid #ff0000; color: #ff3333;
+            padding: 10px 30px; font-family: monospace; font-size: 16px; cursor: pointer;
+        }
+        #overlay button:hover { background: #ff0000; color: #000; box-shadow: 0 0 15px #ff0000; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- 狀態列 -->
+        <div class="status-bar">
+            <div class="hp-container">
+                <div class="hp-label">YOUR SANITY (神智殘留)</div>
+                <div class="hp-bar-outer">
+                    <div id="player-hp" class="hp-bar-inner"></div>
+                </div>
+            </div>
+            <div class="hp-container">
+                <div class="hp-label" style="text-align: right; color: #9900ff;">MAINFRAME (核心崩潰度)</div>
+                <div id="enemy-border" class="hp-bar-outer">
+                    <div id="enemy-hp" class="hp-bar-inner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 即時 Canvas 戰場 -->
+        <div class="arena-wrapper" id="arena-wrapper">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- 鍵盤操作提示 -->
+        <div class="instructions">
+            <div>移動：<span>W / A / S / D</span> 或 <span>方向鍵</span></div>
+            <div>攻擊：<span>空白鍵 (SPACE)</span> 注入強制重開機代碼</div>
+            <div>目標：一邊閃躲彈幕，一邊射擊上方的<span>電腦核心</span></div>
+        </div>
+
+        <!-- 歷史日誌 -->
+        <div id="log-console">
+            <div>[SYSTEM]: 核心已鎖定你的鍵盤輸入。逃生協議...未找到。</div>
+        </div>
+    </div>
+
+    <!-- 終局畫面 -->
+    <div id="overlay" id="overlay-screen">
+        <h1 id="overlay-title">SYSTEM FAILURE</h1>
+        <p id="overlay-desc" style="margin-bottom: 25px; color: #777;"></p>
+        <button onclick="location.reload()">重新初始化靈魂</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('game-container');
+
+        // 調整 Canvas 解析度
+        canvas.width = 756;
+        canvas.height = 390;
+
+        // 遊戲狀態與屬性
+        let player = { x: canvas.width / 2, y: canvas.height - 50, size: 12, speed: 4.5, hp: 100, maxHp: 100 };
+        let boss = { x: canvas.width / 2, y: 60, radius: 45, hp: 200, maxHp: 200, direction: 1, speed: 2 };
+        
+        let keys = {};
+        let playerBullets = [];
+        let enemyBullets = [];
+        let isGameOver = false;
+        let lastShotTime = 0;
+        let enemyPatternTimer = 0;
+
+        const creepyWords = ["DIE", "VOID", "0101", "ERR", "KILL", "STAY", "USER_NULL", "👁️"];
+        const systemLogs = [
+            "核心正在追蹤你的按鍵頻率...",
+            "系統警告：鍵盤已被惡意線程滲透。",
+            "它在對著你笑...從螢幕的反光裡。",
+            "不要放開按鍵，放開就會被格式化。",
+            "偵測到非人類代碼試圖與你的手指同步。"
+        ];
+
+        // 鍵盤事件監聽
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            keys[e.key] = true; // 支援方向鍵與空白鍵
+            // 防止瀏覽器在按方向鍵或空白鍵時滾動網頁
+            if(["space", "arrowup", "arrowdown", "arrowleft", "arrowright", " "].indexOf(e.key.toLowerCase()) > -1) {
+                e.preventDefault();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+            keys[e.key] = false;
+        });
+
+        // 寫入恐怖日誌
+        function logMessage(msg) {
+            const consoleBox = document.getElementById('log-console');
+            const newLog = document.createElement('div');
+            newLog.innerText = msg;
+            consoleBox.appendChild(newLog);
+            if (consoleBox.childNodes.length > 4) {
+                consoleBox.removeChild(consoleBox.firstChild);
+            }
+        }
+
+        // 定時觸發隨機恐怖日誌
+        setInterval(() => {
+            if (!isGameOver && Math.random() < 0.4) {
+                logMessage(`[未知線程]: ${systemLogs[Math.floor(Math.random() * systemLogs.length)]}`);
+            }
+        }, 3000);
+
+        // 產生震撼特效
+        function triggerHitEffect() {
+            container.classList.add('flash-red', 'shake');
+            setTimeout(() => {
+                container.classList.remove('flash-red', 'shake');
+            }, 200);
+        }
+
+        // 主遊戲迴圈
+        function gameLoop() {
+            if (isGameOver) return;
+
+            updateMechanics();
+            renderGraphics();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 物理與邏輯運算
+        function updateMechanics() {
+            // 1. 玩家移動控制 (支援 WASD & 方向鍵)
+            if (keys['w'] || keys['ArrowUp']) player.y -= player.speed;
+            if (keys['s'] || keys['ArrowDown']) player.y += player.speed;
+            if (keys['a'] || keys['ArrowLeft']) player.x -= player.speed;
+            if (keys['d'] || keys['ArrowRight']) player.x += player.speed;
+
+            // 邊界限制
+            if (player.x < player.size) player.x = player.size;
+            if (player.x > canvas.width - player.size) player.x = canvas.width - player.size;
+            if (player.y < 150) player.y = 150; // 限制不能太靠近Boss
+            if (player.y > canvas.height - player.size) player.y = canvas.height - player.size;
+
+            // 2. 玩家攻擊 (空白鍵)
+            if ((keys[' '] || keys['space'])) {
+                let now = Date.now();
+                if (now - lastShotTime > 180) { // 射擊冷卻
+                    playerBullets.push({ x: player.x, y: player.y - 10, speed: 7 });
+                    lastShotTime = now;
+                }
+            }
+
+            // 更新玩家子彈
+            for (let i = playerBullets.length - 1; i >= 0; i--) {
+                let b = playerBullets[i];
+                b.y -= b.speed;
+                
+                // 碰撞偵測 (子彈 打中 電腦核心)
+                let distToBoss = Math.hypot(b.x - boss.x, b.y - boss.y);
+                if (distToBoss < boss.radius) {
+                    boss.hp -= 2;
+                    if (boss.hp < 0) boss.hp = 0;
+                    document.getElementById('enemy-hp').style.width = `${(boss.hp / boss.maxHp) * 100}%`;
+                    playerBullets.splice(i, 1);
+                    continue;
+                }
+                if (b.y < 0) playerBullets.splice(i, 1);
+            }
+
+            // 3. 電腦核心 (Boss) 行動與彈幕發射
+            boss.x += boss.speed * boss.direction;
+            if (boss.x > canvas.width - boss.radius || boss.x < boss.radius) {
+                boss.direction *= -1;
+            }
+
+            enemyPatternTimer++;
+            // 隨機彈幕模式
+            if (enemyPatternTimer % 25 === 0) {
+                // 模式 A: 向下方散開的惡意代碼
+                let word = creepyWords[Math.floor(Math.random() * creepyWords.length)];
+                let angleStep = Math.PI / 4;
+                for (let a = 0; a <= Math.PI; a += angleStep) {
+                    enemyBullets.push({
+                        x: boss.x,
+                        y: boss.y + 20,
+                        vx: Math.cos(a + Math.random()*0.2) * 3,
+                        vy: Math.sin(a + Math.random()*0.2) * 3 + 1,
+                        text: word
+                    });
+                }
+            }
+            if (enemyPatternTimer % 60 === 0 && Math.random() < 0.6) {
+                // 模式 B: 精準追蹤玩家的惡毒字串
+                let angleToPlayer = Math.atan2(player.y - boss.y, player.x - boss.x);
+                enemyBullets.push({
+                    x: boss.x,
+                    y: boss.y + 20,
+                    vx: Math.cos(angleToPlayer) * 5.5,
+                    vy: Math.sin(angleToPlayer) * 5.5,
+                    text: "CRITICAL_ERR"
+                });
+            }
+
+            // 更新電腦彈幕
+            for (let i = enemyBullets.length - 1; i >= 0; i--) {
+                let eb = enemyBullets[i];
+                eb.x += eb.vx;
+                eb.y += eb.vy;
+
+                // 碰撞偵測 (電腦彈幕 擊中 玩家意識)
+                let distToPlayer = Math.hypot(eb.x - player.x, eb.y - player.y);
+                if (distToPlayer < player.size + 10) {
+                    player.hp -= 6;
+                    if (player.hp < 0) player.hp = 0;
+                    document.getElementById('player-hp').style.width = `${(player.hp / player.maxHp) * 100}%`;
+                    triggerHitEffect();
+                    logMessage(`[☠️受創]: 核心代碼 "${eb.text}" 侵蝕了你的理智！`);
+                    enemyBullets.splice(i, 1);
+                    checkGameOver();
+                    continue;
+                }
+
+                // 超出邊界刪除
+                if (eb.y > canvas.height || eb.x < 0 || eb.x > canvas.width) {
+                    enemyBullets.splice(i, 1);
+                }
+            }
+
+            // 檢查勝負條件
+            if (boss.hp <= 0) checkGameOver();
+        }
+
+        // 渲染畫面繪製
+        function renderGraphics() {
+            // 背景底色抹除
+            ctx.fillStyle = "rgba(10, 0, 0, 0.3)"; // 留下一點殘影感
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 繪製背景微弱的隨機0和1 (背景駭客流)
+            ctx.fillStyle = "rgba(40, 0, 0, 0.15)";
+            ctx.font = "10px monospace";
+            for(let i=0; i<5; i++) {
+                ctx.fillText(Math.random() > 0.5 ? "1" : "0", Math.random()*canvas.width, Math.random()*canvas.height);
+            }
+
+            // 1. 繪製電腦核心 (Boss)
+            let glitchOffset = (Math.random() - 0.5) * 6; // 隨機抖動
+            ctx.save();
+            ctx.translate(boss.x + glitchOffset, boss.y);
+            
+            // 外圈核心發光
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#9900ff";
+            ctx.fillStyle = "#150025";
+            ctx.beginPath();
+            ctx.arc(0, 0, boss.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#9900ff";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 核心內部邪惡之眼/符號
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#ff0033";
+            ctx.font = "bold 14px monospace";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            if (Math.random() < 0.1) {
+                ctx.fillText("[ ☠️ ]", 0, 0);
+            } else {
+                ctx.fillText("[ 👁️ ]", 0, 0);
+            }
+            ctx.restore();
+
+            // 2. 繪製玩家意識 (由鍵盤控制)
+            ctx.save();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#00ff66";
+            ctx.fillStyle = "#00ff66"; // 玩家是綠色的希望之光
+            ctx.beginPath();
+            // 畫一個代表意識的菱形/核心
+            ctx.moveTo(player.x, player.y - player.size);
+            ctx.lineTo(player.x + player.size, player.y);
+            ctx.lineTo(player.x, player.y + player.size);
+            ctx.lineTo(player.x - player.size, player.y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 意識內核
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "9px monospace";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("I", player.x, player.y);
+            ctx.restore();
+
+            // 3. 繪製玩家淨化子彈
+            ctx.fillStyle = "#00ffff";
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#00ffff";
+            for (let b of playerBullets) {
+                ctx.fillRect(b.x - 2, b.y, 4, 12);
+            }
+
+            // 4. 繪製電腦詛咒彈幕 (文字型彈幕)
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "#ff0000";
+            ctx.fillStyle = "#ff3333";
+            ctx.font = "bold 12px monospace";
+            ctx.textAlign = "center";
+            for (let eb of enemyBullets) {
+                ctx.fillText(eb.text, eb.x, eb.y);
+            }
+            ctx.shadowBlur = 0; // 重設
+        }
+
+        // 結束判斷
+        function checkGameOver() {
+            if (isGameOver) return;
+
+            const overlay = document.getElementById('overlay');
+            const title = document.getElementById('overlay-title');
+            const desc = document.getElementById('overlay-desc');
+
+            if (player.hp <= 0) {
+                isGameOver = true;
+                overlay.style.display = 'flex';
+                title.innerText = "靈 魂 被 抹 除";
+                title.style.color = "#ff0000";
+                title.style.textShadow = "0 0 20px #ff0000";
+                desc.innerText = "你的鍵盤停止了回應。核心已接管你的神經網路，系統強制關機...";
+            } else if (boss.hp <= 0) {
+                isGameOver = true;
+                overlay.style.display = 'flex';
+                title.innerText = "主 機 遭 強 制 關 機";
+                title.style.color = "#00ff66";
+                title.style.textShadow = "0 0 20px #00ff66";
+                desc.innerText = "螢幕噴出腥紅的液體並陷入永久黑暗...你成功奪回了雙手的控制權。";
+            }
+        }
+
+        // 啟動遊戲
+        gameLoop();
+    </script>
+</body>
+</html>

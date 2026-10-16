@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 堂｜紅石音樂盒與飛行機器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="18">
+<main class="wrap">
+
+<section class="hero" style="--u:#FFB74D">
+  <span class="tag">第 18 堂 ／ 單元4　大型機關</span>
+  <h1>紅石音樂盒與飛行機器 🎼</h1>
+  <p>用中繼器的延遲排出節奏，讓一整排音符盒自動演奏《小星星》！最後挑戰紅石界的超酷作品：用黏液方塊和觀察者做出會自己飛的飛行機器。</p>
+  <div class="chips"><span class="chip">🧱 音符盒、紅石中繼器、按鈕、黏液方塊、觀察者、黏性活塞</span><span class="chip">💻 MakeCode：本堂不搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>會調音符盒音高、換樂器，用中繼器排出旋律。</li><li>做出自動演奏的音樂盒。</li><li>🦊 做出基岩版的黏液飛行機器，說得出它為什麼會一直前進。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：聽一聽：網頁的小星星音樂盒</div></div>
+<div class="slot" data-min="10" data-label="第1節 新概念"><b>10 分</b><div><b>新概念</b>：音符盒音高 0～24、樂器由下方方塊決定</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：自動演奏《小星星》：照網頁的音高在遊戲做</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="25" data-label="第2節 應用 2"><b>25 分</b><div><b>應用 2</b>：飛行機器（🦊）／自由作曲（🐣）</div></div>
+<div class="slot" data-min="5" data-label="第2節 音樂會"><b>5 分</b><div><b>音樂會</b>：全班播放自己的音樂盒</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">🎵</span><b>音符盒音高</b>右鍵一下升半音，0～24 共 25 個音。<b>6 = Do</b>、8 = Re、10 = Mi、11 = Fa、13 = Sol、15 = La、17 = Si、18 = 高音 Do。</div><div class="lc"><span class="ic">🥁</span><b>換樂器</b>下面墊不同方塊：木頭＝貝斯、沙子＝小鼓、玻璃＝喀喀聲、石頭＝大鼓、金塊＝鐘琴、黏土＝長笛、羊毛＝吉他。</div><div class="lc"><span class="ic">🛸</span><b>飛行機器</b>黏液方塊會把旁邊的方塊一起拉走。觀察者看到「自己被推動」就發出訊號讓活塞再推一次，所以會一直前進。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>音樂盒：每個中繼器延遲＝一個節拍，延遲越大節奏越慢。</li><li>飛行機器會一直飛到碰到障礙物或世界邊界，請在空曠的地方往「空的方向」發射，並先存檔。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：自動演奏《小星星》 🎼</h3></header>
+  <div class="items">🎒 準備物品：按鈕、紅石粉、紅石中繼器 ×6、音符盒 ×7</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s18a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>按鈕 → 紅石粉 → 中繼器（延遲 3）→ 紅石粉 → 中繼器……排成一排。</li><li>每段紅石粉旁邊放一個音符盒。</li><li>照順序調音高：<b>6 6 13 13 15 15 13</b>（Do Do Sol Sol La La Sol）。</li><li>按下按鈕，聽聽看！</li></ol>
+  <div class="tip">💡 調音高時一邊點一邊聽，點過頭了就繼續點，到 24 之後會回到 0。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：完成第一句《小星星》。</div><div class="lv f"><b>🦊 五、六年級</b>：接上第二句：11 11 10 10 8 8 6（Fa Fa Mi Mi Re Re Do）。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：黏液飛行機器 🛸</h3></header>
+  <div class="items">🎒 準備物品：黏液方塊 ×4、觀察者 ×2、黏性活塞 ×1、活塞 ×1</div>
+  
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>先在空中蓋一個基座（之後要挖掉）。</li><li>照老師的示範圖（或基岩版飛行機器教學影片）擺放：兩組「黏液方塊＋觀察者＋活塞」前後相接。</li><li>挖掉基座，在最後面放一個方塊再挖掉，觸發觀察者。</li><li>機器開始一格一格往前飛！</li></ol>
+  <div class="tip">💡 一定要確認是「Bedrock／基岩版」的飛行機器圖，Java 版的設計在這裡飛不起來。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：自由作曲：用 7 個音符盒編一段自己的旋律。</div><div class="lv f"><b>🦊 五、六年級</b>：做出飛行機器，並在上面載一個人一起飛。</div></div>
+</section>
+
+<section class="card"><h2>💻 MakeCode</h2>
+  <p class="nomc">這堂<b>不搭配</b> MakeCode：音符盒的音高要一格一格點、用耳朵聽，飛行機器也要親手擺放；這堂專心在遊戲裡創作。</p></section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>你想讓音樂盒演奏哪一首歌？試著寫出它的音高數字。</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>音高對照（F♯ 為 0）：6=C、8=D、10=E、11=F、13=G、15=A、17=B、18=高音 C。</li><li>飛行機器設計請老師課前在本校版本測試過，並用結構方塊存一份給學生參考；若時間不夠，可改為示範觀看。</li><li>飛行機器可能飛進別人的建地，請規劃專用的「飛行跑道」。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s18a": {"title": "🎼 自動演奏：小星星", "desc": "按下按鈕，訊號一格一格往右跑，經過的音符盒依序發出聲音。用 🖐️ 點音符盒改音高，編一首自己的曲子！", "rows": ["B:B - r>3 - r>3 - r>3 - r>3 - r>3 - r>3 -", ". N6 . N6 . N13 . N13 . N15 . N15 . N13:N"], "tools": ["rep", "dust", "note"], "names": {"B": "按鈕", "N": "最後一個音符盒"}, "challenges": [{"name": "按一下，一路響到最後一個音", "level": "🐣", "demo": true, "steps": [{"press": "B", "atLeast": {"N": 1}}]}]}};
+window.QUIZ = [{"q": "音符盒的音高「6」是哪個音？", "o": ["Do", "Sol", "La"], "a": 0, "why": "6 = Do，13 = Sol，15 = La。"}, {"q": "音符盒下面墊金塊，會變成什麼樂器？", "o": ["鐘琴", "大鼓", "吉他"], "a": 0, "why": "金塊是鐘琴（叮叮聲）。"}, {"q": "想讓音樂盒的節奏變慢，要怎麼做？", "o": ["中繼器延遲調大", "多放音符盒", "換按鈕"], "a": 0, "why": "延遲越大，下一個音越晚響。"}, {"q": "飛行機器為什麼會一直前進？", "o": ["觀察者看到自己被推動又觸發活塞", "它有引擎", "風吹的"], "a": 0, "why": "觀察者 → 活塞推 → 觀察者看到變化 → 再推……"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

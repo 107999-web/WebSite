@@ -1,0 +1,116 @@
+/* hand.css — 手勢辨識大挑戰：互動實驗室專用樣式 */
+
+/* ---------- 可點的手 ---------- */
+.handlab{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start;
+  background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:18px}
+.handbox{flex:0 0 auto;text-align:center}
+.handsvg{display:block;width:180px;height:210px;touch-action:manipulation}
+.handsvg .fg{cursor:pointer;transition:transform .12s ease}
+.handsvg .fg:hover{filter:brightness(1.06)}
+.handhint{font-size:.8rem;color:var(--ink2);margin-top:6px}
+.handout{flex:1 1 260px;min-width:250px;display:flex;flex-direction:column;gap:10px}
+
+/* ---------- 四盞燈 ---------- */
+.lamps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lamp{width:62px;border:3px solid #C9C9C9;border-radius:14px;background:var(--paper);
+  padding:8px 0 6px;text-align:center;transition:.15s}
+.lamp i{display:block;width:28px;height:28px;border-radius:50%;background:#C9C9C9;margin:0 auto 5px;
+  color:#fff;font-style:normal;font-weight:800;line-height:28px;font-size:1rem}
+.lamp b{font-size:.85rem;color:#9A9A9A;font-weight:800}
+.lamp.on{border-color:#3FAE6A}
+.lamp.on i{background:#3FAE6A}
+.lamp.on b{color:#3FAE6A}
+
+/* ---------- 讀值列 ---------- */
+.vrow{display:flex;flex-wrap:wrap;gap:8px}
+.vbox{background:var(--c-variables);color:#fff;border-radius:999px;padding:5px 14px;
+  font-weight:800;font-size:.9rem;box-shadow:var(--shadow-s)}
+.vbox em{font-style:normal;opacity:.85;font-weight:700;margin-right:6px}
+.vbox.code{background:var(--c-operators);font-family:var(--f-num);letter-spacing:.14em}
+.vbox.res{background:var(--c-myblocks)}
+.vbox.dim{background:#9E9E9E}
+
+/* ---------- 指型密碼表 ---------- */
+.pattab{width:100%;border-collapse:collapse;font-size:.92rem}
+.pattab th,.pattab td{border:1px solid var(--line);padding:7px 10px;text-align:center}
+.pattab th{background:var(--paper2);font-weight:800}
+.pattab td.code{font-family:var(--f-num);letter-spacing:.18em;font-weight:800}
+.pattab tr.yes td.code{background:rgba(63,174,106,.16);color:#2E8B5E}
+.pattab tr.no td.code{background:rgba(158,158,158,.14);color:var(--ink2)}
+
+/* ---------- 一根手指的比大小 ---------- */
+.fingerlab{display:flex;gap:20px;flex-wrap:wrap;align-items:center;
+  background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:18px}
+.fstage{position:relative;width:190px;height:230px;background:var(--paper);
+  border:2px solid var(--line);border-radius:14px;overflow:hidden;flex:0 0 auto}
+.fstage .gl{position:absolute;left:0;right:0;height:0;border-top:2px dashed #4C97FF}
+.fstage .gl.tip{border-top-color:#FF3B7A}
+.fstage .gl span{position:absolute;right:6px;top:-18px;font-size:.72rem;font-weight:800;color:#4C97FF}
+.fstage .gl.tip span{color:#FF3B7A}
+.fout{flex:1 1 240px;min-width:230px}
+.verdict{font-size:1.15rem;font-weight:900;padding:10px 16px;border-radius:14px;text-align:center;margin-top:10px}
+.verdict.up{background:rgba(63,174,106,.18);color:#2E8B5E;border:2px solid #3FAE6A}
+.verdict.down{background:rgba(158,158,158,.16);color:var(--ink2);border:2px solid #C9C9C9}
+
+/* ---------- 猜拳算式 ---------- */
+.rpslab{background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:18px}
+.pickrow{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px}
+.pick{flex:1 1 220px}
+.pick h4{margin:0 0 7px;font-size:.92rem;color:var(--ink2)}
+.pick .opts3{display:flex;gap:7px}
+.pick button{flex:1;padding:9px 4px;border-radius:12px;border:2px solid var(--line);
+  background:var(--paper);font-weight:800;cursor:pointer;font-family:inherit;font-size:.92rem;color:var(--ink)}
+.pick button.sel{background:var(--accent);border-color:var(--accent-d);color:#fff}
+.formula{background:var(--paper);border:2px dashed var(--accent);border-radius:14px;
+  padding:12px 14px;font-family:var(--f-num);font-size:1.02rem;font-weight:800;text-align:center;line-height:1.9}
+.formula b{color:var(--accent-d)}
+
+/* ---------- 抖動示範 ---------- */
+.jitlab{background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:18px}
+.jitbars{display:flex;gap:3px;height:44px;align-items:flex-end;margin:10px 0;overflow:hidden}
+.jitbars i{flex:1 0 5px;background:#C9C9C9;border-radius:3px 3px 0 0;transition:height .1s}
+.jitbars i.a{background:#4C97FF}
+.jitbars i.b{background:#FF3B7A}
+.slid{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.slid input[type=range]{flex:1 1 180px;accent-color:var(--accent)}
+
+/* ---------- 試玩台 ---------- */
+.playbox{background:var(--paper2);border:2px solid var(--line);border-radius:18px;padding:18px}
+.pstage{position:relative;background:linear-gradient(#E3F0FF,#FFF3DA);border:3px solid var(--line);
+  border-radius:14px;height:300px;overflow:hidden;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;text-align:center}
+.pstage .big{font-size:4.2rem;font-weight:900;color:#4C97FF;font-family:var(--f-num);line-height:1}
+.pstage .mid{font-size:1.5rem;font-weight:900}
+.pstage .sm{font-size:.95rem;color:var(--ink2)}
+.pcard{background:#fff;border:5px solid #4C97FF;border-radius:22px;padding:6px 26px}
+.pbanner{padding:9px 26px;border-radius:16px;color:#fff;font-weight:900;font-size:1.25rem}
+.pbanner.ok{background:#3FAE6A}.pbanner.no{background:#9E9E9E}.pbanner.win{background:#3FAE6A}
+.pbanner.lose{background:#E8607D}.pbanner.tie{background:#FF8C1A}
+.phud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0 0}
+.phud span{background:var(--paper);border:2px solid var(--line);border-radius:999px;
+  padding:4px 14px;font-weight:800;font-size:.9rem}
+.hands2{display:flex;gap:30px;align-items:flex-end;justify-content:center}
+.hands2 figure{margin:0;text-align:center}
+.hands2 figcaption{font-weight:800;margin-top:4px;font-size:.9rem}
+.hands2 svg{width:110px;height:128px}
+
+/* ---------- 擴充功能／清單積木配色 ---------- */
+:root{--c-ext:#0FBD8C;--c-list:#FF661A}
+.sb.ext{background:var(--c-ext);box-shadow:0 3px 0 #0B9A72}
+.rp.ext,.bl.ext{background:var(--c-ext)}
+.rp.listtone,.bl.listtone{background:var(--c-list)}
+.bscript{overflow-x:auto;padding-bottom:6px}
+.bscript .cwrap{min-width:0}
+
+/* ---------- 重點規則框 ---------- */
+.keyrule{background:var(--paper);border:3px solid var(--accent);border-radius:18px;
+  padding:14px 18px;margin:14px 0;font-size:1rem;line-height:1.95;text-align:center}
+.keyrule b{color:var(--accent-d);font-weight:900}
+.keyrule .k{font-family:var(--f-num);font-weight:900;font-size:1.12rem}
+.keyrule .sub{display:block;font-size:.86rem;color:var(--ink2);margin-top:4px;line-height:1.7}
+
+/* ---------- 抖動示範：三條軌跡 ---------- */
+.jrow{display:flex;align-items:center;gap:10px;margin:4px 0}
+.jrow>b{flex:0 0 7.4em;font-size:.88rem}
+.jrow .jitbars{flex:1;margin:0}
+.jitbars i.c{background:#FF8C1A}

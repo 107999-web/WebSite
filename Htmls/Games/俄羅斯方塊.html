@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夢幻馬卡龍 俄羅斯方塊 ✨</title>
+    <style>
+        :root {
+            --bg-color: #ffeef2;
+            --panel-bg: #ffffff;
+            --text-color: #7d5a64;
+            --border-color: #ffccd5;
+            --grid-bg: #fff5f7;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei";
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        h1 {
+            margin: 10px 0;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 0px #fff, 4px 4px 0px #ffccd5;
+            letter-spacing: 2px;
+        }
+
+        .game-container {
+            display: flex;
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(255, 182, 193, 0.4);
+            border: 4px solid var(--border-color);
+            gap: 25px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 遊戲主要網格 */
+        #canvas {
+            background-color: var(--grid-bg);
+            border: 4px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 140px;
+        }
+
+        .info-box {
+            background: #fff9fa;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .info-box h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ff758f;
+        }
+
+        /* 下一個方塊預覽區 */
+        #next-canvas {
+            background-color: var(--grid-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(255, 154, 158, 0.4);
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(255, 154, 158, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 操控說明 */
+        .controls-hint {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #aaa0a2;
+            background: #fff9fa;
+            padding: 12px;
+            border-radius: 15px;
+            border: 1px dashed var(--border-color);
+        }
+
+        /* 遊戲結束覆蓋層 */
+        .game-over-overlay {
+            display: none;
+            position: absolute;
+            background: rgba(255, 238, 242, 0.9);
+            border-radius: 26px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff758f;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>俄羅斯方塊 🧸</h1>
+
+    <div style="position: relative;">
+        <!-- 遊戲主體面板 -->
+        <div class="game-container" id="game-container">
+            <div class="left-panel">
+                <canvas id="canvas" width="240" height="480"></canvas>
+            </div>
+            
+            <div class="right-panel">
+                <div class="info-box">
+                    <h2>SCORE 分數</h2>
+                    <p id="score">0</p>
+                </div>
+
+                <div class="info-box">
+                    <h2>NEXT 下一個</h2>
+                    <canvas id="next-canvas" width="96" height="96"></canvas>
+                </div>
+
+                <button class="btn" id="start-btn" onclick="toggleGame()">START 開始</button>
+
+                <div class="controls-hint">
+                    <b>💡 萌新操作指南:</b><br>
+                    ⬅️ ➡️ : 左右移動<br>
+                    ⬆️ : 旋轉方塊<br>
+                    ⬇️ : 加速下落<br>
+                    Space : 瞬間下落
+                </div>
+            </div>
+        </div>
+
+        <!-- 遊戲結束畫面 -->
+        <div class="game-over-overlay" id="over-overlay">
+            <div>GAME OVER 😭</div>
+            <button class="btn" style="margin-top: 20px;" onclick="resetGame()">再玩一次 🎀</button>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const nextCanvas = document.getElementById('next-canvas');
+    const nextCtx = nextCanvas.getContext('2d');
+    const scoreElement = document.getElementById('score');
+    const startBtn = document.getElementById('start-btn');
+    const overOverlay = document.getElementById('over-overlay');
+    const gameContainer = document.getElementById('game-container');
+
+    const ROW = 20;
+    const COL = 10;
+    const BLOCK_SIZE = 24; // 240/10
+    const NEXT_BLOCK_SIZE = 24;
+
+    // 馬卡龍粉嫩色彩配置
+    const COLORS = {
+        'I': '#93e1d8', // 粉綠
+        'O': '#ffe227', // 柔黃
+        'T': '#a0c4ff', // 天藍
+        'S': '#bdb2ff', // 薰衣草紫
+        'Z': '#ffc6ff', // 糖果粉
+        'J': '#ffadad', // 蜜桃紅
+        'L': '#ffd6a5'  // 暖橘
+    };
+
+    const SHAPES = {
+        'I': [[1,1,1,1]],
+        'O': [[1,1],[1,1]],
+        'T': [[0,1,0],[1,1,1]],
+        'S': [[0,1,1],[1,1,0]],
+        'Z': [[1,1,0],[0,1,1]],
+        'J': [[1,0,0],[1,1,1]],
+        'L': [[0,0,1],[1,1,1]]
+    };
+
+    let board = [];
+    let score = 0;
+    let gameInterval = null;
+    let isGameOver = false;
+    let isPaused = true;
+
+    let currentPiece = null;
+    let nextPiece = null;
+
+    // 初始化遊戲板
+    function initBoard() {
+        board = Array.from({length: ROW}, () => Array(COL).fill(0));
+    }
+
+    // 產生隨方塊
+    function createPiece(type) {
+        const t = type || 'IOTSZJL'[Math.floor(Math.random() * 7)];
+        return {
+            type: t,
+            matrix: SHAPES[t],
+            x: Math.floor((COL - SHAPES[t][0].length) / 2),
+            y: 0
+        };
+    }
+
+    // 繪製圓角方塊 (讓視覺更可愛)
+    function drawBlock(context, x, y, color, size) {
+        context.fillStyle = color;
+        
+        // 繪製帶微圓角的方塊
+        const radius = 5; 
+        context.beginPath();
+        context.roundRect(x * size + 1, y * size + 1, size - 2, size - 2, radius);
+        context.fill();
+
+        // 加上白色內高光，營造果凍感
+        context.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        context.beginPath();
+        context.roundRect(x * size + 3, y * size + 3, size - 6, 4, 2);
+        context.fill();
+    }
+
+    // 繪製主畫面
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 畫地圖上落下的方塊
+        for(let r=0; r<ROW; r++) {
+            for(let c=0; c<COL; c++) {
+                if(board[r][c]) {
+                    drawBlock(ctx, c, r, COLORS[board[r][c]], BLOCK_SIZE);
+                }
+            }
+        }
+
+        // 畫當前操作的方塊
+        if (currentPiece) {
+            currentPiece.matrix.forEach((row, r) => {
+                row.forEach((value, c) => {
+                    if (value) {
+                        drawBlock(ctx, currentPiece.x + c, currentPiece.y + r, COLORS[currentPiece.type], BLOCK_SIZE);
+                    }
+                });
+            });
+        }
+    }
+
+    // 繪製預覽區
+    function drawNext() {
+        nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+        if (!nextPiece) return;
+
+        const m = nextPiece.matrix;
+        const offsetX = (4 - m[0].length) / 2;
+        const offsetY = (4 - m.length) / 2;
+
+        m.forEach((row, r) => {
+            row.forEach((value, c) => {
+                if (value) {
+                    drawBlock(nextCtx, c + offsetX, r + offsetY, COLORS[nextPiece.type], NEXT_BLOCK_SIZE);
+                }
+            });
+        });
+    }
+
+    // 碰撞偵測
+    function collide(piece, offsetRow = 0, offsetCol = 0) {
+        return piece.matrix.some((row, r) => {
+            return row.some((value, c) => {
+                if (!value) return false;
+                let nextX = piece.x + c + offsetCol;
+                let nextY = piece.y + r + offsetRow;
+                return nextX < 0 || nextX >= COL || nextY >= ROW || (nextY >= 0 && board[nextY][nextX]);
+            });
+        });
+    }
+
+    // 固定方塊並檢查消行
+    function mergePiece() {
+        currentPiece.matrix.forEach((row, r) => {
+            row.forEach((value, c) => {
+                if (value) {
+                    if(currentPiece.y + r >= 0) {
+                        board[currentPiece.y + r][currentPiece.x + c] = currentPiece.type;
+                    }
+                }
+            });
+        });
+
+        // 消行邏輯
+        let linesCleared = 0;
+        for (let r = ROW - 1; r >= 0; r--) {
+            if (board[r].every(val => val !== 0)) {
+                board.splice(r, 1);
+                board.unshift(Array(COL).fill(0));
+                linesCleared++;
+                r++; // 遞補後需要重新檢查同一行
+            }
+        }
+
+        if (linesCleared > 0) {
+            // 加分機制 (消越多行獎勵加倍)
+            const scoreReward = [0, 100, 300, 500, 800];
+            score += scoreReward[linesCleared] || 1000;
+            scoreElement.innerText = score;
+        }
+    }
+
+    // 方塊旋轉 (順時針)
+    function rotatePiece() {
+        const matrix = currentPiece.matrix;
+        const n = matrix.length;
+        const m = matrix[0].length;
+        
+        // 矩陣轉置並反轉列
+        let rotated = Array.from({length: m}, () => Array(n).fill(0));
+        for(let r=0; r<n; r++) {
+            for(let c=0; c<m; c++) {
+                rotated[c][n - 1 - r] = matrix[r][c];
+            }
+        }
+
+        const originMatrix = currentPiece.matrix;
+        currentPiece.matrix = rotated;
+        
+        // 踢牆處理 (避免轉動時出界)
+        let offset = 0;
+        while(collide(currentPiece) && offset < 3) {
+            if(currentPiece.x + currentPiece.matrix[0].length > COL) {
+                currentPiece.x--;
+            } else if(currentPiece.x < 0) {
+                currentPiece.x++;
+            }
+            offset++;
+        }
+        
+        // 如果依然碰撞，則還原旋轉
+        if(collide(currentPiece)) {
+            currentPiece.matrix = originMatrix;
+        }
+    }
+
+    // 每一步下落邏輯
+    function drop() {
+        if (isGameOver || isPaused) return;
+
+        if (!collide(currentPiece, 1, 0)) {
+            currentPiece.y++;
+        } else {
+            mergePiece();
+            
+            // 檢查是否攻頂 (輸掉遊戲)
+            if (currentPiece.y <= 0) {
+                endGame();
+                return;
+            }
+
+            // 更換下一個方塊
+            currentPiece = nextPiece;
+            nextPiece = createPiece();
+            drawNext();
+        }
+        draw();
+    }
+
+    // 瞬間下落 (Space 鍵)
+    function hardDrop() {
+        if (isGameOver || isPaused) return;
+        while (!collide(currentPiece, 1, 0)) {
+            currentPiece.y++;
+        }
+        drop(); // 觸發 merge
+    }
+
+    // 遊戲流程控制
+    function toggleGame() {
+        if (isGameOver) return;
+
+        if (isPaused) {
+            // 開始或繼續遊戲
+            isPaused = false;
+            startBtn.innerText = "PAUSE 暫停";
+            if (!currentPiece) {
+                currentPiece = createPiece();
+                nextPiece = createPiece();
+                drawNext();
+            }
+            gameInterval = setInterval(drop, 1000);
+        } else {
+            // 暫停遊戲
+            isPaused = true;
+            startBtn.innerText = "RESUME 繼續";
+            clearInterval(gameInterval);
+        }
+    }
+
+    function endGame() {
+        isGameOver = true;
+        clearInterval(gameInterval);
+        
+        // 顯示可愛的 GameOver 覆蓋層
+        overOverlay.style.width = gameContainer.offsetWidth + 'px';
+        overOverlay.style.height = gameContainer.offsetHeight + 'px';
+        overOverlay.style.display = 'flex';
+    }
+
+    function resetGame() {
+        overOverlay.style.display = 'none';
+        initBoard();
+        score = 0;
+        scoreElement.innerText = score;
+        isGameOver = false;
+        isPaused = true;
+        currentPiece = null;
+        nextPiece = null;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+        toggleGame();
+    }
+
+    // 鍵盤監聽事件
+    document.addEventListener('keydown', event => {
+        if (isGameOver || isPaused) return;
+
+        switch (event.keyCode) {
+            case 37: // Left
+                if (!collide(currentPiece, 0, -1)) currentPiece.x--;
+                break;
+            case 39: // Right
+                if (!collide(currentPiece, 0, 1)) currentPiece.x++;
+                break;
+            case 40: // Down
+                if (!collide(currentPiece, 1, 0)) currentPiece.x++;
+                drop();
+                return; // 避免重複 draw
+            case 38: // Up (Rotate)
+                rotatePiece();
+                break;
+            case 32: // Space (Hard drop)
+                hardDrop();
+                break;
+        }
+        draw();
+    });
+
+    // 初始化準備
+    initBoard();
+</script>
+</body>
+</html>

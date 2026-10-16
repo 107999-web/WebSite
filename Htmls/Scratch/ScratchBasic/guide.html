@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>Scratch 積木圖鑑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+
+<header class="top">
+  <div class="in">
+    <div class="brand">🧩 Scratch 積木圖鑑 <em>八大類・115 塊</em></div>
+    <div class="unitnav">
+      <a href="index.html">首頁</a>
+      <a href="unit1_student.html">單元1</a>
+      <a href="unit2_student.html">單元2</a>
+      <a href="unit3_student.html">單元3</a>
+      <a href="unit4_student.html">單元4</a>
+      <a href="unit5_student.html">單元5</a>
+      <a href="unit6_student.html">單元6</a>
+      <a href="unit7_student.html">單元7</a>
+      <a href="worksheet.html">學習單</a>
+      <a href="assess.html">評量</a>
+      <a href="mistakes.html">易錯點</a>
+    </div>
+    <div class="search">
+      <input id="q" type="search" placeholder="搜尋積木或功能…" aria-label="搜尋積木">
+      <button class="btn ghost sm" id="clearq">清除</button>
+    </div>
+  </div>
+  <div class="cats" id="cats"></div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>點一下積木，角色就真的會動</h1>
+    <p>每一塊積木都可以直接修改數字並按「試一試」，右邊的舞台會立刻做給你看。也可以把積木「加入腳本」，串成一小段程式一次執行。</p>
+    <div class="tasks" id="tasks"></div>
+  </section>
+
+  <div class="cols">
+    <div>
+      <div class="cards" id="cards"></div>
+      <div class="empty" id="empty" hidden>找不到符合的積木，換個關鍵字試試看。</div>
+    </div>
+
+    <aside class="panel">
+      <div class="stagebox">
+        <h3>🎬 小舞台 <span style="font-size:.76rem;color:var(--ink2);font-weight:400">（滑鼠移到舞台上就是「鼠標」的位置）</span></h3>
+        <div class="stagewrap"><svg class="stage" id="stage" role="img" aria-label="可互動的迷你舞台"></svg></div>
+        <div class="readout">
+          <div><div class="k">x 座標</div><div class="v" id="rx">0</div></div>
+          <div><div class="k">y 座標</div><div class="v" id="ry">0</div></div>
+          <div><div class="k">方向</div><div class="v" id="rd">90</div></div>
+          <div><div class="k">尺寸</div><div class="v" id="rs">100</div></div>
+          <div><div class="k">造型</div><div class="v" id="rc">1</div></div>
+          <div><div class="k">背景</div><div class="v" id="rb">1</div></div>
+          <div><div class="k">鼠標 x</div><div class="v" id="rmx">0</div></div>
+          <div><div class="k">鼠標 y</div><div class="v" id="rmy">0</div></div>
+          <div><div class="k">計時器</div><div class="v" id="rt">0</div></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" id="optGrid"> 座標格線</label>
+          <label><input type="checkbox" id="optArrow" checked> 方向箭頭</label>
+          <label><input type="checkbox" id="optMouse" checked> 滑鼠標記</label>
+          <button class="btn ghost sm" id="reset" style="margin-left:auto">重設角色</button>
+        </div>
+        <div class="note">舞台是 <b>480 × 360</b>：中央是 x:0 y:0，右邊 x 變大、上面 y 變大。這裡的角色不會跑出舞台外面。</div>
+      </div>
+
+      <div class="script fillhost">
+        <h3>🧱 我的小腳本</h3>
+        <div class="list" id="list"><div class="none">還沒有積木。按積木卡上的「加入腳本」把它放進來吧！</div></div>
+        <div class="runbar">
+          <button class="btn flag" id="runAll">🏳 執行</button>
+          <button class="btn stopb" id="stopAll">■ 停止</button>
+          <button class="btn ghost" id="clearAll">清空</button>
+          <label style="font-size:.8rem;color:var(--ink2);display:flex;align-items:center;gap:5px">速度
+            <select id="speed" style="border:2px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--paper);color:var(--ink);font-family:var(--f-round);font-weight:700">
+              <option value="480">慢</option><option value="260" selected>中</option><option value="90">快</option>
+            </select>
+          </label>
+        </div>
+        <div class="note" style="font-size:.82rem">C 型積木（重複、如果）加進來之後，點它裡面的<b>「＋ 放進這裡面」</b>就能把下一塊積木放進迴圈裡。<br>放錯位置時：<b>▲▼</b> 調整順序、<b>✥</b> 先點要搬的積木再點目的地（可搬進或搬出迴圈）、<b>✕</b> 刪除。<br><b>圓形／六角形積木</b>（偵測、運算）按卡片上的<b>「⤵ 放進欄位」</b>，再點腳本裡發亮的欄位，就能把積木<b>放進積木裡</b>；欄位上的紅色 <b>✕</b> 可以再取出來。</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    🧩 Scratch 積木圖鑑（動作 18 ＋ 外觀 20 ＋ 事件 8 ＋ 控制 11 ＋ 偵測 18 ＋ 運算 18 ＋ 變數 5 ＋ 清單 12 ＋ 函式積木 5 ＝ 115 塊）　·　積木文字依 Scratch 3 繁體中文介面
+  </footer>
+</div>
+
+<script src="assets/blocks.js"></script>
+<script src="assets/stage.js"></script>
+<script src="assets/ui.js"></script>
+<script>
+/* ---------- 積木元件（共用自 assets/ui.js） ---------- */
+var blockEl=UI.blockEl, readArgs=UI.readArgs;
+
+/* ---------- 類別列 ---------- */
+var catsEl=document.getElementById('cats');
+var curCat='motion', mode='cat', kw='', idsList=[];
+BLOCK_CATS.forEach(function(c){
+  var b=document.createElement('button');
+  b.dataset.cat=c.id;
+  b.innerHTML='<span class="bd" style="background:'+c.color+'"></span>'+c.name+
+    (c.ready?'':' <span class="soon">準備中</span>');
+  if(!c.ready){b.disabled=true;}
+  else{
+    if(c.id===curCat)b.classList.add('on');
+    b.addEventListener('click',function(){
+      curCat=c.id;mode='cat';
+      document.getElementById('q').value='';
+      catsEl.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.cat===curCat);});
+      renderTasks();update();
+      document.querySelector('.hero').scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }
+  catsEl.appendChild(b);
+});
+
+/* ---------- 任務索引 ---------- */
+var tasksEl=document.getElementById('tasks');
+function renderTasks(){
+  tasksEl.textContent='';
+  TASKS.filter(function(t){return t.cat===curCat;}).forEach(function(t){
+    var b=document.createElement('button');
+    b.textContent=t.label;
+    b.addEventListener('click',function(){
+      document.getElementById('q').value='';
+      mode='ids';idsList=t.ids;update();
+      document.getElementById('cards').scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    tasksEl.appendChild(b);
+  });
+}
+renderTasks();
+
+/* ---------- 積木卡 ---------- */
+var cardsEl=document.getElementById('cards'), cardMap={};
+BLOCKS.forEach(function(b){
+  var card=document.createElement('article');
+  card.className='card';card.id='card-'+b.id;
+  var head=document.createElement('div');head.className='head';
+  head.appendChild(blockEl(b,true,null,{placeholder:true}));
+  var acts=document.createElement('div');acts.className='acts';
+  var isVal=(b.shape==='round'||b.shape==='bool');
+  var tryB=document.createElement('button');tryB.className='btn sm';tryB.textContent='▶ 試一試';
+  var addB=document.createElement('button');
+  addB.className=isVal?'btn sm fillb':'btn ghost sm';
+  addB.textContent=isVal?'⤵ 放進欄位':'+ 加入腳本';
+  addB.title=isVal?'這是回報型／布林積木，要放進別塊積木的欄位裡':'把這塊積木加到右邊的小腳本';
+  acts.appendChild(tryB);acts.appendChild(addB);head.appendChild(acts);
+  var res=document.createElement('span');
+  res.style.cssText='font-family:var(--f-num);font-weight:800;color:var(--accent-d);margin-left:4px';
+  head.appendChild(res);
+  card.appendChild(head);
+
+  var desc=document.createElement('p');desc.className='desc';desc.innerHTML=b.desc;card.appendChild(desc);
+  var meta=document.createElement('div');meta.className='meta';
+  meta.innerHTML='<div><b>💡 什麼時候用：</b>'+b.use+'</div><div><b>⚠️ 容易搞混：</b>'+b.miss+'</div>';
+  card.appendChild(meta);
+  if(b.rel&&b.rel.length){
+    var rel=document.createElement('div');rel.className='rel';
+    rel.innerHTML='<span class="tag">相關積木</span>';
+    b.rel.forEach(function(rid){
+      var t=BLOCKS.filter(function(x){return x.id===rid;})[0];
+      if(!t)return;
+      var rb=document.createElement('button');
+      rb.textContent=t.parts.map(function(p){
+        return (p.t==='txt'||p.t==='ico'||p.t==='num'||p.t==='drop')?String(p.v):'';
+      }).join(' ').replace(/\s+/g,' ').trim()||t.id;
+      rb.addEventListener('click',function(){
+        document.getElementById('q').value='';
+        curCat=t.cat;mode='cat';
+        catsEl.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.cat===curCat);});
+        renderTasks();update();
+        var target=document.getElementById('card-'+rid);
+        target.scrollIntoView({behavior:'smooth',block:'center'});
+        target.style.borderColor='var(--accent)';
+        setTimeout(function(){target.style.borderColor='';},1400);
+      });
+      rel.appendChild(rb);
+    });
+    card.appendChild(rel);
+  }
+  tryB.addEventListener('click',function(){
+    var args=readArgs(head);
+    res.textContent='';
+    Stage.run(b.op,args).then(function(v){
+      if(b.shape==='bool'){res.textContent=UI.showVal(!!v);}
+      else if(v!==undefined&&v!==null&&b.shape==='round'){res.textContent='＝ '+v;}
+      else if(b.op==='bounce'){res.textContent=v?'碰到了，彈回來！':'還沒碰到邊緣';}
+      else if(typeof v==='string'){res.textContent=v;res.style.fontWeight='700';}
+    });
+  });
+  addB.addEventListener('click',function(){
+    if(isVal){UI.startFill(b,readArgs(head));}
+    else{addToScript(b,readArgs(head));}
+  });
+  cardsEl.appendChild(card);
+  cardMap[b.id]=card;
+});
+
+/* ---------- 搜尋與篩選 ---------- */
+function update(){
+  var n=0;
+  BLOCKS.forEach(function(b){
+    var on;
+    if(mode==='search'){on=textOf(b).indexOf(kw)>=0;}
+    else if(mode==='ids'){on=idsList.indexOf(b.id)>=0;}
+    else{on=b.cat===curCat;}
+    cardMap[b.id].classList.toggle('hide',!on);
+    if(on)n++;
+  });
+  document.getElementById('empty').hidden=n>0;
+}
+function showAll(){mode='cat';update();}
+function textOf(b){
+  return b.parts.map(function(p){return p.v!==undefined?p.v:'';}).join('')+' '+
+    b.desc.replace(/<[^>]+>/g,'')+' '+b.use+' '+b.miss;
+}
+document.getElementById('q').addEventListener('input',function(e){
+  kw=e.target.value.trim();
+  mode=kw?'search':'cat';
+  update();
+});
+document.getElementById('clearq').addEventListener('click',function(){
+  document.getElementById('q').value='';showAll();
+});
+
+/* ---------- 腳本區（巢狀） ---------- */
+var builder=UI.Builder(document.getElementById('list'));
+function addToScript(b,args){builder.add(b,args);}
+document.getElementById('clearAll').addEventListener('click',function(){builder.clear();});
+document.getElementById('stopAll').addEventListener('click',function(){
+  builder.stop();document.getElementById('runAll').disabled=false;
+});
+document.getElementById('runAll').addEventListener('click',function(){
+  var btn=this;btn.disabled=true;
+  builder.run(function(){btn.disabled=false;});
+});
+document.getElementById('speed').addEventListener('change',function(e){UI.setSpeed(Number(e.target.value));});
+update();
+
+/* ---------- 啟動舞台 ---------- */
+Stage.init(document.getElementById('stage'));
+Stage.onChange(function(s,m){
+  document.getElementById('rmx').textContent=Math.round(m.x);
+  document.getElementById('rmy').textContent=Math.round(m.y);
+  document.getElementById('rx').textContent=Math.round(s.x);
+  document.getElementById('ry').textContent=Math.round(s.y);
+  document.getElementById('rd').textContent=Math.round(s.dir);
+  document.getElementById('rs').textContent=Math.round(s.size);
+  document.getElementById('rc').textContent=s.costume;
+  document.getElementById('rb').textContent=s.backdrop;
+});
+Stage.reset();
+document.getElementById('reset').addEventListener('click',function(){Stage.reset();});
+setInterval(function(){document.getElementById('rt').textContent=Stage.calc('timer',{});},200);
+document.getElementById('optGrid').addEventListener('change',function(e){Stage.setGrid(e.target.checked);});
+document.getElementById('optArrow').addEventListener('change',function(e){Stage.setArrow(e.target.checked);});
+document.getElementById('optMouse').addEventListener('change',function(e){Stage.setMouseMark(e.target.checked);});
+</script>
+
+</body>
+</html>

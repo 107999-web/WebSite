@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>3 持續特效｜Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap" style="--mc:#FF8C1A">
+<section class="hero"><span class="kind">第 3 類｜7 個函式（A 型 7）</span><h1>持續特效</h1><p>讓角色「活起來」的小動作：抖一抖、閃一閃、呼吸、搖擺、漂浮，還有播放造型動畫。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="on">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="">8 遊戲機制</a></div><div class="btnrow" style="margin-top:12px"><a class="btn" href="sb3/3_持續特效.sb3" download>⬇ 3_持續特效.sb3</a><a class="btn ghost" href="play/3_持續特效/index.html" target="_blank" rel="noopener">🎮 網頁版試玩</a><a class="btn ghost" href="sprite3/小幫手_3_持續特效.sprite3" download>⬇ 小幫手_3_持續特效.sprite3</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">這一類在做什麼</a><a href="#lab">🎛️ 試玩台</a><a class="sub" href="#f3-1">3-1 抖動</a><a class="sub" href="#f3-2">3-2 閃爍</a><a class="sub" href="#f3-3">3-3 呼吸</a><a class="sub" href="#f3-4">3-4 擺動</a><a class="sub" href="#f3-5">3-5 漂浮</a><a class="sub" href="#f3-6">3-6 播放造型</a><a class="sub" href="#f3-7">3-7 換到第 n 個造型</a><a href="#work">✏️ 動手改・檢核</a><div class="prog">自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#FF8C1A;color:#fff">第 3 類</span><h2>這一類在做什麼</h2></div><div class="topic"><h3>✨ 一個公式做出三種動作</h3>
+<p>呼吸、擺動、漂浮其實是同一招：<b>原本的值 ＋ 幅度 × sin(經過秒數 × 360)</b>。
+sin 的值會在 −1 和 1 之間來回，所以尺寸（或方向、y）會在原本的值附近一大一小、一左一右、一上一下，最後剛好回到原點。</p></div>
+<div class="why"><b class="t">函式裡可以呼叫函式</b>　「播放造型」第一步是呼叫另一個函式「換到第 n 個造型」。
+小函式組成大函式，就像用積木蓋房子。</div>
+<div class="warn"><b class="t">為什麼不直接「造型換成 (1)」？</b>　「造型換成」收到數字會當成「第幾個」、收到文字會當成「造型名稱」。
+變數裡的值有時是數字、有時是文字，很容易搞混（手勢辨識專案就中過這個坑）。「換到第 n 個造型」用「下一個造型」一直換到編號對了為止，一定是「第幾個」。</div></section>
+<section class="chap" id="lab"><div class="ch"><span class="cn" style="background:#FF8C1A;color:#fff">試玩台</span><h2>🎛️ 先玩玩看</h2></div><p class="lead">這裡的效果都是照 .sb3 裡的積木一句一句翻成網頁程式，數字和順序完全一樣。按下按鈕時，下面會顯示「在 Scratch 裡等於呼叫哪一塊積木」。</p><div class="lab"><div class="lh">🎛️ 試玩台 3 <span class="tag">動手按</span></div><div data-lab="3"></div></div></section>
+<section class="chap" id="funcs"><div class="ch"><span class="cn" style="background:#FF8C1A;color:#fff">函式</span><h2>🧩 7 個函式</h2></div><p class="lead">每張卡片的積木圖都是從 <b>3_持續特效.sb3</b> 自動轉出來的，和檔案裡一模一樣。</p>
+<article class="func" id="f3-1" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-1</span><span class="sb myblocks">抖動 <span class="rp myblocks">次數</span> 次 強度 <span class="rp myblocks">強度</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>次數、左右移動幾步</span><b>輸出</b><span>（角色左右抖，最後回原位）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>記住原本的 x，左右來回跳，最後回到原本的 x。適合「被打到」「答錯了」。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:抖動 %s 次 強度 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 1 鍵</p><div data-sb="3|圓圓|key:1" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f3-2" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-2</span><span class="sb myblocks">閃爍 <span class="rp myblocks">次數</span> 次 間隔 <span class="rp myblocks">間隔</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>次數、間隔秒數</span><b>輸出</b><span>（角色一閃一閃，最後顯示）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>隱藏、等、顯示、等，重複幾次。最後一定是「顯示」的狀態。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:閃爍 %s 次 間隔 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 2 鍵</p><div data-sb="3|圓圓|key:2" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f3-3" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-3</span><span class="sb myblocks">呼吸 <span class="rp myblocks">秒數</span> 秒 幅度 <span class="rp myblocks">幅度</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>秒數、尺寸變化多少</span><b>輸出</b><span>（角色一大一小，最後回原尺寸）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>尺寸 ＝ 原本尺寸 ＋ 幅度 × sin(經過秒數 × 360)。sin 會在 −1 到 1 之間來回，所以尺寸會一大一小，一秒一次。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:呼吸 %s 秒 幅度 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 3 鍵</p><div data-sb="3|圓圓|key:3" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f3-4" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-4</span><span class="sb myblocks">擺動 <span class="rp myblocks">秒數</span> 秒 角度 <span class="rp myblocks">角度</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>秒數、最多轉幾度</span><b>輸出</b><span>（角色左右搖擺，最後回原方向）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>方向 ＝ 原本方向 ＋ 角度 × sin(經過秒數 × 360)。⚠ 角色的旋轉方式要是「任意旋轉」才看得到。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:擺動 %s 秒 角度 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 4 鍵</p><div data-sb="3|圓圓|key:4" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f3-5" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-5</span><span class="sb myblocks">漂浮 <span class="rp myblocks">秒數</span> 秒 高度 <span class="rp myblocks">高度</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>秒數、上下飄多高</span><b>輸出</b><span>（角色上下飄，最後回原位）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>y ＝ 原本 y ＋ 高度 × sin(經過秒數 × 180)，兩秒上下一次，比呼吸慢，像飄在水上。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:漂浮 %s 秒 高度 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 5 鍵</p><div data-sb="3|圓圓|key:5" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f3-6" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-6</span><span class="sb myblocks">播放造型 <span class="rp myblocks">第一格</span> 到 <span class="rp myblocks">最後一格</span> 每格 <span class="rp myblocks">每格秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>第一個、最後一個造型的編號、每格秒數</span><b>輸出</b><span>（造型動畫播一次）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>先用「換到第 n 個造型」跳到第一格，再「下一個造型」一格一格播到最後一格。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:播放造型 %s 到 %s 每格 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 6 鍵</p><div data-sb="3|圓圓|key:6" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f3-7" style="--mc:#FF8C1A">
+<div class="fcard"><div class="fname"><span class="fid">3-7</span><span class="sb myblocks">換到第 <span class="rp myblocks">編號</span> 個造型</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✔ 勾選執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>造型編號</span><b>輸出</b><span>（換好造型）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>一直按「下一個造型」直到造型編號等於目標（最多 50 次，不會卡住）。勾了「執行時不重新整理畫面」，所以一瞬間就換好，看不到中間的造型。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="3|圓圓|def:換到第 %s 個造型"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・綠旗</p><div data-sb="3|圓圓|flag" style="margin-bottom:10px"></div><p class="sm" style="margin:0 0 4px">圓圓・按 6 鍵</p><div data-sb="3|圓圓|key:6" style="margin-bottom:10px"></div></div>
+</div></article>
+</section>
+<section class="chap" id="work"><div class="ch"><span class="cn" style="background:#FF8C1A;color:#fff">動手</span><h2>✏️ 動手改・小測驗・自我檢核</h2></div><div class="work"><h3>✏️ 動手改</h3><ol><li>打開 <b>3_持續特效.sb3</b>，按 <kbd>1</kbd>～<kbd>6</kbd>。</li><li>在試玩台把「擺動」的角度改成 90，再把秒數改成 0.5，看起來像什麼？</li><li>把「呼吸」的 360 改成 720（定義裡），呼吸變快還是變慢？為什麼？</li><li>答錯的時候讓角色「抖動 6 次 強度 10」，答對的時候「閃爍」。</li><li>挑戰：寫「心跳 (次數)」：尺寸 100 → 120 → 100，每次 0.15 秒。</li></ol></div><div class="qz"><div class="qq">「漂浮 2 秒 高度 20」結束時，角色的 y 在哪裡？</div><div class="ops"><button>比原本高 20</button><button data-r>回到原本的 y</button><button>隨機</button></div><div class="ex">函式開頭先記住原本的 y，最後設回去。</div></div><div class="qz"><div class="qq">呼吸的公式裡，哪個數字決定「一秒呼吸幾次」？</div><div class="ops"><button>幅度</button><button data-r>sin 裡面乘的 360</button><button>秒數</button></div><div class="ex">360 度是一圈。乘 360 ＝ 一秒一圈；乘 720 ＝ 一秒兩圈。</div></div><div class="chklist" style="margin-top:14px"><label><input type="checkbox" id="k3a"> 我會用 sin 讓數值來回變化</label><label><input type="checkbox" id="k3b"> 我知道函式裡可以呼叫別的函式</label><label><input type="checkbox" id="k3c"> 我知道「造型換成（數字）」的陷阱</label></div></section>
+<p class="sm" style="margin-top:28px">← <a href="c2.html">2 出場與退場</a>　<a href="c4.html">4 角色管理</a> →</p>
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 產生工具：tools/build_library.py ・ 積木圖由 .sb3 自動轉出</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

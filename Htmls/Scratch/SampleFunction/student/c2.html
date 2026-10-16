@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>2 出場與退場｜Scratch 函式庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/lib.css">
+</head>
+<body>
+
+<header class="top"><div class="in"><div class="brand"><a href="index.html">🧰 Scratch 函式庫</a> <em>51 個函式</em></div><div class="unitnav"><a href="index.html#map">🗺️ 函式地圖</a><a href="index.html#dl">⬇ 下載</a><a href="sb3/完整函式庫.sb3" download>⬇ 完整函式庫.sb3</a></div></div></header>
+
+<div class="wrap" style="--mc:#FF6680">
+<section class="hero"><span class="kind">第 2 類｜6 個函式（A 型 6）</span><h1>出場與退場</h1><p>角色怎麼「進場」、怎麼「離場」：淡入淡出、啵一聲跳出來、縮小消失、從天上掉下來、從邊邊滑進來。</p><div class="catnav"><a href="c1.html" style="--mc:#9966FF" class="">1 文字與對話</a><a href="c2.html" style="--mc:#FF6680" class="on">2 出場與退場</a><a href="c3.html" style="--mc:#FF8C1A" class="">3 持續特效</a><a href="c4.html" style="--mc:#4C97FF" class="">4 角色管理</a><a href="c5.html" style="--mc:#0FBD8C" class="">5 計時與流程</a><a href="c6.html" style="--mc:#59C059" class="">6 數學小工具</a><a href="c7.html" style="--mc:#FF661A" class="">7 清單工具</a><a href="c8.html" style="--mc:#E8544B" class="">8 遊戲機制</a></div><div class="btnrow" style="margin-top:12px"><a class="btn" href="sb3/2_出場與退場.sb3" download>⬇ 2_出場與退場.sb3</a><a class="btn ghost" href="play/2_出場與退場/index.html" target="_blank" rel="noopener">🎮 網頁版試玩</a><a class="btn ghost" href="sprite3/小幫手_2_出場與退場.sprite3" download>⬇ 小幫手_2_出場與退場.sprite3</a></div></section>
+<div class="layout"><nav class="toc" aria-label="目錄"><h3>目錄</h3><a href="#intro">這一類在做什麼</a><a href="#lab">🎛️ 試玩台</a><a class="sub" href="#f2-1">2-1 淡入</a><a class="sub" href="#f2-2">2-2 淡出</a><a class="sub" href="#f2-3">2-3 彈出放大</a><a class="sub" href="#f2-4">2-4 縮小消失</a><a class="sub" href="#f2-5">2-5 彈跳落下</a><a class="sub" href="#f2-6">2-6 從邊滑入</a><a href="#work">✏️ 動手改・檢核</a><div class="prog">自我檢核 <span id="ptxt"></span></div><div class="pbar"><i id="pbar"></i></div></nav><main>
+<section class="chap" id="intro"><div class="ch"><span class="cn" style="background:#FF6680;color:#fff">第 2 類</span><h2>這一類在做什麼</h2></div><div class="topic"><h3>🎬 出場和退場，讓作品像一部動畫</h3>
+<p>直接「顯示」「隱藏」的角色，看起來是「突然出現」。加上 0.5～1 秒的出場動畫，觀眾的眼睛就會被帶到那個角色身上。這一類的 6 個函式都是 <b>A 型</b>：放在要動的角色裡，動的是角色自己。</p></div>
+<div class="why"><b class="t">用「計時器」控制時間，不要數「等待」</b>　淡入寫成「重複 10 次：幻影 −10、等待 0.1 秒」看起來也行，
+但每一次「等待」都會多等一點點，電腦忙的時候會越來越慢。這裡的寫法是：記住開始時間，每一格都用「計時器 − 開始時間」算出<b>現在應該到哪裡</b>，幾秒就是幾秒。</div>
+<div class="warn"><b class="t">動畫結束一定要「還原」</b>　淡出最後要把幻影設回 0、縮小消失最後要把尺寸設回原本的大小。否則下一次「顯示」時，角色還是透明的或小小的。</div></section>
+<section class="chap" id="lab"><div class="ch"><span class="cn" style="background:#FF6680;color:#fff">試玩台</span><h2>🎛️ 先玩玩看</h2></div><p class="lead">這裡的效果都是照 .sb3 裡的積木一句一句翻成網頁程式，數字和順序完全一樣。按下按鈕時，下面會顯示「在 Scratch 裡等於呼叫哪一塊積木」。</p><div class="lab"><div class="lh">🎛️ 試玩台 2 <span class="tag">動手按</span></div><div data-lab="2"></div></div></section>
+<section class="chap" id="funcs"><div class="ch"><span class="cn" style="background:#FF6680;color:#fff">函式</span><h2>🧩 6 個函式</h2></div><p class="lead">每張卡片的積木圖都是從 <b>2_出場與退場.sb3</b> 自動轉出來的，和檔案裡一模一樣。</p>
+<article class="func" id="f2-1" style="--mc:#FF6680">
+<div class="fcard"><div class="fname"><span class="fid">2-1</span><span class="sb myblocks">淡入 <span class="rp myblocks">秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>秒數</span><b>輸出</b><span>（角色慢慢出現）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>幻影效果從 100（看不見）變到 0。用「計時器」算經過了幾秒，所以不管電腦快慢，幾秒就是幾秒。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="2|圓圓|def:淡入 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 1 鍵</p><div data-sb="2|圓圓|key:1" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f2-2" style="--mc:#FF6680">
+<div class="fcard"><div class="fname"><span class="fid">2-2</span><span class="sb myblocks">淡出 <span class="rp myblocks">秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>秒數</span><b>輸出</b><span>（角色慢慢消失，最後隱藏）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>幻影效果從 0 變到 100，最後「隱藏」並把幻影設回 0 —— 下次顯示時才不會是透明的。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="2|圓圓|def:淡出 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 2 鍵</p><div data-sb="2|圓圓|key:2" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f2-3" style="--mc:#FF6680">
+<div class="fcard"><div class="fname"><span class="fid">2-3</span><span class="sb myblocks">彈出放大到尺寸 <span class="rp myblocks">尺寸</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>最後的尺寸</span><b>輸出</b><span>（角色「啵」一聲跳出來）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>先在 0.2 秒內放大到目標的 1.2 倍（衝過頭），再用 0.1 秒縮回目標尺寸。衝過頭再彈回，看起來就有彈性。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="2|圓圓|def:彈出放大到尺寸 %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 3 鍵</p><div data-sb="2|圓圓|key:3" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f2-4" style="--mc:#FF6680">
+<div class="fcard"><div class="fname"><span class="fid">2-4</span><span class="sb myblocks">縮小消失 <span class="rp myblocks">秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>秒數</span><b>輸出</b><span>（角色縮小到不見，最後隱藏）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>先記住原本的尺寸，縮到 0 之後隱藏，再把尺寸設回原本的大小。「先記住、最後還原」是動畫函式的好習慣。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="2|圓圓|def:縮小消失 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 4 鍵</p><div data-sb="2|圓圓|key:4" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f2-5" style="--mc:#FF6680">
+<div class="fcard"><div class="fname"><span class="fid">2-5</span><span class="sb myblocks">彈跳落到 y <span class="rp myblocks">地面y</span></span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>落地的 y 座標</span><b>輸出</b><span>（角色從上方掉下來，彈幾下停住）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>每一格：速度減掉重力、y 加上速度。碰到地面就把速度反過來並打折（×−0.55），彈得越來越低，速度很小就停。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="2|圓圓|def:彈跳落到 y %s"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 5 鍵</p><div data-sb="2|圓圓|key:5" style="margin-bottom:10px"></div></div>
+</div></article>
+<article class="func" id="f2-6" style="--mc:#FF6680">
+<div class="fcard"><div class="fname"><span class="fid">2-6</span><span class="sb myblocks">從 <span class="rp myblocks">方向</span> 邊滑入 <span class="rp myblocks">秒數</span> 秒</span><span class="ftype A">A 型｜角色自己用</span><span class="warp">✘ 不勾執行時不重新整理畫面</span></div>
+<div class="io"><b>輸入</b><span>方向（左／右／上／下）、秒數</span><b>輸出</b><span>（角色從舞台邊緣滑回原位）</span><b>放在哪</b><span>放在要動的角色裡（或匯入 .sprite3）。在同一個角色裡直接呼叫。</span><b>怎麼做</b><span>先記住現在的位置，跳到舞台邊緣，再用「滑行」回到記住的位置。所以先把角色擺在想要的位置，再呼叫它。</span></div></div>
+<div class="bgrid"><div class="bwrap"><h4>定義 <small>（圓圓・定義）</small></h4><div data-sb="2|圓圓|def:從 %s 邊滑入 %s 秒"></div></div>
+<div class="bwrap"><h4>怎麼用 <small>（範例檔裡的程式）</small></h4><p class="sm" style="margin:0 0 4px">圓圓・按 6 鍵</p><div data-sb="2|圓圓|key:6" style="margin-bottom:10px"></div><p class="sm" style="margin:0 0 4px">圓圓・按 7 鍵</p><div data-sb="2|圓圓|key:7" style="margin-bottom:10px"></div></div>
+</div></article>
+</section>
+<section class="chap" id="work"><div class="ch"><span class="cn" style="background:#FF6680;color:#fff">動手</span><h2>✏️ 動手改・小測驗・自我檢核</h2></div><div class="work"><h3>✏️ 動手改</h3><ol><li>打開 <b>2_出場與退場.sb3</b>，按 <kbd>1</kbd>～<kbd>7</kbd>，按 <kbd>R</kbd> 可以重設。</li><li>在試玩台把淡入改成 3 秒、0.2 秒，找出你覺得最舒服的秒數。</li><li>把「彈出放大」的 1.2 改成 1.5（在定義裡改兩個地方），衝過頭的感覺有什麼不同？</li><li>做一個片頭：標題「從上面滑入」，接著主角「彈跳落下」，最後按鈕「彈出放大」。</li><li>挑戰：寫一個新函式「淡入並放大 (秒數)」，同時改幻影和尺寸。</li></ol></div><div class="qz"><div class="qq">「淡出」最後為什麼要把幻影設回 0？</div><div class="ops"><button>讓淡出看起來比較快</button><button data-r>角色已經隱藏了，設回 0 下次顯示才不會是透明的</button><button>沒有原因，可以刪掉</button></div><div class="ex">「隱藏」和「幻影」是兩件事。只隱藏不還原，下次「顯示」時會看不到角色，以為程式壞了。</div></div><div class="qz"><div class="qq">「從左邊滑入」為什麼要先把角色擺好位置再呼叫？</div><div class="ops"><button data-r>因為它會記住「現在的位置」當作終點</button><button>因為滑行一定從 x = 0 開始</button><button>其實不用</button></div><div class="ex">函式第一件事就是「記住x、記住y」，最後滑回那裡。</div></div><div class="chklist" style="margin-top:14px"><label><input type="checkbox" id="k2a"> 我知道 A 型函式要放在哪個角色裡</label><label><input type="checkbox" id="k2b"> 我能說出為什麼用計時器而不是累加等待</label><label><input type="checkbox" id="k2c"> 我知道動畫結束要還原幻影和尺寸</label></div></section>
+<p class="sm" style="margin-top:28px">← <a href="c1.html">1 文字與對話</a>　<a href="c3.html">3 持續特效</a> →</p>
+</main></div></div>
+<footer class="sm" style="text-align:center;padding:20px">Scratch 函式庫 ・ 產生工具：tools/build_library.py ・ 積木圖由 .sb3 自動轉出</footer>
+<script src="assets/funcs_data.js"></script>
+<script src="assets/blocks_data.js"></script>
+<script src="assets/blk.js"></script>
+<script src="assets/ministage.js"></script>
+<script src="assets/lessons.js"></script>
+
+</body>
+</html>

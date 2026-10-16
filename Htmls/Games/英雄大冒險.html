@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 英雄大冒險 ✨</title>
+    <style>
+        /* 整體可愛風格設定 */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e8f5e9; /* 清新草地綠 */
+            font-family: 'Comic Sans MS', '微軟正黑體', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #game-container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+            width: 400px;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff9800;
+            margin-top: 0;
+            text-shadow: 2px 2px 0px #ffe0b2;
+        }
+
+        #level-board {
+            font-size: 20px;
+            color: #fff;
+            background-color: #ffb74d;
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* 戰鬥競技場 */
+        #arena {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px 0;
+            background-color: #f1f8e9;
+            border-radius: 20px;
+            border: 3px dashed #c5e1a5;
+        }
+
+        .character {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+        }
+
+        .emoji {
+            font-size: 70px;
+            transition: transform 0.2s;
+            margin-top: 10px;
+            /* 呼吸動畫 */
+            animation: breathe 2s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.05) translateY(-5px); }
+        }
+
+        .vs {
+            font-size: 24px;
+            font-weight: bold;
+            color: #bdbdbd;
+        }
+
+        /* 血條設定 */
+        .hp-container {
+            width: 100%;
+            height: 15px;
+            background-color: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #ccc;
+            margin-bottom: 5px;
+        }
+
+        #hero-hp-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #4caf50; /* 英雄健康綠 */
+            transition: width 0.3s ease-out, background-color 0.3s;
+        }
+
+        #monster-hp-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #f44336; /* 怪物危險紅 */
+            transition: width 0.3s ease-out;
+        }
+
+        /* 按鈕區 */
+        #controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        button {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+
+        #btn-attack { background-color: #29b6f6; box-shadow: 0 4px 0px #0288d1; }
+        #btn-attack:hover { background-color: #03a9f4; }
+        #btn-attack:active { transform: translateY(4px); box-shadow: 0 0px 0px #0288d1; }
+
+        #btn-heal { background-color: #f06292; box-shadow: 0 4px 0px #c2185b; }
+        #btn-heal:hover { background-color: #e91e63; }
+        #btn-heal:active { transform: translateY(4px); box-shadow: 0 0px 0px #c2185b; }
+        
+        button:disabled {
+            filter: grayscale(100%);
+            cursor: not-allowed;
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* 訊息視窗 */
+        #message-box {
+            margin-top: 20px;
+            min-height: 50px;
+            background-color: #fff3e0;
+            border-radius: 10px;
+            padding: 10px;
+            color: #795548;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 動畫特效類別 */
+        .action-attack-right { animation: dash-right 0.3s forwards; }
+        .action-attack-left { animation: dash-left 0.3s forwards; }
+        .action-shake { animation: take-damage 0.3s forwards; }
+        .action-heal { animation: heal-pulse 0.5s forwards; }
+
+        @keyframes dash-right {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(50px) scale(1.2); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes dash-left {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-50px) scale(1.2); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes take-damage {
+            0%, 100% { transform: translateX(0) rotate(0); filter: brightness(1); }
+            25% { transform: translateX(-5px) rotate(-10deg); filter: brightness(2) contrast(2) hue-rotate(-50deg); }
+            75% { transform: translateX(5px) rotate(10deg); }
+        }
+        @keyframes heal-pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+            50% { transform: scale(1.2); filter: drop-shadow(0 0 15px #f06292); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>✨ 英雄大冒險 ✨</h1>
+        <div id="level-board">第 <span id="level">1</span> 關</div>
+        
+        <div id="arena">
+            <div class="character" id="hero-box">
+                <div class="hp-container"><div id="hero-hp-bar"></div></div>
+                <div style="font-size: 14px; color:#555;">HP: <span id="hero-hp-text">20</span></div>
+                <div class="emoji" id="hero">🦸‍♂️</div>
+            </div>
+            
+            <div class="vs">VS</div>
+            
+            <div class="character" id="monster-box">
+                <div class="hp-container"><div id="monster-hp-bar"></div></div>
+                <div style="font-size: 14px; color:#555;">HP: <span id="monster-hp-text">10</span></div>
+                <div class="emoji" id="monster">🐲</div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button id="btn-attack" onclick="playerAction('attack')">⚔️ 攻擊</button>
+            <button id="btn-heal" onclick="playerAction('heal')">💖 補血</button>
+        </div>
+        
+        <div id="message-box">野生怪物出現了！準備戰鬥！</div>
+    </div>
+
+    <script>
+        // 遊戲數值設定
+        let level = 1;
+        
+        let hero = {
+            maxHp: 25,
+            hp: 25,
+            baseAtk: 4
+        };
+        
+        let currentMonster = {
+            maxHp: 10,
+            hp: 10,
+            baseAtk: 2,
+            emoji: '🐲'
+        };
+
+        const monsterList = ['🐲', '🦇', '🕷️', '🐺', '🦂', '🦍', '🦖', '👹', '👽'];
+
+        // DOM 元素
+        const heroEl = document.getElementById('hero');
+        const heroHpBar = document.getElementById('hero-hp-bar');
+        const heroHpText = document.getElementById('hero-hp-text');
+        
+        const monsterEl = document.getElementById('monster');
+        const monsterHpBar = document.getElementById('monster-hp-bar');
+        const monsterHpText = document.getElementById('monster-hp-text');
+        
+        const messageBox = document.getElementById('message-box');
+        const levelText = document.getElementById('level');
+        const btnAttack = document.getElementById('btn-attack');
+        const btnHeal = document.getElementById('btn-heal');
+
+        // 初始化更新介面
+        updateUI();
+
+        // 玩家回合行動
+        function playerAction(action) {
+            disableButtons(true); // 行動中禁用按鈕
+
+            if (action === 'attack') {
+                // 攻擊邏輯
+                let damage = hero.baseAtk + Math.floor(Math.random() * 3); // 浮動傷害
+                currentMonster.hp -= damage;
+                if (currentMonster.hp < 0) currentMonster.hp = 0;
+                
+                triggerAnimation(heroEl, 'action-attack-right');
+                setTimeout(() => triggerAnimation(monsterEl, 'action-shake'), 150);
+                
+                logMessage(`🦸‍♂️ 英雄攻擊！對怪物造成 ${damage} 點傷害！`);
+
+            } else if (action === 'heal') {
+                // 補血邏輯
+                let healAmount = 8 + Math.floor(Math.random() * 5);
+                hero.hp += healAmount;
+                if (hero.hp > hero.maxHp) hero.hp = hero.maxHp;
+                
+                triggerAnimation(heroEl, 'action-heal');
+                logMessage(`💖 英雄使用魔法！回復了 ${healAmount} 點生命值！`);
+            }
+
+            updateUI();
+
+            // 檢查怪物是否死亡
+            setTimeout(() => {
+                if (currentMonster.hp === 0) {
+                    winLevel();
+                } else {
+                    monsterTurn(); // 怪物反擊
+                }
+            }, 800);
+        }
+
+        // 怪物回合行動
+        function monsterTurn() {
+            logMessage(`⚠️ 輪到 ${currentMonster.emoji} 攻擊了...`);
+            
+            setTimeout(() => {
+                let damage = currentMonster.baseAtk + Math.floor(Math.random() * 3);
+                hero.hp -= damage;
+                if (hero.hp < 0) hero.hp = 0;
+
+                triggerAnimation(monsterEl, 'action-attack-left');
+                setTimeout(() => triggerAnimation(heroEl, 'action-shake'), 150);
+
+                logMessage(`💥 怪物發動攻擊！英雄受到 ${damage} 點傷害！`);
+                updateUI();
+
+                if (hero.hp === 0) {
+                    setTimeout(gameOver, 500);
+                } else {
+                    disableButtons(false); // 換回玩家回合
+                }
+            }, 800);
+        }
+
+        // 進入下一關
+        function winLevel() {
+            level++;
+            logMessage("🎉 太棒了！怪物被打敗了！前往下一關！");
+            
+            // 升級獎勵
+            hero.maxHp += 5;
+            hero.hp += 10; // 過關回血
+            if (hero.hp > hero.maxHp) hero.hp = hero.maxHp;
+            hero.baseAtk += 1;
+
+            // 生成新怪物 (越來越強)
+            currentMonster.maxHp = 10 + (level * 5);
+            currentMonster.hp = currentMonster.maxHp;
+            currentMonster.baseAtk = 1 + Math.floor(level * 1.5);
+            currentMonster.emoji = monsterList[(level - 1) % monsterList.length];
+
+            setTimeout(() => {
+                monsterEl.innerText = currentMonster.emoji;
+                updateUI();
+                disableButtons(false);
+                logMessage(`第 ${level} 關：新的怪物 ${currentMonster.emoji} 出現了！`);
+            }, 1500);
+        }
+
+        // 遊戲結束
+        function gameOver() {
+            heroEl.innerText = '👻';
+            logMessage("💀 英雄倒下了... 遊戲結束！請重新整理網頁再來一次。");
+            // 按鈕保持禁用狀態
+        }
+
+        // 更新畫面數值
+        function updateUI() {
+            levelText.innerText = level;
+            
+            heroHpText.innerText = `${hero.hp}/${hero.maxHp}`;
+            heroHpBar.style.width = `${(hero.hp / hero.maxHp) * 100}%`;
+            // 血量低於 30% 變為黃色警告
+            heroHpBar.style.backgroundColor = (hero.hp / hero.maxHp) < 0.3 ? '#ff9800' : '#4caf50';
+            
+            monsterHpText.innerText = `${currentMonster.hp}/${currentMonster.maxHp}`;
+            monsterHpBar.style.width = `${(currentMonster.hp / currentMonster.maxHp) * 100}%`;
+        }
+
+        // 寫入訊息視窗
+        function logMessage(text) {
+            messageBox.innerText = text;
+        }
+
+        // 控制按鈕開關
+        function disableButtons(disabled) {
+            btnAttack.disabled = disabled;
+            btnHeal.disabled = disabled;
+        }
+
+        // 觸發 CSS 動畫的小工具函數
+        function triggerAnimation(element, animationClass) {
+            element.classList.remove(animationClass);
+            void element.offsetWidth; // 觸發重繪 (Reflow) 讓動畫可以重新播放
+            element.classList.add(animationClass);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D 圍棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#050210;font-family:'Noto Sans TC',system-ui,sans-serif}
+#c{display:block;width:100%;height:100%}
+
+/* ── HUD ── */
+#hud{
+  display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  z-index:10;background:rgba(5,2,16,.90);backdrop-filter:blur(14px);
+  border:1px solid rgba(150,90,255,.20);border-radius:16px;
+  padding:9px 22px 10px;text-align:center;color:#DDD8FF;min-width:300px;
+}
+#hud-turn{font-size:1.05em;font-weight:600;letter-spacing:.4px}
+#hud-caps{font-size:.79em;color:#9977CC;margin:3px 0}
+#hud-info{font-size:.74em;color:#7755AA;min-height:1em}
+#pass-btn{
+  display:none;margin-top:6px;padding:5px 22px;border-radius:8px;
+  border:1px solid rgba(150,90,255,.28);background:rgba(90,40,160,.18);
+  color:#BBAAEE;cursor:pointer;font-size:.80em;letter-spacing:.5px;
+  transition:background .15s,border-color .15s;
+}
+#pass-btn:hover{background:rgba(110,55,190,.34);border-color:rgba(180,120,255,.5)}
+
+/* ── DIALOGS ── */
+#dlg,#win-dlg{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.93);z-index:100;
+}
+#win-dlg{display:none}
+.box{
+  background:linear-gradient(158deg,#0C0418,#070212);
+  border:1px solid rgba(130,70,230,.28);border-radius:22px;
+  padding:36px 44px;min-width:340px;max-width:450px;text-align:center;
+  box-shadow:0 0 100px rgba(70,20,190,.14);
+}
+.box h1{font-size:1.75em;color:#EEE8FF;letter-spacing:1.5px;margin-bottom:4px}
+.sub{font-size:.80em;color:#7766AA;margin-bottom:18px;letter-spacing:.5px}
+.sect{font-size:.70em;color:#6644AA;letter-spacing:2.5px;text-transform:uppercase;margin:14px 0 8px}
+.size-row{display:flex;gap:8px;justify-content:center;margin-bottom:2px}
+.sz-btn{
+  padding:7px 0;width:86px;border-radius:9px;border:1px solid rgba(130,70,230,.26);
+  background:transparent;color:#9977CC;cursor:pointer;font-size:.86em;
+  transition:.15s;text-align:center;
+}
+.sz-btn small{display:block;font-size:.72em;color:#7755AA;margin-top:1px}
+.sz-btn:hover{border-color:rgba(180,120,255,.5);color:#CCAAFF}
+.sz-btn.sel{background:rgba(100,45,180,.28);border-color:#7744BB;color:#DDBEFF;font-weight:600}
+.p-row{
+  display:flex;align-items:center;gap:10px;margin:7px 0;padding:9px 13px;
+  background:rgba(255,255,255,.04);border-radius:11px;
+}
+.stone-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0}
+.p-label{flex:1;text-align:left;font-size:.88em}
+.t-btns{display:flex;gap:6px}
+.t-btn{
+  padding:5px 13px;border-radius:8px;border:1px solid rgba(130,70,230,.22);
+  background:transparent;color:#8877BB;cursor:pointer;font-size:.80em;transition:.15s;
+}
+.t-btn:hover{border-color:rgba(180,120,255,.5);color:#CCAAFF}
+.t-btn.sel{background:rgba(95,42,168,.28);border-color:#7744BB;color:#DDBEFF;font-weight:600}
+.go-btn{
+  margin-top:22px;padding:12px 50px;font-size:1.05em;border-radius:12px;
+  background:linear-gradient(135deg,#3E1480,#7530BB);
+  color:#EEE8FF;border:none;cursor:pointer;font-weight:bold;letter-spacing:1px;
+  transition:transform .18s,box-shadow .18s;
+}
+.go-btn:hover{transform:scale(1.04);box-shadow:0 6px 30px rgba(90,30,200,.46)}
+#score-box{
+  text-align:left;margin:14px 0 6px;background:rgba(255,255,255,.04);
+  border-radius:12px;padding:12px 16px;font-size:.86em;line-height:2.0;color:#CCC8EE;
+}
+#score-box span{float:right;font-weight:600}
+.score-sep{height:1px;background:rgba(255,255,255,.08);margin:6px 0}
+.score-total{font-weight:700}
+.score-winner{
+  margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.10);
+  font-size:1.0em;font-weight:700;
+}
+#win-title{font-size:1.9em;margin-bottom:8px;line-height:1.2}
+</style>
+</head>
+<body>
+<a href="../index.html" title="回首頁" style="position:fixed;bottom:18px;left:18px;z-index:9999;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #f9a8d4;box-shadow:0 6px 16px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;text-decoration:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+<a href="index.html" title="回棋類選單" style="position:fixed;bottom:18px;left:86px;z-index:9999;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;background:linear-gradient(160deg,#ECFEFF,#A5F3FC);border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.25);font-family:system-ui,sans-serif;">♟️</a>
+<canvas id="c"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-turn">—</div>
+  <div id="hud-caps">⚫ 俘獲 <b id="caps-b">0</b> 子 ｜ ⚪ 俘獲 <b id="caps-w">0</b> 子</div>
+  <div id="hud-info"></div>
+  <button id="pass-btn" onclick="passTurn()">虛手（Pass）</button>
+</div>
+
+<!-- Start dialog -->
+<div id="dlg">
+  <div class="box">
+    <h1>⚫ 圍棋 ⚪</h1>
+    <p class="sub">3D Go · Weiqi · 貼目 6.5</p>
+    <p class="sect">棋盤大小</p>
+    <div class="size-row" id="size-row"></div>
+    <p class="sect">玩家設定</p>
+    <div id="p-rows"></div>
+    <button class="go-btn" onclick="startGame()">開始對局</button>
+  </div>
+</div>
+
+<!-- End dialog -->
+<div id="win-dlg">
+  <div class="box">
+    <div id="win-title"></div>
+    <div id="score-box"></div>
+    <button class="go-btn" onclick="resetToMenu()">再來一局</button>
+  </div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════
+//  CONSTANTS
+// ════════════════════════════════════════════════
+const ADJ4 = [[0,1],[0,-1],[1,0],[-1,0]];
+const PLR_NAMES = ['','⚫ 黑棋（先手）','⚪ 白棋（後手）'];
+const PLR_CSS   = ['','#aaaaaa','#eeeeee'];
+const KOMI = 6.5;
+
+// ════════════════════════════════════════════════
+//  GAME STATE
+// ════════════════════════════════════════════════
+let BSIZE, BHALF;
+let gBoard;
+let gCurrent;       // 1=black, 2=white
+let gPasses;        // consecutive passes; 2 = game end
+let gWon;           // 0=ongoing, -1=finished
+let gBusy;
+let gPlayerTypes;   // [null, 'human'|'ai', 'human'|'ai']
+let gNumMoves;
+let gCaptures;      // [unused, black's, white's] — prisoner counts
+let gPrevHash;      // board hash before last move (Ko rule)
+
+function newBoard(){
+  return Array.from({length:BSIZE},()=>new Array(BSIZE).fill(0));
+}
+function inBounds(r,c){return r>=0&&r<BSIZE&&c>=0&&c<BSIZE;}
+function boardHash(b){return b.map(row=>row.join('')).join('|');}
+
+// ════════════════════════════════════════════════
+//  GROUP BFS  —  returns {stones:[{r,c}...], libs:N}
+// ════════════════════════════════════════════════
+function groupInfo(board,r,c){
+  const player=board[r][c];
+  if(!player)return null;
+  const stones=[];
+  const libSet=new Set();
+  const vis=new Set();
+  const q=[{r,c}];
+  while(q.length){
+    const cu=q.shift();
+    const key=cu.r*BSIZE+cu.c;
+    if(vis.has(key))continue;
+    vis.add(key);stones.push(cu);
+    for(const[dr,dc]of ADJ4){
+      const nr=cu.r+dr,nc=cu.c+dc;
+      if(!inBounds(nr,nc))continue;
+      const nk=nr*BSIZE+nc;
+      if(board[nr][nc]===player&&!vis.has(nk))q.push({r:nr,c:nc});
+      else if(!board[nr][nc])libSet.add(nk);
+    }
+  }
+  return{stones,libs:libSet.size};
+}
+
+// ════════════════════════════════════════════════
+//  MOVE VALIDATION
+//  Returns null if illegal, else {nb:newBoard, caps:N}
+// ════════════════════════════════════════════════
+function tryPlace(board,r,c,player){
+  if(board[r][c])return null;
+  const opp=3-player;
+  const nb=board.map(row=>[...row]);
+  nb[r][c]=player;
+  let caps=0;
+  for(const[dr,dc]of ADJ4){
+    const nr=r+dr,nc=c+dc;
+    if(!inBounds(nr,nc)||nb[nr][nc]!==opp)continue;
+    const info=groupInfo(nb,nr,nc);
+    if(info&&info.libs===0){
+      for(const s of info.stones){nb[s.r][s.c]=0;caps++;}
+    }
+  }
+  const own=groupInfo(nb,r,c);
+  if(!own||own.libs===0)return null; // suicide — illegal
+  return{nb,caps};
+}
+
+// ════════════════════════════════════════════════
+//  TERRITORY SCORING  (Japanese-style simple count)
+// ════════════════════════════════════════════════
+function countTerritory(board){
+  const vis=Array.from({length:BSIZE},()=>new Array(BSIZE).fill(false));
+  let bTerr=0,wTerr=0;
+  for(let r=0;r<BSIZE;r++){
+    for(let c=0;c<BSIZE;c++){
+      if(board[r][c]===0&&!vis[r][c]){
+        const region=[],borders=new Set();
+        const q=[{r,c}];
+        while(q.length){
+          const cu=q.shift();
+          if(vis[cu.r][cu.c])continue;
+          vis[cu.r][cu.c]=true;region.push(cu);
+          for(const[dr,dc]of ADJ4){
+            const nr=cu.r+dr,nc=cu.c+dc;
+            if(!inBounds(nr,nc))continue;
+            if(!board[nr][nc]&&!vis[nr][nc])q.push({r:nr,c:nc});
+            else if(board[nr][nc])borders.add(board[nr][nc]);
+          }
+        }
+        if(borders.size===1){
+          const owner=[...borders][0];
+          if(owner===1)bTerr+=region.length;
+          else         wTerr+=region.length;
+        }
+      }
+    }
+  }
+  return{bTerr,wTerr};
+}
+
+// ════════════════════════════════════════════════
+//  AI  —  heuristic greedy with capture / atari awareness
+// ════════════════════════════════════════════════
+function aiPickMove(board,player,prevHash){
+  const opp=3-player;
+  // First move → tengen (centre)
+  let hasStone=false;
+  outer:for(let r=0;r<BSIZE;r++)for(let c=0;c<BSIZE;c++)if(board[r][c]){hasStone=true;break outer;}
+  if(!hasStone)return{r:BHALF,c:BHALF};
+
+  let bestSc=-Infinity,bestMv=null;
+  for(let r=0;r<BSIZE;r++){
+    for(let c=0;c<BSIZE;c++){
+      if(board[r][c])continue;
+      const result=tryPlace(board,r,c,player);
+      if(!result)continue;
+      if(prevHash&&boardHash(result.nb)===prevHash)continue; // Ko
+      let sc=0;
+      // Capture value
+      sc+=result.caps*14;
+      // Put opponent in atari after our move
+      for(const[dr,dc]of ADJ4){
+        const nr=r+dr,nc=c+dc;
+        if(!inBounds(nr,nc))continue;
+        if(result.nb[nr][nc]===opp){
+          const info=groupInfo(result.nb,nr,nc);
+          if(info){
+            if(info.libs===1)sc+=6;   // atari
+            else if(info.libs===0)sc+=14; // should have been captured — shouldn't reach here
+          }
+        }
+      }
+      // Save own groups in atari
+      for(const[dr,dc]of ADJ4){
+        const nr=r+dr,nc=c+dc;
+        if(!inBounds(nr,nc))continue;
+        if(board[nr][nc]===player){
+          const infoBefore=groupInfo(board,nr,nc);
+          const infoAfter =groupInfo(result.nb,nr,nc);
+          if(infoBefore&&infoAfter&&infoBefore.libs===1&&infoAfter.libs>1)sc+=10;
+        }
+      }
+      // Own group liberties
+      const own=groupInfo(result.nb,r,c);
+      if(own)sc+=own.libs*0.25;
+      // Prefer centre
+      sc-=(Math.abs(r-BHALF)+Math.abs(c-BHALF))*0.06;
+      // Randomness (prevents deterministic patterns)
+      sc+=Math.random()*1.0;
+
+      if(sc>bestSc){bestSc=sc;bestMv={r,c};}
+    }
+  }
+  return bestMv; // null → AI will pass
+}
+
+// ════════════════════════════════════════════════
+//  THREE.JS
+// ════════════════════════════════════════════════
+let scene,camera,renderer,raycaster;
+let boardGrp,stonesGrp;
+let hoverMesh=null;
+let camR=20,camTheta=0.28,camPhi=0.68;
+let isDrag=false,lmx=0,lmy=0;
+let matBoard,matGridLine,matDot,matEdge;
+let matStone=[null,null,null];
+let matHover=[null,null,null];
+
+function stoneR(){return BSIZE<=9?0.44:BSIZE===13?0.40:0.34;}
+
+function initScene(){
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.setClearColor(0x050210);
+
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x050210,0.024);
+
+  camera=new THREE.PerspectiveCamera(44,innerWidth/innerHeight,0.1,150);
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0x3A2266,0.68));
+  const sun=new THREE.DirectionalLight(0xFFEECC,1.50);
+  sun.position.set(7,18,11);
+  sun.castShadow=true;
+  sun.shadow.mapSize.width=2048;sun.shadow.mapSize.height=2048;
+  sun.shadow.camera.left=-22;sun.shadow.camera.right=22;
+  sun.shadow.camera.top=22;sun.shadow.camera.bottom=-22;
+  scene.add(sun);
+  const fill=new THREE.DirectionalLight(0x2244EE,0.32);
+  fill.position.set(-10,8,-8);scene.add(fill);
+  const rim=new THREE.PointLight(0xAA77FF,0.40,80);
+  rim.position.set(0,16,0);scene.add(rim);
+
+  boardGrp=new THREE.Group();
+  stonesGrp=new THREE.Group();
+  scene.add(boardGrp);scene.add(stonesGrp);
+
+  raycaster=new THREE.Raycaster();
+  buildMaterials();
+  updateCamera();
+
+  // ── Event listeners (inside initScene — renderer exists here) ──
+  renderer.domElement.addEventListener('pointerdown',e=>{isDrag=true;lmx=e.clientX;lmy=e.clientY;});
+  renderer.domElement.addEventListener('pointermove',onPointerMove);
+  renderer.domElement.addEventListener('pointerup',  ()=>isDrag=false);
+  renderer.domElement.addEventListener('pointercancel',()=>isDrag=false);
+  renderer.domElement.addEventListener('wheel',e=>{
+    camR=Math.max(6,Math.min(80,camR+e.deltaY*0.028));
+    updateCamera();
+  },{passive:true});
+  renderer.domElement.addEventListener('click',onCanvasClick);
+  window.addEventListener('resize',()=>{
+    renderer.setSize(innerWidth,innerHeight);
+    camera.aspect=innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  });
+}
+
+function buildMaterials(){
+  matBoard   =new THREE.MeshPhongMaterial({color:0x231206,shininess:10});
+  matGridLine=new THREE.LineBasicMaterial({color:0x7B5421});
+  matDot     =new THREE.MeshPhongMaterial({color:0x634218,shininess:4});
+  matEdge    =new THREE.MeshPhongMaterial({color:0x361807,shininess:14});
+  matStone[1]=new THREE.MeshPhongMaterial({color:0x111120,shininess:280,specular:0x4455AA});
+  matStone[2]=new THREE.MeshPhongMaterial({color:0xEEEEFF,shininess:340,specular:0xFFFFFF});
+  matHover[1]=new THREE.MeshPhongMaterial({color:0x28284a,transparent:true,opacity:.60,shininess:160,specular:0x5577BB});
+  matHover[2]=new THREE.MeshPhongMaterial({color:0xCCCCFF,transparent:true,opacity:.60,shininess:220,specular:0xFFFFFF});
+}
+
+function starPositions(n){
+  if(n===9) return[[2,2],[2,4],[2,6],[4,2],[4,4],[4,6],[6,2],[6,4],[6,6]];
+  if(n===13)return[[3,3],[3,6],[3,9],[6,3],[6,6],[6,9],[9,3],[9,6],[9,9]];
+  return[[3,3],[3,9],[3,15],[9,3],[9,9],[9,15],[15,3],[15,9],[15,15]];
+}
+
+function buildBoard(){
+  boardGrp.clear();
+  const span=BSIZE-1; // units from first to last line
+
+  // Base plate
+  const base=new THREE.Mesh(new THREE.BoxGeometry(span+1.8,0.28,span+1.8),matBoard);
+  base.position.y=-0.14;base.receiveShadow=true;
+  boardGrp.add(base);
+
+  // Frame strips (4 sides)
+  const fw=span+2.4,fd=0.42,fh=0.10,fH=(span*0.5+0.9+fd*0.5);
+  [
+    [fw,fh,fd, 0,0.01,-fH],
+    [fw,fh,fd, 0,0.01, fH],
+    [fd,fh,fw+fd*2,-fH,0.01,0],
+    [fd,fh,fw+fd*2, fH,0.01,0],
+  ].forEach(([w,h,d,x,y,z])=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),matEdge);
+    m.position.set(x,y,z);boardGrp.add(m);
+  });
+
+  // Grid lines
+  const pts=[];
+  for(let i=0;i<BSIZE;i++){
+    const p=i-BHALF;
+    pts.push(-BHALF,0.016,p, BHALF,0.016,p);
+    pts.push(p,0.016,-BHALF, p,0.016,BHALF);
+  }
+  const gGeo=new THREE.BufferGeometry();
+  gGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+  boardGrp.add(new THREE.LineSegments(gGeo,matGridLine));
+
+  // Star points (天元 + 星位)
+  const dGeo=new THREE.SphereGeometry(0.10,8,6);
+  for(const[r,c]of starPositions(BSIZE)){
+    const d=new THREE.Mesh(dGeo,matDot);
+    d.position.set(c-BHALF,0.022,r-BHALF);
+    boardGrp.add(d);
+  }
+}
+
+function rebuildStones(){
+  stonesGrp.clear();
+  const sr=stoneR();
+  const geo=new THREE.SphereGeometry(sr,28,20);
+  for(let r=0;r<BSIZE;r++){
+    for(let c=0;c<BSIZE;c++){
+      const p=gBoard[r][c];
+      if(!p)continue;
+      const m=new THREE.Mesh(geo,matStone[p]);
+      m.castShadow=true;
+      m.position.set(c-BHALF,sr,r-BHALF);
+      stonesGrp.add(m);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════
+//  HOVER GHOST
+// ════════════════════════════════════════════════
+function setHover(r,c){
+  const sr=stoneR();
+  if(!hoverMesh){
+    const geo=new THREE.SphereGeometry(sr,18,14);
+    hoverMesh=new THREE.Mesh(geo,matHover[1]);
+    scene.add(hoverMesh);
+  }
+  const active=gBoard&&!gWon&&!gBusy&&gPlayerTypes&&gPlayerTypes[gCurrent]==='human';
+  if(!active||r===null||!inBounds(r,c)||gBoard[r][c]){
+    hoverMesh.visible=false;return;
+  }
+  const result=tryPlace(gBoard,r,c,gCurrent);
+  if(!result||(gPrevHash&&boardHash(result.nb)===gPrevHash)){
+    hoverMesh.visible=false;return;
+  }
+  hoverMesh.material=matHover[gCurrent];
+  hoverMesh.position.set(c-BHALF,sr,r-BHALF);
+  hoverMesh.visible=true;
+}
+
+// ════════════════════════════════════════════════
+//  CAMERA
+// ════════════════════════════════════════════════
+function updateCamera(){
+  const x=camR*Math.sin(camPhi)*Math.sin(camTheta);
+  const y=camR*Math.cos(camPhi);
+  const z=camR*Math.sin(camPhi)*Math.cos(camTheta);
+  camera.position.set(x,y,z);
+  camera.lookAt(0,0,0);
+}
+
+// ════════════════════════════════════════════════
+//  INPUT
+// ════════════════════════════════════════════════
+function rayToGrid(cx,cy){
+  const rect=renderer.domElement.getBoundingClientRect();
+  const ndx=((cx-rect.left)/rect.width)*2-1;
+  const ndy=-((cy-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:ndx,y:ndy},camera);
+  const plane=new THREE.Plane(new THREE.Vector3(0,1,0),-0.05);
+  const hit=new THREE.Vector3();
+  if(!raycaster.ray.intersectPlane(plane,hit))return null;
+  const col=Math.round(hit.x)+BHALF;
+  const row=Math.round(hit.z)+BHALF;
+  if(!inBounds(row,col))return null;
+  return{r:row,c:col};
+}
+
+function onPointerMove(e){
+  if(isDrag){
+    camTheta-=(e.clientX-lmx)*.006;
+    camPhi=Math.max(.08,Math.min(1.55,camPhi+(e.clientY-lmy)*.006));
+    updateCamera();lmx=e.clientX;lmy=e.clientY;
+    if(hoverMesh)hoverMesh.visible=false;
+    return;
+  }
+  const pos=rayToGrid(e.clientX,e.clientY);
+  if(pos)setHover(pos.r,pos.c);
+  else if(hoverMesh)hoverMesh.visible=false;
+}
+
+function onCanvasClick(e){
+  if(!gBoard||gBusy||gWon)return;
+  if(!gPlayerTypes||gPlayerTypes[gCurrent]!=='human')return;
+  const pos=rayToGrid(e.clientX,e.clientY);
+  if(pos)doPlace(pos.r,pos.c);
+}
+
+// ════════════════════════════════════════════════
+//  GAME LOGIC
+// ════════════════════════════════════════════════
+function doPlace(r,c){
+  const result=tryPlace(gBoard,r,c,gCurrent);
+  if(!result)return;
+  if(gPrevHash&&boardHash(result.nb)===gPrevHash)return; // Ko
+
+  const oldHash=boardHash(gBoard);
+  gBoard=result.nb;
+  gCaptures[gCurrent]+=result.caps;
+  gPrevHash=oldHash;
+  gPasses=0;
+  gNumMoves++;
+
+  rebuildStones();
+  if(hoverMesh)hoverMesh.visible=false;
+
+  gCurrent=3-gCurrent;
+  updateHUD();
+
+  if(gPlayerTypes[gCurrent]==='ai'){
+    gBusy=true;updateHUD();
+    setTimeout(doAI,420);
+  }
+}
+
+function passTurn(){
+  if(!gBoard||gBusy||gWon)return;
+  if(gPlayerTypes[gCurrent]!=='human')return;
+  doPass();
+}
+
+function doPass(){
+  gPasses++;
+  gNumMoves++;
+  if(gPasses>=2){endGame();return;}
+  gCurrent=3-gCurrent;
+  updateHUD();
+  if(gPlayerTypes[gCurrent]==='ai'){
+    gBusy=true;updateHUD();setTimeout(doAI,420);
+  }
+}
+
+function doAI(){
+  gBusy=false;
+  const mv=aiPickMove(gBoard,gCurrent,gPrevHash);
+  if(mv)doPlace(mv.r,mv.c);
+  else doPass();
+}
+
+// ════════════════════════════════════════════════
+//  END GAME + SCORING
+// ════════════════════════════════════════════════
+function endGame(){
+  gWon=-1;
+  if(hoverMesh)hoverMesh.visible=false;
+  const{bTerr,wTerr}=countTerritory(gBoard);
+  const bScore=bTerr+gCaptures[1];
+  const wScore=wTerr+gCaptures[2]+KOMI;
+  const winner=bScore>wScore?1:2;
+  const diff=Math.abs(bScore-wScore).toFixed(1);
+  const css=PLR_CSS[winner];
+
+  document.getElementById('win-title').innerHTML=
+    `<span style="color:${css};text-shadow:0 0 16px ${css}">🏆 ${PLR_NAMES[winner]} 勝</span>`;
+
+  document.getElementById('score-box').innerHTML=`
+    <div>⚫ 黑棋地盤<span>${bTerr} 目</span></div>
+    <div>⚫ 黑棋俘獲<span>${gCaptures[1]} 子</span></div>
+    <div class="score-total" style="color:#aaa">⚫ 黑棋合計<span>${bScore.toFixed(1)}</span></div>
+    <div class="score-sep"></div>
+    <div>⚪ 白棋地盤<span>${wTerr} 目</span></div>
+    <div>⚪ 白棋俘獲<span>${gCaptures[2]} 子</span></div>
+    <div>⚪ 貼目（黑先）<span>${KOMI}</span></div>
+    <div class="score-total" style="color:#eee">⚪ 白棋合計<span>${wScore.toFixed(1)}</span></div>
+    <div class="score-winner" style="color:${css}">${PLR_NAMES[winner]} 以 ${diff} 目之差獲勝</div>
+  `;
+  document.getElementById('win-dlg').style.display='flex';
+  updateHUD();
+}
+
+function initGame(){
+  gBoard=newBoard();
+  gCurrent=1;
+  gPasses=0;
+  gWon=0;
+  gBusy=false;
+  gNumMoves=0;
+  gCaptures=[0,0,0];
+  gPrevHash=null;
+
+  // Remove hover mesh so it's recreated at the right size for this board
+  if(hoverMesh){scene.remove(hoverMesh);hoverMesh=null;}
+
+  // Camera distance by board size
+  camR=BSIZE===9?15:BSIZE===13?22:32;
+
+  buildBoard();
+  rebuildStones();
+  updateCamera();
+  updateHUD();
+
+  if(gPlayerTypes[1]==='ai'){
+    gBusy=true;updateHUD();setTimeout(doAI,700);
+  }
+}
+
+// ════════════════════════════════════════════════
+//  HUD
+// ════════════════════════════════════════════════
+function updateHUD(){
+  document.getElementById('caps-b').textContent=gCaptures?gCaptures[1]:0;
+  document.getElementById('caps-w').textContent=gCaptures?gCaptures[2]:0;
+  const passBtn=document.getElementById('pass-btn');
+
+  if(gWon){
+    document.getElementById('hud-turn').textContent='對局結束';
+    document.getElementById('hud-info').textContent='';
+    passBtn.style.display='none';
+    return;
+  }
+  const p=gCurrent;
+  document.getElementById('hud-turn').innerHTML=
+    `<span style="color:${PLR_CSS[p]};text-shadow:0 0 9px ${PLR_CSS[p]}">${PLR_NAMES[p]}</span>`;
+  document.getElementById('hud-info').textContent=
+    gBusy?'電腦思考中⋯':gPlayerTypes&&gPlayerTypes[p]==='human'?'點擊落子，或虛手':'';
+  passBtn.style.display=(!gBusy&&gPlayerTypes&&gPlayerTypes[p]==='human')?'inline-block':'none';
+}
+
+// ════════════════════════════════════════════════
+//  DIALOG
+// ════════════════════════════════════════════════
+let dlgBoardSize=9;
+let dlgTypes=[null,'human','ai'];
+
+function setBoardSize(n){dlgBoardSize=n;renderSizeRow();}
+function setType(p,t){dlgTypes[p]=t;renderPRows();}
+
+function renderSizeRow(){
+  const el=document.getElementById('size-row');el.innerHTML='';
+  for(const[sz,label,note]of[[9,'9×9','初學者'],[13,'13×13','中級'],[19,'19×19','標準']]){
+    const b=document.createElement('button');
+    b.className='sz-btn'+(sz===dlgBoardSize?' sel':'');
+    b.innerHTML=`${label}<small>${note}</small>`;
+    b.onclick=()=>setBoardSize(sz);
+    el.appendChild(b);
+  }
+}
+
+function renderPRows(){
+  const el=document.getElementById('p-rows');el.innerHTML='';
+  for(let p=1;p<=2;p++){
+    const row=document.createElement('div');
+    row.className='p-row';
+    const isB=p===1;
+    row.innerHTML=`
+      <div class="stone-dot" style="background:${isB?'#1a1a2e':'#eeeeee'};border:2px solid ${isB?'#3a3a88':'#cccccc'}"></div>
+      <div class="p-label" style="color:${PLR_CSS[p]}">${PLR_NAMES[p]}</div>
+      <div class="t-btns">
+        <button class="t-btn${dlgTypes[p]==='human'?' sel':''}" onclick="setType(${p},'human')">人類</button>
+        <button class="t-btn${dlgTypes[p]==='ai'?' sel':''}" onclick="setType(${p},'ai')">電腦</button>
+      </div>`;
+    el.appendChild(row);
+  }
+}
+
+function startGame(){
+  BSIZE=dlgBoardSize;
+  BHALF=Math.floor(BSIZE/2);
+  gPlayerTypes=[null,dlgTypes[1],dlgTypes[2]];
+  document.getElementById('dlg').style.display='none';
+  document.getElementById('hud').style.display='block';
+  initGame();
+}
+
+function resetToMenu(){
+  document.getElementById('win-dlg').style.display='none';
+  document.getElementById('hud').style.display='none';
+  document.getElementById('dlg').style.display='flex';
+  renderSizeRow();
+  renderPRows();
+}
+
+// ════════════════════════════════════════════════
+//  ANIMATION
+// ════════════════════════════════════════════════
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+  if(hoverMesh&&hoverMesh.visible){
+    hoverMesh.material.opacity=0.44+Math.sin(t*5.2)*0.18;
+  }
+  renderer.render(scene,camera);
+}
+
+// ════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════
+initScene();
+renderSizeRow();
+renderPRows();
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>無盡生存射擊遊戲（道具散射版 v7）</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{width:100%;height:100%;overflow:hidden;background:#f0f8ff;}
+    canvas{display:block;background:#fafafa;}
+    #ui{position:absolute;top:10px;left:50%;transform:translateX(-50%);
+        font-family:'Noto Sans TC',sans-serif;color:#333;text-align:center;z-index:10;}
+    #score{font-size:20px;line-height:1.4;}
+    #restartBtn{
+      display:none;position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      padding:8px 16px;font-size:18px;
+      background:#333;color:#fff;border:none;border-radius:8px;
+      cursor:pointer;z-index:12;
+    }
+    #joystick{
+      position:absolute;bottom:20px;left:50%;
+      transform:translateX(-50%);
+      width:120px;height:120px;
+      background:rgba(0,0,0,0.3);border-radius:50%;
+      touch-action:none;z-index:9;
+    }
+    #joy-knob{
+      position:absolute;left:50%;top:50%;
+      width:60px;height:60px;margin-left:-30px;margin-top:-30px;
+      background:rgba(255,255,255,0.7);border-radius:50%;
+      transition:background 0.2s;
+    }
+    #joy-knob.active{background:rgba(255,255,255,0.9);}
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <div id="ui"><div id="score">分數: 0<br/>散射: 0</div></div>
+  <button id="restartBtn">重新開始</button>
+  <div id="joystick"><div id="joy-knob"></div></div>
+  <script>
+    const canvas=document.getElementById('gameCanvas'), ctx=canvas.getContext('2d');
+    let W,H; function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;} 
+    window.addEventListener('resize',resize); resize();
+
+    let bullets=[], enemies=[], items=[];
+    let score=0, scatterCount=0, frameCount=0, gameOver=false;
+    let lastShrink=0, lastEnemyShrink=0;
+    let joyX=0, joyY=0, lastDX=0, lastDY=0;
+    let enemyShrinkTimer=0;
+    const fireRate=15, initSpawn=60, minSpawn=15, decRate=300;
+    const itemInterval=1000, itemR=10;
+
+    class Player{
+      constructor(){this.origR=20;this.radius=20;this.x=W/2;this.y=H/2;this.speed=4;}
+      update(){
+        this.x+=joyX*this.speed; this.y+=joyY*this.speed;
+        this.x=Math.max(this.radius,Math.min(W-this.radius,this.x));
+        this.y=Math.max(this.radius,Math.min(H-this.radius,this.y));
+      }
+      draw(){
+        ctx.fillStyle='#ff6363';
+        ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,2*Math.PI);ctx.fill();
+      }
+    }
+    class Bullet{
+      constructor(x,y,dx,dy){this.x=x;this.y=y;this.dx=dx*6;this.dy=dy*6;this.r=5;}
+      update(){this.x+=this.dx;this.y+=this.dy;}
+      draw(){ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,2*Math.PI);ctx.fill();}
+    }
+    class Enemy{
+      constructor(x,y,dx,dy){this.x=x;this.y=y;this.dx=dx;this.dy=dy;this.origR=15;this.r=15;}
+      update(){
+        const factor = enemyShrinkTimer>0 ? 0.5 : 1;
+        this.x += this.dx*1.5*factor;
+        this.y += this.dy*1.5*factor;
+        this.r = enemyShrinkTimer>0 ? this.origR/2 : this.origR;
+      }
+      draw(){ctx.fillStyle='#06d6a0';ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,2*Math.PI);ctx.fill();}
+    }
+    class Item{
+      constructor(x,y,type){this.x=x;this.y=y;this.r=itemR;this.type=type;}
+      draw(){
+        ctx.fillStyle = this.type==='shrink'?'#d361ff':
+                        this.type==='scatter'?'#4d96ff':'#006400';
+        ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,2*Math.PI);ctx.fill();
+      }
+    }
+
+    const player=new Player();
+    function spawnEnemy(){
+      let edge=Math.floor(Math.random()*4),x,y;
+      if(edge===0){x=0;y=Math.random()*H;}
+      if(edge===1){x=W;y=Math.random()*H;}
+      if(edge===2){x=Math.random()*W;y=0;}
+      if(edge===3){x=Math.random()*W;y=H;}
+      const ang=Math.atan2(player.y-y,player.x-x);
+      enemies.push(new Enemy(x,y,Math.cos(ang),Math.sin(ang)));
+    }
+    function spawnItem(type){
+      items.push(new Item(
+        Math.random()*(W-2*itemR)+itemR,
+        Math.random()*(H-2*itemR)+itemR,
+        type
+      ));
+    }
+
+    canvas.addEventListener('touchstart',e=>{
+      if(gameOver) return;
+      let r=canvas.getBoundingClientRect();
+      let tx=e.touches[0].clientX-r.left, ty=e.touches[0].clientY-r.top;
+      let d=Math.hypot(tx-player.x,ty-player.y);
+      lastDX=(tx-player.x)/d; lastDY=(ty-player.y)/d;
+      bullets.push(new Bullet(player.x,player.y,lastDX,lastDY));
+    });
+
+    function update(){
+      if(gameOver) return;
+      frameCount++;
+      if(frameCount % Math.max(minSpawn, initSpawn-Math.floor(frameCount/decRate))===0) spawnEnemy();
+      if(frameCount % itemInterval===0) spawnItem('scatter');
+      if(score>0 && score%50===0 && lastShrink!==score){
+        spawnItem('shrink'); lastShrink=score;
+      }
+      if(score>0 && score%100===0 && lastEnemyShrink!==score){
+        spawnItem('enemyShrink'); lastEnemyShrink=score;
+      }
+      if(enemyShrinkTimer>0) enemyShrinkTimer--;
+
+      player.update();
+      if(frameCount % fireRate===0 && (lastDX||lastDY)){
+        for(let i=0;i<scatterCount+1;i++){
+          let center=Math.atan2(lastDY,lastDX), spread=Math.PI/8;
+          let ang=center-(scatterCount/2)*spread + i*spread;
+          bullets.push(new Bullet(player.x,player.y,Math.cos(ang),Math.sin(ang)));
+        }
+      }
+
+      bullets = bullets.filter(b=>{b.update(); return b.x>=0&&b.x<=W&&b.y>=0&&b.y<=H;});
+      enemies = enemies.filter(e=>{
+        e.update();
+        for(let i=0;i<bullets.length;i++){
+          if(Math.hypot(bullets[i].x-e.x,bullets[i].y-e.y)<bullets[i].r+e.r){
+            bullets.splice(i,1); score++; updateUI(); return false;
+          }
+        }
+        if(Math.hypot(player.x-e.x,player.y-e.y)<player.radius+e.r){
+          endGame(); return false;
+        }
+        return true;
+      });
+      items = items.filter(it=>{
+        if(Math.hypot(player.x-it.x,player.y-it.y)<player.radius+it.r){
+          if(it.type==='scatter') scatterCount++;
+          if(it.type==='shrink') player.radius=player.origR/2;
+          if(it.type==='enemyShrink') enemyShrinkTimer=600;
+          updateUI(); return false;
+        }
+        return true;
+      });
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      player.draw(); bullets.forEach(b=>b.draw());
+      enemies.forEach(e=>e.draw()); items.forEach(it=>it.draw());
+    }
+
+    function loop(){ update(); draw(); if(!gameOver) requestAnimationFrame(loop); }
+    function updateUI(){ document.getElementById('score').innerHTML='分數: '+score+'<br/>散射: '+scatterCount; }
+    function endGame(){ gameOver=true; document.getElementById('restartBtn').style.display='block'; }
+    document.getElementById('restartBtn').onclick=()=>{
+      bullets=[];enemies=[];items=[];
+      score=0;scatterCount=0;frameCount=0;gameOver=false;lastShrink=0;lastEnemyShrink=0;enemyShrinkTimer=0;
+      player.radius=player.origR; updateUI(); document.getElementById('restartBtn').style.display='none'; loop();
+    };
+
+    // joystick via pointer events
+    const joyBase=document.getElementById('joystick'), joyKnob=document.getElementById('joy-knob');
+    let pid=null; const maxR=60;
+    joyBase.addEventListener('pointerdown',e=>{ if(!pid){pid=e.pointerId; joyBase.setPointerCapture(pid);} });
+    joyBase.addEventListener('pointermove',e=>{
+      if(e.pointerId===pid){
+        let rect=joyBase.getBoundingClientRect();
+        let dx=e.clientX-(rect.left+rect.width/2), dy=e.clientY-(rect.top+rect.height/2);
+        let d=Math.hypot(dx,dy);
+        if(d>maxR){dx=dx/d*maxR;dy=dy/d*maxR;}
+        joyKnob.style.transform=`translate(${dx}px,${dy}px)`; joyKnob.classList.add('active');
+        joyX=dx/maxR;joyY=dy/maxR; lastDX=joyX; lastDY=joyY;
+      }
+    });
+    joyBase.addEventListener('pointerup',e=>{
+      if(e.pointerId===pid){ joyBase.releasePointerCapture(pid); pid=null;
+        joyKnob.style.transform='translate(0,0)'; joyKnob.classList.remove('active'); joyX=0; joyY=0; }
+    });
+
+    loop();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 可愛音樂播放器 🎵</title>
+    <style>
+        /* 全局樣式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FFE4E1 0%, #FFF0F5 30%, #E6E6FA 60%, #F0F8FF 100%);
+            min-height: 100vh;
+            color: #5D5D5D;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 裝飾元素 */
+        .decoration {
+            position: fixed;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .note {
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="%23FFB6C1"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .heart {
+            width: 35px;
+            height: 35px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="%23FF69B4"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .star {
+            width: 30px;
+            height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="%23FFD700"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        /* 容器樣式 */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 標題樣式 */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #FFB6C1, #FFC0CB, #DDA0DD);
+            border-radius: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(255, 182, 193, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "🎵";
+            position: absolute;
+            left: 30px;
+            top: 30px;
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .header::after {
+            content: "🎶";
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite 1.5s;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #FFFFFF;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #FFFFFF;
+            opacity: 0.9;
+        }
+
+        /* 主播放器容器 */
+        .music-player {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border: 3px solid #FFB6C1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .music-player::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 檔案選擇區域 */
+        .file-selector {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #FFB6C1;
+            border-radius: 15px;
+            background: rgba(255, 240, 245, 0.5);
+        }
+
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input-label:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .file-input-label:hover:before {
+            left: 100%;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 105, 180, 0.4);
+        }
+
+        .disconnect-btn {
+            margin-left: 15px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        .disconnect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        .disconnect-btn:disabled {
+            background: #CCC;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 當前播放資訊 */
+        .now-playing {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(221, 160, 221, 0.2));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 182, 193, 0.5);
+        }
+
+        .album-art {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFB6C1, #DDA0DD);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            animation: spin 10s linear infinite;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .album-art.playing {
+            animation-play-state: running;
+        }
+
+        .album-art.paused {
+            animation-play-state: paused;
+        }
+
+        .album-art::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .song-info h3 {
+            font-size: 1.5rem;
+            color: #FF69B4;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .song-info p {
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        /* 進度條 */
+        .progress-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 182, 193, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.1s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #FF69B4;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 控制按鈕 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn.play-pause {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(255, 105, 180, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(255, 105, 180, 0.4);
+        }
+
+        .control-btn:disabled {
+            background: linear-gradient(135deg, #CCC, #DDD);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 音量控制 */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .volume-icon {
+            font-size: 1.5rem;
+            color: #FF69B4;
+        }
+
+        .volume-slider {
+            width: 150px;
+            height: 6px;
+            background: rgba(255, 182, 193, 0.3);
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #FF69B4;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #FF69B4;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* 播放清單 */
+        .playlist-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #FFB6C1;
+        }
+
+        .playlist-title {
+            font-size: 1.5rem;
+            color: #FF69B4;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .playlist {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 240, 245, 0.5);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255, 182, 193, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 182, 193, 0.3);
+        }
+
+        .playlist-item.active {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(255, 182, 193, 0.2));
+            border-color: #FF69B4;
+            box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+        }
+
+        .playlist-item-number {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .playlist-item-info {
+            flex: 1;
+        }
+
+        .playlist-item-name {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #5D5D5D;
+            margin-bottom: 2px;
+        }
+
+        .playlist-item-duration {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .playlist-item-playing {
+            color: #FF69B4;
+            font-size: 1.2rem;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* 空狀態 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #FFB6C1;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* 自定義滾動條 */
+        .playlist::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .playlist::-webkit-scrollbar-track {
+            background: rgba(255, 182, 193, 0.2);
+            border-radius: 10px;
+        }
+
+        .playlist::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            border-radius: 10px;
+        }
+
+        .playlist::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .music-player {
+                padding: 20px;
+            }
+            
+            .album-art {
+                width: 120px;
+                height: 120px;
+                font-size: 3rem;
+            }
+            
+            .controls {
+                gap: 15px;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .control-btn.play-pause {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+            
+            .volume-control {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .volume-slider {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .file-input-label,
+            .disconnect-btn {
+                display: block;
+                margin: 10px auto;
+                width: 80%;
+                text-align: center;
+            }
+            
+            .album-art {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 裝飾元素 -->
+    <div class="decoration note" style="top: 15%; left: 8%; animation-delay: 0s;"></div>
+    <div class="decoration heart" style="top: 25%; right: 12%; animation-delay: 1s;"></div>
+    <div class="decoration star" style="top: 60%; left: 5%; animation-delay: 2s;"></div>
+    <div class="decoration note" style="top: 70%; right: 8%; animation-delay: 3s;"></div>
+    <div class="decoration heart" style="bottom: 20%; left: 15%; animation-delay: 4s;"></div>
+    <div class="decoration star" style="bottom: 30%; right: 20%; animation-delay: 5s;"></div>
+
+    <div class="container">
+        <!-- 標題 -->
+        <header class="header">
+            <h1>🎵 可愛音樂播放器 🎵</h1>
+            <p class="subtitle">享受美好的音樂時光 ♪</p>
+        </header>
+
+        <!-- 主播放器 -->
+        <div class="music-player">
+            <!-- 檔案選擇區域 -->
+            <div class="file-selector">
+                <div class="file-input-container">
+                    <input type="file" id="audioFiles" class="file-input" multiple accept="audio/*" webkitdirectory>
+                    <label for="audioFiles" class="file-input-label">
+                        📁 選擇音樂資料夾
+                    </label>
+                    <button id="disconnectBtn" class="disconnect-btn" disabled>
+                        🔌 中斷連線
+                    </button>
+                </div>
+                <p style="margin-top: 15px; color: #888; font-size: 0.9rem;">
+                    選擇包含音樂檔案的資料夾，支援 MP3、WAV、OGG 等格式
+                </p>
+            </div>
+
+            <!-- 當前播放資訊 -->
+            <div class="now-playing">
+                <div class="album-art paused" id="albumArt">
+                    🎵
+                </div>
+                <div class="song-info">
+                    <h3 id="songTitle">選擇音樂開始播放</h3>
+                    <p id="songArtist">未知藝術家</p>
+                </div>
+
+                <!-- 進度條 -->
+                <div class="progress-container">
+                    <div class="time-info">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <!-- 控制按鈕 -->
+                <div class="controls">
+                    <button class="control-btn" id="prevBtn" disabled>⏮️</button>
+                    <button class="control-btn play-pause" id="playPauseBtn" disabled>▶️</button>
+                    <button class="control-btn" id="nextBtn" disabled>⏭️</button>
+                </div>
+
+                <!-- 音量控制 -->
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+                    <span id="volumeValue">50%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 播放清單 -->
+        <div class="playlist-container">
+            <h2 class="playlist-title">🎶 播放清單</h2>
+            <div class="playlist" id="playlist">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎵</div>
+                    <h3>播放清單是空的</h3>
+                    <p>請選擇包含音樂檔案的資料夾來建立播放清單</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隱藏的音頻元素 -->
+    <audio id="audioPlayer" preload="metadata"></audio>
+
+    <script>
+        class KawaiiMusicPlayer {
+            constructor() {
+                this.audioFiles = [];
+                this.currentIndex = 0;
+                this.isPlaying = false;
+                this.isConnected = false;
+                this.volume = 0.5;
+                
+                this.initializeElements();
+                this.setupEventListeners();
+                this.setupAudioEvents();
+            }
+
+            initializeElements() {
+                // 音頻元素
+                this.audioPlayer = document.getElementById('audioPlayer');
+                
+                // 控制元素
+                this.fileInput = document.getElementById('audioFiles');
+                this.disconnectBtn = document.getElementById('disconnectBtn');
+                this.playPauseBtn = document.getElementById('playPauseBtn');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                
+                // 顯示元素
+                this.albumArt = document.getElementById('albumArt');
+                this.songTitle = document.getElementById('songTitle');
+                this.songArtist = document.getElementById('songArtist');
+                this.currentTime = document.getElementById('currentTime');
+                this.totalTime = document.getElementById('totalTime');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressFill = document.getElementById('progressFill');
+                
+                // 音量控制
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.volumeValue = document.getElementById('volumeValue');
+                
+                // 播放清單
+                this.playlist = document.getElementById('playlist');
+                
+                // 設置初始音量
+                this.audioPlayer.volume = this.volume;
+            }
+
+            setupEventListeners() {
+                // 檔案選擇
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelection(e));
+                
+                // 中斷連線
+                this.disconnectBtn.addEventListener('click', () => this.disconnectFolder());
+                
+                // 播放控制
+                this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+                this.prevBtn.addEventListener('click', () => this.playPrevious());
+                this.nextBtn.addEventListener('click', () => this.playNext());
+                
+                // 進度條控制
+                this.progressBar.addEventListener('click', (e) => this.handleProgressClick(e));
+                
+                // 音量控制
+                this.volumeSlider.addEventListener('input', (e) => this.handleVolumeChange(e));
+                
+                // 鍵盤快捷鍵
+                document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+            }
+
+            setupAudioEvents() {
+                // 音頻載入完成
+                this.audioPlayer.addEventListener('loadedmetadata', () => {
+                    this.updateDuration();
+                });
+                
+                // 播放時間更新
+                this.audioPlayer.addEventListener('timeupdate', () => {
+                    this.updateProgress();
+                });
+                
+                // 播放結束
+                this.audioPlayer.addEventListener('ended', () => {
+                    this.playNext();
+                });
+                
+                // 播放開始
+                this.audioPlayer.addEventListener('play', () => {
+                    this.isPlaying = true;
+                    this.updatePlayPauseButton();
+                    this.albumArt.classList.remove('paused');
+                    this.albumArt.classList.add('playing');
+                });
+                
+                // 播放暫停
+                this.audioPlayer.addEventListener('pause', () => {
+                    this.isPlaying = false;
+                    this.updatePlayPauseButton();
+                    this.albumArt.classList.remove('playing');
+                    this.albumArt.classList.add('paused');
+                });
+                
+                // 載入錯誤
+                this.audioPlayer.addEventListener('error', (e) => {
+                    console.error('音頻載入錯誤:', e);
+                    this.showNotification('無法播放此音樂檔案', 'error');
+                    this.playNext();
+                });
+            }
+
+            handleFileSelection(event) {
+                const files = Array.from(event.target.files);
+                const audioFiles = files.filter(file => 
+                    file.type.startsWith('audio/') || 
+                    /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name)
+                );
+
+                if (audioFiles.length === 0) {
+                    this.showNotification('所選資料夾中沒有找到音頻檔案', 'error');
+                    return;
+                }
+
+                this.audioFiles = audioFiles.map((file, index) => ({
+                    file: file,
+                    name: this.getFileName(file.name),
+                    artist: '未知藝術家',
+                    duration: null,
+                    url: URL.createObjectURL(file),
+                    index: index
+                }));
+
+                this.isConnected = true;
+                this.currentIndex = 0;
+                
+                this.updateConnectionStatus();
+                this.generatePlaylist();
+                this.loadCurrentSong();
+                this.showNotification(`成功載入 ${audioFiles.length} 首音樂`, 'success');
+            }
+
+            getFileName(filename) {
+                // 移除副檔名並美化檔案名稱
+                const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+                return nameWithoutExt.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            disconnectFolder() {
+                if (!this.isConnected) return;
+
+                // 停止播放
+                this.audioPlayer.pause();
+                this.audioPlayer.src = '';
+
+                // 清理URL對象
+                this.audioFiles.forEach(audioFile => {
+                    if (audioFile.url) {
+                        URL.revokeObjectURL(audioFile.url);
+                    }
+                });
+
+                // 重置狀態
+                this.audioFiles = [];
+                this.currentIndex = 0;
+                this.isConnected = false;
+                this.isPlaying = false;
+
+                // 更新UI
+                this.updateConnectionStatus();
+                this.resetPlayerDisplay();
+                this.clearPlaylist();
+                
+                this.showNotification('已中斷資料夾連線', 'info');
+            }
+
+            updateConnectionStatus() {
+                this.disconnectBtn.disabled = !this.isConnected;
+                this.playPauseBtn.disabled = !this.isConnected;
+                this.prevBtn.disabled = !this.isConnected;
+                this.nextBtn.disabled = !this.isConnected;
+            }
+
+            generatePlaylist() {
+                this.playlist.innerHTML = '';
+
+                this.audioFiles.forEach((audioFile, index) => {
+                    const playlistItem = document.createElement('div');
+                    playlistItem.className = 'playlist-item';
+                    playlistItem.dataset.index = index;
+
+                    playlistItem.innerHTML = `
+                        <div class="playlist-item-number">${index + 1}</div>
+                        <div class="playlist-item-info">
+                            <div class="playlist-item-name">${audioFile.name}</div>
+                            <div class="playlist-item-duration" id="duration-${index}">載入中...</div>
+                        </div>
+                        <div class="playlist-item-playing" id="playing-${index}" style="display: none;">🎵</div>
+                    `;
+
+                    playlistItem.addEventListener('click', () => {
+                        this.selectSong(index);
+                    });
+
+                    this.playlist.appendChild(playlistItem);
+                    
+                    // 載入音頻時長
+                    this.loadAudioDuration(audioFile, index);
+                });
+            }
+
+            loadAudioDuration(audioFile, index) {
+                const tempAudio = new Audio();
+                tempAudio.src = audioFile.url;
+                
+                tempAudio.addEventListener('loadedmetadata', () => {
+                    const duration = this.formatTime(tempAudio.duration);
+                    audioFile.duration = tempAudio.duration;
+                    
+                    const durationElement = document.getElementById(`duration-${index}`);
+                    if (durationElement) {
+                        durationElement.textContent = duration;
+                    }
+                });
+
+                tempAudio.addEventListener('error', () => {
+                    const durationElement = document.getElementById(`duration-${index}`);
+                    if (durationElement) {
+                        durationElement.textContent = '無法載入';
+                    }
+                });
+            }
+
+            loadCurrentSong() {
+                if (!this.isConnected || this.audioFiles.length === 0) return;
+
+                const currentSong = this.audioFiles[this.currentIndex];
+                this.audioPlayer.src = currentSong.url;
+                
+                // 更新歌曲資訊
+                this.songTitle.textContent = currentSong.name;
+                this.songArtist.textContent = currentSong.artist;
+                
+                // 更新播放清單狀態
+                this.updatePlaylistActive();
+                
+                // 重置進度條
+                this.progressFill.style.width = '0%';
+                this.currentTime.textContent = '0:00';
+            }
+
+            selectSong(index) {
+                if (!this.isConnected || index < 0 || index >= this.audioFiles.length) return;
+                
+                this.currentIndex = index;
+                this.loadCurrentSong();
+                
+                // 如果之前在播放，則自動播放新歌
+                if (this.isPlaying) {
+                    this.audioPlayer.play();
+                }
+            }
+
+            togglePlayPause() {
+                if (!this.isConnected) return;
+
+                if (this.isPlaying) {
+                    this.audioPlayer.pause();
+                } else {
+                    this.audioPlayer.play().catch(error => {
+                        console.error('播放失敗:', error);
+                        this.showNotification('播放失敗，請檢查音頻檔案', 'error');
+                    });
+                }
+            }
+
+            playPrevious() {
+                if (!this.isConnected || this.audioFiles.length === 0) return;
+
+                this.currentIndex = (this.currentIndex - 1 + this.audioFiles.length) % this.audioFiles.length;
+                this.loadCurrentSong();
+                
+                if (this.isPlaying) {
+                    this.audioPlayer.play();
+                }
+            }
+
+            playNext() {
+                if (!this.isConnected || this.audioFiles.length === 0) return;
+
+                this.currentIndex = (this.currentIndex + 1) % this.audioFiles.length;
+                this.loadCurrentSong();
+                
+                if (this.isPlaying) {
+                    this.audioPlayer.play();
+                }
+            }
+
+            handleProgressClick(event) {
+                if (!this.isConnected || !this.audioPlayer.duration) return;
+
+                const rect = this.progressBar.getBoundingClientRect();
+                const clickX = event.clientX - rect.left;
+                const percentage = clickX / rect.width;
+                const newTime = percentage * this.audioPlayer.duration;
+                
+                this.audioPlayer.currentTime = newTime;
+            }
+
+            handleVolumeChange(event) {
+                this.volume = event.target.value / 100;
+                this.audioPlayer.volume = this.volume;
+                this.volumeValue.textContent = `${event.target.value}%`;
+                
+                // 更新音量圖標
+                const volumeIcon = document.querySelector('.volume-icon');
+                if (this.volume === 0) {
+                    volumeIcon.textContent = '🔇';
+                } else if (this.volume < 0.5) {
+                    volumeIcon.textContent = '🔉';
+                } else {
+                    volumeIcon.textContent = '🔊';
+                }
+            }
+
+            handleKeyboard(event) {
+                if (!this.isConnected) return;
+
+                switch(event.code) {
+                    case 'Space':
+                        event.preventDefault();
+                        this.togglePlayPause();
+                        break;
+                    case 'ArrowLeft':
+                        event.preventDefault();
+                        this.playPrevious();
+                        break;
+                    case 'ArrowRight':
+                        event.preventDefault();
+                        this.playNext();
+                        break;
+                    case 'ArrowUp':
+                        event.preventDefault();
+                        this.adjustVolume(5);
+                        break;
+                    case 'ArrowDown':
+                        event.preventDefault();
+                        this.adjustVolume(-5);
+                        break;
+                }
+            }
+
+            adjustVolume(delta) {
+                const currentVolume = parseInt(this.volumeSlider.value);
+                const newVolume = Math.max(0, Math.min(100, currentVolume + delta));
+                
+                this.volumeSlider.value = newVolume;
+                this.handleVolumeChange({ target: { value: newVolume } });
+            }
+
+            updateDuration() {
+                if (this.audioPlayer.duration) {
+                    this.totalTime.textContent = this.formatTime(this.audioPlayer.duration);
+                }
+            }
+
+            updateProgress() {
+                if (this.audioPlayer.duration) {
+                    const percentage = (this.audioPlayer.currentTime / this.audioPlayer.duration) * 100;
+                    this.progressFill.style.width = `${percentage}%`;
+                    this.currentTime.textContent = this.formatTime(this.audioPlayer.currentTime);
+                }
+            }
+
+            updatePlayPauseButton() {
+                this.playPauseBtn.textContent = this.isPlaying ? '⏸️' : '▶️';
+            }
+
+            updatePlaylistActive() {
+                // 移除所有活動狀態
+                document.querySelectorAll('.playlist-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                document.querySelectorAll('.playlist-item-playing').forEach(playing => {
+                    playing.style.display = 'none';
+                });
+
+                // 添加當前歌曲的活動狀態
+                const currentItem = document.querySelector(`[data-index="${this.currentIndex}"]`);
+                const currentPlaying = document.getElementById(`playing-${this.currentIndex}`);
+                
+                if (currentItem) {
+                    currentItem.classList.add('active');
+                }
+                
+                if (currentPlaying) {
+                    currentPlaying.style.display = this.isPlaying ? 'block' : 'none';
+                }
+            }
+
+            resetPlayerDisplay() {
+                this.songTitle.textContent = '選擇音樂開始播放';
+                this.songArtist.textContent = '未知藝術家';
+                this.currentTime.textContent = '0:00';
+                this.totalTime.textContent = '0:00';
+                this.progressFill.style.width = '0%';
+                this.playPauseBtn.textContent = '▶️';
+                this.albumArt.classList.remove('playing');
+                this.albumArt.classList.add('paused');
+            }
+
+            clearPlaylist() {
+                this.playlist.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎵</div>
+                        <h3>播放清單是空的</h3>
+                        <p>請選擇包含音樂檔案的資料夾來建立播放清單</p>
+                    </div>
+                `;
+            }
+
+            formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = Math.floor(seconds % 60);
+                return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+
+            showNotification(message, type = 'info') {
+                // 創建通知元素
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                // 設置通知樣式
+                Object.assign(notification.style, {
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    padding: '15px 20px',
+                    borderRadius: '10px',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    zIndex: '9999',
+                    animation: 'slideIn 0.3s ease-out',
+                    maxWidth: '300px',
+                    wordWrap: 'break-word'
+                });
+
+                // 根據類型設置背景色
+                switch(type) {
+                    case 'success':
+                        notification.style.background = 'linear-gradient(135deg, #4CAF50, #66BB6A)';
+                        break;
+                    case 'error':
+                        notification.style.background = 'linear-gradient(135deg, #f44336, #e57373)';
+                        break;
+                    case 'info':
+                    default:
+                        notification.style.background = 'linear-gradient(135deg, #2196F3, #64B5F6)';
+                        break;
+                }
+
+                // 添加到頁面
+                document.body.appendChild(notification);
+
+                // 3秒後自動移除
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // 添加通知動畫CSS
+        const notificationStyle = document.createElement('style');
+        notificationStyle.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(notificationStyle);
+
+        // 初始化音樂播放器
+        document.addEventListener('DOMContentLoaded', () => {
+            const player = new KawaiiMusicPlayer();
+            
+            // 監聽播放狀態變化以更新播放清單圖標
+            player.audioPlayer.addEventListener('play', () => {
+                player.updatePlaylistActive();
+            });
+            
+            player.audioPlayer.addEventListener('pause', () => {
+                player.updatePlaylistActive();
+            });
+            
+            // 頁面關閉時清理資源
+            window.addEventListener('beforeunload', () => {
+                player.disconnectFolder();
+            });
+        });
+    </script>
+</body>
+</html>

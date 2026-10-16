@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可愛籃球機 🏀</title>
+    <style>
+        /* 整體背景設定 */
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffe6e6; /* 可愛粉紅背景 */
+            font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;
+            overflow: hidden;
+        }
+
+        /* 遊戲主視窗 */
+        #game-container {
+            position: relative;
+            width: 320px;
+            height: 500px;
+            background-color: #fff0f5;
+            border: 6px solid #ffb6c1;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 15px 25px rgba(255, 105, 180, 0.2);
+            user-select: none; /* 防止連點反白 */
+        }
+
+        /* 分數板 */
+        #score-board {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 24px;
+            color: #ff69b4;
+            font-weight: bold;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 5px 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* 籃框設計 */
+        #hoop-container {
+            position: absolute;
+            top: 60px;
+            left: 120px;
+            width: 80px;
+            height: 25px;
+            border: 6px solid #ffa07a; /* 淺橘色籃框 */
+            border-radius: 50%;
+            z-index: 5;
+            box-sizing: border-box;
+            background-color: rgba(255, 160, 122, 0.2);
+        }
+
+        /* 籃球 */
+        #ball {
+            position: absolute;
+            top: 400px;
+            left: 135px;
+            font-size: 45px;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            z-index: 8;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+        }
+
+        /* 開始/結束畫面 */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 250, 250, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            border-radius: 24px;
+        }
+
+        #start-screen h1 {
+            color: #ff69b4;
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-align: center;
+        }
+
+        #start-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 20px;
+            background-color: #ffb6c1;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 10px rgba(255, 182, 193, 0.5);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        #start-btn:hover {
+            background-color: #ff69b4;
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 遊戲提示 */
+        .hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: #d8bfd8;
+            font-size: 14px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="score-board">分數: <span id="score">0</span></div>
+        
+        <div id="hoop-container"></div>
+        
+        <div id="ball">🏀</div>
+
+        <div class="hint">點擊畫面投籃！</div>
+
+        <div id="start-screen">
+            <h1 id="title">可愛投籃機 🏀</h1>
+            <p id="final-score" style="color: #ff99cc; font-size: 20px; font-weight: bold; display: none;">得分: 0</p>
+            <button id="start-btn">開始遊戲</button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const hoop = document.getElementById('hoop-container');
+        const ball = document.getElementById('ball');
+        const scoreElement = document.getElementById('score');
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const titleElement = document.getElementById('title');
+        const finalScoreElement = document.getElementById('final-score');
+
+        // 遊戲變數
+        let score = 0;
+        let gameLoop;
+        let hoopX = 120;
+        let hoopDirection = 1; // 1 向右, -1 向左
+        let hoopSpeed = 3;
+        
+        let ballY = 400;
+        let ballX = 135; // (320寬 - 50球寬) / 2
+        let isShooting = false;
+
+        // 監聽事件
+        startBtn.addEventListener('click', startGame);
+        
+        // 電腦滑鼠點擊 與 手機觸控
+        container.addEventListener('mousedown', shoot);
+        container.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 防止畫面滑動
+            shoot();
+        });
+
+        // 開始遊戲初始化
+        function startGame() {
+            score = 0;
+            scoreElement.innerText = score;
+            hoopSpeed = 3;
+            startScreen.style.display = 'none';
+            finalScoreElement.style.display = 'none';
+            titleElement.innerText = "可愛投籃機 🏀";
+            
+            resetBall();
+            
+            // 清除之前的計時器，重新啟動遊戲迴圈 (每20毫秒更新一次畫面)
+            if(gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, 20);
+        }
+
+        // 投籃動作
+        function shoot() {
+            if (!isShooting && startScreen.style.display === 'none') {
+                isShooting = true;
+            }
+        }
+
+        // 遊戲每一幀的更新邏輯
+        function update() {
+            // 1. 移動籃框
+            hoopX += hoopSpeed * hoopDirection;
+            
+            // 碰到邊界反彈 (320容器寬度 - 80籃框寬度 = 240)
+            if (hoopX <= 0 || hoopX >= 240) {
+                hoopDirection *= -1;
+            }
+            hoop.style.left = hoopX + 'px';
+
+            // 2. 移動籃球 (如果處於投出狀態)
+            if (isShooting) {
+                ballY -= 15; // 球往上飛的速度
+                ball.style.top = ballY + 'px';
+
+                // 3. 判斷進球 (當球飛到籃框的高度區間時)
+                if (ballY <= 70 && ballY >= 30) {
+                    let hoopCenter = hoopX + 40; // 籃框中心 X 座標
+                    let ballCenter = ballX + 25; // 籃球中心 X 座標
+                    
+                    // 如果兩者中心點距離小於 35，判定為進球
+                    if (Math.abs(hoopCenter - ballCenter) < 35) {
+                        score++;
+                        scoreElement.innerText = score;
+                        hoopSpeed += 0.5; // 每進一球籃框變快，增加難度
+                        resetBall();
+                    }
+                }
+
+                // 4. 判斷沒進 (球飛出畫面頂部)
+                if (ballY < -50) {
+                    endGame();
+                }
+            }
+        }
+
+        // 重置籃球位置
+        function resetBall() {
+            isShooting = false;
+            ballY = 400;
+            ball.style.top = ballY + 'px';
+        }
+
+        // 遊戲結束
+        function endGame() {
+            clearInterval(gameLoop);
+            resetBall();
+            startScreen.style.display = 'flex';
+            titleElement.innerText = "遊戲結束 😢";
+            finalScoreElement.innerText = `得分: ${score}`;
+            finalScoreElement.style.display = 'block';
+            startBtn.innerText = '再玩一次';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 堂｜觀察者：一有變化就通知</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="9">
+<main class="wrap">
+
+<section class="hero" style="--u:#81C784">
+  <span class="tag">第 9 堂 ／ 單元3　感測與自動化</span>
+  <h1>觀察者：一有變化就通知 👀</h1>
+  <p>觀察者有一張臉，一直盯著前面那一格。那一格只要有任何變化（長大、被放方塊、被挖掉、紅石開關），它就從背後送出一個很短的訊號。今天要做偵測警報和自動南瓜收割機！</p>
+  <div class="chips"><span class="chip">🧱 觀察者、黏性活塞／活塞、南瓜種子、音符盒、紅石粉</span><span class="chip">💻 MakeCode：搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>知道觀察者「臉看前面、背後出電」，訊號很短（脈衝）。</li><li>分得出「一直有電」和「一下下的脈衝」。</li><li>做出自動南瓜收割機，並用 MakeCode 的「當方塊被破壞」做程式警報。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：猜猜看：怎麼知道植物「長大了」？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：網頁觀察者警報：拉桿「開」和「關」都會響</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：自動南瓜收割機：網頁放對觀察者方向，再進遊戲蓋</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="15" data-label="第2節 應用 2"><b>15 分</b><div><b>應用 2</b>：偵測挖礦警報：觀察者盯著鑽石礦</div></div>
+<div class="slot" data-min="15" data-label="第2節 MakeCode"><b>15 分</b><div><b>MakeCode</b>：程式版警報：當鑽石礦被破壞就說話</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">👀</span><b>觀察者</b><b>臉</b>看著前面那一格；那一格有變化 → <b>背後</b>的紅點亮一下，送出很短的訊號（脈衝）。</div><div class="lc"><span class="ic">⚡</span><b>脈衝</b>只有一下下的訊號。觀察者、按鈕都會送出脈衝；拉桿是一直有電。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>放觀察者時，它的臉會<b>朝向你</b>。所以要站在「想偵測的東西」那一側放。</li><li>南瓜收割機：觀察者看著<b>南瓜莖</b>（莖長出南瓜時會轉向），活塞推南瓜。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：自動南瓜收割機 🎃</h3></header>
+  <div class="items">🎒 準備物品：泥土、鋤頭、南瓜種子、觀察者、活塞、紅石粉、漏斗＋箱子（下堂課）</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s09a"></div><div class="sim" data-sim="s09b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>鋤一格耕地種南瓜種子，旁邊留一格泥土讓南瓜長。</li><li>在南瓜莖上方放觀察者，<b>臉朝下看著莖</b>。</li><li>在南瓜會長出來的那格上方放活塞（朝下），觀察者背後鋪紅石粉接到活塞。</li><li>用骨粉讓南瓜快點長：南瓜一長出來，活塞就把它打掉！</li></ol>
+  <div class="tip">💡 觀察者看著「南瓜長出來的那一格」也可以，但活塞伸出去時會被觀察者看到又觸發一次，看著莖比較穩。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出 1 組收割機。</div><div class="lv f"><b>🦊 五、六年級</b>：做成 4 組並排，共用一條紅石線。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：挖礦偵測警報 ⛏️</h3></header>
+  <div class="items">🎒 準備物品：鑽石礦、觀察者、紅石粉、音符盒、紅石燈</div>
+  
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>在牆上放一塊鑽石礦當「寶物」。</li><li>牆後面放觀察者，臉看著鑽石礦。</li><li>觀察者背後接紅石粉到音符盒和燈。</li><li>有人挖走鑽石礦 → 警報響一聲、燈閃一下！</li></ol>
+  <div class="tip">💡 觀察者只送出很短的訊號，燈只會閃一下。想讓燈一直亮，要用第 13 堂的記憶電路。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出挖礦警報。</div><div class="lv f"><b>🦊 五、六年級</b>：連「放回去」也會響嗎？試試看並解釋為什麼。</div></div>
+</section>
+
+<section class="mission" id="mc">
+  <header><h3>💻 MakeCode：程式版挖礦警報</h3></header>
+  <p>MakeCode 的「當方塊被破壞」就像程式裡的觀察者：一有事情發生就執行。比較兩種「偵測」的差別。</p>
+  <div class="mcwrap">
+    <div><b>積木</b>（積木上的文字可能因版本略有不同）
+<pre class="mc">blocks hat: 當 [鑽石礦] 被破壞
+  player: 說 {&quot;警報！有人在挖鑽石礦！&quot;}
+  gameplay: 時間設為 [夜晚]
+blocks hat: 當 [鑽石礦] 被放置
+  player: 說 {&quot;鑽石放回去了，謝謝！&quot;}
+  gameplay: 時間設為 [白天]</pre></div>
+    <div><div class="row"><b>JavaScript</b><button class="btn sm blue" data-copy="js9">📋 複製</button></div>
+<pre class="js" id="js9">blocks.onBlockBroken(DIAMOND_ORE, function () {
+    player.say(&quot;警報！有人在挖鑽石礦！&quot;)
+    gameplay.timeSet(gameplay.time(NIGHT))
+})
+blocks.onBlockPlaced(DIAMOND_ORE, function () {
+    player.say(&quot;鑽石放回去了，謝謝！&quot;)
+    gameplay.timeSet(gameplay.time(DAY))
+})</pre>
+      <p class="small">在 MakeCode 上方切換到「JavaScript」，整段貼上，再切回「積木」就會變成上面的積木。</p></div>
+  </div>
+  <div class="dl"><a class="btn green" href="../makecode/第09堂_程式版挖礦警報.mkcd" download>⬇️ 下載 MakeCode 檔（.mkcd）</a>
+    <span class="small">Minecraft Education 按 <kbd>C</kbd> → MakeCode → <b>匯入</b> → 選這個檔案，打開就是上面的積木，不用自己拼。</span></div>
+  <h4>🧪 試試看</h4>
+  <ol class="steps"><li>拼好積木後，在附近放幾塊鑽石礦。</li><li>挖掉一塊：聊天室出現警報，天馬上變黑！</li><li>放回一塊鑽石礦：天又亮了。</li><li>比一比：觀察者只看「一格」，程式看「全世界的鑽石礦」。</li></ol>
+  <div class="note">📌 「當方塊被破壞」偵測的是<b>任何地方</b>的那種方塊；觀察者只盯著自己面前那一格。</div>
+</section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>你還想讓觀察者偵測什麼？（門被打開、水流過來、甘蔗長高……）</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>南瓜生長很慢，課堂上請用<b>骨粉</b>加速；或把示範改成「甘蔗收割機」（觀察者看甘蔗第 3 格）。</li><li>基岩版觀察者也會偵測到很多小變化（例如紅石粉強度改變），學生的電路若「莫名其妙一直觸發」，多半是觀察者看到了自己電路的變化。</li><li>「當方塊被破壞」積木在 MakeCode 的「方塊」分類下。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s09a": {"title": "👀 應用 1：觀察者警報", "desc": "上面那排用觀察者看著拉桿，下面那排直接接線。在黃色格子放觀察者，臉要「看著拉桿」（朝 ←）。", "rows": ["L:A ? - - N8:1", ". . . . .", "L:B - - - N13:2"], "tools": ["obs"], "names": {"A": "拉桿A", "B": "拉桿B", "1": "警報1", "2": "音符盒2"}, "challenges": [{"name": "拉桿 A 打開和關掉都要響", "level": "🐣", "steps": [{"set": {"A": true}, "atLeast": {"1": 1}, "say": "打開拉桿 A → 響 1 次"}, {"set": {"A": false}, "atLeast": {"1": 2}, "say": "關掉拉桿 A → 再響 1 次"}]}]}, "s09b": {"title": "🎃 應用 2：自動南瓜收割機", "desc": "南瓜莖長出南瓜時，莖會「轉向」南瓜。在黃色格子放觀察者看著莖（朝 ↓），讓活塞把南瓜打下來。", "rows": [". - - .", ". ? pv .", ". Z:Z Y .", ". . C:C ."], "tools": ["obs"], "names": {"Z": "南瓜莖", "C": "箱子"}, "challenges": [{"name": "南瓜長出來就自動收進箱子", "level": "🐣", "steps": [{"grow": "Z", "atLeast": {"C": 1}, "say": "第 1 顆南瓜 → 箱子裡有 1 顆"}, {"grow": "Z", "atLeast": {"C": 2}, "say": "第 2 顆南瓜 → 箱子裡有 2 顆"}]}]}};
+window.QUIZ = [{"q": "觀察者的訊號從哪裡出來？", "o": ["臉", "背後", "上面"], "a": 1, "why": "臉看前面，訊號從背後出來。"}, {"q": "觀察者的訊號是？", "o": ["一直有電", "一下下的脈衝", "沒有電"], "a": 1, "why": "只有一下下（脈衝）。"}, {"q": "拉桿 → 觀察者盯著拉桿 → 音符盒。拉桿打開再關掉，音符盒響幾次？", "o": ["1 次", "2 次", "0 次"], "a": 1, "why": "開、關都是「變化」，所以響 2 次。"}, {"q": "南瓜收割機的觀察者要看著哪裡比較穩？", "o": ["南瓜莖", "天空", "活塞"], "a": 0, "why": "莖長出南瓜時會轉向，觀察者就會看到。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

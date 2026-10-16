@@ -1,0 +1,129 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 堂｜密碼鎖：拉桿密碼與聊天密碼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="16">
+<main class="wrap">
+
+<section class="hero" style="--u:#FFB74D">
+  <span class="tag">第 16 堂 ／ 單元4　大型機關</span>
+  <h1>密碼鎖：拉桿密碼與聊天密碼 🔢</h1>
+  <p>密室逃脫一定會有密碼鎖！今天做兩種：用 4 根拉桿組合的紅石密碼鎖（用到 NOT 和 OR），以及用 MakeCode 做的「聊天輸入密碼」門。</p>
+  <div class="chips"><span class="chip">🧱 拉桿 ×4、紅石火把、石頭、紅石粉、鐵門</span><span class="chip">💻 MakeCode：搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>了解密碼鎖的原理：檢查「有沒有哪一根拉錯」。</li><li>做出 4 位數拉桿密碼鎖，並會改密碼。</li><li>用 MakeCode 做出聊天密碼門，比較兩種密碼鎖。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：猜密碼遊戲：老師心中想 4 個 0 或 1，全班要猜幾次？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新概念"><b>10 分</b><div><b>新概念</b>：密碼鎖原理：每一欄放火把或紅石粉</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：拉桿密碼鎖：網頁完成密碼 1010，遊戲照圖蓋</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="20" data-label="第2節 MakeCode"><b>20 分</b><div><b>MakeCode</b>：聊天密碼門：pw 1234</div></div>
+<div class="slot" data-min="10" data-label="第2節 互相破解"><b>10 分</b><div><b>互相破解</b>：設定新密碼，請別組來破解（數一數試了幾次）</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">🔢</span><b>密碼鎖的想法</b>每根拉桿都檢查一次：<b>拉錯就送出「錯誤訊號」</b>。只要有任何一個錯誤訊號（OR），門就不開（NOT）。</div><div class="lc"><span class="ic">🕯️</span><b>要「開」的拉桿</b>拉桿 → 石頭 → 火把：拉桿沒開時火把亮＝錯誤訊號。</div><div class="lc"><span class="ic">🔴</span><b>要「關」的拉桿</b>拉桿 → 直接紅石粉：拉桿被打開＝錯誤訊號。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>所有錯誤訊號接到同一條線（OR），最後再接一支火把（NOT）到門：沒有任何錯誤 → 火把亮 → 開門。</li><li>改密碼＝把某一欄的「火把」和「紅石粉」交換。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：4 位數拉桿密碼鎖 🔢</h3></header>
+  <div class="items">🎒 準備物品：拉桿 ×4、石頭、紅石火把、紅石粉、鐵門</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s16a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>牆上排 4 根拉桿，每根之間空一格。</li><li>照網頁：要「開」的拉桿下面接 石頭＋火把；要「關」的直接接紅石粉。</li><li>4 欄在下面合成一條線 → 石頭 → 火把 → 鐵門。</li><li>測試：只有密碼正確門才開；把密碼寫在紙上交給隊友試。</li></ol>
+  <div class="tip">💡 每一欄之間要空一格，不然火把的電會跑到隔壁欄。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：網頁完成密碼 1010，在遊戲照圖蓋。</div><div class="lv f"><b>🦊 五、六年級</b>：網頁挑戰改成 0110，並在遊戲改成自己的密碼。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：聊天密碼門 💬</h3></header>
+  <div class="items">🎒 準備物品：（MakeCode）鐵門或活塞門</div>
+  
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>照下面的積木拼好，密碼先設 1234。</li><li>門的電路旁留一個空位，程式會在那裡放紅石方塊 3 秒。</li><li>輸入 <code>pw 1111</code>：門不開，聊天室說密碼錯誤。</li><li>輸入 <code>pw 1234</code>：門打開 3 秒後自動關上！</li></ol>
+  <div class="tip">💡 拉桿密碼只有 0 和 1，4 位數只有 16 種可能；數字密碼 0000～9999 有 10000 種，哪個比較難破解？</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：照積木做出密碼門。</div><div class="lv f"><b>🦊 五、六年級</b>：加一個變數記錄「猜錯幾次」，錯 3 次就說「鎖住了！」。</div></div>
+</section>
+
+<section class="mission" id="mc">
+  <header><h3>💻 MakeCode：聊天密碼門</h3></header>
+  <p>程式可以比對任何數字，密碼的組合比拉桿多很多；還能限制猜錯次數。這就是電腦密碼的基本概念。</p>
+  <div class="mcwrap">
+    <div><b>積木</b>（積木上的文字可能因版本略有不同）
+<pre class="mc">player hat: 當聊天指令 {&quot;pw&quot;} 參數 {num1}
+  logic: 如果 {num1 = 1234} 那麼
+    player: 說 {&quot;密碼正確，門打開了！&quot;}
+    blocks: 放置 [紅石方塊] 位於 {~0 ~0 ~2}
+    loops: 暫停 {3000} 毫秒
+    blocks: 放置 [空氣] 位於 {~0 ~0 ~2}
+  logic: 否則
+    player: 說 {&quot;密碼錯誤！&quot;}</pre></div>
+    <div><div class="row"><b>JavaScript</b><button class="btn sm blue" data-copy="js16">📋 複製</button></div>
+<pre class="js" id="js16">player.onChat(&quot;pw&quot;, function (num1) {
+    if (num1 == 1234) {
+        player.say(&quot;密碼正確，門打開了！&quot;)
+        blocks.place(REDSTONE_BLOCK, pos(0, 0, 2))
+        loops.pause(3000)
+        blocks.place(AIR, pos(0, 0, 2))
+    } else {
+        player.say(&quot;密碼錯誤！&quot;)
+    }
+})</pre>
+      <p class="small">在 MakeCode 上方切換到「JavaScript」，整段貼上，再切回「積木」就會變成上面的積木。</p></div>
+  </div>
+  <div class="dl"><a class="btn green" href="../makecode/第16堂_聊天密碼門.mkcd" download>⬇️ 下載 MakeCode 檔（.mkcd）</a>
+    <span class="small">Minecraft Education 按 <kbd>C</kbd> → MakeCode → <b>匯入</b> → 選這個檔案，打開就是上面的積木，不用自己拼。</span></div>
+  <h4>🧪 試試看</h4>
+  <ol class="steps"><li>「=」比較積木在邏輯分類。</li><li>輸入指令時，指令和數字中間要空一格：<code>pw 1234</code>。</li><li>門打開 3 秒後自動關上，記得快點走過去！</li><li>和紅石密碼鎖比一比：哪一個比較容易改密碼？</li></ol>
+  <div class="note">📌 聊天指令會留在聊天紀錄裡，別人往上翻就看得到密碼——真正的密碼要小心保管喔！</div>
+</section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>你覺得拉桿密碼鎖和聊天密碼門，哪一個比較安全？為什麼？</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li>密碼鎖電路就是「4 輸入的 AND」（每一欄都要對），可以連結第 6 堂。</li><li>16 種組合可以用「樹狀圖」帶五六年級計算，三四年級可以實際一個一個試。</li><li>MakeCode 中 <code>loops.pause</code> 會讓這個指令暫停 3 秒，期間再輸入指令會排隊執行。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s16a": {"title": "🔢 拉桿密碼鎖", "desc": "每一欄決定一個數字：放<b>火把<\/b>的欄位＝這根拉桿要「開」，鋪<b>紅石粉<\/b>的欄位＝要「關」。下面那排會檢查「有沒有哪一根拉錯」。", "rows": ["L:A . L:B . L:C . L:D . . . .", "? . ? . ? . ? . . . .", "? . ? . ? . ? . . . .", "? . ? . ? . ? . . . .", "- - - - - - - # T> - D:M"], "tools": ["dust", "block", "torch"], "names": {"A": "A", "B": "B", "C": "C", "D": "D", "M": "鐵門"}, "challenges": [{"name": "密碼 1010（A 開 B 關 C 開 D 關）", "level": "🐣", "steps": [{"set": {"A": true, "B": false, "C": true, "D": false}, "expect": {"M": true}, "say": "1010 → 開門"}, {"set": {"A": true, "B": true, "C": true, "D": true}, "expect": {"M": false}, "say": "1111 → 不開"}, {"set": {"A": false, "B": false, "C": false, "D": false}, "expect": {"M": false}, "say": "0000 → 不開"}, {"set": {"A": true, "B": false, "C": false, "D": false}, "expect": {"M": false}, "say": "1000 → 不開"}]}, {"name": "自己改成密碼 0110", "level": "🦊", "steps": [{"set": {"A": false, "B": true, "C": true, "D": false}, "expect": {"M": true}, "say": "0110 → 開門"}, {"set": {"A": true, "B": false, "C": true, "D": false}, "expect": {"M": false}, "say": "1010 → 不開"}, {"set": {"A": true, "B": true, "C": true, "D": true}, "expect": {"M": false}, "say": "1111 → 不開"}]}]}};
+window.QUIZ = [{"q": "拉桿密碼鎖裡，「要打開」的拉桿下面接什麼？", "o": ["石頭＋火把", "只有紅石粉", "音符盒"], "a": 0, "why": "拉桿沒開時火把亮，送出錯誤訊號。"}, {"q": "所有錯誤訊號合在一起，是哪一種邏輯？", "o": ["AND", "OR", "XOR"], "a": 1, "why": "任何一個錯誤（OR）都不能開門。"}, {"q": "4 根拉桿的密碼一共有幾種組合？", "o": ["4 種", "8 種", "16 種"], "a": 2, "why": "每根 2 種，2×2×2×2 = 16。"}, {"q": "MakeCode 輸入密碼的正確寫法？", "o": ["pw1234", "pw 1234", "1234 pw"], "a": 1, "why": "指令和數字中間要空一格。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

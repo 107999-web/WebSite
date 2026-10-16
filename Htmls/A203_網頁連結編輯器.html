@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>連結網頁編輯器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
+        
+        /* 編輯器本身的樣式 */
+        body { font-family: 'Nunito', 'Microsoft JhengHei', sans-serif; }
+        .preview-container {
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#fbcfe8 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        
+        /* 注入預覽區的專屬樣式 */
+        .cute-card {
+            border: 4px solid #fff;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .cute-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 35px rgba(255, 182, 193, 0.6);
+            border-color: #fce7f3;
+        }
+        .icon-bounce { transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .cute-card:hover .icon-bounce { transform: scale(1.15) rotate(5deg); }
+        
+        /* 公告區專屬樣式 */
+        .announcement-box {
+            box-shadow: 0 15px 30px -5px rgba(234, 179, 8, 0.3);
+            border-left-width: 12px;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden bg-gray-50">
+
+    <!-- 左側編輯區 -->
+    <aside class="w-1/3 min-w-[350px] max-w-[500px] h-full bg-white border-r shadow-xl flex flex-col z-10">
+        <div class="p-6 border-b flex justify-between items-center bg-gray-800 text-white">
+            <h1 class="text-xl font-bold">頁面編輯器</h1>
+            <button onclick="exportHTML()" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded font-bold shadow transition-colors">
+                匯出 HTML
+            </button>
+        </div>
+        
+        <div class="p-6 border-b bg-gray-50 space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">主標題</label>
+                <input type="text" id="pageTitle" value="學習資源" oninput="renderPreview()" class="w-full border p-2 rounded focus:ring-2 focus:ring-pink-300 outline-none">
+            </div>
+
+            <!-- 公告設定 -->
+            <div class="border-t pt-4">
+                <label class="flex items-center space-x-2 text-sm font-bold text-gray-700 mb-2 cursor-pointer">
+                    <input type="checkbox" id="showAnnouncement" onchange="toggleAnnouncement()" class="w-4 h-4 text-pink-500 focus:ring-pink-400 border-gray-300 rounded">
+                    <span>顯示公告說明區塊</span>
+                </label>
+                
+                <div id="announcementSettings" class="hidden space-y-3 mt-3 bg-white p-3 border rounded shadow-inner">
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-500 mb-1">顯示位置</label>
+                            <select id="announcementPosition" onchange="renderPreview()" class="w-full border p-2 text-sm rounded outline-none focus:ring-1 focus:ring-pink-300">
+                                <option value="top">連結上方</option>
+                                <option value="bottom">連結下方</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-500 mb-1">文字對齊</label>
+                            <select id="announcementAlign" onchange="renderPreview()" class="w-full border p-2 text-sm rounded outline-none focus:ring-1 focus:ring-pink-300">
+                                <option value="text-center">置中對齊</option>
+                                <option value="text-left">靠左對齊</option>
+                                <option value="text-right">靠右對齊</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">公告內容</label>
+                        <textarea id="announcementText" oninput="renderPreview()" rows="3" class="w-full border p-2 text-sm rounded outline-none focus:ring-1 focus:ring-pink-300 resize-y">這裡是一段重要公告或說明文字。支援多行顯示，字體將會大大明顯！</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="linkEditor" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- 動態產生表單 -->
+        </div>
+
+        <div class="p-6 border-t bg-gray-50">
+            <button onclick="addLink()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded border border-gray-300 border-dashed transition-colors">
+                + 新增連結
+            </button>
+        </div>
+    </aside>
+
+    <!-- 右側預覽區 -->
+    <main class="flex-1 h-full overflow-y-auto preview-container flex flex-col items-center py-16 px-6 relative">
+        <div class="absolute top-4 right-6 text-pink-400 font-bold opacity-50 tracking-widest uppercase pointer-events-none">Live Preview</div>
+        
+        <header class="mb-10 text-center w-full">
+            <h1 id="previewTitle" class="text-4xl md:text-5xl font-black text-pink-500 tracking-wide drop-shadow-sm mb-3"></h1>
+            <div class="h-2 w-24 bg-pink-300 rounded-full mx-auto"></div>
+        </header>
+
+        <!-- 預留公告位置 (上方) -->
+        <div id="announcementTop" class="w-full max-w-7xl flex justify-center"></div>
+
+        <div id="previewGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl w-full">
+            <!-- 動態產生預覽 -->
+        </div>
+
+        <!-- 預留公告位置 (下方) -->
+        <div id="announcementBottom" class="w-full max-w-7xl flex justify-center"></div>
+    </main>
+
+<script>
+    // 內建圖示庫
+    const ICONS = {
+        puzzle: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1H6a3 3 0 0 0-3 3v3h1a3 3 0 0 1 0 6H3v3a3 3 0 0 0 3 3h3v-1a3 3 0 0 1 6 0v1h3a3 3 0 0 0 3-3v-3h-1a3 3 0 0 1 0-6h1V9a3 3 0 0 0-3-3h-3V5a3 3 0 0 0-3-3z"></path></svg>`,
+        robot: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>`,
+        book: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>`,
+        cloud: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`,
+        code: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+        star: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+        video: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`,
+        music: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`,
+        gamepad: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><circle cx="15" cy="13" r="1"></circle><circle cx="18" cy="11" r="1"></circle></svg>`,
+        heart: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+        lightbulb: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path></svg>`,
+        globe: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+        rocket: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>`,
+        pen: `<svg class="w-24 h-24 icon-bounce relative z-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`
+    };
+
+    // 主題配色
+    const THEMES = {
+        red: { bg: 'bg-red-100', text: 'text-red-500', hex: '#ef4444' },
+        orange: { bg: 'bg-orange-100', text: 'text-orange-500', hex: '#f97316' },
+        amber: { bg: 'bg-amber-100', text: 'text-amber-500', hex: '#f59e0b' },
+        yellow: { bg: 'bg-yellow-100', text: 'text-yellow-500', hex: '#eab308' },
+        lime: { bg: 'bg-lime-100', text: 'text-lime-500', hex: '#84cc16' },
+        emerald: { bg: 'bg-emerald-100', text: 'text-emerald-500', hex: '#10b981' },
+        teal: { bg: 'bg-teal-100', text: 'text-teal-500', hex: '#14b8a6' },
+        cyan: { bg: 'bg-cyan-100', text: 'text-cyan-500', hex: '#06b6d4' },
+        blue: { bg: 'bg-blue-100', text: 'text-blue-500', hex: '#3b82f6' },
+        indigo: { bg: 'bg-indigo-100', text: 'text-indigo-500', hex: '#6366f1' },
+        purple: { bg: 'bg-purple-100', text: 'text-purple-500', hex: '#a855f7' },
+        fuchsia: { bg: 'bg-fuchsia-100', text: 'text-fuchsia-500', hex: '#d946ef' },
+        pink: { bg: 'bg-pink-100', text: 'text-pink-500', hex: '#ec4899' },
+        rose: { bg: 'bg-rose-100', text: 'text-rose-500', hex: '#f43f5e' }
+    };
+
+    let links = [
+        { id: generateId(), name: 'Scratch', url: 'https://scratch.mit.edu/', icon: 'puzzle', theme: 'orange' },
+        { id: generateId(), name: 'Hour of AI', url: 'https://code.org/zh-Hant/hour-of-ai', icon: 'robot', theme: 'blue' }
+    ];
+
+    let showAnnounce = false;
+
+    function generateId() {
+        return Math.random().toString(36).substr(2, 9);
+    }
+
+    function toggleAnnouncement() {
+        showAnnounce = document.getElementById('showAnnouncement').checked;
+        const settings = document.getElementById('announcementSettings');
+        if (showAnnounce) {
+            settings.classList.remove('hidden');
+        } else {
+            settings.classList.add('hidden');
+        }
+        renderPreview();
+    }
+
+    function addLink() {
+        links.push({ id: generateId(), name: '新連結', url: 'https://', icon: 'star', theme: 'pink' });
+        renderEditor();
+        renderPreview();
+    }
+
+    function removeLink(id) {
+        links = links.filter(l => l.id !== id);
+        renderEditor();
+        renderPreview();
+    }
+
+    function updateLink(id, field, value) {
+        const link = links.find(l => l.id === id);
+        if (link) {
+            link[field] = value;
+            renderPreview();
+        }
+    }
+
+    function renderEditor() {
+        const container = document.getElementById('linkEditor');
+        container.innerHTML = '';
+
+        links.forEach((link, index) => {
+            const card = document.createElement('div');
+            card.className = 'p-4 border rounded bg-white shadow-sm relative';
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-gray-700">項目 ${index + 1}</span>
+                    <button onclick="removeLink('${link.id}')" class="text-red-500 hover:text-red-700 text-sm">刪除</button>
+                </div>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">名稱</label>
+                        <input type="text" value="${link.name}" oninput="updateLink('${link.id}', 'name', this.value)" class="w-full border p-2 text-sm rounded focus:ring-1 focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">網址 (URL)</label>
+                        <input type="text" value="${link.url}" oninput="updateLink('${link.id}', 'url', this.value)" class="w-full border p-2 text-sm rounded focus:ring-1 focus:ring-blue-300 outline-none">
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-500 mb-1">圖示</label>
+                            <select onchange="updateLink('${link.id}', 'icon', this.value)" class="w-full border p-2 text-sm rounded outline-none">
+                                ${Object.keys(ICONS).map(k => `<option value="${k}" ${link.icon === k ? 'selected' : ''}>${k}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-500 mb-1">顏色</label>
+                            <select onchange="updateLink('${link.id}', 'theme', this.value)" class="w-full border p-2 text-sm rounded outline-none">
+                                ${Object.keys(THEMES).map(k => `<option value="${k}" ${link.theme === k ? 'selected' : ''}>${k}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function generateCardHTML(link) {
+        const theme = THEMES[link.theme];
+        const iconSVG = ICONS[link.icon].replace('currentColor', theme.hex);
+        const dotColor = encodeURIComponent(theme.hex);
+        const bgPattern = `data:image/svg+xml;utf8,<svg width='20' height='20' xmlns='http://www.w3.org/2000/svg'><circle cx='10' cy='10' r='2' fill='${dotColor}'/></svg>`;
+
+        return `
+        <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="cute-card bg-white rounded-3xl overflow-hidden group flex flex-col no-underline">
+            <div class="h-48 ${theme.bg} flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: url('${bgPattern}')"></div>
+                <div class="${theme.text}">
+                    ${iconSVG}
+                </div>
+            </div>
+            <div class="p-6 flex-1 flex items-center justify-center bg-white text-center">
+                <h2 class="text-2xl font-extrabold ${theme.text} opacity-90 group-hover:opacity-100 transition-opacity leading-tight">
+                    ${link.name.replace(/\n/g, '<br>')}
+                </h2>
+            </div>
+        </a>`;
+    }
+
+    function getAnnouncementHTML(positionContext) {
+        if (!showAnnounce) return '';
+        const text = document.getElementById('announcementText').value.replace(/\n/g, '<br>');
+        const alignClass = document.getElementById('announcementAlign').value;
+        const marginClass = positionContext === 'top' ? 'mb-10' : 'mt-10';
+        
+        return `
+        <div class="w-full bg-yellow-50 text-yellow-900 border-yellow-400 p-8 md:p-10 rounded-2xl announcement-box relative overflow-hidden ${marginClass}">
+            <div class="absolute top-0 right-0 -mt-6 -mr-6 text-yellow-200 opacity-40 pointer-events-none">
+                <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+            </div>
+            <div class="relative z-10 text-2xl md:text-3xl font-black leading-relaxed tracking-wide ${alignClass}">
+                ${text}
+            </div>
+        </div>`;
+    }
+
+    function renderPreview() {
+        const title = document.getElementById('pageTitle').value;
+        document.getElementById('previewTitle').textContent = title;
+        
+        const container = document.getElementById('previewGrid');
+        container.innerHTML = links.map(link => generateCardHTML(link)).join('');
+
+        const topContainer = document.getElementById('announcementTop');
+        const bottomContainer = document.getElementById('announcementBottom');
+        
+        topContainer.innerHTML = '';
+        bottomContainer.innerHTML = '';
+
+        if (showAnnounce) {
+            const pos = document.getElementById('announcementPosition').value;
+            if (pos === 'top') {
+                topContainer.innerHTML = getAnnouncementHTML('top');
+            } else {
+                bottomContainer.innerHTML = getAnnouncementHTML('bottom');
+            }
+        }
+    }
+
+    function exportHTML() {
+        const title = document.getElementById('pageTitle').value;
+        const cardsHTML = links.map(link => generateCardHTML(link)).join('\n        ');
+        
+        let annTopHTML = '';
+        let annBottomHTML = '';
+        
+        if (showAnnounce) {
+            const pos = document.getElementById('announcementPosition').value;
+            if (pos === 'top') annTopHTML = getAnnouncementHTML('top');
+            if (pos === 'bottom') annBottomHTML = getAnnouncementHTML('bottom');
+        }
+        
+        const htmlContent = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
+        
+        body {
+            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#fbcfe8 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .cute-card {
+            border: 4px solid #fff;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .cute-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 35px rgba(255, 182, 193, 0.6);
+            border-color: #fce7f3;
+        }
+
+        .icon-bounce {
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .cute-card:hover .icon-bounce {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .announcement-box {
+            box-shadow: 0 15px 30px -5px rgba(234, 179, 8, 0.3);
+            border-left-width: 12px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-16 px-6">
+
+    <header class="mb-10 text-center w-full max-w-7xl">
+        <h1 class="text-4xl md:text-5xl font-black text-pink-500 tracking-wide drop-shadow-sm mb-3">
+            ${title}
+        </h1>
+        <div class="h-2 w-24 bg-pink-300 rounded-full mx-auto"></div>
+    </header>
+
+    ${annTopHTML ? `<div class="w-full max-w-7xl flex justify-center">\n        ${annTopHTML}\n    </div>` : ''}
+
+    <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl w-full">
+        ${cardsHTML}
+    </main>
+
+    ${annBottomHTML ? `<div class="w-full max-w-7xl flex justify-center">\n        ${annBottomHTML}\n    </div>` : ''}
+
+</body>
+</html>`;
+
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title || '網頁'}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // 初始化
+    renderEditor();
+    renderPreview();
+</script>
+</body>
+</html>

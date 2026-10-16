@@ -1,0 +1,130 @@
+<!doctype html>
+<!-- 由 tools/build.py 產生，請改 tools/lessons.py 或 tools/sims.py 後重新產生 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 堂｜記憶電路：會記住的紅石</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-lesson="13">
+<main class="wrap">
+
+<section class="hero" style="--u:#81C784">
+  <span class="tag">第 13 堂 ／ 單元3　感測與自動化</span>
+  <h1>記憶電路：會記住的紅石 🧠</h1>
+  <p>按一下開燈、再按一下關燈——家裡的電燈就是這樣。但按鈕只有一下下的電，紅石要怎麼「記住」現在是開還是關？今天認識銅燈（T 正反器）和火把記憶電路，也用 MakeCode 的「變數」來記住。</p>
+  <div class="chips"><span class="chip">🧱 銅燈、按鈕、紅石比較器、紅石火把、鐵門</span><span class="chip">💻 MakeCode：搭配</span><span class="chip">⏰ 40 分＋下課 10 分＋40 分</span></div>
+</section>
+
+<section class="card mint">
+  <h2>🎯 今日目標</h2>
+  <ol><li>知道「記憶」＝電路能保持狀態，不會因為按鈕放開就消失。</li><li>做出一顆按鈕開關的燈和門（銅燈＋比較器）。</li><li>了解程式的變數也是一種記憶。</li></ol>
+</section>
+
+<section class="card">
+  <h2>🕘 上課流程</h2>
+  <div class="period">📗 第 1 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="5" data-label="第1節 暖身"><b>5 分</b><div><b>暖身</b>：按鈕一放開電就沒了，家裡的燈為什麼不會熄？</div></div>
+<div class="slot" data-min="10" data-label="第1節 新元件"><b>10 分</b><div><b>新元件</b>：銅燈：每次收到新訊號就切換亮暗</div></div>
+<div class="slot" data-min="25" data-label="第1節 應用 1"><b>25 分</b><div><b>應用 1</b>：一顆按鈕開關燈＋🦊 開關門</div></div></div>
+  <div class="schedule" style="margin-top:10px"><div class="slot rest"><b>☕ 10 分</b><div><b>下課</b>：存檔、起來走走、喝水，讓眼睛休息一下 👀</div></div></div>
+  <div class="period">📘 第 2 節（40 分）</div>
+  <div class="schedule"><div class="slot" data-min="15" data-label="第2節 應用 2"><b>15 分</b><div><b>應用 2</b>：會記住的警報：網頁觀察兩支火把互相控制</div></div>
+<div class="slot" data-min="15" data-label="第2節 MakeCode"><b>15 分</b><div><b>MakeCode</b>：程式版開關：用變數記住燈的狀態</div></div>
+<div class="slot" data-min="10" data-label="第2節 測驗＋日誌"><b>10 分</b><div><b>測驗＋日誌</b>：闖關小測驗、紅石日誌</div></div></div>
+  <p class="small">點右邊的 ⏱ 會在右下角倒數計時，投影上課時很好用。</p>
+</section>
+
+<section class="card sky">
+  <h2>📚 新元件小教室</h2>
+  <div class="learn"><div class="lc"><span class="ic">💡</span><b>銅燈</b>每收到一次<b>新的</b>訊號就切換一次：暗→亮→暗……會自己記住。它本身不會送電出去，要用比較器讀它（亮＝15）。</div><div class="lc"><span class="ic">🧠</span><b>T 正反器</b>「按一下切換」的電路叫 T 正反器（Toggle）。銅燈就是現成的 T 正反器。</div><div class="lc"><span class="ic">🔁</span><b>火把記憶（鎖存器）</b>兩支火把互相控制對方：一支亮，另一支就熄，會一直保持，直到按另一邊的按鈕。</div></div>
+  <h3>🔑 今天的重點</h3>
+  <ul class="rules"><li>銅燈需要 Minecraft 1.21 以上的版本。遊戲裡找不到銅燈，就先在網頁做，遊戲裡改做火把記憶電路。</li><li>記憶電路就是電腦「記憶體」的最小單位：記住一個 0 或 1。</li></ul>
+  <p class="small">🖥️ 網頁模擬器是「從上往下看」的示意圖：先在這裡想清楚線路，正式結果以遊戲為準。操作：選工具 → 點格子放元件；同一種元件再點一次會轉方向；🖐️ 操作開關；🧽 清除。</p>
+</section>
+
+<section class="mission" id="m1">
+  <header><h3>🎮 應用 1：一顆按鈕開關燈 💡</h3></header>
+  <div class="items">🎒 準備物品：按鈕、紅石粉、銅燈、紅石比較器、鐵門</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s13a"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>牆上放按鈕，鋪紅石粉接到銅燈。</li><li>按一下 → 銅燈亮；再按一下 → 熄。</li><li>🦊 在銅燈旁邊放比較器（背對銅燈），前面接紅石粉到鐵門。</li><li>按一下開門、再按一下關門，門會一直保持！</li></ol>
+  <div class="tip">💡 銅燈放久了會氧化變綠，亮度會變暗，但開關功能一樣。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：做出一顆按鈕開關燈。</div><div class="lv f"><b>🦊 五、六年級</b>：加比較器，做出一顆按鈕開關門。</div></div>
+</section>
+<section class="mission" id="m2">
+  <header><h3>🎮 應用 2：會記住的警報 🚨</h3></header>
+  <div class="items">🎒 準備物品：按鈕 ×2、石頭 ×2、紅石火把 ×2、紅石粉、紅石燈</div>
+  <p class="webfirst">🖥️ 先在網頁試試看</p><div class="sim" data-sim="s13b"></div>
+  <h4>🧱 在遊戲裡做</h4>
+  <ol class="steps"><li>在網頁按「觸發 S」：警報燈亮起來，而且一直亮著。</li><li>按「重設 R」：警報燈熄滅。</li><li>打開「顯示訊號強度」，用「走一步」看兩支火把怎麼互相控制。</li><li>🦊 照網頁的樣子在遊戲蓋出來，把「觸發」換成壓力板：有人踩過就一直響，直到警衛按重設。</li></ol>
+  <div class="tip">💡 這個電路一開始要「其中一支火把亮、另一支熄」；如果兩支一起亮，會互相打架閃個不停，按一下重設就好了。</div>
+  <div class="lvrow"><div class="lv c"><b>🐣 三、四年級</b>：在網頁玩懂觸發和重設。</div><div class="lv f"><b>🦊 五、六年級</b>：在遊戲蓋出壓力板觸發的警報。</div></div>
+</section>
+
+<section class="mission" id="mc">
+  <header><h3>💻 MakeCode：程式版開關：變數就是記憶</h3></header>
+  <p>程式用變數 <code>light</code> 記住燈現在是開還是關。每次輸入指令就把它「反過來」——跟銅燈一模一樣。</p>
+  <div class="mcwrap">
+    <div><b>積木</b>（積木上的文字可能因版本略有不同）
+<pre class="mc">player hat: 當聊天指令 {&quot;light&quot;}
+  vars: 設定 {light} 為 {不是 light}
+  logic: 如果 {light} 那麼
+    blocks: 放置 [紅石方塊] 位於 {~0 ~0 ~2}
+    player: 說 {&quot;開燈&quot;}
+  logic: 否則
+    blocks: 放置 [空氣] 位於 {~0 ~0 ~2}
+    player: 說 {&quot;關燈&quot;}</pre></div>
+    <div><div class="row"><b>JavaScript</b><button class="btn sm blue" data-copy="js13">📋 複製</button></div>
+<pre class="js" id="js13">let light = false
+player.onChat(&quot;light&quot;, function () {
+    light = !(light)
+    if (light) {
+        blocks.place(REDSTONE_BLOCK, pos(0, 0, 2))
+        player.say(&quot;開燈&quot;)
+    } else {
+        blocks.place(AIR, pos(0, 0, 2))
+        player.say(&quot;關燈&quot;)
+    }
+})</pre>
+      <p class="small">在 MakeCode 上方切換到「JavaScript」，整段貼上，再切回「積木」就會變成上面的積木。</p></div>
+  </div>
+  <div class="dl"><a class="btn green" href="../makecode/第13堂_程式版開關_變數就是記憶.mkcd" download>⬇️ 下載 MakeCode 檔（.mkcd）</a>
+    <span class="small">Minecraft Education 按 <kbd>C</kbd> → MakeCode → <b>匯入</b> → 選這個檔案，打開就是上面的積木，不用自己拼。</span></div>
+  <h4>🧪 試試看</h4>
+  <ol class="steps"><li>建立變數 <code>light</code>。</li><li>「不是」在邏輯分類（<code>not</code>）：把「真」變「假」、「假」變「真」。</li><li>面前 2 格旁邊放燈，輸入 <code>light</code> 好幾次，燈會一開一關。</li><li>想一想：變數 <code>light</code> 記住的是什麼？</li></ol>
+  <div class="note">📌 「設定 light 為 不是 light」就是程式版的 T 正反器。</div>
+</section>
+
+
+
+<section class="card sky">
+  <h2>📝 闖關小測驗</h2>
+  <div class="quiz"></div>
+</section>
+
+<section class="card cream reflect">
+  <h2>💭 紅石日誌</h2>
+  <p>電腦和手機為什麼需要「記憶」？如果沒有記憶會怎樣？</p>
+  <textarea data-save="reflect"></textarea>
+  <p class="small">日誌只存在這台電腦的瀏覽器裡。</p>
+</section>
+
+<details class="teacher">
+  <summary>👩‍🏫 教師備註</summary>
+  <ul><li><b>銅燈需要 1.21 以上版本</b>：請課前確認學校的 Minecraft Education 版本。若沒有銅燈，第 1 節改做火把記憶電路，網頁仍可體驗銅燈。</li><li>火把記憶電路在遊戲中可能因為初始狀態兩支火把都亮而閃爍，按一下任一按鈕即可穩定。</li><li>基岩版另有「投擲器＋比較器」的 T 正反器做法，🦊 可以上網查「T flip flop bedrock」。</li></ul>
+</details>
+
+</main>
+<script src="../assets/meta.js"></script>
+<script src="../assets/redsim.js"></script>
+<script>
+window.SIM_DATA = {"s13a": {"title": "💡 一顆按鈕開關燈（銅燈）", "desc": "鋪紅石粉讓按鈕接到銅燈。🦊 再加一個比較器（朝 →）讀銅燈，用它控制鐵門。", "rows": ["B:B ? ? U:U ? ? D:M"], "tools": ["dust", "comp"], "names": {"B": "按鈕", "U": "銅燈", "M": "鐵門"}, "challenges": [{"name": "按一下亮、再按一下暗", "level": "🐣", "steps": [{"press": "B", "expect": {"U": true}}, {"press": "B", "expect": {"U": false}}, {"press": "B", "expect": {"U": true}}]}, {"name": "按一下開門、再按一下關門", "level": "🦊", "steps": [{"press": "B", "expect": {"M": true}}, {"press": "B", "expect": {"M": false}}]}]}, "s13b": {"title": "🚨 會記住的警報（火把記憶電路）", "desc": "按「觸發 S」警報就一直響著，按「重設 R」才會停。兩支火把互相控制對方——這就是「記憶」。", "rows": [". . . . B:R . . .", "B:S # T> - # t> - O:L", ". - . . . - . .", ". - - - - - . ."], "names": {"S": "觸發", "R": "重設", "L": "警報燈"}, "challenges": [{"name": "觸發後一直亮，重設才暗", "level": "🐣", "demo": true, "steps": [{"press": "S", "expect": {"L": true}}, {"wait": 50, "expect": {"L": true}, "say": "過 5 秒 → 還是亮著"}, {"press": "R", "expect": {"L": false}}, {"wait": 50, "expect": {"L": false}, "say": "過 5 秒 → 還是暗的"}]}]}};
+window.QUIZ = [{"q": "「按一下開、再按一下關」的電路叫做？", "o": ["T 正反器", "中繼器", "時鐘"], "a": 0, "why": "Toggle（切換）正反器。"}, {"q": "銅燈亮著時，要怎麼讓它控制鐵門？", "o": ["用比較器讀它", "直接接鐵門", "用水"], "a": 0, "why": "銅燈本身不送電，要用比較器讀它。"}, {"q": "程式裡用來「記住」東西的是？", "o": ["變數", "迴圈", "聊天"], "a": 0, "why": "變數可以記住數字、真假。"}, {"q": "「設定 light 為 不是 light」，light 原本是真，執行後變成？", "o": ["真", "假"], "a": 1, "why": "「不是 真」就是假。"}];
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scratch 動畫製作・互動教學</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<style>
+.lbx{position:fixed;inset:0;background:rgba(20,14,8,.72);display:none;place-items:center;z-index:100;padding:18px}
+.lbx.on{display:grid}
+.lbx .in{background:#fff;border-radius:18px;max-width:900px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lbx img{display:block;width:100%;height:auto}
+.lbx .b{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--paper);color:var(--ink);font-size:.88rem}
+.lbx .b button{margin-left:auto}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🎬 Scratch 動畫製作 <em>互動教學</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="#ch0">原作投影片</a>
+      <a href="#ch6">自我檢核</a>
+      <a href="動畫教學_李昀宸大神.sb3" download>⬇ 原作 .sb3</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge" style="display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:999px;margin-bottom:10px">學生作品改編・互動教學文件</span>
+    <h1>讓動畫流暢地切換畫面：從規劃到程式</h1>
+    <p>這份文件改編自 <b>60319 李昀宸大神</b>同學做的 Scratch「動畫教學」。原作本身就是一個用 Scratch 寫成的投影片，共 <b>18 頁、4 個章節</b>，專案裡還用註解藏了更多程式技巧。<br>
+      這裡把每一頁的重點拆開來說明「<b>為什麼要這樣做</b>」，並加上可以直接動手操作的示範。</p>
+    <div class="credit">
+      <div class="av">🐱</div>
+      <div><b>原作：60319 李昀宸大神</b>
+        <small>「很多同學在製作動畫時無法流暢切換畫面，今天這個教學就是要來拯救你們！」<br>
+        本文件中標示「昀宸大神說」的內容皆引自原作投影片；其餘說明與互動示範為改編補充。</small></div>
+    </div>
+    <div class="warn" style="max-width:48em"><b class="t">開始之前　</b>原作封面第一句話是：「<b>嚴禁不思考原理就直接複製！請好好理解。</b>」
+      這份文件的每一段也都照這個精神寫——先弄懂為什麼，再決定要不要用在自己的作品裡。</div>
+  </section>
+
+  <div class="layout">
+    <nav class="toc" id="toc" aria-label="目錄">
+      <h3>目錄</h3>
+      <a href="#ch0">0　原作投影片</a>
+      <a href="#ch1">1　製作動畫的步驟</a>
+      <a class="sub" href="#t11">先規劃再動手</a>
+      <a class="sub" href="#t12">我的分鏡表</a>
+      <a class="sub" href="#t13">不要一次播到底</a>
+      <a class="sub" href="#t14">秒數不要寫死</a>
+      <a href="#ch2">2　廣播訊息</a>
+      <a class="sub" href="#t21">廣播與接收</a>
+      <a class="sub" href="#t22">命名要清楚</a>
+      <a class="sub" href="#t23">角色分工與分身</a>
+      <a class="sub" href="#t24">誰何時出現・消失</a>
+      <a href="#ch3">3　動畫的四個元素</a>
+      <a href="#ch4">4　我的程式機密</a>
+      <a class="sub" href="#t41">定義積木：換頁</a>
+      <a class="sub" href="#t42">幻影淡入</a>
+      <a class="sub" href="#t43">sin 擺動</a>
+      <a href="#ch5">5　藏在 .sb3 裡的教學</a>
+      <a class="sub" href="#t51">背景音樂循環</a>
+      <a class="sub" href="#t52">初始化與圖層</a>
+      <a class="sub" href="#t53">上一頁怎麼做</a>
+      <a class="sub" href="#t54">主體隱藏，分身工作</a>
+      <a class="sub" href="#t55">按住不會一直翻頁</a>
+      <a class="sub" href="#t56">讓人知道可以點</a>
+      <a class="sub" href="#t57">命名與整理</a>
+      <a href="#ch6">6　自我檢核與小測驗</a>
+      <div class="prog">自我檢核進度 <b id="tocProg">0 / 0</b></div>
+      <div class="pbar"><i id="tocBar"></i></div>
+    </nav>
+
+    <main>
+<!-- ================= 0 原作投影片 ================= -->
+<section class="chap" id="ch0">
+  <div class="ch"><span class="cn c6">0</span><h2>原作投影片</h2></div>
+  <p class="lead">先把昀宸大神的 18 頁投影片翻一遍，知道整份教學在講什麼。點畫面兩側、用下方按鈕，或按鍵盤 ← → 都可以翻頁。</p>
+
+  <div class="viewer" id="viewer">
+    <div class="scr">
+      <img id="vImg" src="assets/slides/s01.jpg" alt="原作投影片">
+      <button class="nav l" id="vPrev" aria-label="上一頁">◀</button>
+      <button class="nav r" id="vNext" aria-label="下一頁">▶</button>
+    </div>
+    <div class="bar">
+      <span class="cnt" id="vCnt">1 / 18</span>
+      <div class="chips" id="vChips"></div>
+    </div>
+    <div class="cap" id="vCap"></div>
+  </div>
+  <div class="thumbs noprint" id="vThumbs"></div>
+
+  <div class="good noprint"><b class="t">小發現　</b>把滑鼠移到投影片左右兩側，箭頭會從淡淡的變清楚——這個效果就是照昀宸大神在 .sb3 裡的寫法做的，第 5 章會說明原理。</div>
+
+  <div class="dl">
+    <span class="fi">📦</span>
+    <div><b>原作 Scratch 專案：動畫教學_李昀宸大神.sb3</b>
+      <small>下載後到 Scratch 選「檔案 → 從你的電腦挑選」開啟。專案裡的程式旁邊有昀宸大神寫的註解，第 5 章會一段一段說明。</small></div>
+    <a class="btn" href="動畫教學_李昀宸大神.sb3" download>⬇ 下載 .sb3</a>
+  </div>
+</section>
+<!-- ================= 1 製作動畫的步驟 ================= -->
+<section class="chap" id="ch1">
+  <div class="ch"><span class="cn c1">1</span><h2>製作動畫的步驟</h2></div>
+  <p class="lead">昀宸大神在標題旁邊特別註明「僅供參考」——每個人的做法可以不一樣。但有一件事他反覆強調：<b>先規劃，再動手</b>。</p>
+
+  <div class="topic" id="t11">
+    <h3>📝 先規劃再動手：看題目 → 想劇情 → 決定架構</h3>
+    <p>很多人一打開 Scratch 就開始畫角色，做到一半才發現故事接不起來、角色不知道什麼時候該出現。點下面三個步驟，看看每一步要做出什麼。</p>
+    <div class="flow" id="flow">
+      <button class="st on" data-i="0"><b>① 看題目</b><small>題目要求什麼？</small></button>
+      <span class="ar">→</span>
+      <button class="st" data-i="1"><b>② 想劇情</b><small>故事分幾段？</small></button>
+      <span class="ar">→</span>
+      <button class="st" data-i="2"><b>③ 決定架構</b><small>誰在哪個分鏡？</small></button>
+    </div>
+    <div class="flowdet" id="flowdet"></div>
+
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「看題目 → 想劇情 → 決定架構。<b>要記下來每個角色要在哪個分鏡。</b>」
+        <span class="sl">原作第 4 頁　<a data-slide="4">看原投影片</a></span></p></div>
+
+    <h3 style="margin-top:16px;font-size:1rem">昀宸大神的範例：「貓的幸福人生」</h3>
+    <p>他在紙上把題目拆成三段，再把每一段展開成幾個畫面。注意第 2 段下面還分出好幾個小情節——這就是他說的「<b>一個主題不要只有一個畫面</b>」。</p>
+    <div class="story">
+      <div class="sc"><span class="no">分鏡 1</span><b>🐣 貓出生</b><span>貓咪出生的畫面，接著貓咪離開媽媽。</span><em>廣播 → 進入分鏡 2</em></div>
+      <div class="sc"><span class="no">分鏡 2</span><b>🌧️ 開始流浪</b><span>好心人餵飯、流浪狗出場、好餓……同一個主題裡有好幾個畫面。</span><em>廣播 → 進入分鏡 3</em></div>
+      <div class="sc"><span class="no">分鏡 3</span><b>🏠 領養</b><span>出現動保人員，把貓咪送到中途之家。</span><em>廣播 → 進入結尾</em></div>
+      <div class="sc"><span class="no">結尾</span><b>💛 呼應主題</b><span>最後回到「幸福人生」這個題目，讓故事有頭有尾。</span></div>
+    </div>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「一個主題不要只有一個畫面！」「最後呼應主題～」「<b>事先規劃才不會手忙腳亂！</b>」
+        <span class="sl">原作第 4、5 頁　<a data-slide="4">看第 4 頁</a>・<a data-slide="5">看第 5 頁</a></span></p></div>
+  </div>
+
+  <div class="topic" id="t12">
+    <h3>🗂️ 我的分鏡表</h3>
+    <p>照昀宸大神的方法，把你自己的動畫先寫成分鏡表。每一列是一個分鏡：這個畫面發生什麼事、<b>哪些角色出現、哪些角色要消失</b>、結束時要廣播什麼訊息給下一段。</p>
+    <div class="tablewrap">
+      <table class="sbtable" id="sbTable">
+        <thead><tr><th>分鏡</th><th>畫面內容（發生什麼事）</th><th>出現的角色</th><th>要消失的角色</th><th>結束時廣播</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="ctrl noprint">
+      <button class="btn sm" id="sbAdd">＋ 加一列</button>
+      <button class="btn ghost sm" id="sbDel">－ 刪掉最後一列</button>
+      <button class="btn ghost sm" id="sbEx">填入昀宸大神的範例</button>
+      <button class="btn ghost sm" id="sbPrint">🖨️ 列印分鏡表</button>
+    </div>
+    <div class="savenote" id="sbSave">內容會自動存在這台電腦的瀏覽器裡。</div>
+  </div>
+
+  <div class="topic" id="t13">
+    <h3>✂️ 不要讓動畫「一次播到底」</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「比較不建議動畫一次播到底（就是當綠旗按下時，1 2 3 就會直接播完），那樣子<b>測試很困難</b>。還有有時老師會要求你要做選單，可以選擇想看的章節，到時候就<b>必須全部分開</b>。」
+        <span class="sl">原作第 6 頁　<a data-slide="6">看原投影片</a></span></p></div>
+    <div class="two">
+      <div class="pane bad"><h4>✗ 一次播到底</h4>
+        <p style="font-size:.88rem;margin:0">綠旗 → 第 1 段 → 第 2 段 → 第 3 段，全部接在同一條程式裡。</p>
+        <ul style="font-size:.86rem">
+          <li>想測試第 3 段，每次都要從頭看完 1、2 段。</li>
+          <li>想做「選章節」的選單，得整個拆開重寫。</li>
+          <li>中間改一個地方，後面的時間全部要重算。</li>
+        </ul></div>
+      <div class="pane ok"><h4>✓ 每一段用廣播分開</h4>
+        <p style="font-size:.88rem;margin:0">每一段都從「當收到訊息」開始，播完再廣播下一段。</p>
+        <ul style="font-size:.86rem">
+          <li>測試第 3 段：直接點「廣播訊息 第 3 段」那塊積木就好。</li>
+          <li>要做選單：按鈕被點擊時廣播對應的段落，其他不用改。</li>
+          <li>一段改了，不會影響其他段。</li>
+        </ul></div>
+    </div>
+    <div class="why"><b class="t">小技巧　</b>在 Scratch 裡<b>直接點一下</b>任何一塊積木，它就會執行。把「廣播訊息 第 3 段」單獨拖一塊放在旁邊，點它就能從第 3 段開始測，不用每次按綠旗從頭看。</div>
+  </div>
+
+  <div class="topic" id="t14">
+    <h3>⏱️ 秒數不要寫死，一個廣播一個動作</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「秒數也不要寫死，<b>一個廣播一個動作才能同步！</b>」
+        <span class="sl">原作第 6 頁　<a data-slide="6">看原投影片</a></span></p></div>
+    <p>「寫死」的意思是：用「等待 3 秒」去<b>猜</b>別的角色什麼時候做完。問題是配音錄出來的長度常常跟你想的不一樣，換一次錄音就要重算一次。</p>
+    <div class="two">
+      <div class="pane bad"><h4>✗ 秒數寫死</h4>
+        <div class="bscript" data-blk="syncBadA"></div>
+        <div class="bscript" data-blk="syncBadB" style="margin-top:8px"></div></div>
+      <div class="pane ok"><h4>✓ 講完才廣播</h4>
+        <div class="bscript" data-blk="syncGoodA"></div>
+        <div class="bscript" data-blk="syncGoodB" style="margin-top:8px"></div></div>
+    </div>
+
+    <div class="lab" id="syncLab">
+      <div class="lh"><span class="tag">動手試</span>拉動「台詞實際長度」，看看兩種寫法差在哪</div>
+      <div class="ctrl">
+        <label>台詞實際長度 <input type="range" id="syncLen" min="1" max="5.5" step="0.5" value="4"> <output id="syncLenO">4</output> 秒</label>
+        <button class="btn sm" id="syncPlay">▶ 播放</button>
+      </div>
+      <h4 style="margin:12px 0 4px;font-size:.88rem;color:var(--no)">✗ 秒數寫死（小貓固定等 3 秒）</h4>
+      <div class="tlbox">
+        <div class="tlane"><span class="who">貓媽媽說話</span><div class="ttrack" id="trA1"></div></div>
+        <div class="tlane"><span class="who">小貓出場</span><div class="ttrack" id="trB1"></div></div>
+      </div>
+      <div class="verdict" id="syncV1"></div>
+      <h4 style="margin:14px 0 4px;font-size:.88rem;color:var(--ok)">✓ 廣播同步（講完才廣播）</h4>
+      <div class="tlbox">
+        <div class="tlane"><span class="who">貓媽媽說話</span><div class="ttrack" id="trA2"></div></div>
+        <div class="tlane"><span class="who">小貓出場</span><div class="ttrack" id="trB2"></div></div>
+      </div>
+      <div class="taxis"><span></span><div class="sc" id="syncAxis"></div></div>
+      <div class="verdict ok" id="syncV2"></div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <h3>🎬 有時間的話，做一段開頭動畫</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「還有，要記得不管是遊戲組還是動畫組，有時間的話做開頭的動畫或什麼什麼比較可以加分（大概吧）。」
+        <span class="sl">原作第 7 頁　<a data-slide="7">看原投影片</a></span></p></div>
+    <p>他自己也加了「大概吧」——評分標準裡不一定寫著「要有開頭動畫」。但一段好的開場能讓人一眼知道<b>這部作品在講什麼</b>，完成度也會高很多。記得把它排在<b>主要內容都做完之後</b>，不要本末倒置。</p>
+  </div>
+</section>
+<!-- ================= 2 廣播訊息 ================= -->
+<section class="chap" id="ch2">
+  <div class="ch"><span class="cn c2">2</span><h2>廣播訊息</h2></div>
+  <p class="lead">昀宸大神說「在動畫裡，廣播訊息很重要」。它是讓好幾個角色<b>在同一個時間點一起反應</b>的方法，也是第 1 章「一個廣播一個動作」的基礎。</p>
+
+  <div class="topic" id="t21">
+    <h3>📣 廣播與接收：一個喊，大家聽</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「在某個地方（像是動畫之後）廣播訊息，在其他地方接收到後執行動作。」
+        <span class="sl">原作第 9 頁　<a data-slide="9">看原投影片</a></span></p></div>
+    <div class="two">
+      <div class="pane"><h4>① 發送的角色</h4><div class="bscript" data-blk="sendMsg"></div></div>
+      <div class="pane"><h4>② 接收的角色</h4><div class="bscript" data-blk="recvMsg"></div></div>
+    </div>
+    <div class="why"><b class="t">看懂這張圖　</b>左邊的角色先等 5 秒、慢慢變透明，最後「廣播訊息 1 主」。右邊的角色原本什麼都沒做，一聽到「1 主」就開始換造型、顯示。<b>兩段程式在不同角色身上，靠一個訊息名稱連起來。</b>
+      粉紅色的「復原」「換頁」是昀宸大神自己做的函式積木，第 4 章會講。</div>
+
+    <div class="lab" id="bcLab">
+      <div class="lh"><span class="tag">動手試</span>按下「廣播訊息 1 主」，三個角色會同時收到</div>
+      <div class="ctrl"><button class="btn sm" id="bcGo">📣 廣播訊息［1 主］</button><button class="btn ghost sm" id="bcReset">↺ 回到開頭</button></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;align-items:flex-start">
+        <div class="mstage" id="bcStage">
+          <div class="spr title" id="bcTitle">🎬 貓的幸福人生</div>
+          <div class="spr cat off" id="bcCat">🐱</div>
+          <div class="spr subt off" id="bcSub">小貓出生了，牠的冒險就要開始……</div>
+          <span class="bcwave" id="bcWave"></span>
+        </div>
+      </div>
+      <div class="recv">
+        <div class="rc" id="rc1"><h5>🎬 開頭動畫</h5><div class="bscript" data-blk="bcTitle"></div></div>
+        <div class="rc" id="rc2"><h5>💬 字幕</h5><div class="bscript" data-blk="bcSub"></div></div>
+        <div class="rc" id="rc3"><h5>🐱 小貓</h5><div class="bscript" data-blk="bcCat"></div></div>
+      </div>
+      <p style="font-size:.86rem;color:var(--ink2);margin:10px 0 0">這就是昀宸大神第 11 頁畫的那張樹狀圖：綠旗 → 開頭動畫 → 廣播「1」→ 字幕出現、角色出現、開頭動畫隱藏，<b>三件事同時發生</b>。</p>
+    </div>
+  </div>
+
+  <div class="topic" id="t22">
+    <h3>🏷️ 命名要清楚，一百年後回來看也要懂</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「請注意命名要清楚，<b>即使一百年後你回來看也要馬上就能懂</b>（你也可以先記錄）。」「為角色命名時能加上關於在哪個畫面出現的資訊，如：動畫1-1…」
+        <span class="sl">原作第 9、11 頁　<a data-slide="9">看第 9 頁</a>・<a data-slide="11">看第 11 頁</a></span></p></div>
+    <p>作品做到後面，訊息和角色常常有二、三十個。名字取得好，一看就知道它是哪一段、做什麼事。</p>
+    <div class="lab">
+      <div class="lh"><span class="tag">判斷看看</span>這些名字取得好不好？</div>
+      <div class="names" id="names"></div>
+      <div class="ctrl"><span>答對 <b class="score" id="nmScore">0</b> / <span id="nmTotal">0</span></span><button class="btn ghost sm" id="nmReset">↺ 重來</button></div>
+    </div>
+  </div>
+
+  <div class="topic" id="t23">
+    <h3>🧩 角色怎麼分工：一個角色一個畫面，或用分身</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「如果你對這些技巧沒有很熟悉，<b>建議每個角色各自負責不同畫面，盡量不用同一個</b>。有些同學（像我）喜歡用分身，也能創造不同分身做不同事。」
+        <span class="sl">原作第 10 頁　<a data-slide="10">看原投影片</a></span></p></div>
+    <div class="two">
+      <div class="pane"><h4>初學者：一個角色負責一個畫面</h4>
+        <p style="font-size:.88rem;margin:0">角色多一點沒關係，好處是<b>出問題時一眼就知道是誰</b>。命名時加上畫面編號，例如「動畫1-1 貓媽媽」「動畫2-1 流浪狗」。</p></div>
+      <div class="pane"><h4>熟練之後：一個角色多造型＋分身</h4>
+        <p style="font-size:.88rem;margin:0">昀宸大神稱它為「<b>角色少的秘訣</b>」：把很多東西畫成同一個角色的不同造型，需要時再建立分身，每個分身<b>看自己是哪個造型</b>來決定要做什麼。</p></div>
+    </div>
+    <div class="two">
+      <div class="pane"><h4>本體：負責製造分身</h4><div class="bscript" data-blk="cloneMain"></div></div>
+      <div class="pane"><h4>分身：先判斷自己是誰</h4><div class="bscript" data-blk="cloneWork"></div></div>
+    </div>
+    <div class="why"><b class="t">昀宸大神的註解　</b>「分身產生後透過條件判斷來知道自己要做什麼事（可以判斷<b>造型名稱</b>，或是在製造分身時給他 <b>ID</b>）。」
+      上圖就是判斷造型名稱的做法：造型名稱是 8 的分身，會從畫面上方（y = 300）掉下來，速度越來越快，落到 y = 100 時彈一下。</div>
+    <div class="warn"><b class="t">小提醒　</b>分身很方便，但一出錯比較難找——因為好幾個分身跑的是同一段程式。如果你還不熟，先照昀宸大神的建議，<b>一個角色負責一個畫面</b>。</div>
+  </div>
+
+  <div class="topic" id="t24">
+    <h3>👀 先想好誰在什麼時候出現・消失</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「可以先想好誰在什麼時候要出現・消失。」
+        <span class="sl">原作第 11 頁　<a data-slide="11">看原投影片</a></span></p></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:12px;font-weight:800">
+      <span style="background:#8BD35A;color:#fff;border-radius:10px;padding:4px 14px">🏳 綠旗</span><span>│</span>
+      <span style="background:var(--paper2);border:2px solid var(--line);border-radius:10px;padding:4px 14px">開頭動畫</span><span>│</span>
+      <span style="background:var(--c-events);color:#fff;border-radius:10px;padding:4px 14px">廣播「1」</span>
+      <span style="font-size:.9rem;color:var(--ink2)">┌────────┼────────┐</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <span style="background:var(--paper);border:2px solid var(--ok);border-radius:10px;padding:3px 12px">字幕出現</span>
+        <span style="background:var(--paper);border:2px solid var(--ok);border-radius:10px;padding:3px 12px">角色出現</span>
+        <span style="background:var(--paper);border:2px solid var(--no);border-radius:10px;padding:3px 12px">開頭動畫隱藏</span>
+      </div>
+      <span style="color:var(--ink2)">⋮</span>
+    </div>
+    <div class="why"><b class="t">和分鏡表一起用　</b>上面「我的分鏡表」裡的「出現的角色」「要消失的角色」兩欄，就是這張樹狀圖。<b>先把每個分鏡的出現與消失寫清楚</b>，寫程式時照表一個個接收訊息就好，不會漏掉「上一段的角色忘了隱藏」這種常見錯誤。</div>
+  </div>
+</section>
+
+<!-- ================= 3 動畫的四個元素 ================= -->
+<section class="chap" id="ch3">
+  <div class="ch"><span class="cn c3">3</span><h2>動畫應該要有哪些元素</h2></div>
+  <div class="quote"><span class="who">昀宸大神說</span>
+    <p>「簡單來說，要有<b>畫面・劇情・字幕・配音</b>。」
+      <span class="sl">原作第 13 頁　<a data-slide="13">看原投影片</a></span></p></div>
+  <div class="four">
+    <div class="el"><div class="i">🎨</div><b>畫面</b><span class="k" style="background:var(--c-looks)">好看</span>
+      <p>角色、背景、顏色風格一致。不一定要畫得很精緻，但同一部作品裡的風格要統一。</p></div>
+    <div class="el"><div class="i">📖</div><b>劇情</b><span class="k" style="background:var(--c-looks)">好看</span>
+      <p>有開頭、有發展、有結尾，最後呼應主題。記得昀宸大神說的：一個主題不要只有一個畫面。</p></div>
+    <div class="el"><div class="i">💬</div><b>字幕</b><span class="k" style="background:var(--c-sensing)">看得懂</span>
+      <p>沒有聲音、或聽不清楚的時候，觀眾也看得懂在演什麼。</p></div>
+    <div class="el"><div class="i">🔊</div><b>配音</b><span class="k" style="background:var(--c-sound)">聽得見</span>
+      <p>台詞、音效、背景音樂。錄音時注意音量和雜音，錄完自己聽一次。</p></div>
+  </div>
+
+  <div class="topic">
+    <h3>💬 字幕：避免用「說出」，改用造型</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「我會避免使用『說出』，而是透過『造型』來顯示。」
+        <span class="sl">原作第 13 頁　<a data-slide="13">看原投影片</a></span></p></div>
+    <div class="lab">
+      <div class="lh"><span class="tag">比較看看</span>同一句台詞，兩種做法</div>
+      <div class="ctrl"><div class="seg" id="subSeg"><button class="on" data-m="say">用「說出」</button><button data-m="cos">用字幕造型</button></div></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;align-items:flex-start">
+        <div class="subdemo" id="subDemo">
+          <span class="c1">🐱</span><span class="c2">🐶</span>
+          <span class="bub" id="subBub">你好！我是住在公園的小貓，今天肚子好餓喔，你有沒有東西可以吃？</span>
+          <div class="bar" id="subBar" style="display:none"><small>小貓</small>你好！我是住在公園的小貓，今天肚子好餓喔，你有沒有東西可以吃？</div>
+        </div>
+        <div style="flex:1;min-width:220px;font-size:.9rem" id="subTxt"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ================= 4 我的程式機密 ================= -->
+<section class="chap" id="ch4">
+  <div class="ch"><span class="cn c4">4</span><h2>我的程式機密</h2></div>
+  <p class="lead">昀宸大神公開了三個他自己常用的技巧。每一個都附上可以調整數字的示範，先玩玩看，再想想能用在你作品的哪裡。</p>
+
+  <div class="topic" id="t41">
+    <h3>🧱 機密一：用「定義」積木，一頁只要一塊</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「不要再這樣啦！播放字幕和配音，這樣太麻煩了！」「使用『定義』積木，輕輕鬆鬆！想使用時只用一個積木！棒棒！」
+        <span class="sl">原作第 15、16 頁　<a data-slide="15">看第 15 頁</a>・<a data-slide="16">看第 16 頁</a></span></p></div>
+    <div class="two">
+      <div class="pane bad"><h4>✗ 每一頁都拼兩塊</h4><div class="bscript" data-blk="longWay"></div></div>
+      <div class="pane ok"><h4>✓ 先定義一次，之後一頁一塊</h4>
+        <div class="bscript" data-blk="defPage"></div>
+        <div class="bscript" data-blk="usePage" style="margin-top:10px"></div></div>
+    </div>
+    <div class="why"><b class="t">「造型」這個粉紅色的東西是什麼？　</b>它叫做<b>參數</b>。昀宸大神的說明是：「在其他地方用這個積木，可以輸入某種值，像是切換到造型 1 等等。」
+      呼叫「換頁 1」時，定義裡的每一個「造型」都會變成 1，所以會換成造型 1、播放音效 1。</div>
+    <div class="warn"><b class="t">一定要做到　</b>昀宸大神在圖旁邊寫著「<b>把造型和音效名稱統一</b>」。因為同一個參數要同時拿去找造型和音效，兩邊的名字必須一模一樣。
+      名字打錯一個字，Scratch 不會跳出錯誤，只是<b>那一頁會安靜無聲</b>——這種錯誤最難發現。</div>
+    <div class="lab">
+      <div class="lh"><span class="tag">算算看</span>你的動畫有幾頁？要拼幾塊積木？</div>
+      <div class="ctrl"><label>頁數 <input type="range" id="pgN" min="2" max="30" value="12"> <output id="pgNO">12</output> 頁</label></div>
+      <div class="countbox">
+        <div class="bad"><div class="k">每頁拼兩塊</div><div class="v" id="pgA">24</div><div class="k">塊積木</div></div>
+        <div class="ok"><div class="k">用「定義」積木</div><div class="v" id="pgB">15</div><div class="k">塊積木（定義 3 塊＋每頁 1 塊）</div></div>
+      </div>
+      <p style="font-size:.86rem;color:var(--ink2);margin:8px 0 0" id="pgTxt"></p>
+    </div>
+  </div>
+  <div class="topic" id="t42">
+    <h3>👻 機密二：善用圖像效果，讓角色慢慢浮現</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「像是你可以使用『幻影』慢慢浮現不突兀。」
+        <span class="sl">原作第 17 頁　<a data-slide="17">看原投影片</a></span></p></div>
+    <div class="bscript" data-blk="fadeIn"></div>
+    <div class="why"><b class="t">算式在這裡　</b>幻影 100 是完全透明、0 是完全看得見。從 100 開始，每次改變 −10，重複 10 次：100 − 10 × 10 ＝ 0，剛好變回完全看得見。
+      <b>重複次數 × 每次改變的量 ＝ 100</b>，這個關係記住，就能自己調快慢。</div>
+    <div class="lab">
+      <div class="lh"><span class="tag">動手試</span>調整數字，看淡入的速度和結果</div>
+      <div class="ctrl">
+        <label>重複 <input type="range" id="fdN" min="2" max="40" value="10"> <output id="fdNO">10</output> 次</label>
+        <label>每次改變 <input type="range" id="fdS" min="-25" max="-2" value="-10"> <output id="fdSO">-10</output></label>
+        <label>迴圈裡加「等待」 <select id="fdW" style="font-family:var(--f-round);border-radius:999px;border:2px solid var(--line);padding:3px 8px;background:var(--paper);color:var(--ink)">
+          <option value="0">不加</option><option value="0.05">0.05 秒</option><option value="0.1">0.1 秒</option></select></label>
+        <button class="btn sm" id="fdGo">▶ 執行</button>
+      </div>
+      <div class="fadebox">
+        <div class="fadestage"><span class="who" id="fdWho">🐱</span></div>
+        <div class="fadeinfo">
+          <div>目前幻影值　<span class="v" id="fdV">0</span></div>
+          <div class="ghostbar"><i id="fdBar"></i></div>
+          <div>最後會停在　<span class="v" id="fdEnd">0</span></div>
+          <div>大約花費　<span class="v" id="fdT">0.33</span> 秒</div>
+        </div>
+      </div>
+      <div class="verdict" id="fdVerdict"></div>
+    </div>
+    <div class="good"><b class="t">舉一反三　</b>把 −10 改成 +10，就變成<b>慢慢消失</b>。把「幻影」換成「顏色」，就是角色慢慢變色。場景切換時，前一個畫面淡出、下一個畫面淡入，看起來會比直接切換流暢很多。</div>
+  </div>
+
+  <div class="topic" id="t43">
+    <h3>〰️ 機密三：用 sin 讓角色來回擺動</h3>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「對於這個我也不會解釋，高中數學。但是用於動畫我覺得很好用，你可以試著拼出以下程式，看看效果。接著，就看你怎樣運用了。」「效果很神奇喲！你們可以更改數值看看變化！」
+        <span class="sl">原作第 17 頁　<a data-slide="17">看原投影片</a></span></p></div>
+    <div class="bscript" data-blk="sinSwing"></div>
+    <div class="why"><b class="t">不用懂三角函數也能用　</b>只要記住一件事：<b>sin 算出來的數字，永遠在 −1 到 1 之間來回</b>，而且是平滑的來回，不會突然跳。
+      <br>所以 sin(…) × 10 會在 −10 到 10 之間來回，再加上 90，角度就在 <b>80° 到 100° 之間</b>擺動——90° 是 Scratch 裡「面朝右邊、站直」的方向。
+      計時器一直在增加，乘上 100 決定<b>擺得多快</b>；乘上 10 決定<b>擺得多大</b>。</div>
+    
+    <div class="good"><b class="t">可以用在哪裡　</b>花草隨風搖、鐘擺、角色開心時左右晃、招牌輕輕擺動。把「面朝」換成「y 改變」，就變成上下漂浮（例如水面上的東西）。</div>
+    <div class="quote"><span class="who">昀宸大神說</span>
+      <p>「你是看到這開始想用在遊戲裡，跟我說一聲，也許我認可你後會告訴你用法也說不定！」
+        <span class="sl">原作第 17 頁</span></p></div>
+  </div>
+</section>
+
+<!-- ================= 5 藏在 .sb3 裡的教學 ================= -->
+<section class="chap" id="ch5">
+  <div class="ch"><span class="cn c5">5</span><h2>藏在 .sb3 裡的教學</h2></div>
+  <div class="quote"><span class="who">昀宸大神說</span>
+    <p>「感謝你看到最後，我不能透露更多機密了哈哈！……<b>你可以看看這個教學內部程式，有更多教學。</b>」
+      <span class="sl">原作第 18 頁　<a data-slide="18">看原投影片</a></span></p></div>
+  <p class="lead">我們把他的專案打開來看。這個投影片本身就是用 Scratch 寫的，程式旁邊留了不少註解。下面每一段的「昀宸大神的註解」都是從專案裡原封不動抄出來的。</p>
+
+  <div class="topic" id="t51">
+    <h3>🎵 背景音樂要用「播放音效 … 直到結束」</h3>
+    <div class="quote"><span class="who">昀宸大神的註解</span>
+      <p>「不要傻傻的用下面那一個，這樣（直到結束）才能循環播放！」<span class="sl">位置：舞台的程式</span></p></div>
+    <div class="two">
+      <div class="pane ok"><h4>✓ 昀宸大神用的寫法</h4><div class="bscript" data-blk="bgmGood"></div></div>
+      <div class="pane bad"><h4>✗ 「下面那一個」</h4><div class="bscript" data-blk="bgmBad"></div></div>
+    </div>
+    <div class="why"><b class="t">差在哪裡　</b>「播放音效」按下去<b>馬上就往下走</b>，不會等音樂播完；放在「重複無限次」裡，下一圈又立刻叫它重新播放。
+      Scratch 一秒大約跑 30 圈，所以音樂<b>每一圈都被拉回開頭</b>，你只會聽到開頭那一小段一直重複。
+      「播放音效 … 直到結束」會<b>等整首播完</b>才進入下一圈，所以能正常循環。</div>
+    <div class="lab">
+      <div class="lh"><span class="tag">看看差別</span>兩種寫法的播放進度</div>
+      <div class="ctrl"><button class="btn sm" id="mzGo">▶ 播放 6 秒</button><span style="font-size:.84rem;color:var(--ink2)">假設背景音樂長 4 秒；畫面放慢顯示</span></div>
+      <div class="musicbox">
+        <div class="mtrack"><span class="who">直到結束</span><div class="bar"><i id="mzA"></i></div><span class="n" id="mzAn">第 0 次</span></div>
+        <div class="mtrack"><span class="who">只有播放音效</span><div class="bar"><i id="mzB"></i></div><span class="n" id="mzBn">第 0 次</span></div>
+      </div>
+      <div class="verdict" id="mzV"></div>
+    </div>
+  </div>
+
+  <div class="topic" id="t52">
+    <h3>🧹 初始化與圖層</h3>
+    <div class="quote"><span class="who">昀宸大神的註解</span>
+      <p>「初始化要記得！！」「圖層要注意！！！！」<span class="sl">位置：「幻燈片」角色</span></p></div>
+    <div class="bscript" data-blk="slideInit"></div>
+    <div class="why"><b class="t">初始化　</b>按下綠旗時，把角色放回<b>一開始該有的樣子</b>：第 1 個造型、正中央。沒有初始化的話，上次播到第 12 頁、這次按綠旗就會從第 12 頁開始。</div>
+    <div class="why"><b class="t">圖層　</b>Scratch 的角色像一疊透明片，上面的會蓋住下面的。昀宸大神先把投影片移到最上層，再往下移 2 層，用意是讓出最上面兩層給「下一頁」「上一頁」兩個箭頭。
+      箭頭分身出生後自己也會「圖層移到最上層」，兩邊都照顧到，箭頭就一定不會被投影片蓋住。<b>投影片是整個畫面那麼大的角色，圖層一弄錯，按鈕就會被整個蓋掉。</b></div>
+  </div>
+
+  <div class="topic" id="t53">
+    <h3>⬅️ 上一頁：造型編號減 1</h3>
+    <div class="quote"><span class="who">昀宸大神的註解</span>
+      <p>「這樣就能造型換成上一個，簡簡單單。」<span class="sl">位置：「幻燈片」角色</span></p></div>
+    <div class="two">
+      <div class="pane"><h4>下一頁</h4><div class="bscript" data-blk="slideNext"></div></div>
+      <div class="pane"><h4>上一頁</h4><div class="bscript" data-blk="slidePrev"></div></div>
+    </div>
+    <p>Scratch 有「造型換成下一個」，卻沒有「上一個」。昀宸大神的做法是把<b>目前的造型編號減 1</b>，再換過去。</p>
+    <div class="lab">
+      <div class="lh"><span class="tag">動手試</span>一直按「上一頁」，看看到了第 1 頁會發生什麼事</div>
+      <div class="ctrl"><button class="btn ghost sm" id="cyP">◀ 上一頁（編號 − 1）</button><button class="btn ghost sm" id="cyN">下一頁 ▶（換成下一個）</button><button class="btn ghost sm" id="cyR">↺ 回到 1</button></div>
+      <div class="cyc" id="cyc"></div>
+      <div class="cyclog" id="cyLog"></div>
+    </div>
+    <div class="why"><b class="t">你發現了嗎？　</b>在第 1 頁按上一頁，會跳到<b>最後一頁</b>；在最後一頁按下一頁，會回到第 1 頁。這是 Scratch 的規則：造型編號超出範圍時會<b>繞一圈</b>。
+      做投影片時這樣剛好可以循環；如果你<b>不想</b>讓它繞回去，就要加「如果 造型編號 = 1 那麼 就不要換」之類的判斷。</div>
+  </div>
+
+  <div class="topic" id="t54">
+    <h3>👥 主體隱藏，分身工作</h3>
+    <div class="quote"><span class="who">昀宸大神的註解</span>
+      <p>「主體隱藏，分身工作，也很不錯！」「判斷造型編號，各自做自己的工作。」<span class="sl">位置：「箭頭」角色</span></p></div>
+    <div class="two">
+      <div class="pane"><h4>本體：隱藏，然後做出兩個分身</h4><div class="bscript" data-blk="arrowMain"></div></div>
+      <div class="pane"><h4>分身：看自己的造型編號分工</h4>
+        <p style="font-size:.86rem;margin:0 0 6px;color:var(--ink2)">造型 1 是「下一頁」箭頭，造型 2 是「上一頁」箭頭。</p>
+        <div class="bscript" data-blk="arrowCloneShort"></div></div>
+    </div>
+    <div class="why"><b class="t">為什麼這樣做　</b>兩個箭頭的功能幾乎一樣，只差在廣播的訊息不同。做成<b>一個角色兩個造型</b>，本體先換造型再建立分身，每個分身就帶著自己的造型出生，
+      再用「造型編號」判斷自己是哪一個——這正是第 2 章昀宸大神說的「角色少的秘訣」。本體自己則一直隱藏，只負責生分身。</div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:800;font-size:.9rem">看「下一頁」箭頭分身的完整程式</summary>
+      <div class="bscript" data-blk="arrowClone" style="margin-top:8px"></div></details>
+  </div>
+
+  <div class="topic" id="t55">
+    <h3>🖱️ 按住滑鼠也不會一直翻頁</h3>
+    <div class="quote"><span class="who">昀宸大神的註解</span>
+      <p>「可以避免滑鼠持續按著時，會重複超多次廣播。」<span class="sl">位置：「箭頭」角色</span></p></div>
+    <div class="two">
+      <div class="pane bad"><h4>✗ 沒有等待</h4><div class="bscript" data-blk="holdBad"></div></div>
+      <div class="pane ok"><h4>✓ 等到放開才繼續</h4><div class="bscript" data-blk="holdGood"></div></div>
+    </div>
+    <div class="lab">
+      <div class="lh"><span class="tag">動手試</span>在兩個箭頭上<b>按住滑鼠一秒鐘</b>再放開，比比看翻了幾頁</div>
+      <div class="holdbox">
+        <div class="holdpad" id="hpBad"><div class="arr">➡️</div><small>沒有「等待直到」</small><div class="cnt" id="hpBadN">0</div><small>次廣播</small><div class="pg" id="hpBadP">第 1 頁</div></div>
+        <div class="holdpad" id="hpGood"><div class="arr">➡️</div><small>有「等待直到 滑鼠鍵被按下？不成立」</small><div class="cnt" id="hpGoodN">0</div><small>次廣播</small><div class="pg" id="hpGoodP">第 1 頁</div></div>
+      </div>
+      <div class="ctrl"><button class="btn ghost sm" id="hpR">↺ 歸零</button><span style="font-size:.84rem;color:var(--ink2)">和 Scratch 一樣，每秒檢查 30 次；總共 18 頁</span></div>
+    </div>
+    <div class="why"><b class="t">原理　</b>「重複無限次」每秒跑大約 30 圈。滑鼠按住一秒，「滑鼠鍵被按下？」就連續 30 圈都成立，廣播 30 次，一下子翻過好幾頁。
+      加上「等待直到 滑鼠鍵被按下？不成立」之後，廣播完就<b>停在原地等你放開</b>，所以按一次只算一次。這個技巧在遊戲裡也很常用（例如按一下只發射一顆子彈）。</div>
+  </div>
+
+  <div class="topic" id="t56">
+    <h3>✨ 讓人知道「這裡可以點」</h3>
+    <div class="quote"><span class="who">昀宸大神的註解</span>
+      <p>「透過圖像效果，看起來更美觀（當滑鼠沒碰到他，變透明一點，碰到時不透明，讓玩家知道那個好像能點）。」<span class="sl">位置：「箭頭」角色</span></p></div>
+    <p>沒碰到時「圖像效果 幻影 設為 80」，碰到時設為 20。這個小細節不影響功能，卻讓看的人<b>不用猜就知道可以點</b>。</p>
+    <div class="good"><b class="t">你已經用過了　</b>回到最上面的<a href="#ch0">原作投影片</a>，把滑鼠移到左右兩側——翻頁箭頭就是用同樣的方式做的：平常很淡，碰到才變清楚。</div>
+  </div>
+
+  <div class="topic" id="t57">
+    <h3>🏷️ 命名與整理：昀宸大神留下的兩個「示範」</h3>
+    <p>打開專案，你會看到兩個很特別的名字——它們本身就是教學：</p>
+    <div class="two">
+      <div class="pane"><h4>角色名稱</h4><p style="margin:0;font-size:.92rem">「<b>幻燈片（你們看，命名要命名的好理解）</b>」</p>
+        <p style="margin:6px 0 0;font-size:.84rem;color:var(--ink2)">一看就知道這個角色是投影片本體。對照第 2 章「一百年後回來看也要懂」。</p></div>
+      <div class="pane"><h4>變數名稱</h4><p style="margin:0;font-size:.92rem">「<b>像這種變數，用不到，就應該刪掉</b>」</p>
+        <p style="margin:6px 0 0;font-size:.84rem;color:var(--ink2)">Scratch 新專案預設會有一個「my variable」。用不到的變數、積木、造型都要清掉，別人看你的程式才不會被搞混。</p></div>
+    </div>
+    <div class="why"><b class="t">交作品前的整理清單　</b>刪掉用不到的變數與角色 → 刪掉沒接在任何程式上的零散積木 → 角色、造型、訊息都改成看得懂的名字 → 從綠旗完整播一次。</div>
+  </div>
+</section>
+
+<!-- ================= 6 自我檢核 ================= -->
+<section class="chap" id="ch6">
+  <div class="ch"><span class="cn c6">6</span><h2>自我檢核與小測驗</h2></div>
+  <div class="topic">
+    <h3>✅ 做動畫前後，對照這張表</h3>
+    <div class="chklist" id="chk"></div>
+    <div class="savenote">勾選會自動存在這台電腦的瀏覽器裡。</div>
+  </div>
+  <div class="topic">
+    <h3>🧠 小測驗</h3>
+    <p>選一個答案就會看到解說。<span class="score" id="qzScore"></span></p>
+    <div id="qz"></div>
+    <div class="ctrl"><button class="btn ghost sm" id="qzReset">↺ 重新作答</button></div>
+  </div>
+</section>
+
+<footer>🎬 Scratch 動畫製作・互動教學　·　原作：60319 李昀宸大神「動畫教學」　·　積木文字依 Scratch 官方繁體中文介面</footer>
+    </main>
+  </div>
+</div>
+
+<div class="lbx" id="lbx" role="dialog" aria-modal="true" aria-label="原作投影片">
+  <div class="in"><img id="lbxImg" alt=""><div class="b"><span id="lbxCap"></span><button class="btn sm" id="lbxClose">關閉</button></div></div>
+</div>
+
+<script src="assets/blk.js"></script>
+<script src="assets/lesson.js"></script>
+</body>
+</html>

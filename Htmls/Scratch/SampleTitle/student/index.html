@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>貓咪甜點店・片頭與選單 製作教學</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/anim.css">
+<link rel="stylesheet" href="assets/cafe.css">
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <div class="brand">🍰 貓咪甜點店 <em>片頭與選單・製作教學</em></div>
+    <div class="unitnav" style="margin-left:auto">
+      <a href="#ch1">🎬 試玩台</a>
+      <a href="#ch9">自我檢核</a>
+      <a href="貓咪甜點店_片頭與選單.sb3" download>⬇ 範例 .sb3</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="badge" style="display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;padding:5px 16px;border-radius:999px;margin-bottom:10px">Scratch 作品的「門面」：片頭 · 故事 · 選單</span>
+    <h1>貓咪甜點店</h1>
+    <p>一份作品給人的第一印象，就是<b>片頭</b>、<b>故事簡介</b>和<b>主選單</b>。<br>
+      這份教材把它做成一間甜點店：招牌落下、店名放大、貓店長滑進來打招呼，
+      看完故事就進到選單，三個甜點分別是<b>遊戲一、二、三</b>——<b>之後把你自己的遊戲接上去就好</b>。</p>
+    <div class="warn" style="max-width:48em"><b class="t">這份教材的重點　</b>不是甜點店，而是三件每個作品都用得到的功夫：
+      <b>① 用一個變數管理所有畫面</b>、<b>② 每個段落都能跳過</b>、<b>③ 讓動畫看起來「有彈性」</b>。
+      每個效果都會給<b>入門</b>與<b>進階</b>兩種做法，先做得完，再做得好看。</div>
+  </section>
+
+  <div class="layout">
+    <nav class="toc" id="toc" aria-label="目錄">
+      <h3>目錄</h3>
+      <a href="#ch0">0　這個作品有哪些畫面</a>
+      <a href="#ch1">1　🎬 先玩玩看</a>
+      <a href="#ch2">2　畫面切換：一個變數</a>
+      <a href="#ch3">3　Skip：可跳過的等待</a>
+      <a href="#ch4">4　片頭動畫</a>
+      <a href="#ch5">5　故事簡介：打字機</a>
+      <a href="#ch6">6　遊戲說明：三頁輪播</a>
+      <a href="#ch7">7　主選單與按鈕</a>
+      <a href="#ch8">8　遊戲畫面與小裝飾</a>
+      <a href="#ch9">9　測試、挑戰與檢核</a>
+      <div class="prog">自我檢核進度</div>
+      <div class="pbar"><i id="pbar"></i></div>
+    </nav>
+
+    <main>
+<!-- ============ 0 ============ -->
+<section class="chap" id="ch0">
+  <div class="ch"><span class="cn" style="background:#FFD9E4">第 0 章</span><h2>這個作品有哪些畫面</h2></div>
+
+  <div class="topic">
+    <h3>五種畫面、一條主線</h3>
+    <div class="flowmap" id="dFlow">
+      <div class="node" data-s="片頭">片頭<small>招牌落下</small></div><span class="ar">→</span>
+      <div class="node" data-s="故事">故事簡介<small>打字機</small></div><span class="ar">→</span>
+      <div class="node" data-s="說明">遊戲說明<small>三頁輪播</small></div><span class="ar">→</span>
+      <div class="node" data-s="選單">主選單<small>三個甜點</small></div><span class="ar">→</span>
+      <div class="node" data-s="遊戲">遊戲標題<small>一／二／三</small></div>
+    </div>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>畫面</th><th>玩家可以做什麼</th></tr>
+      <tr><td><b>片頭</b></td><td>看動畫，或按<b>跳過</b>／空白鍵直接進下一段</td></tr>
+      <tr><td><b>故事簡介</b></td><td>看貓店長一個字一個字說故事，一樣可以跳過</td></tr>
+      <tr><td><b>遊戲說明</b></td><td>三頁操作說明輪流顯示，一樣可以跳過</td></tr>
+      <tr><td><b>主選單</b></td><td>點甜點進遊戲；也可以按<b>重看片頭／看故事／看說明</b></td></tr>
+      <tr><td><b>遊戲標題</b></td><td>現在只有標題，按<b>回選單</b>回去；<b>這裡就是之後接自己遊戲的位置</b></td></tr>
+    </table></div>
+  </div>
+
+  <div class="dlcard">
+    <div class="ic">🍰</div>
+    <div><b>完成版範例：貓咪甜點店_片頭與選單.sb3</b><small>14 個角色、所有造型與音效都是程式畫出來的，重要的積木旁邊都有中文註解。<br>沒有用到任何擴充功能，用一般的 Scratch 編輯器就能打開。</small></div>
+    <a class="btn" href="貓咪甜點店_片頭與選單.sb3" download>下載範例</a>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="ch1">
+  <div class="ch"><span class="cn" style="background:#FFE7C7">第 1 章</span><h2>🎬 先玩玩看</h2></div>
+  <p class="lead">這台的規則和範例 .sb3 <b>一模一樣</b>。先玩一次，再回頭看積木會快很多。
+    右邊會即時顯示程式裡的三個變數——<b>看懂它們，就看懂整個作品了</b>。</p>
+
+  <div class="topic lab" id="lab-demo">
+    <div class="lh"><h3>🍰 貓咪甜點店 試玩台</h3><span class="tag">點畫面上的按鈕</span></div>
+    <div class="demo">
+      <div class="screen" id="dScene"></div>
+      <div>
+        <div class="btnrow">
+          <button class="btn sm" id="dStart">▶ 從片頭開始</button>
+          <button class="btn sm ghost" id="dReset">↺ 重來</button>
+        </div>
+        <div class="vars" style="margin-top:10px">
+          <div class="box"><div class="k">畫面</div><div class="v" id="dScreen">片頭</div></div>
+          <div class="box"><div class="k">跳過</div><div class="v" id="dSkip">0</div></div>
+        </div>
+        <div class="vars" style="margin-top:8px">
+          <div class="box"><div class="k">回到哪</div><div class="v" id="dBack">（空白）</div></div>
+          <div class="box"><div class="k">目前遊戲</div><div class="v" id="dGame">0</div></div>
+        </div>
+        <p class="keyhint" style="font-size:.84rem;color:var(--ink2);margin-top:10px">
+          試試看：<br>
+          ① 片頭播到一半按<b>跳過</b>，看「跳過」變成 1。<br>
+          ② 到選單後按<b>看故事</b>，注意「回到哪」變成<b>選單</b>——所以看完會回選單，不會繼續往下走。<br>
+          ③ 點甜點進遊戲，看「目前遊戲」變成 1／2／3。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="ch2">
+  <div class="ch"><span class="cn" style="background:#D8ECFF">第 2 章</span><h2>畫面切換：一個變數就夠了</h2></div>
+
+  <div class="topic">
+    <h3>想法：不要用「一堆訊息」，用「一個變數」</h3>
+    <p>很多人做選單會做成：按這個按鈕廣播 A、按那個廣播 B，角色各自隱藏顯示……
+      畫面一多就會亂掉，常常出現「上一個畫面的東西忘了隱藏」。</p>
+    <div class="why"><b class="t">改成這樣就清楚了　</b>
+      用一個變數 <code class="v">畫面</code> 記住<b>現在在哪一頁</b>，再用<b>一個</b>訊息 <code class="m">切換畫面</code> 通知大家。<br>
+      每個角色收到訊息時只問自己一句：「<b>現在是我的畫面嗎？是就顯示，不是就隱藏。</b>」</div>
+    <div class="two">
+      <div class="pane"><h4>舞台：切到某個畫面</h4><div class="bscript" data-blk="gotoScene"></div></div>
+      <div class="pane"><h4>每個角色：我該不該出現</h4><div class="bscript" data-blk="showhide"></div></div>
+    </div>
+    <div class="warn"><b class="t">好處　</b>以後要加第六個畫面（例如「排行榜」），<b>不用改任何舊角色的程式</b>，
+      只要新角色自己判斷 <code class="v">畫面</code> ＝ 排行榜就好。</div>
+  </div>
+
+  <div class="topic">
+    <h3>主程式：一個重複無限次，就是整個作品的流程</h3>
+    <div class="bscript" data-blk="main"></div>
+    <div class="why"><b class="t">為什麼播完還要「再確認一次」　</b>因為播片頭的時候，玩家可能按了選單的按鈕把
+      <code class="v">畫面</code> 改掉了。如果不確認就硬把畫面設成下一頁，玩家的操作就被蓋掉了。</div>
+    <div class="bscript" data-blk="nextScene" style="margin-top:12px"></div>
+    <div class="why"><b class="t">「回到哪」在做什麼　</b>第一次玩：片頭 → 故事 → 說明 → 選單。
+      但如果是從選單按<b>看故事</b>進來的，看完應該<b>回選單</b>才對。
+      所以按鈕會先把 <code class="v">回到哪</code> 設成「選單」，播完再看這個變數決定去哪裡。</div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="ch3">
+  <div class="ch"><span class="cn" style="background:#E3DBFF">第 3 章</span><h2>Skip：讓每個段落都能跳過</h2></div>
+
+  <div class="topic">
+    <h3>關鍵：不要用內建的「等待 n 秒」</h3>
+    <p>內建的「等待 2 秒」一旦開始，<b>就一定要等滿 2 秒</b>，按什麼都沒用。
+      所以我們自己做一塊「<b>等 n 秒（可跳過）</b>」，整份作品的等待都用它。</p>
+    <div class="bscript" data-blk="waitSkip"></div>
+    <p>跳過鈕只做一件事——把 <code class="v">跳過</code> 設成 1：</p>
+    <div class="bscript" data-blk="skipBtn"></div>
+    <div class="why"><b class="t">為什麼這樣就會「整段」跳掉　</b>因為片頭、故事、說明裡面<b>所有</b>的等待都用同一塊積木，
+      所以 <code class="v">跳過</code> 一變成 1，它們會<b>同時</b>結束，畫面就一路衝到最後。</div>
+    <div class="warn"><b class="t">兩個容易忘記的地方　</b>
+      ① <b>換畫面時要把「跳過」設回 0</b>，不然下一段會被上一次的跳過一起跳掉。<br>
+      ② 自訂積木<b>只屬於自己的角色</b>。貓店長要在自己的角色裡再做一塊一樣的「等 n 秒（可跳過）」。</div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="ch4">
+  <div class="ch"><span class="cn" style="background:#FFE3C2">第 4 章</span><h2>片頭動畫：先做完，再做好看</h2></div>
+
+  <div class="topic lab" id="lab-anim">
+    <div class="lh"><h3>✨ 入門 vs 進階</h3><span class="tag">按播放看差別</span></div>
+    <p>同樣是「招牌從上面掉下來」，兩種做法的感覺差很多。按下面的按鈕比較看看。</p>
+    <div class="btnrow"><button class="btn sm" id="aGo">▶ 再播一次</button></div>
+    <div class="vs">
+      <div class="col"><h4>入門：直接滑到定位</h4>
+        <div class="track"><div class="obj" id="aEasy">招牌</div></div>
+        <p style="font-size:.85rem;color:var(--ink2);margin:8px 0 0">滑行 0.6 秒到 y ＝ 76。<b>穩、快、不會錯</b>。</p></div>
+      <div class="col"><h4>進階：衝過頭再彈回來</h4>
+        <div class="track"><div class="obj" id="aPro">招牌</div></div>
+        <p style="font-size:.85rem;color:var(--ink2);margin:8px 0 0">先滑到比目標低一點 → 往上彈過頭 → 回到定位，同時淡入放大。</p></div>
+    </div>
+    <div class="why"><b class="t">「彈性」的秘密就是衝過頭　</b>真實世界的東西掉下來會<b>反彈</b>。
+      程式只要多兩句「滑行到超過目標的位置」再「滑回來」，看起來就會有重量感。</div>
+  </div>
+
+  <div class="topic">
+    <h3>積木：招牌落下</h3>
+    <div class="two">
+      <div class="pane"><h4>入門版</h4><div class="bscript" data-blk="signEasy"></div></div>
+      <div class="pane"><h4>進階版</h4><div class="bscript" data-blk="signPro"></div></div>
+    </div>
+    <div class="warn"><b class="t">動畫一定要補最後一句「定位」　</b>玩家可能在動畫播到一半按跳過。
+      如果沒有最後那句「定位到 x:0 y:76」，招牌就會停在半空中。<br>
+      <b>口訣：動畫可以被跳過，但結果一定要正確。</b></div>
+  </div>
+
+  <div class="topic">
+    <h3>積木：店名一邊放大一邊淡入</h3>
+    <div class="bscript" data-blk="titleZoom"></div>
+    <div class="why"><b class="t">兩個效果一起做　</b>只有放大會有點生硬，只有淡入會有點無聊，
+      <b>同時做</b>就會有「登場」的感覺。重複 12 次、每次尺寸 +5、幽靈 −9，剛好從 40 變 100、從透明變清楚。</div>
+    <div class="why"><b class="t">出場要有先後順序　</b>招牌 → 店名 → 副標 → 貓店長，中間各等一下下。
+      全部同時出現，觀眾會不知道要看哪裡。</div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="ch5">
+  <div class="ch"><span class="cn" style="background:#D6F5E8">第 5 章</span><h2>故事簡介：打字機效果</h2></div>
+
+  <div class="topic lab" id="lab-type">
+    <div class="lh"><h3>⌨️ 打字機實驗室</h3><span class="tag">改速度、按跳過</span></div>
+    <p>改改看句子和速度，再按「跳過」試試看。</p>
+    <input class="f" id="tText" value="歡迎光臨！我是店長小奶油。" style="width:100%;font-family:inherit;font-size:1rem;padding:8px 10px;border:2px solid var(--line);border-radius:12px;background:var(--paper2);color:var(--ink)">
+    <div class="ctrl" style="margin-top:8px"><label>每個字之間等幾毫秒
+      <input type="range" id="tSpeed" min="10" max="200" step="5" value="45"> <output id="tSpeedO">45</output></label></div>
+    <div class="btnrow">
+      <button class="btn sm" id="tGo">▶ 開始打字</button>
+      <button class="btn sm ghost" id="tSkip">⏭ 跳過</button>
+    </div>
+    <div class="typer" id="tOut"></div>
+    <p class="savenote">這句話有 <b id="tCount">0</b> 個字 → 迴圈就要重複幾次。</p>
+  </div>
+
+  <div class="topic">
+    <h3>積木：打字 ◯</h3>
+    <div class="bscript" data-blk="typer"></div>
+    <div class="why"><b class="t">原理只有一句話　</b>
+      把「<b>第 n 個字元</b>」一個一個用「<b>字串組合</b>」接到後面，每接一個就「說出」一次。<br>
+      <code class="v">顯示文字</code> ＝ 字串組合（<code class="v">顯示文字</code>，第 <code class="v">第幾個字</code> 個字元）</div>
+    <div class="warn"><b class="t">中文要注意　</b>「字串的長度」算的是<b>字元</b>，中文一個字就是一個字元，所以中文可以正常使用。
+      標點符號也算一個字。</div>
+  </div>
+
+  <div class="topic">
+    <h3>整段故事</h3>
+    <div class="bscript" data-blk="story"></div>
+    <p>說出<b>空白</b>就會把對話框收起來——很多人會忘記這一句，結果對話框跟著角色跑到下一個畫面。</p>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="ch6">
+  <div class="ch"><span class="cn" style="background:#FFD6E3">第 6 章</span><h2>遊戲說明：三頁輪播</h2></div>
+  <div class="topic">
+    <div class="two">
+      <div class="pane"><h4>舞台：一頁一頁換</h4><div class="bscript" data-blk="info"></div></div>
+      <div class="pane"><h4>說明卡：淡入＋放大</h4><div class="bscript" data-blk="infoCard"></div></div>
+    </div>
+    <div class="why"><b class="t">為什麼用「廣播並等待」　</b>舞台負責<b>時間</b>（每頁停 2.4 秒），
+      說明卡負責<b>長相</b>（換造型、淡入）。分工清楚，以後要加第四頁只要多一個造型。</div>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="ch7">
+  <div class="ch"><span class="cn" style="background:#D8ECFF">第 7 章</span><h2>主選單與按鈕</h2></div>
+
+  <div class="topic">
+    <h3>滑鼠滑過去會變大</h3>
+    <div class="bscript" data-blk="hover"></div>
+    <div class="why"><b class="t">為什麼不要一次變大到底　</b>「尺寸設為 112」是<b>瞬間</b>變大，很生硬。
+      改成「每次 +4、直到 112」，眼睛看到的就是<b>慢慢脹大</b>，離開時再慢慢縮回去。
+      這是所有按鈕都適用的小技巧。</div>
+  </div>
+
+  <div class="topic">
+    <h3>點下去 → 進遊戲畫面</h3>
+    <div class="bscript" data-blk="pick"></div>
+    <div class="warn"><b class="t">一定要先確認「畫面 ＝ 選單」　</b>不然在片頭播到一半時，
+      玩家亂點到甜點原本的位置也會直接跳進遊戲。<b>按鈕要知道自己現在有沒有上班。</b></div>
+  </div>
+
+  <div class="topic">
+    <h3>回片頭／看故事／看說明</h3>
+    <div class="bscript" data-blk="smallBtn"></div>
+    <div class="why"><b class="t">三顆按鈕只用一個角色　</b>做 3 個分身，用 <code class="v">編號</code> 決定自己是哪一顆、
+      位置用 <b>x ＝ 編號 × 160 − 320</b> 算出來（−160、0、160）。
+      要改成四顆時，只要把 3 改成 4、公式稍微調一下就好。</div>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="ch8">
+  <div class="ch"><span class="cn" style="background:#E3DBFF">第 8 章</span><h2>遊戲畫面與小裝飾</h2></div>
+
+  <div class="topic">
+    <h3>三個遊戲共用一個角色</h3>
+    <div class="bscript" data-blk="gameTitle"></div>
+    <div class="why"><b class="t">👉 這裡就是接自己遊戲的位置　</b>目前遊戲畫面只有標題和「回選單」。
+      等你把遊戲做好，就在這裡加上「如果 <code class="v">目前遊戲</code> ＝ 1 → 廣播 開始遊戲一」，
+      再讓你的遊戲角色收到訊息後開始跑。<b>整個選單系統完全不用改。</b></div>
+  </div>
+
+  <div class="topic">
+    <h3>小裝飾：讓畫面活起來</h3>
+    <div class="bscript" data-blk="particle"></div>
+    <div class="warn"><b class="t">分身一定要刪掉　</b>沒有「刪除這個分身」的話，
+      分身會一直累積，玩不到一分鐘畫面就會開始卡。<br>
+      另外分身太多也會拖慢速度，本體做分身的間隔不要小於 0.3 秒。</div>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="ch9">
+  <div class="ch"><span class="cn" style="background:#FFE7C7">第 9 章</span><h2>測試、挑戰與檢核</h2></div>
+
+  <div class="topic">
+    <h3>建議的測試順序</h3>
+    <ol>
+      <li><b>一路按跳過</b>：片頭、故事、說明各按一次跳過，要能順順地到選單，而且每個角色都停在正確的位置。</li>
+      <li><b>完全不按</b>：讓它自己播完，一樣要到選單。</li>
+      <li><b>三個甜點各點一次</b>：標題要對（遊戲一／二／三），按回選單要回得來。</li>
+      <li><b>從選單看故事</b>：看完要<b>回選單</b>，不可以繼續跑到說明。</li>
+      <li><b>亂點測試</b>：在片頭時亂點畫面各處，不應該跳進遊戲。</li>
+      <li><b>放著不動一分鐘</b>：看看小裝飾有沒有越來越多、畫面有沒有變慢。</li>
+    </ol>
+  </div>
+
+  <div class="topic">
+    <h3>可以調整的數字</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>數字</th><th>預設</th><th>調整後</th></tr>
+      <tr><td>片頭總長度</td><td>6 秒</td><td>調長可以放更多動畫，但別超過 10 秒，觀眾會不耐煩</td></tr>
+      <tr><td>打字速度</td><td>0.045 秒／字</td><td>調小會變快；中文建議 0.04～0.08</td></tr>
+      <tr><td>說明每頁停留</td><td>2.4 秒</td><td>字多就調長一點</td></tr>
+      <tr><td>按鈕放大上限</td><td>112%</td><td>太大會蓋到旁邊的按鈕</td></tr>
+      <tr><td>小裝飾間隔</td><td>0.3～0.9 秒</td><td>調太小畫面會卡</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic">
+    <h3>🔧 遇到問題先看這裡</h3>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>症狀</th><th>常見原因</th></tr>
+      <tr><td>按跳過沒反應</td><td>某個地方還在用內建的「等待 n 秒」</td></tr>
+      <tr><td>跳過之後角色停在奇怪的位置</td><td>動畫最後忘了補「定位到 ◯ ◯」</td></tr>
+      <tr><td>下一段自己被跳掉了</td><td>換畫面時忘了把 <code class="v">跳過</code> 設回 0</td></tr>
+      <tr><td>上一個畫面的東西還留著</td><td>那個角色沒有寫「否則 → 隱藏」</td></tr>
+      <tr><td>從選單看完故事卻跑到說明</td><td><code class="v">回到哪</code> 忘了設，或播完忘了判斷</td></tr>
+      <tr><td>對話框跟著跑到下一頁</td><td>故事結束時忘了「說出（空白）」</td></tr>
+      <tr><td>越玩越卡</td><td>分身沒有刪除</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic">
+    <h3>挑戰任務</h3>
+    <div class="cards3">
+      <div><b>⭐ 換成自己的店</b><span>把甜點換成自己的主題，店名和三個遊戲名稱一起改</span></div>
+      <div><b>⭐ 加背景音樂</b><span>在舞台加「重複播放音樂」，進遊戲畫面時換一首</span></div>
+      <div><b>⭐⭐ 加「設定」畫面</b><span>多一個畫面放音量開關，試試看新增畫面有多簡單</span></div>
+      <div><b>⭐⭐ 選單加說明泡泡</b><span>滑鼠滑到甜點上時，貓店長說出那個遊戲的玩法</span></div>
+      <div><b>⭐⭐⭐ 接上真的遊戲</b><span>在遊戲標題畫面廣播「開始遊戲一」，把你做好的遊戲接上去</span></div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <h3>✅ 自我檢核</h3>
+    <div class="chklist" id="chk">
+      <label><input type="checkbox"> 作品有片頭、故事簡介、遊戲說明、主選單四個畫面</label>
+      <label><input type="checkbox"> 片頭、故事、說明三個段落都可以跳過（按鈕和空白鍵都行）</label>
+      <label><input type="checkbox"> 跳過之後，每個角色都停在正確的位置</label>
+      <label><input type="checkbox"> 換畫面時「跳過」會設回 0</label>
+      <label><input type="checkbox"> 每個角色都有寫「不是我的畫面就隱藏」</label>
+      <label><input type="checkbox"> 主選單有三個遊戲按鈕，滑鼠滑過會有反應</label>
+      <label><input type="checkbox"> 主選單可以回片頭、看故事、看說明，而且看完會回選單</label>
+      <label><input type="checkbox"> 三個遊戲畫面標題正確，都能回選單</label>
+      <label><input type="checkbox"> 片頭至少用了兩種動畫效果（滑行、淡入、放大、彈跳…）</label>
+      <label><input type="checkbox"> 小裝飾的分身會自己刪掉，玩久了不會變卡</label>
+    </div>
+    <p class="savenote" id="chkNote"></p>
+  </div>
+</section>
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="in">貓咪甜點店・片頭與選單　·　Scratch 作品的門面練習　·　角色、背景與音效皆為程式產生</div>
+</footer>
+
+<script src="assets/blk.js"></script>
+<script src="assets/lesson.js"></script>
+</body>
+</html>

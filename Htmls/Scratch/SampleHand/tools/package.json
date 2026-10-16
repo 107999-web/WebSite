@@ -1,0 +1,7 @@
+{
+  "name": "gesture-modules-tools",
+  "private": true,
+  "description": "手勢模組教室：用 headless scratch-vm 測試 .sb3（node test_modules.js）",
+  "scripts": { "test": "node test_modules.js" },
+  "dependencies": { "scratch-vm": "*" }
+}
