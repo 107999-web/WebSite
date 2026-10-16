@@ -8,7 +8,7 @@
 <!-- 這個檔案由 _tools/generate_index.ps1 產生，請不要直接修改；要改外觀請改 _tools/index_template.html -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<!-- 字型由下方程式依 site-config.json 的 font（或訪客自己選的）載入，只下載用到的那一套 -->
 <style>
   :root {
     --bg: #FFF0F5;
@@ -30,7 +30,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    font-family: 'M PLUS Rounded 1c', 'Nunito', 'Microsoft JhengHei', sans-serif;
+    font-family: var(--font, 'Microsoft JhengHei'), 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', sans-serif;
     color: var(--text);
     background-color: var(--bg);
     background-image: radial-gradient(var(--dot) 2px, transparent 2.5px);
@@ -194,6 +194,13 @@
   }
   .empty .big { font-size: 2.2rem; display: block; margin-bottom: 4px; }
   footer { text-align: center; margin-top: 34px; color: var(--muted); font-size: .85rem; }
+  .font-pick { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-weight: 700; }
+  .font-pick select {
+    font: inherit; font-weight: 400; color: var(--text); cursor: pointer;
+    background: var(--card); border: 3px solid var(--line); border-radius: 50px; padding: 4px 12px;
+    max-width: 70vw;
+  }
+  .font-pick select:focus-visible { outline: 3px solid var(--pink-deep); outline-offset: 2px; }
 
   @media (max-width: 560px) {
     body { padding: 18px 12px 40px; }
@@ -242,7 +249,12 @@
     <div class="empty" id="empty" hidden></div>
   </main>
 
-  <footer id="footer"></footer>
+  <footer>
+    <div id="footer"></div>
+    <label class="font-pick">🔤 字型
+      <select id="fontSel" aria-label="選擇字型"></select>
+    </label>
+  </footer>
 </div>
 
 <script>
@@ -299,19 +311,25 @@ window.SITE_DATA = __SITE_DATA__;
     var info = el('span', 'info');
     // 顯示網頁的 <title>；沒有 title 才用檔名。檔名放在滑鼠提示裡
     var nm = el('span', 'name'); setText(nm, label(f), q); info.appendChild(nm); nm.style.display = 'block';
-    a.title = f.path.split('/').pop();
+    a.title = (f.title ? f.title + '\n' : '') + '檔案：' + f.path.split('/').pop();
     a.appendChild(info);
     if (f.mtime) a.appendChild(el('span', 'date', '🕒 ' + f.mtime.slice(0, 10)));
     return a;
   }
 
-  function label(f) { return (f.title && f.title.trim()) ? f.title : f.name; }
+  // 首頁只顯示 title 中「｜」（或半形 |）前面的第一段，例如「單元1 太陽的祕密｜自然五上｜互動學習網」→「單元1 太陽的祕密」
+  function shortTitle(t) {
+    if (!t) return '';
+    var first = t.split(/[｜|]/)[0].trim();
+    return first || t.trim();
+  }
+  function label(f) { return shortTitle(f.title) || f.name; }
   function matches(text, q) { return !!text && text.toLowerCase().indexOf(q) !== -1; }
 
   // 回傳 <li> 或 null（搜尋時沒有符合的就不顯示）
   function buildFolder(d, depth, q) {
     // 資料夾有 index.html 就顯示它的 <title>，沒有才用資料夾名稱
-    var folderLabel = (d.index && d.index.title && d.index.title.trim()) ? d.index.title : d.name;
+    var folderLabel = (d.index && shortTitle(d.index.title)) || d.name;
     var selfHit = q && (matches(d.name, q) || matches(folderLabel, q));
     var kids = [];
     d.children.forEach(function (c) {
@@ -338,7 +356,7 @@ window.SITE_DATA = __SITE_DATA__;
     head.appendChild(el('span', 'chev', '▶'));
     head.appendChild(el('span', 'ico', open ? '📂' : '📁'));
     var nm = el('span', 'name'); setText(nm, folderLabel, q); head.appendChild(nm);
-    head.title = '資料夾：' + d.name;
+    head.title = (d.index && d.index.title ? d.index.title + '\n' : '') + '資料夾：' + d.name;
     head.appendChild(el('span', 'count', d.count + ' 頁'));
     head.addEventListener('click', function () {
       var now = !li.classList.contains('open');
@@ -371,7 +389,7 @@ window.SITE_DATA = __SITE_DATA__;
   }
 
   function collect(d) {
-    if (d.index) allPages.push({ name: d.index.title || d.name, path: d.index.path, mtime: d.index.mtime });
+    if (d.index) allPages.push({ name: shortTitle(d.index.title) || d.name, path: d.index.path, mtime: d.index.mtime });
     d.children.forEach(function (c) {
       if (c.t === 'd') collect(c); else allPages.push({ name: label(c), path: c.path, mtime: c.mtime });
     });
@@ -418,6 +436,39 @@ window.SITE_DATA = __SITE_DATA__;
     stats.appendChild(c);
   });
   document.getElementById('footer').textContent = '🍬 最後更新：' + D.generated + '　·　本頁由 Sync.bat 自動產生';
+
+  // ---------- 字型：預設用 site-config.json 的 font，訪客可在頁尾自己換（記在這台瀏覽器） ----------
+  // 都是有完整繁體中文的字型；舊版用的 M PLUS Rounded 1c 是日文字型，缺「啟圖錄關」等字，會混到別的字型
+  var FONTS = {
+    huninn: { label: '粉圓體（可愛圓體）', family: "'Huninn'", css: 'Huninn' },
+    chiron: { label: '昭源圓體（端正圓體）', family: "'Chiron GoRound TC'", css: 'Chiron+GoRound+TC:wght@400;700;800' },
+    iansui: { label: '芫荽（手寫風）', family: "'Iansui'", css: 'Iansui' },
+    wenkai: { label: '霞鶩文楷（楷書風）', family: "'LXGW WenKai TC'", css: 'LXGW+WenKai+TC:wght@400;700' },
+    system: { label: '微軟正黑體（不用下載）', family: "'Microsoft JhengHei'", css: '' }
+  };
+  var FONT_KEY = 'ws-font:' + location.pathname;
+  var fontSel = document.getElementById('fontSel');
+  Object.keys(FONTS).forEach(function (k) {
+    var o = el('option', null, FONTS[k].label); o.value = k; fontSel.appendChild(o);
+  });
+  function applyFont(key) {
+    if (!FONTS[key]) key = 'huninn';
+    var f = FONTS[key];
+    if (f.css) {
+      var link = document.getElementById('fontCss');
+      if (!link) { link = document.createElement('link'); link.id = 'fontCss'; link.rel = 'stylesheet'; document.head.appendChild(link); }
+      link.href = 'https://fonts.googleapis.com/css2?family=' + f.css + '&display=swap';
+    }
+    document.documentElement.style.setProperty('--font', f.family);
+    fontSel.value = key;
+  }
+  var savedFont = null;
+  try { savedFont = localStorage.getItem(FONT_KEY); } catch (e) {}
+  applyFont(savedFont || D.font || 'huninn');
+  fontSel.addEventListener('change', function () {
+    applyFont(fontSel.value);
+    try { localStorage.setItem(FONT_KEY, fontSel.value); } catch (e) {}
+  });
 
   collect(D.tree);
   var recent = allPages.slice().sort(function (a, b) { return a.mtime < b.mtime ? 1 : a.mtime > b.mtime ? -1 : 0; }).slice(0, 6);

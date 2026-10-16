@@ -118,11 +118,14 @@ function Build-Node([System.IO.DirectoryInfo]$dir, [string]$rel, [bool]$isRoot) 
 # ---------- 網站設定 ----------
 $siteTitle = '我的網頁小天地'
 $siteSub = '點一下資料夾就能展開，點網頁就能開啟'
+# 字型：huninn 粉圓體／chiron 昭源圓體／iansui 芫荽／wenkai 霞鶩文楷／system 微軟正黑體
+$siteFont = 'huninn'
 if (Test-Path $ConfigFile) {
     try {
         $cfg = [IO.File]::ReadAllText($ConfigFile, $utf8) | ConvertFrom-Json
         if ($cfg.title) { $siteTitle = [string]$cfg.title }
         if ($cfg.subtitle) { $siteSub = [string]$cfg.subtitle }
+        if ($cfg.font) { $siteFont = [string]$cfg.font }
     } catch { Write-Host "  [注意] site-config.json 格式有誤，使用預設標題" -ForegroundColor Yellow }
 }
 
@@ -133,7 +136,7 @@ if (Test-Path -LiteralPath $HtmlsDir) {
 $treeJson = if ($tree) { $tree.json } else { '{"t":"d","name":' + (J $htmlsName) + ',"path":' + (J $htmlsName) + ',"count":0,"mtime":"","index":null,"children":[]}' }
 
 $generated = Fmt (Get-Date)
-$data = '{"title":' + (J $siteTitle) + ',"subtitle":' + (J $siteSub) + ',"generated":' + (J $generated) +
+$data = '{"title":' + (J $siteTitle) + ',"subtitle":' + (J $siteSub) + ',"font":' + (J $siteFont) + ',"generated":' + (J $generated) +
         ',"pages":' + $script:pageCount + ',"folders":' + $script:folderCount + ',"tree":' + $treeJson + '}'
 
 $tpl = [IO.File]::ReadAllText($Template, $utf8)
