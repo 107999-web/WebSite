@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="WebIndexGenerator 1.0.0">
-<title>Scratch</title>
+<meta name="generator" content="WebIndexGenerator 1.1.0">
+<title>Scratch學習網站</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&amp;family=Nunito:wght@400;700;800&amp;display=swap">
@@ -12,7 +12,7 @@
 :root{--bg:#fff0f5;--deco:#ffd9e6;--surface:#ffffff;--surface2:#fff0f5;--text:#5d4037;--muted:#a1887f;--accent:#ff8fab;--accent2:#ffb74d;--on-accent:#ffffff;--border:#fadadd;--shadow:rgba(255,143,171,.28);--font:'Nunito','M PLUS Rounded 1c','jf-openhuninn','Microsoft JhengHei',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;overflow-x:hidden}
+body{--gap:18px;--card-min:240px;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 button,input,select{font:inherit;color:inherit}
 .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
@@ -28,7 +28,11 @@ button,input,select{font:inherit;color:inherit}
 .group{margin-bottom:38px}
 .group-title{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:1.25rem}
 .group-title .count{font-size:.8rem;font-weight:600}
-.items{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.group-title .gname{min-width:0;overflow-wrap:anywhere}
+.items{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr))}
+.packed{display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));column-gap:var(--gap);row-gap:34px;margin-bottom:38px}
+.packed .group{margin:0;min-width:0}
+.item .folder{display:inline-block;margin-top:6px;font-size:.78rem;color:var(--accent);overflow-wrap:anywhere}
 .item{position:relative;display:flex;gap:14px;align-items:flex-start;min-width:0}
 .item .icon{flex:none;display:grid;place-items:center}
 .item .main{flex:1;min-width:0}
@@ -68,7 +72,7 @@ body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px
 <body>
 <div class="wrap">
   <header class="hero">
-    <h1>Scratch</h1>
+    <h1>Scratch學習網站</h1>
     <p class="stats"><span>共 <b id="total">0</b> 個網頁<span id="shown"></span></span></p>
   </header>
   <div class="toolbar">
@@ -86,14 +90,6 @@ body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px
   <p id="empty" class="empty hidden"></p>
   <noscript>
     <ul>
-      <li><a href="CatCupGenDoc.html" target="_blank" rel="noopener">貓咪盃程式說明文件產生器</a></li>
-      <li><a href="FM2S_Stu.html" target="_blank" rel="noopener">Facemesh2Scratch 學生實作單</a></li>
-      <li><a href="FM2S_Thr.html" target="_blank" rel="noopener">Facemesh2Scratch 教師手冊</a></li>
-      <li><a href="HP2S_Stu.html" target="_blank" rel="noopener">Handpose2Scratch 學生實作單</a></li>
-      <li><a href="HP2S_Thr.html" target="_blank" rel="noopener">Handpose2Scratch 教師手冊</a></li>
-      <li><a href="ML2S_Stu.html" target="_blank" rel="noopener">ML2Scratch 學生實作單</a></li>
-      <li><a href="ML2S_Thr.html" target="_blank" rel="noopener">ML2Scratch 教師手冊</a></li>
-      <li><a href="ScratchAnalyze.html" target="_blank" rel="noopener">Scratch 作品分析小幫手（離線版）</a></li>
       <li><a href="115_ScratchAI/index.html" target="_blank" rel="noopener">貓咪盃 AI 互動組・互動教材</a></li>
       <li><a href="AnimateTeach/index.html" target="_blank" rel="noopener">Scratch 動畫製作教學</a></li>
       <li><a href="Sample/index.html" target="_blank" rel="noopener">爆炸頭節奏大師 教材入口</a></li>
@@ -103,6 +99,12 @@ body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px
       <li><a href="SampleHand/index.html" target="_blank" rel="noopener">手勢模組教室</a></li>
       <li><a href="SampleHands/index.html" target="_blank" rel="noopener">手勢辨識大挑戰 教材入口</a></li>
       <li><a href="SampleTitle/index.html" target="_blank" rel="noopener">貓咪甜點店・片頭與選單 教材入口</a></li>
+      <li><a href="ScratchAI/FM2S_Stu.html" target="_blank" rel="noopener">Facemesh2Scratch 學生實作單</a></li>
+      <li><a href="ScratchAI/FM2S_Thr.html" target="_blank" rel="noopener">Facemesh2Scratch 教師手冊</a></li>
+      <li><a href="ScratchAI/HP2S_Stu.html" target="_blank" rel="noopener">Handpose2Scratch 學生實作單</a></li>
+      <li><a href="ScratchAI/HP2S_Thr.html" target="_blank" rel="noopener">Handpose2Scratch 教師手冊</a></li>
+      <li><a href="ScratchAI/ML2S_Stu.html" target="_blank" rel="noopener">ML2Scratch 學生實作單</a></li>
+      <li><a href="ScratchAI/ML2S_Thr.html" target="_blank" rel="noopener">ML2Scratch 教師手冊</a></li>
       <li><a href="ScratchBasic/assess.html" target="_blank" rel="noopener">紙本評量：Scratch 積木教室</a></li>
       <li><a href="ScratchBasic/guide.html" target="_blank" rel="noopener">Scratch 積木圖鑑</a></li>
       <li><a href="ScratchBasic/index.html" target="_blank" rel="noopener">Scratch 積木教室</a></li>
@@ -122,11 +124,15 @@ body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px
       <li><a href="ScratchBasic/unit7_student.html" target="_blank" rel="noopener">單元 7：把程式包起來重複用</a></li>
       <li><a href="ScratchBasic/unit7_teacher.html" target="_blank" rel="noopener">單元 7 教師手冊：把程式包起來重複用</a></li>
       <li><a href="ScratchBasic/worksheet.html" target="_blank" rel="noopener">紙本學習單：Scratch 積木教室</a></li>
+      <li><a href="ScratchDocSb3Md/CatCupGenDoc.html" target="_blank" rel="noopener">貓咪盃程式說明文件產生器</a></li>
+      <li><a href="ScratchDocSb3Md/ScratchAnalyze.html" target="_blank" rel="noopener">Scratch 作品分析小幫手（離線版）</a></li>
+      <li><a href="ScratchDocSb3Md/Scratch%E4%BD%9C%E5%93%81%E8%A6%8F%E5%8A%83%E7%94%A2%E7%94%9F%E5%99%A8.html" target="_blank" rel="noopener">Scratch 作品規劃產生器</a></li>
+      <li><a href="ScratchPractice/index.html" target="_blank" rel="noopener">複賽架構練習</a></li>
     </ul>
   </noscript>
   <footer>更新時間 <span id="gen"></span> · 由「網頁索引產生器」產生</footer>
 </div>
-<script type="application/json" id="index-data">{"v":1,"target":"_blank","sort":"name","icon":"emoji","showMeta":true,"generated":1790695354349,"groups":[{"name":"Scratch","items":[{"t":"貓咪盃程式說明文件產生器","f":"CatCupGenDoc.html","h":"CatCupGenDoc.html","m":1790695317357,"s":206749},{"t":"Facemesh2Scratch 學生實作單","f":"FM2S_Stu.html","h":"FM2S_Stu.html","m":1789434677125,"s":30620},{"t":"Facemesh2Scratch 教師手冊","f":"FM2S_Thr.html","h":"FM2S_Thr.html","m":1789434677863,"s":36428},{"t":"Handpose2Scratch 學生實作單","f":"HP2S_Stu.html","h":"HP2S_Stu.html","m":1789432523004,"s":27459},{"t":"Handpose2Scratch 教師手冊","f":"HP2S_Thr.html","h":"HP2S_Thr.html","m":1789432202088,"s":33485},{"t":"ML2Scratch 學生實作單","f":"ML2S_Stu.html","h":"ML2S_Stu.html","m":1789441583443,"s":33409},{"t":"ML2Scratch 教師手冊","f":"ML2S_Thr.html","h":"ML2S_Thr.html","m":1789441583896,"s":37205},{"t":"Scratch 作品分析小幫手（離線版）","f":"ScratchAnalyze.html","h":"ScratchAnalyze.html","m":1790695317075,"s":178848}]},{"name":"115_ScratchAI","items":[{"t":"貓咪盃 AI 互動組・互動教材","f":"index.html","h":"115_ScratchAI/index.html","m":1789732291121,"s":3432}]},{"name":"AnimateTeach","items":[{"t":"Scratch 動畫製作教學","f":"index.html","h":"AnimateTeach/index.html","m":1789958626370,"s":2895}]},{"name":"Sample","items":[{"t":"爆炸頭節奏大師 教材入口","f":"index.html","h":"Sample/index.html","m":1790088811540,"s":3211}]},{"name":"SampleAnimate","items":[{"t":"森林動物搬家記・溪流上游 教材入口","f":"index.html","h":"SampleAnimate/index.html","m":1790123438827,"s":3265}]},{"name":"SampleFunction","items":[{"t":"Scratch 函式庫","f":"index.html","h":"SampleFunction/index.html","m":1790355134589,"s":4282}]},{"name":"SampleGame","items":[{"t":"部落樂舞・火堆旁的節奏 教材入口","f":"index.html","h":"SampleGame/index.html","m":1790144124174,"s":3274}]},{"name":"SampleHand","items":[{"t":"手勢模組教室","f":"index.html","h":"SampleHand/index.html","m":1790306152566,"s":4180}]},{"name":"SampleHands","items":[{"t":"手勢辨識大挑戰 教材入口","f":"index.html","h":"SampleHands/index.html","m":1790235026015,"s":3862}]},{"name":"SampleTitle","items":[{"t":"貓咪甜點店・片頭與選單 教材入口","f":"index.html","h":"SampleTitle/index.html","m":1790208653295,"s":3283}]},{"name":"ScratchBasic","items":[{"t":"紙本評量：Scratch 積木教室","f":"assess.html","h":"ScratchBasic/assess.html","m":1789484538602,"s":15389},{"t":"Scratch 積木圖鑑","f":"guide.html","h":"ScratchBasic/guide.html","m":1789484539590,"s":13229},{"t":"Scratch 積木教室","f":"index.html","h":"ScratchBasic/index.html","m":1789484539094,"s":6200},{"t":"易錯點總表：Scratch 積木教室","f":"mistakes.html","h":"ScratchBasic/mistakes.html","m":1789484540084,"s":11836},{"t":"單元 1：讓角色動起來","f":"unit1_student.html","h":"ScratchBasic/unit1_student.html","m":1789484541625,"s":10288},{"t":"單元 1 教師手冊：讓角色動起來","f":"unit1_teacher.html","h":"ScratchBasic/unit1_teacher.html","m":1789484542080,"s":8409},{"t":"單元 2：說話與變裝","f":"unit2_student.html","h":"ScratchBasic/unit2_student.html","m":1789484542560,"s":9591},{"t":"單元 2 教師手冊：說話與變裝","f":"unit2_teacher.html","h":"ScratchBasic/unit2_teacher.html","m":1789484543107,"s":8092},{"t":"單元 3：讓程式自己跑","f":"unit3_student.html","h":"ScratchBasic/unit3_student.html","m":1789484543593,"s":12247},{"t":"單元 3 教師手冊：讓程式自己跑","f":"unit3_teacher.html","h":"ScratchBasic/unit3_teacher.html","m":1789484544062,"s":9873},{"t":"單元 4：讓角色有感覺","f":"unit4_student.html","h":"ScratchBasic/unit4_student.html","m":1789484544590,"s":18171},{"t":"單元 4 教師手冊：讓角色有感覺","f":"unit4_teacher.html","h":"ScratchBasic/unit4_teacher.html","m":1789484545077,"s":12494},{"t":"單元 5：讓程式記住事情","f":"unit5_student.html","h":"ScratchBasic/unit5_student.html","m":1789484545575,"s":18960},{"t":"單元 5 教師手冊：讓程式記住事情","f":"unit5_teacher.html","h":"ScratchBasic/unit5_teacher.html","m":1789484546181,"s":10830},{"t":"單元 6：一次記住很多件事","f":"unit6_student.html","h":"ScratchBasic/unit6_student.html","m":1789484546712,"s":18317},{"t":"單元 6 教師手冊：一次記住很多件事","f":"unit6_teacher.html","h":"ScratchBasic/unit6_teacher.html","m":1789484547223,"s":10814},{"t":"單元 7：把程式包起來重複用","f":"unit7_student.html","h":"ScratchBasic/unit7_student.html","m":1789484547878,"s":16169},{"t":"單元 7 教師手冊：把程式包起來重複用","f":"unit7_teacher.html","h":"ScratchBasic/unit7_teacher.html","m":1789484548394,"s":12322},{"t":"紙本學習單：Scratch 積木教室","f":"worksheet.html","h":"ScratchBasic/worksheet.html","m":1789484538128,"s":16420}]}]}</script>
+<script type="application/json" id="index-data">{"v":1,"target":"_blank","sort":"name","icon":"emoji","kind":"grid","group":"auto","showMeta":true,"generated":1792114419670,"groups":[{"name":"115_ScratchAI","items":[{"t":"貓咪盃 AI 互動組・互動教材","f":"index.html","h":"115_ScratchAI/index.html","m":1792111986092,"s":3498}]},{"name":"AnimateTeach","items":[{"t":"Scratch 動畫製作教學","f":"index.html","h":"AnimateTeach/index.html","m":1792111986102,"s":2938}]},{"name":"Sample","items":[{"t":"爆炸頭節奏大師 教材入口","f":"index.html","h":"Sample/index.html","m":1792111986197,"s":3256}]},{"name":"SampleAnimate","items":[{"t":"森林動物搬家記・溪流上游 教材入口","f":"index.html","h":"SampleAnimate/index.html","m":1792111986204,"s":3310}]},{"name":"SampleFunction","items":[{"t":"Scratch 函式庫","f":"index.html","h":"SampleFunction/index.html","m":1792111986204,"s":4337}]},{"name":"SampleGame","items":[{"t":"部落樂舞・火堆旁的節奏 教材入口","f":"index.html","h":"SampleGame/index.html","m":1792111986337,"s":3319}]},{"name":"SampleHand","items":[{"t":"手勢模組教室","f":"index.html","h":"SampleHand/index.html","m":1792111986343,"s":4236}]},{"name":"SampleHands","items":[{"t":"手勢辨識大挑戰 教材入口","f":"index.html","h":"SampleHands/index.html","m":1792111986542,"s":3915}]},{"name":"SampleTitle","items":[{"t":"貓咪甜點店・片頭與選單 教材入口","f":"index.html","h":"SampleTitle/index.html","m":1792111986548,"s":3328}]},{"name":"ScratchAI","items":[{"t":"Facemesh2Scratch 學生實作單","f":"FM2S_Stu.html","h":"ScratchAI/FM2S_Stu.html","m":1792111986197,"s":31073},{"t":"Facemesh2Scratch 教師手冊","f":"FM2S_Thr.html","h":"ScratchAI/FM2S_Thr.html","m":1792111986197,"s":36942},{"t":"Handpose2Scratch 學生實作單","f":"HP2S_Stu.html","h":"ScratchAI/HP2S_Stu.html","m":1792111986197,"s":27845},{"t":"Handpose2Scratch 教師手冊","f":"HP2S_Thr.html","h":"ScratchAI/HP2S_Thr.html","m":1792111986197,"s":33935},{"t":"ML2Scratch 學生實作單","f":"ML2S_Stu.html","h":"ScratchAI/ML2S_Stu.html","m":1792111986197,"s":33879},{"t":"ML2Scratch 教師手冊","f":"ML2S_Thr.html","h":"ScratchAI/ML2S_Thr.html","m":1792111986197,"s":37722}]},{"name":"ScratchBasic","items":[{"t":"紙本評量：Scratch 積木教室","f":"assess.html","h":"ScratchBasic/assess.html","m":1792111986552,"s":15690},{"t":"Scratch 積木圖鑑","f":"guide.html","h":"ScratchBasic/guide.html","m":1792111986552,"s":13506},{"t":"Scratch 積木教室","f":"index.html","h":"ScratchBasic/index.html","m":1792111986552,"s":6328},{"t":"易錯點總表：Scratch 積木教室","f":"mistakes.html","h":"ScratchBasic/mistakes.html","m":1792111986552,"s":12033},{"t":"單元 1：讓角色動起來","f":"unit1_student.html","h":"ScratchBasic/unit1_student.html","m":1792111986552,"s":10506},{"t":"單元 1 教師手冊：讓角色動起來","f":"unit1_teacher.html","h":"ScratchBasic/unit1_teacher.html","m":1792111986552,"s":8522},{"t":"單元 2：說話與變裝","f":"unit2_student.html","h":"ScratchBasic/unit2_student.html","m":1792111986552,"s":9791},{"t":"單元 2 教師手冊：說話與變裝","f":"unit2_teacher.html","h":"ScratchBasic/unit2_teacher.html","m":1792111986552,"s":8205},{"t":"單元 3：讓程式自己跑","f":"unit3_student.html","h":"ScratchBasic/unit3_student.html","m":1792111986552,"s":12499},{"t":"單元 3 教師手冊：讓程式自己跑","f":"unit3_teacher.html","h":"ScratchBasic/unit3_teacher.html","m":1792111986552,"s":9994},{"t":"單元 4：讓角色有感覺","f":"unit4_student.html","h":"ScratchBasic/unit4_student.html","m":1792111986552,"s":18521},{"t":"單元 4 教師手冊：讓角色有感覺","f":"unit4_teacher.html","h":"ScratchBasic/unit4_teacher.html","m":1792111986552,"s":12628},{"t":"單元 5：讓程式記住事情","f":"unit5_student.html","h":"ScratchBasic/unit5_student.html","m":1792111986552,"s":19335},{"t":"單元 5 教師手冊：讓程式記住事情","f":"unit5_teacher.html","h":"ScratchBasic/unit5_teacher.html","m":1792111986552,"s":10950},{"t":"單元 6：一次記住很多件事","f":"unit6_student.html","h":"ScratchBasic/unit6_student.html","m":1792111986552,"s":18684},{"t":"單元 6 教師手冊：一次記住很多件事","f":"unit6_teacher.html","h":"ScratchBasic/unit6_teacher.html","m":1792111986552,"s":10932},{"t":"單元 7：把程式包起來重複用","f":"unit7_student.html","h":"ScratchBasic/unit7_student.html","m":1792111986557,"s":16496},{"t":"單元 7 教師手冊：把程式包起來重複用","f":"unit7_teacher.html","h":"ScratchBasic/unit7_teacher.html","m":1792111986557,"s":12452},{"t":"紙本學習單：Scratch 積木教室","f":"worksheet.html","h":"ScratchBasic/worksheet.html","m":1792111986557,"s":16732}]},{"name":"ScratchDocSb3Md","items":[{"t":"貓咪盃程式說明文件產生器","f":"CatCupGenDoc.html","h":"ScratchDocSb3Md/CatCupGenDoc.html","m":1792111986183,"s":235121},{"t":"Scratch 作品分析小幫手（離線版）","f":"ScratchAnalyze.html","h":"ScratchDocSb3Md/ScratchAnalyze.html","m":1792111986552,"s":179988},{"t":"Scratch 作品規劃產生器","f":"Scratch作品規劃產生器.html","h":"ScratchDocSb3Md/Scratch%E4%BD%9C%E5%93%81%E8%A6%8F%E5%8A%83%E7%94%A2%E7%94%9F%E5%99%A8.html","m":1792111986603,"s":103484}]},{"name":"ScratchPractice","items":[{"t":"複賽架構練習","f":"index.html","h":"ScratchPractice/index.html","m":1792111986582,"s":1851}]}]}</script>
 <script>(function(){
   var D = JSON.parse(document.getElementById('index-data').textContent);
   var EMOJI = ['🎀','🍓','🧁','🌸','🍭','⭐','🐰','🍩','🌈','🎈','🍰','🐱','🦄','🍡','🐣','🍒'];
@@ -169,53 +175,126 @@ body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px
     }
     node.appendChild(document.createTextNode(text.slice(pos)));
   }
+  var isList = D.kind === 'list';      // 清單／表格式：一行一筆
+  var SMALL = 3;                       // 清單式：網頁數 ≤ 3 的相鄰資料夾合併成一個表格
+  var lastCols = 0;
+  // 依可用寬度算出一列可以放幾張卡片（與 .items 的 auto-fill 規則相同）
+  function cols(){
+    if (window.matchMedia && matchMedia('(max-width:560px)').matches) return 1;
+    var cs = getComputedStyle(document.body);
+    var gap = parseFloat(cs.getPropertyValue('--gap')) || 18;
+    var min = parseFloat(cs.getPropertyValue('--card-min')) || 240;
+    return Math.max(1, Math.floor((list.clientWidth + gap) / (min + gap)));
+  }
+  // e = {it: 網頁, g: 所屬資料夾名稱（不分組／合併時才有）}
+  function card(e, i, kw){
+    var it = e.it;
+    var a = el('a', 'item');
+    a.href = it.h;
+    a.title = e.g ? e.g + ' / ' + it.t : it.t;
+    if (D.target === '_blank') { a.target = '_blank'; a.rel = 'noopener'; }
+    a.appendChild(el('span', 'icon', iconText(it, i))).setAttribute('aria-hidden', 'true');
+    var main = el('span', 'main');
+    var t = el('span', 'title'); highlight(t, it.t, kw); main.appendChild(t);
+    if (e.g && !isList) { var fd = el('span', 'folder'); highlight(fd, '📁 ' + e.g, kw); main.appendChild(fd); }
+    var meta = el('span', 'meta');
+    var f = el('span', 'file'); highlight(f, e.g && isList ? e.g + '/' + it.f : it.f, kw); meta.appendChild(f);
+    meta.appendChild(el('span', 'date', fmtDate(it.m)));
+    meta.appendChild(el('span', 'size', fmtSize(it.s)));
+    main.appendChild(meta);
+    a.appendChild(main);
+    return a;
+  }
+  // 一個區塊：標題（name 為 null 時不顯示）＋卡片清單
+  function section(name, countText, entries, kw){
+    var sec = el('section', 'group');
+    if (name != null) {
+      var h = el('h2', 'group-title');
+      h.appendChild(el('span', 'gname', name));
+      h.appendChild(el('span', 'count', countText));
+      sec.appendChild(h);
+    }
+    var box = el('div', 'items');
+    var head = el('div', 'list-head');
+    ['#', '名稱', '檔案', '修改日期', '大小'].forEach(function(t){ head.appendChild(el('span', null, t)); });
+    box.appendChild(head);
+    entries.forEach(function(e, i){ box.appendChild(card(e, i, kw)); });
+    sec.appendChild(box);
+    return sec;
+  }
+  function wrapEntries(items, g){ return items.map(function(it){ return {it: it, g: g}; }); }
   function render(){
     var kw = q.value.trim().toLowerCase();
     var cmp = SORTS[sortSel.value] || cmpName;
+    var mode = D.group || 'auto';
+    var multi = D.groups.length > 1;
     var shown = 0;
     list.textContent = '';
+    var groups = [];
     D.groups.forEach(function(g){
+      var inName = kw && g.name.toLowerCase().indexOf(kw) !== -1;   // 搜尋資料夾名稱也算符合
       var items = g.items.filter(function(it){
-        return !kw || it.t.toLowerCase().indexOf(kw) !== -1 || it.f.toLowerCase().indexOf(kw) !== -1;
+        return !kw || inName || it.t.toLowerCase().indexOf(kw) !== -1 || it.f.toLowerCase().indexOf(kw) !== -1;
       }).sort(cmp);
       if (!items.length) return;
       shown += items.length;
-      var sec = el('section', 'group');
-      if (D.groups.length > 1) {
-        var h = el('h2', 'group-title');
-        h.appendChild(el('span', 'gname', g.name));
-        h.appendChild(el('span', 'count', items.length + (kw ? ' / ' + g.items.length : '')));
-        sec.appendChild(h);
-      }
-      var box = el('div', 'items');
-      var head = el('div', 'list-head');
-      ['#', '名稱', '檔案', '修改日期', '大小'].forEach(function(t){ head.appendChild(el('span', null, t)); });
-      box.appendChild(head);
-      items.forEach(function(it, i){
-        var a = el('a', 'item');
-        a.href = it.h;
-        a.title = it.t;
-        if (D.target === '_blank') { a.target = '_blank'; a.rel = 'noopener'; }
-        a.appendChild(el('span', 'icon', iconText(it, i))).setAttribute('aria-hidden', 'true');
-        var main = el('span', 'main');
-        var t = el('span', 'title'); highlight(t, it.t, kw); main.appendChild(t);
-        var meta = el('span', 'meta');
-        var f = el('span', 'file'); highlight(f, it.f, kw); meta.appendChild(f);
-        meta.appendChild(el('span', 'date', fmtDate(it.m)));
-        meta.appendChild(el('span', 'size', fmtSize(it.s)));
-        main.appendChild(meta);
-        a.appendChild(main);
-        box.appendChild(a);
-      });
-      sec.appendChild(box);
-      list.appendChild(sec);
+      groups.push({name: g.name, all: g.items.length, items: items});
     });
+    function countText(g){ return g.items.length + (kw ? ' / ' + g.all : ''); }
+
+    if (multi && mode === 'flat') {
+      // 不分組：全部網頁排在一起，資料夾名稱變成卡片上的小標籤
+      var all = [];
+      groups.forEach(function(g){ all = all.concat(wrapEntries(g.items, g.name)); });
+      all.sort(function(a, b){ return cmp(a.it, b.it); });
+      if (all.length) list.appendChild(section(null, '', all, kw));
+    } else if (multi && mode === 'auto' && !isList) {
+      // 自動並排：每個資料夾佔「網頁數」格（最多一整列），小資料夾就能排在同一列
+      var n = lastCols = cols();
+      var pack = el('div', 'packed');
+      pack.style.setProperty('--cols', n);
+      groups.forEach(function(g){
+        var k = Math.min(g.items.length, n);
+        var sec = section(g.name, countText(g), wrapEntries(g.items), kw);
+        sec.style.gridColumn = 'span ' + k;
+        sec.lastChild.style.gridTemplateColumns = 'repeat(' + k + ',minmax(0,1fr))';
+        pack.appendChild(sec);
+      });
+      list.appendChild(pack);
+    } else if (multi && mode === 'auto' && isList) {
+      // 清單式：相鄰的小資料夾合併成一個表格，檔案欄顯示「資料夾/檔名」
+      var run = [];
+      var flush = function(){
+        if (run.length === 1) list.appendChild(section(run[0].name, countText(run[0]), wrapEntries(run[0].items), kw));
+        else if (run.length > 1) {
+          var es = [];
+          run.forEach(function(g){ es = es.concat(wrapEntries(g.items, g.name)); });
+          list.appendChild(section(run.length + ' 個資料夾', es.length + ' 個網頁', es, kw));
+        }
+        run = [];
+      };
+      groups.forEach(function(g){
+        if (g.items.length <= SMALL) { run.push(g); return; }
+        flush();
+        list.appendChild(section(g.name, countText(g), wrapEntries(g.items), kw));
+      });
+      flush();
+    } else {
+      // 每個資料夾各自一列（只有一個資料夾時不顯示標題）
+      groups.forEach(function(g){ list.appendChild(section(multi ? g.name : null, countText(g), wrapEntries(g.items), kw)); });
+    }
     document.getElementById('shown').textContent = kw ? '，符合 ' + shown + ' 個' : '';
     empty.classList.toggle('hidden', shown > 0);
     empty.textContent = total ? '找不到符合「' + q.value.trim() + '」的網頁' : '這裡還沒有任何網頁';
   }
   q.addEventListener('input', render);
   sortSel.addEventListener('change', render);
+  // 視窗寬度改變、一列能放的卡片數跟著變時，重新排列
+  if ((D.group || 'auto') === 'auto' && !isList) {
+    var rt = 0;
+    var onResize = function(){ clearTimeout(rt); rt = setTimeout(function(){ if (cols() !== lastCols) render(); }, 100); };
+    if (window.ResizeObserver) new ResizeObserver(onResize).observe(list); else window.addEventListener('resize', onResize);
+  }
   document.addEventListener('keydown', function(e){
     if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
     if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; render(); }
