@@ -297,15 +297,15 @@ window.SITE_DATA = __SITE_DATA__;
     a.href = href(f.path);
     a.appendChild(el('span', 'ico', icon || '📄'));
     var info = el('span', 'info');
-    var nm = el('span', 'name'); setText(nm, f.name, q); info.appendChild(nm); nm.style.display = 'block';
-    if (f.title && f.title !== f.name) {
-      var tt = el('span', 'title'); setText(tt, f.title, q); tt.style.display = 'block'; info.appendChild(tt);
-    }
+    // 顯示網頁的 <title>；沒有 title 才用檔名。檔名放在滑鼠提示裡
+    var nm = el('span', 'name'); setText(nm, label(f), q); info.appendChild(nm); nm.style.display = 'block';
+    a.title = f.path.split('/').pop();
     a.appendChild(info);
     if (f.mtime) a.appendChild(el('span', 'date', '🕒 ' + f.mtime.slice(0, 10)));
     return a;
   }
 
+  function label(f) { return (f.title && f.title.trim()) ? f.title : f.name; }
   function matches(text, q) { return !!text && text.toLowerCase().indexOf(q) !== -1; }
 
   // 回傳 <li> 或 null（搜尋時沒有符合的就不顯示）
@@ -368,9 +368,9 @@ window.SITE_DATA = __SITE_DATA__;
   }
 
   function collect(d) {
-    if (d.index) allPages.push({ name: d.name, path: d.index.path, mtime: d.index.mtime });
+    if (d.index) allPages.push({ name: d.index.title || d.name, path: d.index.path, mtime: d.index.mtime });
     d.children.forEach(function (c) {
-      if (c.t === 'd') collect(c); else allPages.push({ name: c.name, path: c.path, mtime: c.mtime });
+      if (c.t === 'd') collect(c); else allPages.push({ name: label(c), path: c.path, mtime: c.mtime });
     });
   }
 
