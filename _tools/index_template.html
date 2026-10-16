@@ -310,7 +310,9 @@ window.SITE_DATA = __SITE_DATA__;
 
   // 回傳 <li> 或 null（搜尋時沒有符合的就不顯示）
   function buildFolder(d, depth, q) {
-    var selfHit = q && matches(d.name, q);
+    // 資料夾有 index.html 就顯示它的 <title>，沒有才用資料夾名稱
+    var folderLabel = (d.index && d.index.title && d.index.title.trim()) ? d.index.title : d.name;
+    var selfHit = q && (matches(d.name, q) || matches(folderLabel, q));
     var kids = [];
     d.children.forEach(function (c) {
       var li = c.t === 'd' ? buildFolder(c, depth + 1, selfHit ? '' : q) : buildFile(c, q && !selfHit ? q : '');
@@ -335,7 +337,8 @@ window.SITE_DATA = __SITE_DATA__;
     head.setAttribute('aria-expanded', open ? 'true' : 'false');
     head.appendChild(el('span', 'chev', '▶'));
     head.appendChild(el('span', 'ico', open ? '📂' : '📁'));
-    var nm = el('span', 'name'); setText(nm, d.name, q); head.appendChild(nm);
+    var nm = el('span', 'name'); setText(nm, folderLabel, q); head.appendChild(nm);
+    head.title = '資料夾：' + d.name;
     head.appendChild(el('span', 'count', d.count + ' 頁'));
     head.addEventListener('click', function () {
       var now = !li.classList.contains('open');
