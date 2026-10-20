@@ -68,6 +68,34 @@
     };
   }
 
+  // ---------- 班級與座號格式 ----------
+  const DEFAULT_CLASSES = Array.from({ length: 10 }, (_, i) => String(601 + i));
+  function classList() {
+    const c = window.ECO_CONFIG && window.ECO_CONFIG.classes;
+    return Array.isArray(c) && c.length ? c.map(String) : DEFAULT_CLASSES;
+  }
+  function halfWidth(v) {
+    return String(v == null ? '' : v).replace(/[０-９]/g, d => String.fromCharCode(d.charCodeAt(0) - 0xFEE0)).trim();
+  }
+  // 「6年1班」「6-1」→「601」；清單內的班級或無法辨識的寫法維持原樣
+  function normCls(v) {
+    const s = halfWidth(v);
+    if (!s || classList().includes(s)) return s;
+    const m = s.match(/^(\d)\D*?(\d{1,2})\D*$/);
+    return m ? m[1] + m[2].padStart(2, '0') : s;
+  }
+  // 「2」「02」「２」→「02」
+  function normSeat(v) {
+    const s = halfWidth(v);
+    const n = parseInt(s.replace(/\D/g, ''), 10);
+    return isNaN(n) ? s : String(n).padStart(2, '0');
+  }
+  function normProfile(p) {
+    if (p.cls) p.cls = normCls(p.cls);
+    if (p.seat) p.seat = normSeat(p.seat);
+    return p;
+  }
+
   function load() {
     try {
       const raw = localStorage.getItem(STORE_KEY);
@@ -75,7 +103,7 @@
       const data = JSON.parse(raw);
       const base = blank();
       return Object.assign(base, data, {
-        profile: Object.assign(base.profile, data.profile),
+        profile: normProfile(Object.assign(base.profile, data.profile)),
         pledge: Object.assign(base.pledge, data.pledge),
         reflection: Object.assign(base.reflection, data.reflection)
       });
@@ -110,7 +138,7 @@
     return !!(p.cls && p.seat && p.name);
   }
   function setProfile(p) {
-    state.profile = Object.assign(state.profile, p);
+    state.profile = normProfile(Object.assign(state.profile, p));
     save();
     renderProfileChip();
   }
@@ -205,7 +233,7 @@
       if (!cur) { state.entries.push(e); added++; }
       else if (String(e.updatedAt) > String(cur.updatedAt)) { Object.assign(cur, e); updated++; }
     });
-    if (!profileReady() && obj.profile) state.profile = Object.assign(state.profile, obj.profile);
+    if (!profileReady() && obj.profile) state.profile = normProfile(Object.assign(state.profile, obj.profile));
     Object.keys(obj.plans || {}).forEach(w => {
       const cur = state.plans[w];
       const inc = obj.plans[w];
@@ -464,7 +492,7 @@
           <h2>👤 我的資料</h2>
           <p class="muted small">這些資料只用來標示你的學習歷程，<strong>不會</strong>傳給任何 AI 平台。</p>
           <div class="row-3">
-            <div class="field"><label class="req" for="pfCls">班級</label><input id="pfCls" type="text" placeholder="例如 601" maxlength="10" required></div>
+            <div class="field"><label class="req" for="pfCls">班級</label><select id="pfCls" required></select></div>
             <div class="field"><label class="req" for="pfSeat">座號</label><input id="pfSeat" type="number" min="1" max="99" required></div>
             <div class="field"><label class="req" for="pfName">姓名</label><input id="pfName" type="text" maxlength="20" required></div>
           </div>
@@ -485,7 +513,11 @@
       sel.addEventListener('change', () => custom.classList.toggle('hidden', sel.value !== '__custom'));
     }
     const p = state.profile;
-    dlg.querySelector('#pfCls').value = p.cls;
+    const clsSel = dlg.querySelector('#pfCls');
+    const opts = classList();
+    if (p.cls && !opts.includes(p.cls)) opts.push(p.cls); // 保留舊資料中不在清單的班級
+    clsSel.innerHTML = `<option value="">請選擇</option>` + opts.map(c => `<option>${esc(c)}</option>`).join('');
+    clsSel.value = p.cls;
     dlg.querySelector('#pfSeat').value = p.seat;
     dlg.querySelector('#pfName').value = p.name;
     const sel = dlg.querySelector('#pfTopic');
@@ -497,7 +529,7 @@
       if (dlg.returnValue !== 'ok') return;
       const topic = sel.value === '__custom' ? custom.value.trim() : sel.value;
       setProfile({
-        cls: dlg.querySelector('#pfCls').value.trim(),
+        cls: dlg.querySelector('#pfCls').value,
         seat: String(dlg.querySelector('#pfSeat').value).trim(),
         name: dlg.querySelector('#pfName').value.trim(),
         topic
@@ -521,7 +553,7 @@
   window.Eco = {
     TASKS, PLATFORMS, STRATEGIES, WORKS, TOPICS, RUBRIC, LEVEL_NAMES,
     get state() { return state; },
-    save, profileReady, setProfile, nextVersion, addEntry, updateEntry, deleteEntry, isPending, sortEntries,
+    save, profileReady, setProfile, classList, normCls, normSeat, normProfile, nextVersion, addEntry, updateEntry, deleteEntry, isPending, sortEntries,
     getPlan, setPlan, getDraft, setDraft, stats,
     exportData, importData, readJsonFile, clearAll, cloud, submitToCloud,
     esc, fmtTime, starsText, toast, copyText, download,

@@ -10,10 +10,10 @@
  */
 
 // 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
-const CLASS_KEY = 'eco601';
+const CLASS_KEY = 'Csps1234';
 
 // 老師讀取全班資料用的密碼，請改成只有你知道的字串
-const TEACHER_KEY = 'change-this-teacher-password';
+const TEACHER_KEY = 'Csps343601';
 
 const SHEET_STUDENTS = '學生總表';
 const SHEET_PROMPTS = '提示詞明細';
@@ -39,11 +39,11 @@ function doPost(e) {
 
     const s = body.student || {};
     const cls = String(s.cls || '').trim();
-    const seat = String(s.seat || '').trim();
+    const seat = String(s.seat || '').trim().replace(/^\d$/, '0$&'); // 座號一律兩位數
     const name = String(s.name || '').trim();
     if (!cls || !seat || !name) return json_({ ok: false, error: '缺少班級、座號或姓名' });
 
-    const id = cls + '-' + ('0' + seat).slice(-2);
+    const id = cls + '-' + seat;
     const data = body.data || {};
     const entries = Array.isArray(data.entries) ? data.entries : [];
     const plans = data.plans || {};

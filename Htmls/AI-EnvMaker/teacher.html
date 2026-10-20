@@ -53,7 +53,9 @@
       <button class="btn" id="loadCloud">☁️ 從雲端載入全班</button>
       <label class="btn ghost" for="importFiles">📂 匯入學生備份檔（可多選）</label>
       <input type="file" id="importFiles" accept=".json,application/json" multiple class="hidden">
+      <select id="clsFilter" aria-label="班級篩選" style="width:auto"></select>
       <span style="flex:1"></span>
+      <button class="btn ghost sm" id="exportZip" title="每位學生一個備份檔，學生可在歷程紀錄本「匯入備份檔」還原">⬇️ 下載歷程檔（給學生還原）</button>
       <button class="btn ghost sm" id="exportCsv">⬇️ 匯出成績 CSV</button>
       <button class="btn danger sm" id="clearTeacher">清除檢視器資料</button>
     </div>
@@ -69,6 +71,7 @@
       <select id="stuSelect" style="max-width:320px"></select>
       <button class="btn ghost sm" id="nextStu">▶</button>
       <span style="flex:1"></span>
+      <button class="btn ghost sm" id="exportOne" title="下載這位學生的備份檔，讓他在歷程紀錄本匯入還原">⬇️ 下載歷程檔</button>
       <button class="btn ghost sm" onclick="window.print()">🖨️ 列印</button>
     </div>
     <div id="detail"></div>
@@ -204,11 +207,11 @@ function doPost(e) {
 
     const s = body.student || {};
     const cls = String(s.cls || '').trim();
-    const seat = String(s.seat || '').trim();
+    const seat = String(s.seat || '').trim().replace(/^\d$/, '0$&'); // 座號一律兩位數
     const name = String(s.name || '').trim();
     if (!cls || !seat || !name) return json_({ ok: false, error: '缺少班級、座號或姓名' });
 
-    const id = cls + '-' + ('0' + seat).slice(-2);
+    const id = cls + '-' + seat;
     const data = body.data || {};
     const entries = Array.isArray(data.entries) ? data.entries : [];
     const plans = data.plans || {};
@@ -327,8 +330,8 @@ function json_(obj) {
 
   // ---------- 教師端資料 ----------
   function tload() {
-    try { return Object.assign({ students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '' }, JSON.parse(localStorage.getItem(TKEY) || '{}')); }
-    catch (e) { return { students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '' }; }
+    try { return Object.assign({ students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '', cls: '' }, JSON.parse(localStorage.getItem(TKEY) || '{}')); }
+    catch (e) { return { students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '', cls: '' }; }
   }
   let T = tload();
   function tsave() {
@@ -341,7 +344,7 @@ function json_(obj) {
     T.classKey = c.classKey;
   }
 
-  const sid = s => `${String(s.cls || '').trim()}-${String(s.seat || '').trim().padStart(2, '0')}`;
+  const sid = s => `${s.cls}-${s.seat}`;
 
   function normalize(obj) {
     if (obj && obj.student && obj.data) return { student: obj.student, data: obj.data, submittedAt: obj.submittedAt || '' };
@@ -356,6 +359,7 @@ function json_(obj) {
   }
   function addRecord(rec, source) {
     if (!rec || !rec.student || !rec.student.cls || !rec.student.seat) return 'skip';
+    E.normProfile(rec.student); // 舊資料的「2」「6年1班」統一成「02」「601」
     const id = sid(rec.student);
     const cur = T.students[id];
     if (cur && String(cur.submittedAt) > String(rec.submittedAt)) return 'older';
@@ -363,8 +367,9 @@ function json_(obj) {
     return cur ? 'updated' : 'added';
   }
 
+  // 依班級篩選後排序；T.cls 為空字串代表全部班級
   function sortedIds() {
-    return Object.keys(T.students).sort((a, b) => {
+    return Object.keys(T.students).filter(id => !T.cls || T.students[id].student.cls === T.cls).sort((a, b) => {
       const A = T.students[a].student, B = T.students[b].student;
       return String(A.cls).localeCompare(String(B.cls)) || (Number(A.seat) || 0) - (Number(B.seat) || 0);
     });
@@ -385,9 +390,99 @@ function json_(obj) {
   }
   $('#tabs').addEventListener('click', ev => { const t = ev.target.closest('.tab'); if (t) showTab(t.dataset.tab); });
 
+  // ---------- 班級篩選 ----------
+  function renderClassFilter() {
+    const count = {};
+    Object.values(T.students).forEach(r => { count[r.student.cls] = (count[r.student.cls] || 0) + 1; });
+    const list = Object.keys(count).sort((a, b) => a.localeCompare(b));
+    if (T.cls && !count[T.cls]) T.cls = '';
+    $('#clsFilter').innerHTML = `<option value="">全部班級（${Object.keys(T.students).length} 人）</option>` +
+      list.map(c => `<option value="${E.esc(c)}">${E.esc(c)} 班（${count[c]} 人）</option>`).join('');
+    $('#clsFilter').value = T.cls;
+  }
+  $('#clsFilter').addEventListener('change', ev => { T.cls = ev.target.value; tsave(); renderOverview(); });
+  const clsLabel = () => T.cls ? `${T.cls}班` : '全部班級';
+
+  // ---------- 下載歷程檔（學生可在歷程紀錄本匯入還原） ----------
+  function studentFile(id) {
+    const rec = T.students[id];
+    const s = rec.student;
+    const d = rec.data || {};
+    // 與歷程紀錄本「匯出備份檔」相同的格式
+    const payload = {
+      app: 'ecoai', exportedAt: new Date().toISOString(),
+      profile: { cls: s.cls, seat: s.seat, name: s.name, topic: s.topic || '' },
+      entries: d.entries || [], plans: d.plans || {}, reflection: d.reflection || {}, pledge: d.pledge || {},
+      lastSubmit: rec.submittedAt || ''
+    };
+    const day = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const safe = v => String(v).replace(/[\\/:*?"<>|]/g, '_');
+    return { name: `${safe(s.cls)}-${safe(s.seat)}-${safe(s.name)}-AI創作歷程-${day}.json`, text: JSON.stringify(payload, null, 2) };
+  }
+
+  // 不壓縮（stored）的 ZIP，檔名用 UTF-8
+  const CRC_TABLE = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(buf) {
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  function makeZip(files) {
+    const enc = new TextEncoder();
+    const d = new Date();
+    const time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+    const date = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+    const parts = [], central = [];
+    let offset = 0;
+    files.forEach(f => {
+      const name = enc.encode(f.name), data = enc.encode(f.text), crc = crc32(data);
+      const local = new DataView(new ArrayBuffer(30));
+      [[0, 0x04034b50, 4], [4, 20, 2], [6, 0x0800, 2], [8, 0, 2], [10, time, 2], [12, date, 2],
+        [14, crc, 4], [18, data.length, 4], [22, data.length, 4], [26, name.length, 2], [28, 0, 2]]
+        .forEach(([o, v, n]) => n === 4 ? local.setUint32(o, v, true) : local.setUint16(o, v, true));
+      const cen = new DataView(new ArrayBuffer(46));
+      [[0, 0x02014b50, 4], [4, 20, 2], [6, 20, 2], [8, 0x0800, 2], [10, 0, 2], [12, time, 2], [14, date, 2],
+        [16, crc, 4], [20, data.length, 4], [24, data.length, 4], [28, name.length, 2], [30, 0, 2], [32, 0, 2],
+        [34, 0, 2], [36, 0, 2], [38, 0, 4], [42, offset, 4]]
+        .forEach(([o, v, n]) => n === 4 ? cen.setUint32(o, v, true) : cen.setUint16(o, v, true));
+      parts.push(local, name, data);
+      central.push(cen, name);
+      offset += 30 + name.length + data.length;
+    });
+    const size = central.reduce((a, x) => a + x.byteLength, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    [[0, 0x06054b50, 4], [4, 0, 2], [6, 0, 2], [8, files.length, 2], [10, files.length, 2], [12, size, 4], [16, offset, 4], [20, 0, 2]]
+      .forEach(([o, v, n]) => n === 4 ? end.setUint32(o, v, true) : end.setUint16(o, v, true));
+    return new Blob([...parts, ...central, end], { type: 'application/zip' });
+  }
+  function saveBlob(name, blob) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  $('#exportZip').addEventListener('click', () => {
+    const ids = sortedIds();
+    if (!ids.length) { E.toast('沒有資料可以下載', 'warn'); return; }
+    saveBlob(`AI環保小創客-${clsLabel()}-歷程檔-${new Date().toISOString().slice(0, 10)}.zip`, makeZip(ids.map(studentFile)));
+    E.toast(`⬇️ 已下載 ${clsLabel()} ${ids.length} 位學生的歷程檔（ZIP）`, 'ok', 5000);
+  });
+  $('#exportOne').addEventListener('click', () => {
+    if (!T.students[currentId]) return;
+    const f = studentFile(currentId);
+    E.download(f.name, f.text, 'application/json');
+  });
+
   // ---------- 總覽 ----------
   const COLS = ['research', 'poster', 'lyrics', 'suno', 'webapp'];
   function renderOverview() {
+    renderClassFilter();
     const ids = sortedIds();
     if (!ids.length) {
       $('#classStats').innerHTML = '';
@@ -484,7 +579,7 @@ function json_(obj) {
         selfSum || '', sc.comment || ''];
     });
     const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
-    E.download(`AI環保小創客-成績-${new Date().toISOString().slice(0, 10)}.csv`, '﻿' + csv, 'text/csv');
+    E.download(`AI環保小創客-${clsLabel()}-成績-${new Date().toISOString().slice(0, 10)}.csv`, '﻿' + csv, 'text/csv');
   });
 
   $('#clearTeacher').addEventListener('click', () => {
