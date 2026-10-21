@@ -11,5 +11,5 @@
 window.ECO_CONFIG = {
   gasUrl: 'https://script.google.com/macros/s/AKfycbzzQlXMmnupA9Qxmew6RHusju3fIR3Vdl6CXV8wx7uTQEzTv8L9atjLVHMS8aq7QvM6Yg/exec',
   classKey: 'Csps1234',
-  classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610']
+  classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610', '611']
 };
