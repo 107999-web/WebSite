@@ -58,7 +58,7 @@
   function blank() {
     return {
       v: 1,
-      profile: { cls: '', seat: '', name: '', topic: '' },
+      profile: { cls: '', seat: '', name: '', topic: '', token: '' },
       pledge: { items: [], signedAt: '' },
       entries: [],
       plans: {},
@@ -96,6 +96,14 @@
     return p;
   }
 
+  // 個人代碼：第一次使用時自動產生，跟著備份檔走。雲端收件用它確認「同一個座號是同一個人送的」
+  function newToken() {
+    const abc = 'abcdefghjkmnpqrstuvwxyz23456789';
+    const buf = new Uint8Array(12);
+    try { crypto.getRandomValues(buf); } catch (e) { buf.forEach((_, i) => { buf[i] = Math.random() * 256; }); }
+    return Array.from(buf, b => abc[b % abc.length]).join('');
+  }
+
   function load() {
     try {
       const raw = localStorage.getItem(STORE_KEY);
@@ -114,6 +122,10 @@
 
   let state = load();
   let saveWarned = false;
+  if (!state.profile.token) {
+    state.profile.token = newToken();
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 存不進去時，匯出備份檔仍會帶著代碼 */ }
+  }
 
   function save() {
     try {
@@ -227,6 +239,10 @@
       throw new Error('這不是「AI 環保小創客」的歷程檔案');
     }
     let added = 0, updated = 0;
+    const inc = obj.profile || {};
+    // 同一位學生的備份檔：沿用檔案裡的個人代碼（電腦被還原後才不會變成「別人」）
+    const sameStudent = profileReady() && normCls(inc.cls) === state.profile.cls && normSeat(inc.seat) === state.profile.seat;
+    const adoptToken = inc.token && (!profileReady() || (sameStudent && !state.lastSubmit));
     obj.entries.forEach(e => {
       if (!e || !e.id) return;
       const cur = state.entries.find(x => x.id === e.id);
@@ -234,6 +250,8 @@
       else if (String(e.updatedAt) > String(cur.updatedAt)) { Object.assign(cur, e); updated++; }
     });
     if (!profileReady() && obj.profile) state.profile = normProfile(Object.assign(state.profile, obj.profile));
+    if (adoptToken) state.profile.token = inc.token;
+    if (!state.profile.token) state.profile.token = newToken();
     Object.keys(obj.plans || {}).forEach(w => {
       const cur = state.plans[w];
       const inc = obj.plans[w];
@@ -261,6 +279,7 @@
 
   function clearAll() {
     state = blank();
+    state.profile.token = newToken();
     save();
     renderProfileChip();
   }
@@ -307,7 +326,11 @@
       await fetch(c.gasUrl, { method: 'POST', mode: 'no-cors', body });
       result = { ok: true, unverified: true };
     }
-    if (!result.ok) throw new Error(result.error || '送出失敗');
+    if (!result.ok) {
+      const err = new Error(result.error || '送出失敗');
+      err.held = !!result.held; // 班級座號和原本的資料對不上，先交給老師確認
+      throw err;
+    }
     state.lastSubmit = payload.submittedAt;
     save();
     return result;

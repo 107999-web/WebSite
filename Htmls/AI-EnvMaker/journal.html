@@ -367,7 +367,7 @@
       const r = await E.submitToCloud();
       E.toast(r.unverified ? '📤 已送出（網路限制無法確認，請請老師檢查是否收到）' : `✅ 送出成功！老師收到了 ${r.count ?? st.count} 筆紀錄`, 'ok', 5000);
     } catch (err) {
-      E.toast('❌ ' + err.message, 'warn', 6000);
+      E.toast((err.held ? '⚠️ ' : '❌ ') + err.message, 'warn', err.held ? 12000 : 6000);
     } finally {
       btn.textContent = '📤 送出我的歷程';
       renderBackup();

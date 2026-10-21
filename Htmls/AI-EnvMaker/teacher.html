@@ -28,6 +28,12 @@
     .plan-box { background: var(--surface-2); border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: .92rem; }
     .plan-box dt { font-weight: 700; color: var(--muted); font-size: .82rem; margin-top: 6px; }
     .plan-box dd { margin: 0; white-space: pre-wrap; }
+    .pending-box { margin-bottom: 16px; }
+    .pending-box .btn-row { flex-wrap: nowrap; }
+    .pending-box td { white-space: nowrap; }
+    .pending-box td.why { white-space: normal; min-width: 11em; }
+    .hist-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+    .hist-list li { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
     @media (max-width: 700px) { .score-row .lv { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
@@ -59,6 +65,7 @@
       <button class="btn ghost sm" id="exportCsv">⬇️ 匯出成績 CSV</button>
       <button class="btn danger sm" id="clearTeacher">清除檢視器資料</button>
     </div>
+    <div id="pendingBox"></div>
     <div class="stat-tiles" id="classStats"></div>
     <div id="stratUsage" style="margin:14px 0"></div>
     <div id="overviewTable"></div>
@@ -71,9 +78,11 @@
       <select id="stuSelect" style="max-width:320px"></select>
       <button class="btn ghost sm" id="nextStu">▶</button>
       <span style="flex:1"></span>
+      <button class="btn ghost sm" id="historyBtn" title="列出這位學生每一次送到雲端的版本，資料被改壞時可以找回舊版">🕘 雲端送出紀錄</button>
       <button class="btn ghost sm" id="exportOne" title="下載這位學生的備份檔，讓他在歷程紀錄本匯入還原">⬇️ 下載歷程檔</button>
       <button class="btn ghost sm" onclick="window.print()">🖨️ 列印</button>
     </div>
+    <div id="history" class="card hidden" style="margin-bottom:16px"></div>
     <div id="detail"></div>
   </section>
 
@@ -90,7 +99,7 @@
           <li><b class="h">建立試算表</b>用你的學校帳號建立一個新的 Google 試算表，例如命名為「AI 環保小創客收件匣」。</li>
           <li><b class="h">貼上程式碼</b>在試算表選單點「擴充功能 → Apps Script」，刪除原本的內容，貼上右邊的程式碼。</li>
           <li><b class="h">修改密碼</b>把 <code>CLASS_KEY</code>（班級密語）和 <code>TEACHER_KEY</code>（教師密碼）改成你自己的字串，然後按儲存 💾。</li>
-          <li><b class="h">部署</b>點右上角「部署 → 新增部署作業」→ 齒輪選「網頁應用程式」→ 執行身分選「<b>我</b>」、誰可以存取選「<b>任何人</b>」→ 部署，並依畫面授權。</li>
+          <li><b class="h">部署</b>點右上角「部署 → 新增部署作業」→ 齒輪選「網頁應用程式」→ 執行身分選「<b>我</b>」、誰可以存取選「<b>任何人</b>」→ 部署，並依畫面授權。<br><span class="small muted">之後更新程式碼時，改用「部署 → 管理部署作業 → 編輯（鉛筆）→ 版本選新版本 → 部署」，網址不會改變。</span></li>
           <li><b class="h">填入下方設定</b>複製部署完成的「網頁應用程式網址」（結尾是 <code>/exec</code>），貼到下面，按「測試連線」。</li>
           <li><b class="h">發給學生</b>產生「學生專用連結」，貼到 Classroom。學生用這個連結打開一次，之後就能直接送出。</li>
         </ol>
@@ -156,7 +165,8 @@
         <h3>💾 資料保存提醒</h3>
         <ul class="small" style="padding-left:18px">
           <li>學生資料存在<strong>各自電腦的瀏覽器</strong>。如果電腦教室有還原卡，請在每節課結束前請學生<strong>送出或匯出備份</strong>。</li>
-          <li>下一節課換了電腦，學生可以在「備份與送出」匯入上次的備份檔，繼續做下去。</li>
+          <li>下一節課換了電腦，學生要先匯入上次的備份檔再繼續。備份檔裡有學生的「個人代碼」，雲端收件靠它確認是同一個人；沒匯入就送出，會被放進「待確認」。</li>
+          <li><b>防冒名</b>：同一個班級座號送來的代碼或姓名和原本的不一樣時，不會覆蓋原本的資料，而是列在「全班總覽」的待確認區，由老師決定要不要採用。</li>
           <li>檢視器裡的評分也只存在這台電腦，請定期「匯出成績 CSV」。</li>
           <li>課程結束後，請學生在共用電腦上「清除所有資料」。</li>
         </ul>
@@ -175,6 +185,15 @@
  * 3. 部署 → 新增部署作業 → 類型選「網頁應用程式」
  *    執行身分：我；誰可以存取：任何人
  * 4. 複製部署網址（…/exec），貼到教師檢視器
+ *
+ * 更新程式碼後：部署 → 管理部署作業 → 編輯（鉛筆）→ 版本選「新版本」→ 部署，網址不會改變。
+ *
+ * 防止冒名覆蓋：
+ * - 學生第一次送出時，會把他電腦上的「個人代碼」記在「身分綁定」工作表。
+ *   之後同一個班級座號只接受同一組代碼；代碼不同，或姓名和原本的不一樣，就不覆蓋，改放到「待確認」。
+ * - 老師在教師檢視器的「待確認」區決定要不要採用。學生真的換了新電腦又沒有備份檔時，
+ *   也可以直接刪掉「身分綁定」裡他的那一列，讓他重新綁定。
+ * - 每一次送出（不論是否採用）都會另存一份在「送出紀錄」，被改壞時可以從這裡找回舊版本。
  */
 
 // 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
@@ -186,6 +205,9 @@ const TEACHER_KEY = 'change-this-teacher-password';
 const SHEET_STUDENTS = '學生總表';
 const SHEET_PROMPTS = '提示詞明細';
 const SHEET_PLANS = '後製構想';
+const SHEET_BIND = '身分綁定';
+const SHEET_HOLD = '待確認';
+const SHEET_LOG = '送出紀錄';
 const CHUNK = 45000; // 單一儲存格上限約 5 萬字，JSON 分段存放
 
 const TASK_NAMES = { research: '議題探究', poster: '環保海報', lyrics: '歌詞與曲風', suno: 'Suno 音樂', webapp: '網頁小程式', other: '其他' };
@@ -196,12 +218,19 @@ const HEADERS = {};
 HEADERS[SHEET_STUDENTS] = ['學生代號', '班級', '座號', '姓名', '議題', '最後送出', '紀錄筆數', '使用技巧次數', '資料(JSON)'];
 HEADERS[SHEET_PROMPTS] = ['學生代號', '班級', '座號', '姓名', '任務', '平台', '版本', '提示詞', 'AI回應摘要', '星等', '好的地方', '下一版要改', '使用技巧', '建立時間'];
 HEADERS[SHEET_PLANS] = ['學生代號', '班級', '座號', '姓名', '作品', 'AI素材', '我加入的元素', '主標語', 'AI貢獻%', '我的貢獻', '作品連結', '後製反思', '更新時間'];
+HEADERS[SHEET_BIND] = ['學生代號', '姓名', '個人代碼', '綁定時間'];
+HEADERS[SHEET_HOLD] = ['編號', '送出時間', '學生代號', '班級', '座號', '送來的姓名', '原本的姓名', '原因', '資料(JSON)'];
+HEADERS[SHEET_LOG] = ['送出時間', '學生代號', '班級', '座號', '姓名', '紀錄筆數', '結果', '資料(JSON)'];
+
+const HELD_MSG = '這個班級和座號已經有同學的資料了，為了保護大家的資料，這次送出先交給老師確認。' +
+  '請檢查班級、座號有沒有選錯；如果沒有選錯（例如換了電腦又沒有匯入備份檔），請告訴老師。';
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
     const body = JSON.parse(e.postData.contents);
+    if (body.action === 'resolve') return json_(resolve_(body));
     if (body.action !== 'submit') return json_({ ok: false, error: '未知的動作' });
     if (CLASS_KEY && body.key !== CLASS_KEY) return json_({ ok: false, error: '班級密語不正確，請向老師確認學生專用連結' });
 
@@ -212,40 +241,34 @@ function doPost(e) {
     if (!cls || !seat || !name) return json_({ ok: false, error: '缺少班級、座號或姓名' });
 
     const id = cls + '-' + seat;
+    const token = String(s.token || '').trim();
     const data = body.data || {};
     const entries = Array.isArray(data.entries) ? data.entries : [];
-    const plans = data.plans || {};
     const submittedAt = body.submittedAt || new Date().toISOString();
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-    // 1. 學生總表（每位學生一列，保留完整 JSON 供教師檢視器讀取）
-    const stratCount = entries.reduce(function (n, x) { return n + ((x.strategies || []).length); }, 0);
     const record = JSON.stringify({ student: s, data: data, submittedAt: submittedAt });
-    const chunks = [];
-    for (let i = 0; i < record.length; i += CHUNK) chunks.push(record.slice(i, i + CHUNK));
-    const row = [id, cls, seat, name, s.topic || '', new Date(submittedAt), entries.length, stratCount].concat(chunks);
-    upsertRow_(ss, SHEET_STUDENTS, id, row);
 
-    // 2. 提示詞明細（先刪除這位學生的舊資料，再寫入最新的）
-    const promptRows = entries.slice().sort(function (a, b) {
-      return String(a.task).localeCompare(String(b.task)) || (Number(a.version) || 0) - (Number(b.version) || 0);
-    }).map(function (x) {
-      return [id, cls, seat, name, TASK_NAMES[x.task] || x.task, x.platform || '', Number(x.version) || '',
-        x.prompt || '', x.response || '', Number(x.rating) || '', x.good || '', x.improve || '',
-        (x.strategies || []).map(function (k) { return STRATEGY_NAMES[k] || k; }).join('、'),
-        x.createdAt ? new Date(x.createdAt) : ''];
-    });
-    replaceRows_(ss, SHEET_PROMPTS, id, promptRows);
+    // 檢查是不是同一個人：已綁定就比對個人代碼，還沒綁定（舊資料）就比對姓名
+    const bind = findRow_(ss, SHEET_BIND, id);
+    const prev = findRow_(ss, SHEET_STUDENTS, id);
+    const prevName = prev ? String(prev[3]) : (bind ? String(bind[1]) : '');
+    let reason = '';
+    if (bind && bind[2]) {
+      if (token !== String(bind[2])) reason = token ? '個人代碼不同（可能是別台電腦或別人送出的）' : '沒有個人代碼（可能是舊版網頁）';
+    } else if (prevName && !sameName_(prevName, name)) {
+      reason = '姓名和原本的資料不同';
+    }
 
-    // 3. 後製構想
-    const planRows = Object.keys(WORK_NAMES).filter(function (w) { return plans[w]; }).map(function (w) {
-      const p = plans[w];
-      return [id, cls, seat, name, WORK_NAMES[w], p.aiAssets || '',
-        (p.myElements || []).concat(p.otherElements ? [p.otherElements] : []).join('、'),
-        p.mainText || '', p.aiPercent != null ? p.aiPercent : '', p.myPart || '', p.link || '', p.reflect || '',
-        p.updatedAt ? new Date(p.updatedAt) : ''];
-    });
-    replaceRows_(ss, SHEET_PLANS, id, planRows);
+    if (reason) {
+      const holdId = 'H' + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+      appendRow_(ss, SHEET_HOLD, [holdId, new Date(submittedAt), id, cls, seat, name, prevName, reason].concat(chunks_(record)));
+      appendRow_(ss, SHEET_LOG, [new Date(submittedAt), id, cls, seat, name, entries.length, '⚠️ 待確認：' + reason].concat(chunks_(record)));
+      return json_({ ok: false, held: true, error: HELD_MSG });
+    }
+
+    saveStudent_(ss, id, cls, seat, name, s, data, submittedAt, record);
+    if (token) upsertRow_(ss, SHEET_BIND, id, [id, name, token, bind ? bind[3] : new Date()]);
+    appendRow_(ss, SHEET_LOG, [new Date(submittedAt), id, cls, seat, name, entries.length, '✅ 已採用'].concat(chunks_(record)));
 
     return json_({ ok: true, id: id, count: entries.length, at: submittedAt });
   } catch (err) {
@@ -253,6 +276,66 @@ function doPost(e) {
   } finally {
     try { lock.releaseLock(); } catch (e2) { /* 沒有取得鎖時忽略 */ }
   }
+}
+
+// 老師處理「待確認」：accept 為 true 就採用並改綁這筆的個人代碼，false 就不採用；兩者都會從待確認移除
+function resolve_(body) {
+  if (body.key !== TEACHER_KEY) return { ok: false, error: '教師密碼不正確' };
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = sheet_(ss, SHEET_HOLD);
+  const last = sh.getLastRow();
+  if (last < 2) return { ok: false, error: '找不到這筆待確認資料（可能已經處理過了）' };
+  const ids = sh.getRange(2, 1, last - 1, 1).getValues();
+  let rowNo = 0;
+  for (let i = 0; i < ids.length; i++) if (String(ids[i][0]) === String(body.holdId)) { rowNo = i + 2; break; }
+  if (!rowNo) return { ok: false, error: '找不到這筆待確認資料（可能已經處理過了）' };
+
+  const r = sh.getRange(rowNo, 1, 1, sh.getLastColumn()).getValues()[0];
+  const id = String(r[2]);
+  if (body.accept) {
+    const rec = JSON.parse(r.slice(HEADERS[SHEET_HOLD].length - 1).join(''));
+    const s = rec.student || {};
+    const cls = String(r[3]), seat = String(r[4]), name = String(r[5]);
+    const token = String(s.token || '').trim();
+    saveStudent_(ss, id, cls, seat, name, s, rec.data || {}, rec.submittedAt, JSON.stringify(rec));
+    if (token) upsertRow_(ss, SHEET_BIND, id, [id, name, token, new Date()]);
+    else deleteRows_(ss, SHEET_BIND, id);
+    appendRow_(ss, SHEET_LOG, [new Date(), id, cls, seat, name, ((rec.data || {}).entries || []).length, '✅ 老師確認採用']);
+  }
+  sh.deleteRow(rowNo);
+  return { ok: true, id: id };
+}
+
+// 寫入學生總表、提示詞明細、後製構想（覆蓋這位學生原本的資料）
+function saveStudent_(ss, id, cls, seat, name, s, data, submittedAt, record) {
+  const entries = Array.isArray(data.entries) ? data.entries : [];
+  const plans = data.plans || {};
+
+  // 1. 學生總表（每位學生一列，保留完整 JSON 供教師檢視器讀取）
+  const stratCount = entries.reduce(function (n, x) { return n + ((x.strategies || []).length); }, 0);
+  const row = [id, cls, seat, name, s.topic || '', new Date(submittedAt), entries.length, stratCount].concat(chunks_(record));
+  upsertRow_(ss, SHEET_STUDENTS, id, row);
+
+  // 2. 提示詞明細（先刪除這位學生的舊資料，再寫入最新的）
+  const promptRows = entries.slice().sort(function (a, b) {
+    return String(a.task).localeCompare(String(b.task)) || (Number(a.version) || 0) - (Number(b.version) || 0);
+  }).map(function (x) {
+    return [id, cls, seat, name, TASK_NAMES[x.task] || x.task, x.platform || '', Number(x.version) || '',
+      x.prompt || '', x.response || '', Number(x.rating) || '', x.good || '', x.improve || '',
+      (x.strategies || []).map(function (k) { return STRATEGY_NAMES[k] || k; }).join('、'),
+      x.createdAt ? new Date(x.createdAt) : ''];
+  });
+  replaceRows_(ss, SHEET_PROMPTS, id, promptRows);
+
+  // 3. 後製構想
+  const planRows = Object.keys(WORK_NAMES).filter(function (w) { return plans[w]; }).map(function (w) {
+    const p = plans[w];
+    return [id, cls, seat, name, WORK_NAMES[w], p.aiAssets || '',
+      (p.myElements || []).concat(p.otherElements ? [p.otherElements] : []).join('、'),
+      p.mainText || '', p.aiPercent != null ? p.aiPercent : '', p.myPart || '', p.link || '', p.reflect || '',
+      p.updatedAt ? new Date(p.updatedAt) : ''];
+  });
+  replaceRows_(ss, SHEET_PLANS, id, planRows);
 }
 
 function doGet(e) {
@@ -268,12 +351,69 @@ function doGet(e) {
       if (!raw) return;
       try { students.push(JSON.parse(raw)); } catch (err) { /* 略過損壞的資料 */ }
     });
-    return json_({ ok: true, students: students, at: new Date().toISOString() });
+    const held = [];
+    jsonRows_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_HOLD).forEach(function (x) {
+      held.push({ holdId: String(x.row[0]), id: String(x.row[2]), prevName: String(x.row[6]), reason: String(x.row[7]), record: x.json });
+    });
+    return json_({ ok: true, students: students, held: held, at: new Date().toISOString() });
+  }
+  if (p.action === 'history') {
+    if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
+    const list = [];
+    jsonRows_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_LOG).forEach(function (x) {
+      if (String(x.row[1]) === String(p.id)) list.push({ result: String(x.row[6]), record: x.json });
+    });
+    return json_({ ok: true, history: list });
   }
   return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中' });
 }
 
 // ---------- 工具函式 ----------
+function chunks_(text) {
+  const out = [];
+  for (let i = 0; i < text.length; i += CHUNK) out.push(text.slice(i, i + CHUNK));
+  return out;
+}
+
+function sameName_(a, b) {
+  return String(a).replace(/\s/g, '') === String(b).replace(/\s/g, '');
+}
+
+// 找出第一欄等於 id 的那一列，回傳整列的值；找不到回傳 null
+function findRow_(ss, name, id) {
+  const sh = sheet_(ss, name);
+  const last = sh.getLastRow();
+  if (last < 2) return null;
+  const ids = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]) === id) return sh.getRange(i + 2, 1, 1, HEADERS[name].length).getValues()[0];
+  }
+  return null;
+}
+
+function appendRow_(ss, name, row) {
+  sheet_(ss, name).appendRow(row);
+}
+
+function deleteRows_(ss, name, id) {
+  const sh = sheet_(ss, name);
+  for (let r = sh.getLastRow(); r >= 2; r--) {
+    if (String(sh.getRange(r, 1).getValue()) === id) sh.deleteRow(r);
+  }
+}
+
+// 讀出最後一欄起存放 JSON 的每一列：[{ row, json }]，略過損壞或沒有 JSON 的列
+function jsonRows_(ss, name) {
+  const values = sheet_(ss, name).getDataRange().getValues().slice(1);
+  const jsonCol = HEADERS[name].length - 1;
+  const out = [];
+  values.forEach(function (r) {
+    const raw = r.slice(jsonCol).join('');
+    if (!raw) return;
+    try { out.push({ row: r, json: JSON.parse(raw) }); } catch (err) { /* 略過損壞的資料 */ }
+  });
+  return out;
+}
 function sheet_(ss, name) {
   let sh = ss.getSheetByName(name);
   if (!sh) {
@@ -330,8 +470,8 @@ function json_(obj) {
 
   // ---------- 教師端資料 ----------
   function tload() {
-    try { return Object.assign({ students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '', cls: '' }, JSON.parse(localStorage.getItem(TKEY) || '{}')); }
-    catch (e) { return { students: {}, scores: {}, gasUrl: '', classKey: '', teacherKey: '', cls: '' }; }
+    try { return Object.assign({ students: {}, scores: {}, pending: [], gasUrl: '', classKey: '', teacherKey: '', cls: '' }, JSON.parse(localStorage.getItem(TKEY) || '{}')); }
+    catch (e) { return { students: {}, scores: {}, pending: [], gasUrl: '', classKey: '', teacherKey: '', cls: '' }; }
   }
   let T = tload();
   function tsave() {
@@ -357,11 +497,29 @@ function json_(obj) {
     }
     return null;
   }
+  const sameName = (a, b) => String(a || '').replace(/\s/g, '') === String(b || '').replace(/\s/g, '');
+  // 同一個班級座號，卻是不同的個人代碼或不同的姓名：可能是冒名，不覆蓋，先放進「待確認」
+  function conflictReason(cur, rec) {
+    const a = cur.student.token, b = rec.student.token;
+    if (a && b) return a === b ? '' : '個人代碼不同（可能是別台電腦或別人送出的）';
+    return sameName(cur.student.name, rec.student.name) ? '' : '姓名和原本的資料不同';
+  }
+  function addPending(item) {
+    const key = item.holdId || [item.id, item.rec.student.token || '', item.rec.student.name, item.rec.submittedAt].join('|');
+    if (T.pending.some(x => x.key === key)) return;
+    T.pending.push(Object.assign({ key }, item));
+  }
   function addRecord(rec, source) {
     if (!rec || !rec.student || !rec.student.cls || !rec.student.seat) return 'skip';
     E.normProfile(rec.student); // 舊資料的「2」「6年1班」統一成「02」「601」
     const id = sid(rec.student);
     const cur = T.students[id];
+    // 雲端資料已經在試算表端檢查過；雲端對雲端（例如老師在別台電腦採用了新的代碼）直接更新
+    const reason = cur && !(source === 'cloud' && cur.source === 'cloud') && conflictReason(cur, rec);
+    if (reason) {
+      addPending({ id, rec: Object.assign(rec, { source }), prevName: cur.student.name, reason, source });
+      return 'conflict';
+    }
     if (cur && String(cur.submittedAt) > String(rec.submittedAt)) return 'older';
     T.students[id] = Object.assign(rec, { source });
     return cur ? 'updated' : 'added';
@@ -404,14 +562,14 @@ function json_(obj) {
   const clsLabel = () => T.cls ? `${T.cls}班` : '全部班級';
 
   // ---------- 下載歷程檔（學生可在歷程紀錄本匯入還原） ----------
-  function studentFile(id) {
-    const rec = T.students[id];
+  function studentFile(id, rec) {
+    rec = rec || T.students[id];
     const s = rec.student;
     const d = rec.data || {};
     // 與歷程紀錄本「匯出備份檔」相同的格式
     const payload = {
       app: 'ecoai', exportedAt: new Date().toISOString(),
-      profile: { cls: s.cls, seat: s.seat, name: s.name, topic: s.topic || '' },
+      profile: { cls: s.cls, seat: s.seat, name: s.name, topic: s.topic || '', token: s.token || '' },
       entries: d.entries || [], plans: d.plans || {}, reflection: d.reflection || {}, pledge: d.pledge || {},
       lastSubmit: rec.submittedAt || ''
     };
@@ -481,8 +639,57 @@ function json_(obj) {
 
   // ---------- 總覽 ----------
   const COLS = ['research', 'poster', 'lyrics', 'suno', 'webapp'];
+  function renderPendingBox() {
+    const box = $('#pendingBox');
+    if (!T.pending.length) { box.innerHTML = ''; return; }
+    box.innerHTML = `<div class="card pending-box">
+      <div class="callout warn small"><strong>⚠️ 有 ${T.pending.length} 筆資料待確認</strong>
+        這些資料的班級座號和原本的同學相同，但個人代碼或姓名對不上，可能是選錯座號，也可能是有人冒名。
+        原本的資料沒有被覆蓋。請和學生確認後再決定要不要採用。</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>班級座號</th><th>原本的姓名</th><th>送來的姓名</th><th>原因</th><th class="num">紀錄</th><th>送出時間</th><th>來源</th><th></th></tr></thead>
+        <tbody>${T.pending.map((p, i) => `<tr>
+          <td>${E.esc(p.rec.student.cls)} 班 ${E.esc(p.rec.student.seat)} 號</td>
+          <td>${E.esc(p.prevName || '—')}</td><td><b>${E.esc(p.rec.student.name)}</b></td>
+          <td class="small why">${E.esc(p.reason)}</td><td class="num">${((p.rec.data || {}).entries || []).length}</td>
+          <td class="small">${E.fmtTime(p.rec.submittedAt)}</td><td class="small">${p.source === 'cloud' ? '雲端' : '備份檔'}</td>
+          <td><div class="btn-row">
+            <button class="btn sm" data-accept="${i}" title="用這筆資料取代原本的資料">✅ 採用</button>
+            <button class="btn ghost sm" data-reject="${i}" title="不採用，原本的資料維持不變">🗑️ 不採用</button>
+          </div></td></tr>`).join('')}</tbody>
+      </table></div></div>`;
+  }
+  $('#pendingBox').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-accept],[data-reject]');
+    if (!b) return;
+    const accept = 'accept' in b.dataset;
+    const p = T.pending[Number(accept ? b.dataset.accept : b.dataset.reject)];
+    if (!p) return;
+    const who = `${p.rec.student.cls} 班 ${p.rec.student.seat} 號`;
+    if (accept && !confirm(`確定要用「${p.rec.student.name}」送來的資料，取代 ${who}「${p.prevName || '原本'}」的資料嗎？` +
+      (p.holdId ? '\n雲端試算表也會一起更新，之後只接受這筆資料的個人代碼。' : ''))) return;
+    if (p.holdId) {
+      if (!T.gasUrl || !T.teacherKey) { E.toast('請先到「雲端收件設定」填寫網址和教師密碼', 'warn'); showTab('cloud'); return; }
+      b.disabled = true;
+      try {
+        const j = await (await fetch(T.gasUrl, { method: 'POST', body: JSON.stringify({ action: 'resolve', key: T.teacherKey, holdId: p.holdId, accept }) })).json();
+        if (!j.ok) throw new Error(j.error || '處理失敗');
+      } catch (err) {
+        b.disabled = false;
+        E.toast('❌ ' + (err.message === 'Failed to fetch' ? '無法連線，請檢查網址與部署權限' : err.message), 'warn', 6000);
+        return;
+      }
+    }
+    if (accept) T.students[p.id] = p.rec;
+    T.pending = T.pending.filter(x => x !== p);
+    tsave();
+    renderOverview();
+    E.toast(accept ? `✅ 已採用 ${who} ${p.rec.student.name} 的資料` : `🗑️ 已略過，${who} 維持原本的資料`, 'ok');
+  });
+
   function renderOverview() {
     renderClassFilter();
+    renderPendingBox();
     const ids = sortedIds();
     if (!ids.length) {
       $('#classStats').innerHTML = '';
@@ -528,7 +735,7 @@ function json_(obj) {
   $('#importFiles').addEventListener('change', async ev => {
     const files = [...ev.target.files];
     ev.target.value = '';
-    const count = { added: 0, updated: 0, older: 0, skip: 0 };
+    const count = { added: 0, updated: 0, older: 0, conflict: 0, skip: 0 };
     const errors = [];
     for (const f of files) {
       try { count[addRecord(normalize(await E.readJsonFile(f)), 'file')]++; }
@@ -537,7 +744,8 @@ function json_(obj) {
     tsave();
     renderOverview();
     E.toast(`匯入完成：新增 ${count.added}、更新 ${count.updated}` +
-      (count.older ? `、較舊略過 ${count.older}` : '') + (count.skip || errors.length ? `、無法辨識 ${count.skip + errors.length}` : ''), 'ok', 5000);
+      (count.older ? `、較舊略過 ${count.older}` : '') + (count.conflict ? `、⚠️ 待確認 ${count.conflict}` : '') +
+      (count.skip || errors.length ? `、無法辨識 ${count.skip + errors.length}` : ''), count.conflict ? 'warn' : 'ok', 6000);
   });
 
   $('#loadCloud').addEventListener('click', async () => {
@@ -551,9 +759,18 @@ function json_(obj) {
       if (!j.ok) throw new Error(j.error || '載入失敗');
       let n = 0;
       j.students.forEach(s => { if (addRecord(normalize(s), 'cloud') !== 'skip') n++; });
+      // 雲端的待確認清單以試算表為準：已經在別台電腦處理掉的就移除
+      const held = j.held || [];
+      T.pending = T.pending.filter(p => !p.holdId || held.some(h => h.holdId === p.holdId));
+      held.forEach(h => {
+        const rec = normalize(h.record);
+        if (!rec || !rec.student) return;
+        E.normProfile(rec.student);
+        addPending({ holdId: h.holdId, id: h.id, rec: Object.assign(rec, { source: 'cloud' }), prevName: h.prevName, reason: h.reason, source: 'cloud' });
+      });
       tsave();
       renderOverview();
-      E.toast(`☁️ 已載入 ${n} 位學生的資料`, 'ok');
+      E.toast(`☁️ 已載入 ${n} 位學生的資料` + (T.pending.length ? `，⚠️ 有 ${T.pending.length} 筆待確認` : ''), T.pending.length ? 'warn' : 'ok', 5000);
     } catch (err) {
       E.toast('❌ ' + (err.message === 'Failed to fetch' ? '無法連線，請檢查網址與部署權限' : err.message), 'warn', 6000);
     } finally {
@@ -586,12 +803,14 @@ function json_(obj) {
     if (!confirm('確定要清除檢視器裡的學生資料和評分嗎？（雲端試算表的資料不受影響）')) return;
     T.students = {};
     T.scores = {};
+    T.pending = [];
     tsave();
     renderOverview();
   });
 
   // ---------- 個別檢視 ----------
   function renderDetail() {
+    if (histId && histId !== currentId) hideHistory();
     const ids = sortedIds();
     const sel = $('#stuSelect');
     sel.innerHTML = ids.map(id => {
@@ -679,6 +898,55 @@ function json_(obj) {
     if (ev.target.id === 'scComment') { clearTimeout(cmTimer); cmTimer = setTimeout(saveScore, 500); }
   });
   $('#stuSelect').addEventListener('change', ev => { currentId = ev.target.value; renderDetail(); });
+
+  // ---------- 雲端送出紀錄（每次送出都有一份，可以找回舊版本） ----------
+  let histList = [], histId = '';
+  function hideHistory() { $('#history').classList.add('hidden'); histList = []; histId = ''; }
+  $('#historyBtn').addEventListener('click', async () => {
+    if (!T.students[currentId]) return;
+    if (!T.gasUrl || !T.teacherKey) { E.toast('請先到「雲端收件設定」填寫網址和教師密碼', 'warn'); showTab('cloud'); return; }
+    const box = $('#history');
+    histId = currentId;
+    box.classList.remove('hidden');
+    box.innerHTML = '<p class="small muted">⏳ 載入中…</p>';
+    try {
+      const j = await (await fetch(`${T.gasUrl}?action=history&id=${encodeURIComponent(currentId)}&key=${encodeURIComponent(T.teacherKey)}`)).json();
+      if (!j.ok) throw new Error(j.error || '載入失敗');
+      histList = (j.history || []).map(h => ({ result: h.result, rec: normalize(h.record) })).filter(h => h.rec).reverse();
+    } catch (err) {
+      box.innerHTML = `<p class="small">❌ ${E.esc(err.message === 'Failed to fetch' ? '無法連線。如果剛更新程式碼，請確認 Apps Script 已經重新部署新版本。' : err.message)}</p>`;
+      return;
+    }
+    const s = T.students[currentId].student;
+    box.innerHTML = `<div class="detail-head" style="margin-bottom:8px"><h3 style="margin:0">🕘 ${E.esc(s.cls)} 班 ${E.esc(s.seat)} 號的雲端送出紀錄</h3>
+        <span style="flex:1"></span><button class="btn ghost sm" data-hclose>關閉</button></div>
+      ${histList.length ? `<ul class="hist-list">${histList.map((h, i) => `<li>
+        <span class="small">${E.fmtTime(h.rec.submittedAt)}</span><b>${E.esc(h.rec.student.name)}</b>
+        <span class="small muted">${((h.rec.data || {}).entries || []).length} 筆紀錄</span>
+        <span class="small">${E.esc(h.result)}</span><span style="flex:1"></span>
+        <button class="btn ghost sm" data-hview="${i}" title="只改變這台電腦的檢視器，雲端資料不變">👀 改看這一版</button>
+        <button class="btn ghost sm" data-hdown="${i}" title="下載成歷程檔，讓學生匯入還原">⬇️ 下載</button></li>`).join('')}</ul>`
+        : '<p class="small muted">雲端還沒有這位學生的送出紀錄（更新程式碼之前的送出不會出現在這裡）。</p>'}`;
+  });
+  $('#history').addEventListener('click', ev => {
+    if (ev.target.closest('[data-hclose]')) { hideHistory(); return; }
+    const b = ev.target.closest('[data-hview],[data-hdown]');
+    const h = b && histList[Number('hview' in b.dataset ? b.dataset.hview : b.dataset.hdown)];
+    if (!h) return;
+    const rec = JSON.parse(JSON.stringify(h.rec));
+    E.normProfile(rec.student);
+    if ('hview' in b.dataset) {
+      if (!confirm('要在這個檢視器改看這一版嗎？（雲端試算表的資料不會改變）')) return;
+      T.students[currentId] = Object.assign(rec, { source: 'cloud' });
+      tsave();
+      hideHistory();
+      renderDetail();
+      E.toast('👀 已改看這一版', 'ok');
+    } else {
+      const f = studentFile(currentId, rec);
+      E.download(f.name, f.text, 'application/json');
+    }
+  });
   function step(n) {
     const ids = sortedIds();
     const i = ids.indexOf(currentId);
