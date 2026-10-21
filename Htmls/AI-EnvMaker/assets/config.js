@@ -9,7 +9,7 @@
  * 學生用那個連結打開一次，設定就會記在他的瀏覽器裡。
  */
 window.ECO_CONFIG = {
-  gasUrl: '',
-  classKey: '',
+  gasUrl: 'https://script.google.com/macros/s/AKfycbzzQlXMmnupA9Qxmew6RHusju3fIR3Vdl6CXV8wx7uTQEzTv8L9atjLVHMS8aq7QvM6Yg/exec',
+  classKey: 'Csps1234',
   classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610']
 };
