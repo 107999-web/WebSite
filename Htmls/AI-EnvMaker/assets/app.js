@@ -482,7 +482,68 @@
     }
   }
 
-  function openProfile(onSaved) {
+  // 還沒有個人資料時先問：第一次使用，還是匯入歷程檔（電腦有還原卡，每次上課都要匯入）
+  const FLASH_KEY = 'ecoai.flash';
+  function openWelcome(onSaved) {
+    let dlg = document.getElementById('welcomeDlg');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'welcomeDlg';
+      dlg.innerHTML = `<div class="dlg-body">
+          <h2>👋 歡迎來到 AI 環保小創客</h2>
+          <p class="muted small">這台電腦上還沒有你的資料，請選一個開始方式：</p>
+          <div class="welcome-choices">
+            <button type="button" class="welcome-choice" data-act="import">
+              <span class="ic">📂</span><b>匯入我的歷程檔</b>
+              <span class="small muted">以前用過、電腦重開機後資料不見了，選這個找回紀錄</span>
+            </button>
+            <button type="button" class="welcome-choice" data-act="new">
+              <span class="ic">🆕</span><b>第一次使用</b>
+              <span class="small muted">填寫班級、座號、姓名，開始新的紀錄</span>
+            </button>
+          </div>
+          <input type="file" id="welcomeFile" accept=".json,application/json" class="hidden">
+        </div>
+        <div class="dlg-foot"><button type="button" class="btn ghost" data-act="later">稍後再說</button></div>`;
+      document.body.appendChild(dlg);
+      dlg.querySelector('#welcomeFile').addEventListener('change', async ev => {
+        const f = ev.target.files[0];
+        ev.target.value = '';
+        if (!f) return;
+        try {
+          const r = importData(await readJsonFile(f));
+          dlg.close();
+          if (!profileReady()) {
+            toast(`✅ 已匯入 ${r.added} 筆紀錄，請補填你的資料`, 'ok', 4000);
+            openProfile(dlg._onSaved, true);
+            return;
+          }
+          // 重新載入頁面，讓目前頁面顯示匯入的紀錄
+          const p = state.profile;
+          try { sessionStorage.setItem(FLASH_KEY, `✅ 歡迎回來，${p.cls} 班 ${p.seat} 號 ${p.name}！已找回 ${r.added + r.updated} 筆紀錄`); } catch (e) { /* 略過 */ }
+          location.reload();
+        } catch (err) { toast('❌ ' + err.message, 'warn', 5000); }
+      });
+      dlg.addEventListener('click', ev => {
+        const b = ev.target.closest('[data-act]');
+        if (!b) return;
+        if (b.dataset.act === 'import') dlg.querySelector('#welcomeFile').click();
+        else if (b.dataset.act === 'new') { dlg.close(); openProfile(dlg._onSaved, true); }
+        else dlg.close();
+      });
+    }
+    dlg._onSaved = onSaved;
+    if (!dlg.open) dlg.showModal();
+  }
+  (function showFlash() {
+    let msg = '';
+    try { msg = sessionStorage.getItem(FLASH_KEY) || ''; sessionStorage.removeItem(FLASH_KEY); } catch (e) { /* 略過 */ }
+    if (msg) setTimeout(() => toast(msg, 'ok', 5000), 300);
+  })();
+
+  // skipWelcome：直接開啟資料表單，不先顯示歡迎選單
+  function openProfile(onSaved, skipWelcome) {
+    if (!skipWelcome && !profileReady()) { openWelcome(onSaved); return; }
     let dlg = document.getElementById('profileDlg');
     if (!dlg) {
       dlg = document.createElement('dialog');
