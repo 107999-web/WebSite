@@ -12,7 +12,7 @@
  * 學生用那個連結打開一次，設定就會記在他的瀏覽器裡。
  */
 window.ECO_CONFIG = {
-  gasUrl: 'https://script.google.com/macros/s/AKfycbywhXHIrANt-z6E1QnQ9NYb4b-gNA2WGL87KIvzqQx-Ltm_TK-Qrf3nJ3x6YWe_xBp2lA/exec',
+  gasUrl: 'https://107999-web.github.io/WebSite/Htmls/AI-EnvMaker/index.html?gas=https%3A%2F%2Fscript.google.com%2Fmacros%2Fs%2FAKfycby1kHag-jpEmAiZPSC0ZqtX7C6eFJvKsM_YO64s1uwr4WAV79Pv9pDwmri8Cix-IANQUA%2Fexec&key=Csps1234',
   classKey: 'Csps1234',
   classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610', '611'],
   uploadUrl: 'http://172.16.9.30:8100/'
