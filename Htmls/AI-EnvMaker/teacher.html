@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<!-- AI 環保小創客｜teacher.html｜版本 2026.10.22-3（2026-10-22 更新） -->
+<!-- AI 環保小創客｜teacher.html｜版本 2026.10.22-4（2026-10-22 更新） -->
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="eco-version" content="2026.10.22-3">
+  <meta name="eco-version" content="2026.10.22-4">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>教師檢視器｜AI 環保小創客</title>
-  <link rel="stylesheet" href="assets/style.css?v=2026.10.22-3">
+  <link rel="stylesheet" href="assets/style.css?v=2026.10.22-4">
   <style>
     .src-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
     .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
@@ -509,8 +509,8 @@ function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 </script>
-<script src="assets/config.js?v=2026.10.22-3"></script>
-<script src="assets/app.js?v=2026.10.22-3"></script>
+<script src="assets/config.js?v=2026.10.22-4"></script>
+<script src="assets/app.js?v=2026.10.22-4"></script>
 <script>
 (function () {
   const E = window.Eco;
@@ -711,7 +711,7 @@ function json_(obj) {
   $('#exportZip').addEventListener('click', () => {
     const ids = sortedIds();
     if (!ids.length) { E.toast('沒有資料可以下載', 'warn'); return; }
-    saveBlob(`AI環保小創客-${clsLabel()}-歷程檔-${new Date().toISOString().slice(0, 10)}.zip`, makeZip(ids.map(studentFile)));
+    saveBlob(`AI環保小創客-${clsLabel()}-歷程檔-${new Date().toISOString().slice(0, 10)}.zip`, makeZip(ids.map(id => studentFile(id))));
     E.toast(`⬇️ 已下載 ${clsLabel()} ${ids.length} 位學生的歷程檔（ZIP）`, 'ok', 5000);
   });
   $('#exportOne').addEventListener('click', () => {
