@@ -1,11 +1,13 @@
 <!DOCTYPE html>
+<!-- AI 環保小創客｜teacher.html｜版本 2026.10.22-2（2026-10-22 更新） -->
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="eco-version" content="2026.10.22-2">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>教師檢視器｜AI 環保小創客</title>
-  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/style.css?v=2026.10.22-2">
   <style>
     .src-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
     .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
@@ -44,6 +46,7 @@
   <div class="page-head">
     <h1>👩‍🏫 教師檢視器</h1>
     <p>收集全班的 AI 創作歷程，查看每位學生的提示詞迭代過程，並依評量規準評分。</p>
+    <p class="small" id="verInfo"></p>
   </div>
 
   <div class="tabs" id="tabs">
@@ -116,7 +119,7 @@
             <button class="btn" id="saveCfg">💾 儲存設定</button>
             <button class="btn ghost" id="testCfg">🔌 測試連線</button>
           </div>
-          <p class="small" id="cfgResult" style="margin-top:10px"></p>
+          <p class="small" id="cfgResult" style="margin-top:10px;white-space:pre-line"></p>
           <p class="small muted">教師密碼只存在這台電腦的瀏覽器，不會放進學生連結。</p>
           <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
           <h3>🔗 學生專用連結</h3>
@@ -177,7 +180,7 @@
 
 <script type="text/plain" id="gsSource">
 /**
- * AI 環保小創客｜雲端收件服務（Google Apps Script）
+ * AI 環保小創客｜雲端收件服務（Google Apps Script）｜版本 2026.10.22-1（2026-10-22 更新）
  *
  * 安裝方式（詳細步驟請看「教師檢視器 → 雲端收件設定」）：
  * 1. 建立一個新的 Google 試算表 → 擴充功能 → Apps Script
@@ -199,6 +202,9 @@
  * 效能：寫入時只動到這位學生自己的列（用「尋找」定位），不會重寫整張工作表；
  * 教師檢視器可以只載入一個班級（action=list&cls=601）。
  */
+
+// 版本號：教師檢視器「測試連線」會顯示，用來確認部署的是不是最新版
+const SCRIPT_VERSION = '2026.10.22-1';
 
 // 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
 const CLASS_KEY = 'eco601';
@@ -342,6 +348,11 @@ function saveStudent_(ss, id, cls, seat, name, s, data, submittedAt, record) {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
+  if (p.action === 'ping') { // 測試連線用：只檢查密碼和人數，不讀資料
+    if (p.key !== TEACHER_KEY) return json_({ ok: false, version: SCRIPT_VERSION, error: '教師密碼不正確' });
+    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_STUDENTS);
+    return json_({ ok: true, version: SCRIPT_VERSION, count: Math.max(sh.getLastRow() - 1, 0) });
+  }
   if (p.action === 'list') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -350,7 +361,7 @@ function doGet(e) {
       .map(function (x) { return x.json; });
     const held = readJsonRows_(sheet_(ss, SHEET_HOLD), function (r) { return !cls || String(r[3]) === cls; })
       .map(function (x) { return { holdId: String(x.row[0]), id: String(x.row[2]), prevName: String(x.row[6]), reason: String(x.row[7]), record: x.json }; });
-    return json_({ ok: true, cls: cls, students: students, held: held, at: new Date().toISOString() });
+    return json_({ ok: true, version: SCRIPT_VERSION, cls: cls, students: students, held: held, at: new Date().toISOString() });
   }
   if (p.action === 'history') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
@@ -359,7 +370,7 @@ function doGet(e) {
     const list = readJsonRows_(sh, null, rows).map(function (x) { return { result: String(x.row[6]), record: x.json }; });
     return json_({ ok: true, history: list });
   }
-  return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中' });
+  return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中', version: SCRIPT_VERSION });
 }
 
 // ---------- 工具函式 ----------
@@ -488,8 +499,8 @@ function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 </script>
-<script src="assets/config.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/config.js?v=2026.10.22-2"></script>
+<script src="assets/app.js?v=2026.10.22-2"></script>
 <script>
 (function () {
   const E = window.Eco;
@@ -498,6 +509,34 @@ function json_(obj) {
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const TKEY = 'ecoai.teacher';
+
+  // ---------- 雲端連線 ----------
+  // 讀取 Apps Script 的回應；回來的不是資料（例如 Google 的錯誤網頁）時，說明可能的原因
+  async function gasJson(url, opts) {
+    const res = await fetch(url, opts);
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch (e) {
+      throw new Error(`雲端回應的不是資料（HTTP ${res.status}）。請到 Apps Script「部署 → 管理部署作業」確認：執行身分是「我」、誰可以存取是「任何人」，而且網址和「雲端收件設定」裡的一樣。`);
+    }
+  }
+  // 最新的雲端程式版本：取自下方「Apps Script 程式碼」裡的 SCRIPT_VERSION（Code.gs 沒改時不必重新部署）
+  const LATEST_GS = (($('#gsSource').textContent.match(/SCRIPT_VERSION = '([^']+)'/) || [])[1]) || E.VERSION;
+  function setCloudVersion(v) {
+    T.cloudVersion = v || '舊版';
+    tsave();
+    renderVersion();
+  }
+  // 頁面上方顯示網頁與雲端程式的版本，方便確認哪一個還沒更新
+  function renderVersion() {
+    const pv = E.pageVersion(), cv = T.cloudVersion;
+    const parts = [`網頁 v${E.esc(pv || E.VERSION)}`];
+    if (pv && pv !== E.VERSION) parts.push(`<b style="color:#b42318">⚠️ 共用程式 app.js 是 v${E.esc(E.VERSION)}，有檔案沒更新</b>`);
+    if (!cv) parts.push('雲端程式：尚未連線');
+    else if (cv !== LATEST_GS) parts.push(`<b style="color:#b42318">⚠️ 雲端程式 ${cv === '舊版' ? '是舊版' : 'v' + E.esc(cv)}，請重新部署 Apps Script</b>`);
+    else parts.push(`雲端程式 v${E.esc(cv)} ✅`);
+    $('#verInfo').innerHTML = '🏷️ 版本：' + parts.join(' · ');
+  }
 
   // ---------- 教師端資料 ----------
   function tload() {
@@ -706,7 +745,7 @@ function json_(obj) {
       if (!T.gasUrl || !T.teacherKey) { E.toast('請先到「雲端收件設定」填寫網址和教師密碼', 'warn'); showTab('cloud'); return; }
       b.disabled = true;
       try {
-        const j = await (await fetch(T.gasUrl, { method: 'POST', body: JSON.stringify({ action: 'resolve', key: T.teacherKey, holdId: p.holdId, accept }) })).json();
+        const j = await gasJson(T.gasUrl, { method: 'POST', body: JSON.stringify({ action: 'resolve', key: T.teacherKey, holdId: p.holdId, accept }) });
         if (!j.ok) throw new Error(j.error || '處理失敗');
       } catch (err) {
         b.disabled = false;
@@ -790,8 +829,8 @@ function json_(obj) {
     try {
       // 選了班級就只載入那一班，資料多的時候比較快
       const cls = T.cls;
-      const res = await fetch(`${T.gasUrl}?action=list&key=${encodeURIComponent(T.teacherKey)}` + (cls ? `&cls=${encodeURIComponent(cls)}` : ''));
-      const j = await res.json();
+      const j = await gasJson(`${T.gasUrl}?action=list&key=${encodeURIComponent(T.teacherKey)}` + (cls ? `&cls=${encodeURIComponent(cls)}` : ''));
+      setCloudVersion(j.version);
       if (!j.ok) throw new Error(j.error || '載入失敗');
       const onlyCls = j.cls || ''; // 舊版 Apps Script 不認得 cls，會回傳全部班級
       let n = 0;
@@ -947,7 +986,7 @@ function json_(obj) {
     box.classList.remove('hidden');
     box.innerHTML = '<p class="small muted">⏳ 載入中…</p>';
     try {
-      const j = await (await fetch(`${T.gasUrl}?action=history&id=${encodeURIComponent(currentId)}&key=${encodeURIComponent(T.teacherKey)}`)).json();
+      const j = await gasJson(`${T.gasUrl}?action=history&id=${encodeURIComponent(currentId)}&key=${encodeURIComponent(T.teacherKey)}`);
       if (!j.ok) throw new Error(j.error || '載入失敗');
       histList = (j.history || []).map(h => ({ result: h.result, rec: normalize(h.record) })).filter(h => h.rec).reverse();
     } catch (err) {
@@ -1026,17 +1065,19 @@ function json_(obj) {
     if (!url) { out.textContent = '請先填寫網址'; return; }
     out.textContent = '⏳ 測試中…';
     try {
-      const j = await (await fetch(url)).json();
+      const j = await gasJson(url);
       if (!j.ok) throw new Error(j.error);
+      setCloudVersion(j.version);
       const key = $('#cfgTeacherKey').value;
-      let msg = `✅ 連線成功：${j.service || ''} ${j.message || ''}`;
-      if (key) {
-        const j2 = await (await fetch(`${url}?action=list&key=${encodeURIComponent(key)}`)).json();
-        msg += j2.ok ? `；教師密碼正確，目前收到 ${j2.students.length} 位學生的資料` : `；⚠️ ${j2.error}`;
+      let msg = `✅ 連線成功：${j.service || ''} ${j.message || ''}（雲端程式 ${j.version ? 'v' + j.version : '舊版，沒有版本號'}）`;
+      if (key && j.version) {
+        const j2 = await gasJson(`${url}?action=ping&key=${encodeURIComponent(key)}`);
+        msg += j2.ok ? `；教師密碼正確，目前收到 ${j2.count} 位學生的資料` : `；⚠️ ${j2.error}`;
       }
+      if (j.version !== LATEST_GS) msg += `\n⚠️ 雲端程式不是最新版（最新是 v${LATEST_GS}）。請把右邊最新的程式碼貼到 Apps Script，再到「部署 → 管理部署作業 → 編輯 → 版本：新版本」重新部署。`;
       out.textContent = msg;
     } catch (err) {
-      out.textContent = '❌ 連線失敗：請確認網址正確、部署時「誰可以存取」選了「任何人」，且修改程式後有重新部署新版本。';
+      out.textContent = '❌ 連線失敗：' + (err.message === 'Failed to fetch' ? '請確認網址正確、部署時「誰可以存取」選了「任何人」，且修改程式後有重新部署新版本。' : err.message);
     }
   });
   $('#copyLink').addEventListener('click', async () => {
@@ -1053,6 +1094,7 @@ function json_(obj) {
   $('#rubricTable').innerHTML = `<div class="table-wrap"><table><thead><tr><th>向度</th>${E.LEVEL_NAMES.map((n, i) => `<th>${i + 1} ${n}</th>`).join('')}</tr></thead>
     <tbody>${E.RUBRIC.map(r => `<tr><td><b>${r.name}</b><br><span class="muted">${r.desc}</span></td>${r.levels.map(l => `<td>${E.esc(l)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 
+  renderVersion();
   showTab('overview');
 })();
 </script>

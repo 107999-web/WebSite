@@ -1,6 +1,14 @@
-/* AI 環保小創客｜共用資料層與介面元件 */
+/* AI 環保小創客｜共用資料層與介面元件｜版本 2026.10.22-2（2026-10-22 更新） */
 (function () {
   'use strict';
+
+  // 版本號：每次修改都要和各 HTML 的 eco-version、Code.gs 的 SCRIPT_VERSION 一起更新
+  const VERSION = '2026.10.22-2';
+  // 頁面（HTML）的版本，和 app.js 不同代表只換了一部分檔案
+  function pageVersion() {
+    const m = document.querySelector('meta[name="eco-version"]');
+    return m ? m.content : '';
+  }
 
   const STORE_KEY = 'ecoai.v1';
   const CLOUD_KEY = 'ecoai.cloud';
@@ -483,19 +491,36 @@
     ['postplan.html', '✂️ 後製構想單']
   ];
 
+  // 「備份歷程給老師」的上傳網址（校內電腦）；config.js 的 uploadUrl 可以改掉或設成 '' 隱藏
+  const DEFAULT_UPLOAD_URL = 'http://172.16.9.30:8100/';
+  function uploadUrl() {
+    const c = window.ECO_CONFIG || {};
+    return String('uploadUrl' in c ? c.uploadUrl || '' : DEFAULT_UPLOAD_URL).trim();
+  }
+
   function renderNav(active) {
     const host = document.getElementById('topnav');
     if (!host) return;
     host.className = 'topnav';
     host.innerHTML = `<div class="nav-inner">
       <a class="brand" href="index.html"><span class="brand-mark">🌏</span><span>AI 環保小創客</span></a>
+      ${versionBadgeHTML()}
       <nav class="nav-links">${NAV.map(([href, label]) =>
-        `<a href="${href}" class="${href === active ? 'active' : ''}">${label}</a>`).join('')}</nav>
+        `<a href="${href}" class="${href === active ? 'active' : ''}">${label}</a>`).join('')}${uploadUrl()
+        ? `<a href="${esc(uploadUrl())}" class="nav-upload" target="_blank" rel="noopener" title="先在「歷程紀錄本 → 備份與送出」匯出備份檔，再到這裡上傳給老師">📤 備份歷程給老師</a>` : ''}</nav>
       ${host.dataset.noProfile ? '' : '<button class="profile-chip" id="profileChip" type="button"></button>'}
     </div>`;
     const chip = document.getElementById('profileChip');
     if (chip) chip.addEventListener('click', () => openProfile());
     renderProfileChip();
+  }
+
+  function versionBadgeHTML() {
+    const pv = pageVersion();
+    if (pv && pv !== VERSION) {
+      return `<span class="ver-badge bad" title="這一頁是 v${esc(pv)}，共用程式 app.js 是 v${VERSION}，請確認檔案都有更新">⚠️ 版本不一致</span>`;
+    }
+    return `<span class="ver-badge" title="網站版本">v${VERSION}</span>`;
   }
 
   function renderProfileChip() {
@@ -635,12 +660,13 @@
   function footer() {
     const f = document.createElement('footer');
     f.className = 'footer';
-    f.innerHTML = `AI 環保小創客 · 六年級 AI 創作課程 ·
+    f.innerHTML = `AI 環保小創客 v${VERSION} · 六年級 AI 創作課程 ·
       <a href="teacher.html">👩‍🏫 教師檢視器</a> · <a href="../../index.html">回網站首頁</a>`;
     document.body.appendChild(f);
   }
 
   window.Eco = {
+    VERSION, pageVersion,
     TASKS, PLATFORMS, STRATEGIES, WORKS, TOPICS, RUBRIC, LEVEL_NAMES,
     get state() { return state; },
     save, profileReady, setProfile, classList, normCls, normSeat, normProfile, nextVersion, addEntry, updateEntry, deleteEntry, isPending, sortEntries,

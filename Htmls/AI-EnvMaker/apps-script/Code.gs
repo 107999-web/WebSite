@@ -1,5 +1,5 @@
 /**
- * AI 環保小創客｜雲端收件服務（Google Apps Script）
+ * AI 環保小創客｜雲端收件服務（Google Apps Script）｜版本 2026.10.22-1（2026-10-22 更新）
  *
  * 安裝方式（詳細步驟請看「教師檢視器 → 雲端收件設定」）：
  * 1. 建立一個新的 Google 試算表 → 擴充功能 → Apps Script
@@ -21,6 +21,9 @@
  * 效能：寫入時只動到這位學生自己的列（用「尋找」定位），不會重寫整張工作表；
  * 教師檢視器可以只載入一個班級（action=list&cls=601）。
  */
+
+// 版本號：教師檢視器「測試連線」會顯示，用來確認部署的是不是最新版
+const SCRIPT_VERSION = '2026.10.22-1';
 
 // 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
 const CLASS_KEY = 'Csps1234';
@@ -164,6 +167,11 @@ function saveStudent_(ss, id, cls, seat, name, s, data, submittedAt, record) {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
+  if (p.action === 'ping') { // 測試連線用：只檢查密碼和人數，不讀資料
+    if (p.key !== TEACHER_KEY) return json_({ ok: false, version: SCRIPT_VERSION, error: '教師密碼不正確' });
+    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_STUDENTS);
+    return json_({ ok: true, version: SCRIPT_VERSION, count: Math.max(sh.getLastRow() - 1, 0) });
+  }
   if (p.action === 'list') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -172,7 +180,7 @@ function doGet(e) {
       .map(function (x) { return x.json; });
     const held = readJsonRows_(sheet_(ss, SHEET_HOLD), function (r) { return !cls || String(r[3]) === cls; })
       .map(function (x) { return { holdId: String(x.row[0]), id: String(x.row[2]), prevName: String(x.row[6]), reason: String(x.row[7]), record: x.json }; });
-    return json_({ ok: true, cls: cls, students: students, held: held, at: new Date().toISOString() });
+    return json_({ ok: true, version: SCRIPT_VERSION, cls: cls, students: students, held: held, at: new Date().toISOString() });
   }
   if (p.action === 'history') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
@@ -181,7 +189,7 @@ function doGet(e) {
     const list = readJsonRows_(sh, null, rows).map(function (x) { return { result: String(x.row[6]), record: x.json }; });
     return json_({ ok: true, history: list });
   }
-  return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中' });
+  return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中', version: SCRIPT_VERSION });
 }
 
 // ---------- 工具函式 ----------
