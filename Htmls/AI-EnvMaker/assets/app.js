@@ -1,9 +1,9 @@
-/* AI 環保小創客｜共用資料層與介面元件｜版本 2026.10.22-3（2026-10-22 更新） */
+/* AI 環保小創客｜共用資料層與介面元件｜版本 2026.10.22-4（2026-10-22 更新） */
 (function () {
   'use strict';
 
   // 版本號：每次修改都要和各 HTML 的 eco-version、Code.gs 的 SCRIPT_VERSION 一起更新
-  const VERSION = '2026.10.22-3';
+  const VERSION = '2026.10.22-4';
   // 頁面（HTML）的版本，和 app.js 不同代表只換了一部分檔案
   function pageVersion() {
     const m = document.querySelector('meta[name="eco-version"]');
