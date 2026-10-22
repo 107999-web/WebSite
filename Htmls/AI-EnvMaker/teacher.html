@@ -56,7 +56,7 @@
   <!-- ===== 總覽 ===== -->
   <section data-panel="overview">
     <div class="src-bar">
-      <button class="btn" id="loadCloud">☁️ 從雲端載入全班</button>
+      <button class="btn" id="loadCloud" title="先在右邊選班級，就只載入那一班">☁️ 從雲端載入全部班級</button>
       <label class="btn ghost" for="importFiles">📂 匯入學生備份檔（可多選）</label>
       <input type="file" id="importFiles" accept=".json,application/json" multiple class="hidden">
       <select id="clsFilter" aria-label="班級篩選" style="width:auto"></select>
@@ -194,6 +194,10 @@
  * - 老師在教師檢視器的「待確認」區決定要不要採用。學生真的換了新電腦又沒有備份檔時，
  *   也可以直接刪掉「身分綁定」裡他的那一列，讓他重新綁定。
  * - 每一次送出（不論是否採用）都會另存一份在「送出紀錄」，被改壞時可以從這裡找回舊版本。
+ *   每位學生只保留最近 KEEP_HISTORY 次，避免試算表越來越大。
+ *
+ * 效能：寫入時只動到這位學生自己的列（用「尋找」定位），不會重寫整張工作表；
+ * 教師檢視器可以只載入一個班級（action=list&cls=601）。
  */
 
 // 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
@@ -209,6 +213,7 @@ const SHEET_BIND = '身分綁定';
 const SHEET_HOLD = '待確認';
 const SHEET_LOG = '送出紀錄';
 const CHUNK = 45000; // 單一儲存格上限約 5 萬字，JSON 分段存放
+const KEEP_HISTORY = 5; // 「送出紀錄」每位學生保留最近幾次（太多會讓試算表變慢）
 
 const TASK_NAMES = { research: '議題探究', poster: '環保海報', lyrics: '歌詞與曲風', suno: 'Suno 音樂', webapp: '網頁小程式', other: '其他' };
 const WORK_NAMES = { poster: '環保海報', mv: '音樂 MV', webapp: '網頁小程式' };
@@ -228,11 +233,12 @@ const HELD_MSG = '這個班級和座號已經有同學的資料了，為了保�
 function doPost(e) {
   const lock = LockService.getScriptLock();
   try {
-    lock.waitLock(20000);
     const body = JSON.parse(e.postData.contents);
+    if (body.action !== 'submit' && body.action !== 'resolve') return json_({ ok: false, error: '未知的動作' });
+    if (body.action === 'submit' && CLASS_KEY && body.key !== CLASS_KEY) return json_({ ok: false, error: '班級密語不正確，請向老師確認學生專用連結' });
+    // 同一時間只處理一筆；排隊超過 30 秒就請學生稍後再送，不讓畫面一直卡住
+    if (!lock.tryLock(30000)) return json_({ ok: false, busy: true, error: '現在很多同學同時送出，請等 10 秒再按一次「送出」。' });
     if (body.action === 'resolve') return json_(resolve_(body));
-    if (body.action !== 'submit') return json_({ ok: false, error: '未知的動作' });
-    if (CLASS_KEY && body.key !== CLASS_KEY) return json_({ ok: false, error: '班級密語不正確，請向老師確認學生專用連結' });
 
     const s = body.student || {};
     const cls = String(s.cls || '').trim();
@@ -262,13 +268,13 @@ function doPost(e) {
     if (reason) {
       const holdId = 'H' + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
       appendRow_(ss, SHEET_HOLD, [holdId, new Date(submittedAt), id, cls, seat, name, prevName, reason].concat(chunks_(record)));
-      appendRow_(ss, SHEET_LOG, [new Date(submittedAt), id, cls, seat, name, entries.length, '⚠️ 待確認：' + reason].concat(chunks_(record)));
+      addLog_(ss, id, [new Date(submittedAt), id, cls, seat, name, entries.length, '⚠️ 待確認：' + reason].concat(chunks_(record)));
       return json_({ ok: false, held: true, error: HELD_MSG });
     }
 
     saveStudent_(ss, id, cls, seat, name, s, data, submittedAt, record);
     if (token) upsertRow_(ss, SHEET_BIND, id, [id, name, token, bind ? bind[3] : new Date()]);
-    appendRow_(ss, SHEET_LOG, [new Date(submittedAt), id, cls, seat, name, entries.length, '✅ 已採用'].concat(chunks_(record)));
+    addLog_(ss, id, [new Date(submittedAt), id, cls, seat, name, entries.length, '✅ 已採用'].concat(chunks_(record)));
 
     return json_({ ok: true, id: id, count: entries.length, at: submittedAt });
   } catch (err) {
@@ -283,11 +289,7 @@ function resolve_(body) {
   if (body.key !== TEACHER_KEY) return { ok: false, error: '教師密碼不正確' };
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sh = sheet_(ss, SHEET_HOLD);
-  const last = sh.getLastRow();
-  if (last < 2) return { ok: false, error: '找不到這筆待確認資料（可能已經處理過了）' };
-  const ids = sh.getRange(2, 1, last - 1, 1).getValues();
-  let rowNo = 0;
-  for (let i = 0; i < ids.length; i++) if (String(ids[i][0]) === String(body.holdId)) { rowNo = i + 2; break; }
+  const rowNo = rowsWithId_(sh, 1, String(body.holdId || ''))[0];
   if (!rowNo) return { ok: false, error: '找不到這筆待確認資料（可能已經處理過了）' };
 
   const r = sh.getRange(rowNo, 1, 1, sh.getLastColumn()).getValues()[0];
@@ -300,7 +302,7 @@ function resolve_(body) {
     saveStudent_(ss, id, cls, seat, name, s, rec.data || {}, rec.submittedAt, JSON.stringify(rec));
     if (token) upsertRow_(ss, SHEET_BIND, id, [id, name, token, new Date()]);
     else deleteRows_(ss, SHEET_BIND, id);
-    appendRow_(ss, SHEET_LOG, [new Date(), id, cls, seat, name, ((rec.data || {}).entries || []).length, '✅ 老師確認採用']);
+    addLog_(ss, id, [new Date(), id, cls, seat, name, ((rec.data || {}).entries || []).length, '✅ 老師確認採用'].concat(chunks_(JSON.stringify(rec))));
   }
   sh.deleteRow(rowNo);
   return { ok: true, id: id };
@@ -342,27 +344,19 @@ function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.action === 'list') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
-    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_STUDENTS);
-    const values = sh.getDataRange().getValues().slice(1);
-    const jsonCol = HEADERS[SHEET_STUDENTS].length - 1;
-    const students = [];
-    values.forEach(function (r) {
-      const raw = r.slice(jsonCol).join('');
-      if (!raw) return;
-      try { students.push(JSON.parse(raw)); } catch (err) { /* 略過損壞的資料 */ }
-    });
-    const held = [];
-    jsonRows_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_HOLD).forEach(function (x) {
-      held.push({ holdId: String(x.row[0]), id: String(x.row[2]), prevName: String(x.row[6]), reason: String(x.row[7]), record: x.json });
-    });
-    return json_({ ok: true, students: students, held: held, at: new Date().toISOString() });
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const cls = String(p.cls || '').trim(); // 空白代表全部班級
+    const students = readJsonRows_(sheet_(ss, SHEET_STUDENTS), function (r) { return !cls || String(r[1]) === cls; })
+      .map(function (x) { return x.json; });
+    const held = readJsonRows_(sheet_(ss, SHEET_HOLD), function (r) { return !cls || String(r[3]) === cls; })
+      .map(function (x) { return { holdId: String(x.row[0]), id: String(x.row[2]), prevName: String(x.row[6]), reason: String(x.row[7]), record: x.json }; });
+    return json_({ ok: true, cls: cls, students: students, held: held, at: new Date().toISOString() });
   }
   if (p.action === 'history') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
-    const list = [];
-    jsonRows_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_LOG).forEach(function (x) {
-      if (String(x.row[1]) === String(p.id)) list.push({ result: String(x.row[6]), record: x.json });
-    });
+    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_LOG);
+    const rows = rowsWithId_(sh, 2, String(p.id || ''));
+    const list = readJsonRows_(sh, null, rows).map(function (x) { return { result: String(x.row[6]), record: x.json }; });
     return json_({ ok: true, history: list });
   }
   return json_({ ok: true, service: 'AI 環保小創客收件服務', message: '運作中' });
@@ -379,41 +373,6 @@ function sameName_(a, b) {
   return String(a).replace(/\s/g, '') === String(b).replace(/\s/g, '');
 }
 
-// 找出第一欄等於 id 的那一列，回傳整列的值；找不到回傳 null
-function findRow_(ss, name, id) {
-  const sh = sheet_(ss, name);
-  const last = sh.getLastRow();
-  if (last < 2) return null;
-  const ids = sh.getRange(2, 1, last - 1, 1).getValues();
-  for (let i = 0; i < ids.length; i++) {
-    if (String(ids[i][0]) === id) return sh.getRange(i + 2, 1, 1, HEADERS[name].length).getValues()[0];
-  }
-  return null;
-}
-
-function appendRow_(ss, name, row) {
-  sheet_(ss, name).appendRow(row);
-}
-
-function deleteRows_(ss, name, id) {
-  const sh = sheet_(ss, name);
-  for (let r = sh.getLastRow(); r >= 2; r--) {
-    if (String(sh.getRange(r, 1).getValue()) === id) sh.deleteRow(r);
-  }
-}
-
-// 讀出最後一欄起存放 JSON 的每一列：[{ row, json }]，略過損壞或沒有 JSON 的列
-function jsonRows_(ss, name) {
-  const values = sheet_(ss, name).getDataRange().getValues().slice(1);
-  const jsonCol = HEADERS[name].length - 1;
-  const out = [];
-  values.forEach(function (r) {
-    const raw = r.slice(jsonCol).join('');
-    if (!raw) return;
-    try { out.push({ row: r, json: JSON.parse(raw) }); } catch (err) { /* 略過損壞的資料 */ }
-  });
-  return out;
-}
 function sheet_(ss, name) {
   let sh = ss.getSheetByName(name);
   if (!sh) {
@@ -424,33 +383,105 @@ function sheet_(ss, name) {
   return sh;
 }
 
+// 某一欄完全等於 id 的列號（由小到大）。用「尋找」定位，不必把整張表讀出來
+function rowsWithId_(sh, col, id) {
+  const last = sh.getLastRow();
+  if (last < 2 || !id) return [];
+  return sh.getRange(2, col, last - 1, 1).createTextFinder(id).matchEntireCell(true).matchCase(true).findAll()
+    .map(function (r) { return r.getRow(); }).sort(function (a, b) { return a - b; });
+}
+
+// 第一欄等於 id 的那一列，回傳整列的值；找不到回傳 null
+function findRow_(ss, name, id) {
+  const sh = sheet_(ss, name);
+  const row = rowsWithId_(sh, 1, id)[0];
+  return row ? sh.getRange(row, 1, 1, HEADERS[name].length).getValues()[0] : null;
+}
+
+// 刪除指定的列：由下往上，相鄰的列一次刪除
+function deleteRowNos_(sh, rows) {
+  rows = rows.slice().sort(function (a, b) { return b - a; });
+  let i = 0;
+  while (i < rows.length) {
+    let j = i;
+    while (j + 1 < rows.length && rows[j + 1] === rows[j] - 1) j++;
+    sh.deleteRows(rows[j], j - i + 1);
+    i = j + 1;
+  }
+}
+
+function deleteRows_(ss, name, id) {
+  const sh = sheet_(ss, name);
+  deleteRowNos_(sh, rowsWithId_(sh, 1, id));
+}
+
+function appendRow_(ss, name, row) {
+  sheet_(ss, name).appendRow(row);
+}
+
+// 寫入送出紀錄，並只保留這位學生最近 KEEP_HISTORY 筆
+function addLog_(ss, id, row) {
+  const sh = sheet_(ss, SHEET_LOG);
+  sh.appendRow(row);
+  const rows = rowsWithId_(sh, 2, id);
+  if (rows.length > KEEP_HISTORY) deleteRowNos_(sh, rows.slice(0, rows.length - KEEP_HISTORY));
+}
+
+// 讀出存有 JSON 的列：先讀前面的窄欄位篩選，再只讀需要的列的 JSON（連續的列一次讀）
+// filter(row) 決定要不要這一列；rowNos 可直接指定列號
+function readJsonRows_(sh, filter, rowNos) {
+  const last = sh.getLastRow();
+  if (last < 2) return [];
+  const name = sh.getName();
+  const jsonCol = HEADERS[name].length; // JSON 從這一欄（1 起算）開始
+  const width = Math.max(sh.getLastColumn(), jsonCol);
+  let rows = rowNos;
+  if (!rows) {
+    rows = [];
+    sh.getRange(2, 1, last - 1, jsonCol - 1).getValues().forEach(function (r, i) {
+      if (!filter || filter(r)) rows.push(i + 2);
+    });
+  }
+  const out = [];
+  let i = 0;
+  while (i < rows.length) {
+    let j = i;
+    while (j + 1 < rows.length && rows[j + 1] === rows[j] + 1) j++;
+    const block = sh.getRange(rows[i], 1, j - i + 1, width).getValues();
+    block.forEach(function (r) {
+      const raw = r.slice(jsonCol - 1).join('');
+      if (!raw) return;
+      try { out.push({ row: r, json: JSON.parse(raw) }); } catch (err) { /* 略過損壞的資料 */ }
+    });
+    i = j + 1;
+  }
+  return out;
+}
+
+// 新增或取代第一欄等於 id 的那一列
 function upsertRow_(ss, name, id, row) {
   const sh = sheet_(ss, name);
-  const last = sh.getLastRow();
-  let target = last + 1;
-  if (last > 1) {
-    const ids = sh.getRange(2, 1, last - 1, 1).getValues();
-    for (let i = 0; i < ids.length; i++) {
-      if (String(ids[i][0]) === id) { target = i + 2; break; }
-    }
-  }
+  const target = rowsWithId_(sh, 1, id)[0] || sh.getLastRow() + 1;
+  ensureRows_(sh, target);
   // 先清除整列，避免舊的 JSON 分段殘留
   const width = Math.max(sh.getLastColumn(), row.length);
   sh.getRange(target, 1, 1, width).clearContent();
   sh.getRange(target, 1, 1, row.length).setValues([row]);
 }
 
+// 只刪掉這位學生原本的列，再把新的列加在最後面（不重寫整張表）
 function replaceRows_(ss, name, id, rows) {
   const sh = sheet_(ss, name);
-  const width = HEADERS[name].length;
-  const last = sh.getLastRow();
-  let keep = [];
-  if (last > 1) {
-    keep = sh.getRange(2, 1, last - 1, width).getValues().filter(function (r) { return String(r[0]) !== id; });
-    sh.getRange(2, 1, last - 1, width).clearContent();
-  }
-  const all = keep.concat(rows);
-  if (all.length) sh.getRange(2, 1, all.length, width).setValues(all);
+  deleteRowNos_(sh, rowsWithId_(sh, 1, id));
+  if (!rows.length) return;
+  const start = sh.getLastRow() + 1;
+  ensureRows_(sh, start + rows.length - 1);
+  sh.getRange(start, 1, rows.length, HEADERS[name].length).setValues(rows);
+}
+
+function ensureRows_(sh, upTo) {
+  const max = sh.getMaxRows();
+  if (upTo > max) sh.insertRowsAfter(max, upTo - max);
 }
 
 function json_(obj) {
@@ -552,12 +583,15 @@ function json_(obj) {
   function renderClassFilter() {
     const count = {};
     Object.values(T.students).forEach(r => { count[r.student.cls] = (count[r.student.cls] || 0) + 1; });
-    const list = Object.keys(count).sort((a, b) => a.localeCompare(b));
-    if (T.cls && !count[T.cls]) T.cls = '';
+    // 設定中的班級都列出來（還沒載入的也能先選，再從雲端只載入那一班）
+    const list = [...new Set([...E.classList(), ...Object.keys(count)])].sort((a, b) => a.localeCompare(b));
+    if (T.cls && !list.includes(T.cls)) T.cls = '';
     $('#clsFilter').innerHTML = `<option value="">全部班級（${Object.keys(T.students).length} 人）</option>` +
-      list.map(c => `<option value="${E.esc(c)}">${E.esc(c)} 班（${count[c]} 人）</option>`).join('');
+      list.map(c => `<option value="${E.esc(c)}">${E.esc(c)} 班（${count[c] || 0} 人）</option>`).join('');
     $('#clsFilter').value = T.cls;
+    $('#loadCloud').textContent = loadLabel();
   }
+  const loadLabel = () => T.cls ? `☁️ 從雲端載入 ${T.cls} 班` : '☁️ 從雲端載入全部班級';
   $('#clsFilter').addEventListener('change', ev => { T.cls = ev.target.value; tsave(); renderOverview(); });
   const clsLabel = () => T.cls ? `${T.cls}班` : '全部班級';
 
@@ -695,7 +729,7 @@ function json_(obj) {
       $('#classStats').innerHTML = '';
       $('#stratUsage').innerHTML = '';
       $('#overviewTable').innerHTML = `<div class="empty-state card"><div class="big">📭</div>
-        <p>還沒有學生資料。<br>請按「從雲端載入全班」，或匯入學生繳交的備份檔。</p>
+        <p>還沒有學生資料。<br>請先在上方選擇班級，再按「☁️ 從雲端載入」，或匯入學生繳交的備份檔。</p>
         <p class="small">還沒設定雲端收件？到 <a href="#" data-goto="cloud">☁️ 雲端收件設定</a> 看步驟。</p></div>`;
       return;
     }
@@ -754,14 +788,17 @@ function json_(obj) {
     btn.disabled = true;
     btn.textContent = '⏳ 載入中…';
     try {
-      const res = await fetch(`${T.gasUrl}?action=list&key=${encodeURIComponent(T.teacherKey)}`);
+      // 選了班級就只載入那一班，資料多的時候比較快
+      const cls = T.cls;
+      const res = await fetch(`${T.gasUrl}?action=list&key=${encodeURIComponent(T.teacherKey)}` + (cls ? `&cls=${encodeURIComponent(cls)}` : ''));
       const j = await res.json();
       if (!j.ok) throw new Error(j.error || '載入失敗');
+      const onlyCls = j.cls || ''; // 舊版 Apps Script 不認得 cls，會回傳全部班級
       let n = 0;
       j.students.forEach(s => { if (addRecord(normalize(s), 'cloud') !== 'skip') n++; });
       // 雲端的待確認清單以試算表為準：已經在別台電腦處理掉的就移除
       const held = j.held || [];
-      T.pending = T.pending.filter(p => !p.holdId || held.some(h => h.holdId === p.holdId));
+      T.pending = T.pending.filter(p => !p.holdId || (onlyCls && p.rec.student.cls !== onlyCls) || held.some(h => h.holdId === p.holdId));
       held.forEach(h => {
         const rec = normalize(h.record);
         if (!rec || !rec.student) return;
@@ -770,12 +807,12 @@ function json_(obj) {
       });
       tsave();
       renderOverview();
-      E.toast(`☁️ 已載入 ${n} 位學生的資料` + (T.pending.length ? `，⚠️ 有 ${T.pending.length} 筆待確認` : ''), T.pending.length ? 'warn' : 'ok', 5000);
+      E.toast(`☁️ 已載入${onlyCls ? ` ${onlyCls} 班` : ''} ${n} 位學生的資料` + (T.pending.length ? `，⚠️ 有 ${T.pending.length} 筆待確認` : ''), T.pending.length ? 'warn' : 'ok', 5000);
     } catch (err) {
       E.toast('❌ ' + (err.message === 'Failed to fetch' ? '無法連線，請檢查網址與部署權限' : err.message), 'warn', 6000);
     } finally {
       btn.disabled = false;
-      btn.textContent = '☁️ 從雲端載入全班';
+      btn.textContent = loadLabel();
     }
   });
 

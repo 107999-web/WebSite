@@ -317,14 +317,20 @@
     };
     const body = JSON.stringify(payload);
     let result;
+    const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ctrl && setTimeout(() => ctrl.abort(), 60000);
     try {
       // 不加自訂標頭（text/plain），避免 CORS 預檢，Apps Script 才能正常回應
-      const res = await fetch(c.gasUrl, { method: 'POST', body });
+      const res = await fetch(c.gasUrl, { method: 'POST', body, signal: ctrl ? ctrl.signal : undefined });
       result = await res.json();
     } catch (err) {
+      // 等太久：不要重送（可能已經在處理），請學生稍後再試
+      if (err && err.name === 'AbortError') throw new Error('等了 1 分鐘還沒有回應，可能很多同學同時送出。請等一下再按一次「送出」，或先「匯出備份檔」。');
       // 部分學校網路會擋住回應內容，改用 no-cors 送出（可送達但無法確認結果）
       await fetch(c.gasUrl, { method: 'POST', mode: 'no-cors', body });
       result = { ok: true, unverified: true };
+    } finally {
+      if (timer) clearTimeout(timer);
     }
     if (!result.ok) {
       const err = new Error(result.error || '送出失敗');
