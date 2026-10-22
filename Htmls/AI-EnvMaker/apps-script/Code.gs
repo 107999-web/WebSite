@@ -1,8 +1,9 @@
 /**
- * AI 環保小創客｜雲端收件服務（Google Apps Script）｜版本 2026.10.22-1（2026-10-22 更新）
+ * AI 環保小創客｜雲端收件服務（Google Apps Script）｜版本 2026.10.22-3（2026-10-22 更新）
  *
  * 安裝方式（詳細步驟請看「教師檢視器 → 雲端收件設定」）：
  * 1. 建立一個新的 Google 試算表 → 擴充功能 → Apps Script
+ *    （或到 script.google.com 建立「獨立專案」，並在下面的 SPREADSHEET_ID 填入試算表 ID）
  * 2. 把這整份程式碼貼上，修改下面兩個密碼後儲存
  * 3. 部署 → 新增部署作業 → 類型選「網頁應用程式」
  *    執行身分：我；誰可以存取：任何人
@@ -23,7 +24,12 @@
  */
 
 // 版本號：教師檢視器「測試連線」會顯示，用來確認部署的是不是最新版
-const SCRIPT_VERSION = '2026.10.22-1';
+const SCRIPT_VERSION = '2026.10.22-3';
+
+// 試算表 ID：用「獨立專案」（script.google.com 新增的專案）時必填；
+// 附在試算表上的專案（擴充功能 → Apps Script）留空 '' 即可。
+// ID 是試算表網址 https://docs.google.com/spreadsheets/d/【這一段】/edit 中間那一長串。
+const SPREADSHEET_ID = '1y6_duFBVRbTwl2F6WGx5tKqx0R_MRzsTgn7ELv-37wI';
 
 // 學生送出時要附上的「班級密語」（留空 '' 代表不檢查）
 const CLASS_KEY = 'Csps1234';
@@ -76,7 +82,7 @@ function doPost(e) {
     const data = body.data || {};
     const entries = Array.isArray(data.entries) ? data.entries : [];
     const submittedAt = body.submittedAt || new Date().toISOString();
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ss = ss_();
     const record = JSON.stringify({ student: s, data: data, submittedAt: submittedAt });
 
     // 檢查是不是同一個人：已綁定就比對個人代碼，還沒綁定（舊資料）就比對姓名
@@ -112,7 +118,7 @@ function doPost(e) {
 // 老師處理「待確認」：accept 為 true 就採用並改綁這筆的個人代碼，false 就不採用；兩者都會從待確認移除
 function resolve_(body) {
   if (body.key !== TEACHER_KEY) return { ok: false, error: '教師密碼不正確' };
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = ss_();
   const sh = sheet_(ss, SHEET_HOLD);
   const rowNo = rowsWithId_(sh, 1, String(body.holdId || ''))[0];
   if (!rowNo) return { ok: false, error: '找不到這筆待確認資料（可能已經處理過了）' };
@@ -169,12 +175,12 @@ function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.action === 'ping') { // 測試連線用：只檢查密碼和人數，不讀資料
     if (p.key !== TEACHER_KEY) return json_({ ok: false, version: SCRIPT_VERSION, error: '教師密碼不正確' });
-    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_STUDENTS);
+    const sh = sheet_(ss_(), SHEET_STUDENTS);
     return json_({ ok: true, version: SCRIPT_VERSION, count: Math.max(sh.getLastRow() - 1, 0) });
   }
   if (p.action === 'list') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ss = ss_();
     const cls = String(p.cls || '').trim(); // 空白代表全部班級
     const students = readJsonRows_(sheet_(ss, SHEET_STUDENTS), function (r) { return !cls || String(r[1]) === cls; })
       .map(function (x) { return x.json; });
@@ -184,7 +190,7 @@ function doGet(e) {
   }
   if (p.action === 'history') {
     if (p.key !== TEACHER_KEY) return json_({ ok: false, error: '教師密碼不正確' });
-    const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(), SHEET_LOG);
+    const sh = sheet_(ss_(), SHEET_LOG);
     const rows = rowsWithId_(sh, 2, String(p.id || ''));
     const list = readJsonRows_(sh, null, rows).map(function (x) { return { result: String(x.row[6]), record: x.json }; });
     return json_({ ok: true, history: list });
@@ -193,6 +199,10 @@ function doGet(e) {
 }
 
 // ---------- 工具函式 ----------
+function ss_() {
+  return SPREADSHEET_ID ? SpreadsheetApp.openById(SPREADSHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
+}
+
 function chunks_(text) {
   const out = [];
   for (let i = 0; i < text.length; i += CHUNK) out.push(text.slice(i, i + CHUNK));

@@ -1,5 +1,5 @@
 /*
- * AI 環保小創客｜雲端收件設定（由老師填寫一次即可）｜版本 2026.10.22-2（2026-10-22 更新）
+ * AI 環保小創客｜雲端收件設定（由老師填寫一次即可）｜版本 2026.10.22-3（2026-10-22 更新）
  * 更新網站時，這個檔案通常不必覆蓋（裡面是您自己的設定），版本號不同也沒關係。
  *
  * gasUrl   ：Google Apps Script「網頁應用程式」部署後的網址（https://script.google.com/macros/s/…/exec）
@@ -12,8 +12,8 @@
  * 學生用那個連結打開一次，設定就會記在他的瀏覽器裡。
  */
 window.ECO_CONFIG = {
-  gasUrl: 'https://107999-web.github.io/WebSite/Htmls/AI-EnvMaker/index.html?gas=https%3A%2F%2Fscript.google.com%2Fmacros%2Fs%2FAKfycby1kHag-jpEmAiZPSC0ZqtX7C6eFJvKsM_YO64s1uwr4WAV79Pv9pDwmri8Cix-IANQUA%2Fexec&key=Csps1234',
-  classKey: 'Csps1234',
-  classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610', '611'],
+  gasUrl: '',
+  classKey: '',
+  classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'],
   uploadUrl: 'http://172.16.9.30:8100/'
 };
