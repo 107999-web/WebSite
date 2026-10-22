@@ -12,8 +12,8 @@
  * 學生用那個連結打開一次，設定就會記在他的瀏覽器裡。
  */
 window.ECO_CONFIG = {
-  gasUrl: '',
-  classKey: '',
+  gasUrl: 'https://script.google.com/macros/s/AKfycbzkutc67R0km8bMcsl3Sx4Z1ByxIsHzWIBgmc7mV_iCrPLUWCf0Bb6tyw9t62hwvxABvA/exec',
+  classKey: 'Csps1234',
   classes: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'],
   uploadUrl: 'http://172.16.9.30:8100/'
 };
