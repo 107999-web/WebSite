@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 創作歷程瀏覽器</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#fff;--ink:#253047;--muted:#6d7890;--line:#e4e9f2;--blue:#477be8;--blue2:#eaf0ff;--teal:#238b83;--purple:#8462c8;--orange:#d88a32;--red:#c44d59;--shadow:0 8px 28px #27385c0d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif;line-height:1.55}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:white;font-weight:650}button:hover{filter:brightness(.97)}button.secondary{background:#eef2f8;color:#33415b;border:1px solid var(--line)}button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}button:disabled{opacity:.45;cursor:not-allowed}
+header{background:linear-gradient(120deg,#fdfdff,#edf3ff);border-bottom:1px solid var(--line);padding:24px max(20px,calc((100vw - 1440px)/2));}
+.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#5b8bf0,#8b6bd2);display:grid;place-items:center;color:white;font-size:25px;box-shadow:0 8px 18px #6384d633}
+h1{font-size:clamp(22px,3vw,30px);margin:0;letter-spacing:.2px}header p{margin:4px 0 0;color:var(--muted);font-size:14px}.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+main{max-width:1440px;margin:22px auto;padding:0 20px 48px}.notice{padding:12px 14px;border-radius:12px;background:#fff8e9;border:1px solid #f1dfb7;color:#795b20;font-size:13px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:var(--shadow)}.stat .label{font-size:12px;color:var(--muted)}.stat .num{font-size:27px;font-weight:750;line-height:1.35;margin-top:4px}.stat .sub{font-size:12px;color:var(--muted)}
+.workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);min-width:0}.panel-head{padding:16px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.panel-head h2{font-size:16px;margin:0}.panel-body{padding:15px}.filters{display:grid;gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.field input,.field select,.searchbox{width:100%;border:1px solid #dce3ef;border-radius:10px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}.field input:focus,.field select:focus,.searchbox:focus{border-color:#85a5f4;box-shadow:0 0 0 3px #477be81a}.file-summary{padding:10px 12px;background:#f7f9fd;border-radius:10px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}.student-list{display:grid;gap:7px;margin-top:13px;max-height:54vh;overflow:auto}.student-item{display:block;width:100%;text-align:left;background:white;color:var(--ink);border:1px solid var(--line);padding:11px 12px;border-radius:11px}.student-item.active{border-color:#8aa9f7;background:var(--blue2)}.student-item .name{font-weight:700}.student-item .meta{font-size:12px;color:var(--muted);margin-top:3px}.student-item .tag{display:inline-block;background:#edf1f7;color:#59657a;border-radius:6px;padding:1px 6px;font-size:11px;margin-left:5px}
+.content{min-height:500px}.empty{padding:58px 22px;text-align:center;color:var(--muted)}.empty .emoji{font-size:42px;margin-bottom:8px}.empty h3{color:var(--ink);margin:8px 0}.empty p{max-width:470px;margin:0 auto 18px}
+.profile{padding:18px 20px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,#fff,#f8faff);border-radius:16px 16px 0 0}.profile-top{display:flex;justify-content:space-between;gap:12px;align-items:start}.profile h2{font-size:23px;margin:0}.profile .subtitle{color:var(--muted);font-size:13px;margin-top:4px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.chip{font-size:12px;padding:4px 9px;border-radius:999px;background:#edf2ff;color:#4665a6}.chip.green{background:#e7f7f1;color:#267d68}.chip.purple{background:#f1eaff;color:#7752b6}
+.toolbar{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;gap:9px;flex-wrap:wrap;align-items:center}.toolbar select,.toolbar input{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:#fff;color:var(--ink)}.toolbar .spacer{flex:1}
+.entries{padding:18px;display:grid;gap:14px}.entry{border:1px solid var(--line);border-radius:14px;overflow:hidden}.entry-head{padding:14px 16px;background:#fbfcff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:start;gap:12px}.entry-title{font-weight:750}.entry-meta{font-size:12px;color:var(--muted);margin-top:4px}.rating{color:#d58b24;letter-spacing:1px;white-space:nowrap}.entry-body{padding:16px}.entry-section{margin-bottom:16px}.entry-section:last-child{margin-bottom:0}.section-label{font-size:12px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}.prompt-box{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fd;border:1px solid #e9edf5;padding:12px;border-radius:10px;font-size:14px}.markdown{overflow-wrap:anywhere;line-height:1.8}.markdown h1,.markdown h2,.markdown h3,.markdown h4{line-height:1.35;margin:1.2em 0 .55em}.markdown h1{font-size:1.6em}.markdown h2{font-size:1.35em;border-bottom:1px solid var(--line);padding-bottom:5px}.markdown h3{font-size:1.15em}.markdown p{margin:.6em 0}.markdown ul,.markdown ol{padding-left:1.7em}.markdown li{margin:.25em 0}.markdown blockquote{border-left:4px solid #9ab3f5;margin:12px 0;padding:4px 14px;color:#59657a;background:#f7f9ff}.markdown pre{white-space:pre-wrap;overflow:auto;background:#20283a;color:#e8edf7;padding:13px;border-radius:10px}.markdown code{background:#eef1f7;border-radius:4px;padding:2px 5px;font-size:.92em}.markdown pre code{background:none;padding:0}.markdown table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;margin:12px 0}.markdown th,.markdown td{border:1px solid #dce3ef;padding:8px 10px;text-align:left;min-width:100px}.markdown th{background:#f1f5fb}.feedback{display:grid;grid-template-columns:1fr 1fr;gap:10px}.feedback>div{padding:11px 12px;border-radius:10px;background:#f8faff;border:1px solid #edf0f7;font-size:13px}.feedback strong{display:block;margin-bottom:4px;font-size:12px;color:var(--muted)}.pill{font-size:11px;padding:3px 7px;border-radius:6px;background:#e9f6f1;color:#267d68}.error-list{margin-top:10px;color:#a93c48;font-size:12px}.footer-note{font-size:12px;color:var(--muted);padding:0 18px 18px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#26334b;color:white;padding:11px 16px;border-radius:12px;box-shadow:0 8px 25px #0002;z-index:20;max-width:90vw}.hidden{display:none!important}
+@media(max-width:900px){.workspace{grid-template-columns:1fr}.student-list{max-height:260px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){header{padding:18px 15px}main{padding:0 12px 30px;margin-top:14px}.stats{gap:8px}.stat{padding:12px}.stat .num{font-size:23px}.profile-top{display:block}.profile h2{font-size:20px}.entry-head{display:block}.rating{margin-top:5px}.feedback{grid-template-columns:1fr}.toolbar .spacer{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">✦</div><div><h1>AI 創作歷程瀏覽器</h1><p>把分散的 JSON 紀錄，整理成可搜尋、可閱讀、可分析的學習歷程</p></div></div>
+  <div class="top-actions">
+    <button id="chooseFolder">📂 選取資料夾</button>
+    <button id="chooseFiles" class="secondary">選取多個 JSON</button>
+    <button id="exportAll" class="secondary" disabled>匯出目前資料</button>
+    <input id="folderInput" type="file" webkitdirectory directory multiple accept=".json,application/json" class="hidden">
+    <input id="filesInput" type="file" multiple accept=".json,application/json" class="hidden">
+  </div>
+</header>
+<main>
+  <div class="notice">🔒 <strong>本機處理：</strong>檔案只在目前瀏覽器分頁中讀取，不會自動上傳。請避免在共用電腦上留下含有學生個資的匯出檔。此版本讀取所選資料夾第一層的 JSON 檔案，不會自動遞迴子資料夾。</div>
+  <section class="stats">
+    <div class="stat"><div class="label">學生／資料檔</div><div class="num" id="statStudents">0</div><div class="sub" id="statFiles">尚未匯入</div></div>
+    <div class="stat"><div class="label">創作紀錄</div><div class="num" id="statEntries">0</div><div class="sub">所有匯入檔案的 entries</div></div>
+    <div class="stat"><div class="label">平均評分</div><div class="num" id="statRating">—</div><div class="sub">僅計算有填寫評分的紀錄</div></div>
+    <div class="stat"><div class="label">AI 平台</div><div class="num" id="statPlatforms">0</div><div class="sub" id="platformNames">尚無平台資料</div></div>
+  </section>
+  <div class="workspace">
+    <aside class="panel">
+      <div class="panel-head"><h2>資料與篩選</h2><button id="clearFilters" class="ghost" style="padding:6px 9px;font-size:12px">清除</button></div>
+      <div class="panel-body">
+        <div class="file-summary" id="fileSummary">尚未選取資料。請選取一個資料夾或多個 JSON 檔案。</div>
+        <div id="errorList" class="error-list"></div>
+        <div class="filters" style="margin-top:14px">
+          <div class="field"><label for="searchInput">搜尋學生、主題、提示詞或回應</label><input id="searchInput" placeholder="輸入關鍵字…"></div>
+          <div class="field"><label for="classFilter">班級</label><select id="classFilter"><option value="">全部班級</option></select></div>
+          <div class="field"><label for="platformFilter">AI 平台</label><select id="platformFilter"><option value="">全部平台</option></select></div>
+          <div class="field"><label for="taskFilter">任務類型</label><select id="taskFilter"><option value="">全部任務</option></select></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:17px"><strong style="font-size:13px">學生清單</strong><span id="studentCountLabel" class="pill">0 位</span></div>
+        <div id="studentList" class="student-list"><div style="font-size:13px;color:var(--muted);padding:10px">匯入資料後，學生會列在這裡。</div></div>
+      </div>
+    </aside>
+    <section class="panel content" id="contentPanel">
+      <div class="empty" id="welcome">
+        <div class="emoji">🗂️</div><h3>從資料夾開始</h3>
+        <p>選取包含學生歷程 JSON 的資料夾，系統會嘗試讀取每個 JSON 檔案，解析學生資料與創作紀錄，並將 Markdown 回應轉成可閱讀的文章。</p>
+        <button id="chooseFolderEmpty">選取資料夾</button>
+      </div>
+      <div id="detail" class="hidden"></div>
+    </section>
+  </div>
+</main>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let records = [];
+  let selectedKey = null;
+  let currentFiles = [];
+  let toastTimer;
+  const safeText = v => v == null ? '' : String(v);
+  const normalize = v => safeText(v).toLocaleLowerCase('zh-Hant');
+  function notify(message) {
+    const el = $('toast'); el.textContent = message; el.classList.remove('hidden');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add('hidden'), 2800);
+  }
+  function escapeHTML(s) {
+    return safeText(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function safeUrl(url) {
+    try { const u = new URL(url); return ['http:','https:','mailto:'].includes(u.protocol) ? u.href : ''; } catch { return ''; }
+  }
+  // 小型 Markdown renderer：先跳脫 HTML，再處理常見 Markdown 語法；不執行原文中的 HTML。
+  function inlineMarkdown(text) {
+    // 僅將來源中辨識到的 <br> 標籤轉成安全的換行；其他 HTML 仍一律跳脫。
+    let s = escapeHTML(text).replace(/\uE000BR\uE001/g, '<br>');
+    s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+    s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>');
+    s = s.replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>').replace(/(^|[^_])_([^_]+)_/g,'$1<em>$2</em>');
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+)\)/g, (m,label,url) => {
+      const safe = safeUrl(url); return safe ? `<a href="${escapeHTML(safe)}" target="_blank" rel="noopener noreferrer">${label}</a>` : label;
+    });
+    return s;
+  }
+  function renderMarkdown(source) {
+    // AI 回應可能混用 Markdown 與 HTML <br>，先把 <br> 換成內部標記。
+    // 對被 <br> 與空白行切斷的 Markdown 表格列進行合併，避免表格破版。
+    const brToken = '\uE000BR\uE001';
+    let normalized = safeText(source)
+      .replace(/<br\s*\/?\s*>/gi, brToken)
+      .replace(/\r\n?/g,'\n');
+    let rawLines = normalized.split('\n');
+    const lines = [];
+    for (let i = 0; i < rawLines.length; i++) {
+      let line = rawLines[i];
+      if (/^\s*\|/.test(line) && !/\|\s*$/.test(line)) {
+        let j = i + 1;
+        while (j < rawLines.length && !/\|\s*$/.test(rawLines[j])) {
+          if (rawLines[j].trim()) line += ' ' + rawLines[j].trim();
+          j++;
+        }
+        if (j < rawLines.length) {
+          line += ' ' + rawLines[j].trim();
+          i = j;
+        }
+      }
+      lines.push(line);
+    }
+    let out = [], paragraph = [], listType = null, tableRows = [];
+    const flushP = () => { if(paragraph.length){out.push('<p>'+paragraph.map(inlineMarkdown).join('<br>')+'</p>');paragraph=[];} };
+    const flushList = () => { if(listType){out.push(`</${listType}>`);listType=null;} };
+    const flushTable = () => {
+      if(tableRows.length){
+        const rows = tableRows; tableRows=[];
+        const cells = line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(x=>x.trim());
+        const isSep = row => /^\s*\|?[\s:|-]+\|?\s*$/.test(row) && row.includes('-');
+        let data = rows.filter(r=>!isSep(r));
+        if(data.length){out.push('<table><thead><tr>'+cells(data[0]).map(c=>'<th>'+inlineMarkdown(c)+'</th>').join('')+'</tr></thead><tbody>'+data.slice(1).map(r=>'<tr>'+cells(r).map(c=>'<td>'+inlineMarkdown(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table>');}
+      }
+    };
+    for(let i=0;i<lines.length;i++){
+      const line=lines[i], t=line.trim();
+      if(!t){flushP();flushList();flushTable();continue;}
+      if(/^```/.test(t)){
+        flushP();flushList();flushTable(); const lang=t.slice(3).trim(); let code=[];
+        i++; while(i<lines.length && !/^```/.test(lines[i].trim())){code.push(lines[i]);i++;}
+        out.push('<pre><code>'+escapeHTML(code.join('\n'))+'</code></pre>'); continue;
+      }
+      if(/^\|.*\|$/.test(t)){flushP();flushList();tableRows.push(t);continue;} else flushTable();
+      const heading=t.match(/^(#{1,6})\s+(.+)$/);
+      if(heading){flushP();flushList();const n=heading[1].length;out.push(`<h${n}>${inlineMarkdown(heading[2])}</h${n}>`);continue;}
+      if(/^(\*\s*\*\s*\*|-{3,}|_{3,})$/.test(t)){flushP();flushList();out.push('<hr>');continue;}
+      const quote=t.match(/^>\s?(.*)$/);
+      if(quote){flushP();flushList();out.push('<blockquote>'+inlineMarkdown(quote[1])+'</blockquote>');continue;}
+      const ul=t.match(/^[-*+]\s+(.+)$/), ol=t.match(/^\d+[.)]\s+(.+)$/);
+      if(ul||ol){flushP();const type=ul?'ul':'ol';if(listType!==type){flushList();listType=type;out.push(`<${type}>`);}out.push('<li>'+inlineMarkdown((ul||ol)[1])+'</li>');continue;}
+      flushList(); paragraph.push(t);
+    }
+    flushP();flushList();flushTable();
+    return out.join('\n') || '<p style="color:var(--muted)">（沒有內容）</p>';
+  }
+  function dateText(value) {
+    if(!value)return '時間未提供';
+    const d=new Date(value); return Number.isNaN(d.getTime())?safeText(value):d.toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }
+  function averageRating(items) {
+    const a=items.map(x=>Number(x.rating)).filter(n=>Number.isFinite(n)&&n>0&&n<=5);
+    return a.length ? (a.reduce((s,n)=>s+n,0)/a.length).toFixed(1) : '—';
+  }
+  function parseRecord(data, fileName, index) {
+    if(!data || typeof data!=='object' || Array.isArray(data)) throw new Error('JSON 最外層必須是物件');
+    const p=(data.profile && typeof data.profile==='object')?data.profile:{};
+    const entries=Array.isArray(data.entries)?data.entries:[];
+    const key=[safeText(p.cls),safeText(p.seat),safeText(p.name),fileName].join('|')+'|'+index;
+    return {key,fileName,profile:p,entries,raw:data,topic:safeText(p.topic)||'未設定主題',cls:safeText(p.cls)||'未提供',seat:safeText(p.seat)||'未提供',name:safeText(p.name)||fileName.replace(/\.json$/i,''),exportedAt:data.exportedAt||'',lastSubmit:data.lastSubmit||'',plans:data.plans||{},reflection:data.reflection||{},pledge:data.pledge||{},entryCount:entries.length};
+  }
+  function allEntries(){return records.flatMap(r=>r.entries.map((e,i)=>({...e,_record:r,_index:i})))}
+  function uniqueVals(vals){return [...new Set(vals.map(safeText).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-Hant'))}
+  function setOptions(id, values, allLabel) {
+    const el=$(id), previous=el.value;
+    el.innerHTML='<option value="">'+escapeHTML(allLabel)+'</option>'+values.map(v=>`<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join('');
+    if(values.includes(previous))el.value=previous;
+  }
+  function getFilteredRecords(){
+    const q=normalize($('searchInput').value), cls=$('classFilter').value, plat=$('platformFilter').value, task=$('taskFilter').value;
+    return records.filter(r=>{
+      if(cls && r.cls!==cls)return false;
+      const es=r.entries;
+      if(plat&&!es.some(e=>safeText(e.platform)===plat))return false;
+      if(task&&!es.some(e=>safeText(e.task)===task))return false;
+      if(q){
+        const hay=[r.name,r.cls,r.seat,r.topic,r.fileName,...es.flatMap(e=>[e.task,e.platform,e.prompt,e.response,e.good,e.improve])].map(normalize).join('\n');
+        if(!hay.includes(q))return false;
+      }
+      return true;
+    });
+  }
+  function refreshFilters(){
+    setOptions('classFilter',uniqueVals(records.map(r=>r.cls).filter(x=>x!=='未提供')),'全部班級');
+    setOptions('platformFilter',uniqueVals(allEntries().map(e=>e.platform)),'全部平台');
+    setOptions('taskFilter',uniqueVals(allEntries().map(e=>e.task)),'全部任務');
+  }
+  function updateStats(){
+    const es=allEntries(), platforms=uniqueVals(es.map(e=>e.platform));
+    $('statStudents').textContent=records.length;
+    $('statFiles').textContent=`已載入 ${currentFiles.length} 個檔案`;
+    $('statEntries').textContent=es.length;
+    $('statRating').textContent=averageRating(es);
+    $('statPlatforms').textContent=platforms.length;
+    $('platformNames').textContent=platforms.join('、')||'尚無平台資料';
+    $('exportAll').disabled=!records.length;
+  }
+  function renderStudents(){
+    const filtered=getFilteredRecords();
+    $('studentCountLabel').textContent=`${filtered.length} 位`;
+    const list=$('studentList');
+    if(!filtered.length){list.innerHTML='<div style="font-size:13px;color:var(--muted);padding:10px">沒有符合條件的資料。</div>';return;}
+    if(!filtered.some(r=>r.key===selectedKey))selectedKey=filtered[0].key;
+    list.innerHTML=filtered.map(r=>`<button class="student-item ${r.key===selectedKey?'active':''}" data-key="${escapeHTML(r.key)}"><div class="name">${escapeHTML(r.name)} <span class="tag">${escapeHTML(r.cls)}</span></div><div class="meta">座號 ${escapeHTML(r.seat)} · ${escapeHTML(r.topic)} · ${r.entries.length} 筆紀錄</div></button>`).join('');
+    list.querySelectorAll('[data-key]').forEach(btn=>btn.addEventListener('click',()=>{selectedKey=btn.dataset.key;renderStudents();renderDetail();}));
+  }
+  function renderEntry(e, idx) {
+    const task=safeText(e.task)||'未分類任務', platform=safeText(e.platform)||'未提供平台';
+    const rating=Number(e.rating), stars=Number.isFinite(rating)&&rating>0?('★'.repeat(Math.min(5,Math.round(rating)))+'☆'.repeat(5-Math.min(5,Math.round(rating)))):'尚未評分';
+    const prompt=safeText(e.prompt), response=safeText(e.response);
+    let html=`<article class="entry"><div class="entry-head"><div><div class="entry-title">${idx+1}. ${escapeHTML(task)} <span class="pill">${escapeHTML(platform)}</span></div><div class="entry-meta">版本 ${escapeHTML(e.version??'—')} · 建立：${escapeHTML(dateText(e.createdAt))}</div></div><div class="rating" title="評分">${escapeHTML(stars)}</div></div><div class="entry-body">`;
+    if(prompt)html+=`<div class="entry-section"><div class="section-label">使用的提示詞 Prompt</div><div class="prompt-box">${escapeHTML(prompt)}</div></div>`;
+    html+=`<div class="entry-section"><div class="section-label">AI 回應 Response · Markdown</div><div class="markdown">${renderMarkdown(response)}</div></div>`;
+    if(e.good||e.improve)html+=`<div class="entry-section feedback">${e.good?`<div><strong>覺得不錯的地方</strong>${escapeHTML(e.good)}</div>`:''}${e.improve?`<div><strong>希望改善的地方</strong>${escapeHTML(e.improve)}</div>`:''}</div>`;
+    if(Array.isArray(e.strategies)&&e.strategies.length)html+=`<div class="entry-section"><div class="section-label">使用策略</div><div class="chips">${e.strategies.map(s=>`<span class="chip purple">${escapeHTML(s)}</span>`).join('')}</div></div>`;
+    html+='</div></article>'; return html;
+  }
+  function renderDetail(){
+    const r=records.find(x=>x.key===selectedKey), detail=$('detail'), welcome=$('welcome');
+    if(!r){detail.classList.add('hidden');welcome.classList.remove('hidden');return;}
+    welcome.classList.add('hidden');detail.classList.remove('hidden');
+    const entries=r.entries.map((e,i)=>({...e,_index:i}));
+    const sort=$('sortEntries')?.value||'old';
+    if(sort==='new')entries.reverse();
+    const entrySearch=normalize($('entrySearch')?.value||'');
+    const shown=entries.filter(e=>!entrySearch||[e.task,e.platform,e.prompt,e.response,e.good,e.improve].map(normalize).join('\n').includes(entrySearch));
+    detail.innerHTML=`<div class="profile"><div class="profile-top"><div><h2>${escapeHTML(r.name)}</h2><div class="subtitle">${escapeHTML(r.topic)} · ${escapeHTML(r.fileName)}</div></div><button id="exportOne" class="secondary">匯出此筆 JSON</button></div><div class="chips"><span class="chip">班級 ${escapeHTML(r.cls)}</span><span class="chip">座號 ${escapeHTML(r.seat)}</span><span class="chip green">${r.entries.length} 筆創作紀錄</span><span class="chip purple">平均評分 ${averageRating(r.entries)}</span><span class="chip">最後提交 ${escapeHTML(dateText(r.lastSubmit))}</span></div></div>
+    <div class="toolbar"><strong style="font-size:13px">創作歷程</strong><span class="spacer"></span><input id="entrySearch" placeholder="搜尋此學生的紀錄…" value="${escapeHTML(entrySearch)}"><select id="sortEntries" aria-label="排序"><option value="old" ${sort==='old'?'selected':''}>舊到新</option><option value="new" ${sort==='new'?'selected':''}>新到舊</option></select></div>
+    <div class="entries">${shown.length?shown.map((e,i)=>renderEntry(e,e._index)).join(''):'<div class="empty" style="padding:28px">沒有符合的創作紀錄。</div>'}</div>
+    <div class="footer-note">資料來源：${escapeHTML(r.fileName)}。原始 JSON 未被修改；Markdown 僅在畫面上轉換呈現。</div>`;
+    $('exportOne').addEventListener('click',()=>downloadJSON(r.raw, safeFilename(r.fileName)));
+    $('entrySearch').addEventListener('input',()=>{const pos=$('entrySearch').selectionStart;renderDetail();const el=$('entrySearch');el.focus();el.setSelectionRange(pos,pos);});
+    $('sortEntries').addEventListener('change',renderDetail);
+  }
+  function safeFilename(s){return safeText(s).replace(/[\\/:*?"<>|]/g,'_')||'export.json'}
+  function downloadJSON(obj, filename){
+    const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'});
+    const url=URL.createObjectURL(blob), a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  async function loadFiles(files){
+    const jsonFiles=[...files].filter(f=>/\.json$/i.test(f.name));
+    if(!jsonFiles.length){notify('沒有找到 JSON 檔案。');return;}
+    const next=[], errors=[];
+    for(const file of jsonFiles){
+      try{
+        const text=await file.text();
+        const data=JSON.parse(text);
+        next.push(parseRecord(data,file.webkitRelativePath||file.name,next.length));
+      }catch(err){errors.push(`${file.name}：${err.message||'讀取失敗'}`);}
+    }
+    records=next;currentFiles=jsonFiles.map(f=>f.webkitRelativePath||f.name);selectedKey=records[0]?.key||null;
+    refreshFilters();updateStats();renderStudents();renderDetail();
+    $('fileSummary').textContent=`選取 ${jsonFiles.length} 個 JSON；成功 ${next.length} 個，失敗 ${errors.length} 個。`;
+    $('errorList').innerHTML=errors.length?'<strong>以下檔案無法匯入：</strong><br>'+errors.map(escapeHTML).join('<br>'):'';
+    notify(`匯入完成：成功 ${next.length} 個，失敗 ${errors.length} 個。`);
+  }
+  $('chooseFolder').addEventListener('click',()=> $('folderInput').click());
+  $('chooseFolderEmpty').addEventListener('click',()=> $('folderInput').click());
+  $('chooseFiles').addEventListener('click',()=> $('filesInput').click());
+  $('folderInput').addEventListener('change',e=>{loadFiles(e.target.files);e.target.value='';});
+  $('filesInput').addEventListener('change',e=>{loadFiles(e.target.files);e.target.value='';});
+  ['searchInput','classFilter','platformFilter','taskFilter'].forEach(id=>$(id).addEventListener(id==='searchInput'?'input':'change',()=>{renderStudents();renderDetail();}));
+  $('clearFilters').addEventListener('click',()=>{$('searchInput').value='';$('classFilter').value='';$('platformFilter').value='';$('taskFilter').value='';renderStudents();renderDetail();});
+  $('exportAll').addEventListener('click',()=>downloadJSON(records.map(r=>r.raw),'ai-creation-journeys.json'));
+})();
+</script>
+</body>
+</html>
