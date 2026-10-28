@@ -339,10 +339,10 @@
                             <span class="bg-amber-400 text-indigo-950 font-black px-3 py-1 rounded-xl text-sm">
                                 隨堂大挑戰
                             </span>
-                            <span id="quiz-progress" class="text-xs font-bold text-slate-500">第 1 題</span>
+                            <span id="quiz-progress" class="text-xs font-bold text-slate-500">第 1 / 10 題</span>
                         </div>
                         <div class="bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-xl text-sm font-black text-indigo-700">
-                            得分：<span id="quiz-score" class="num-font text-base text-rose-600">0</span> 分
+                            得分：<span id="quiz-score" class="num-font text-base text-rose-600">0</span> <span class="text-xs text-slate-500">/ 100 分</span>
                         </div>
                     </div>
 
@@ -1655,6 +1655,14 @@
                 options: ['7 個頂點、14 條邊', '8 個頂點、14 條邊', '8 個頂點、21 條邊', '14 個頂點、21 條邊'],
                 ans: 1,
                 exp: '七角錐 N=7：頂點數是 7+1=8 個頂點，邊數是 7×2=14 條邊！'
+            },
+            {
+                shapeId: 'pyramid_8',
+                unfold: 0,
+                q: '最後一題！「八角錐」的側面是由幾個什麼形狀組成的呢？',
+                options: ['8 個長方形', '8 個等腰三角形', '9 個三角形', '16 個三角形'],
+                ans: 1,
+                exp: 'N 角錐的側面都是由 N 個三角形組成，所以八角錐有 8 個等腰三角形側面！'
             }
         ];
 
@@ -1692,7 +1700,7 @@
             selectShape(qObj.shapeId);
             animateUnfoldTo(qObj.unfold * 100);
 
-            document.getElementById('quiz-progress').textContent = `第 ${idx + 1} / ${QUIZ_BANK.length} 題`;
+            document.getElementById('quiz-progress').textContent = `第 ${idx + 1} / ${QUIZ_BANK.length} 題（每題 10 分）`;
             document.getElementById('quiz-question-text').textContent = qObj.q;
 
             const optContainer = document.getElementById('quiz-options');
@@ -1708,6 +1716,13 @@
 
             const fb = document.getElementById('quiz-feedback');
             fb.classList.add('hidden');
+
+            const nextBtn = document.getElementById('quiz-next-btn');
+            if (idx === QUIZ_BANK.length - 1) {
+                nextBtn.innerHTML = `查看總成績 / 重新挑戰 <i class="fa-solid fa-rotate-right"></i>`;
+            } else {
+                nextBtn.innerHTML = `下一題 <i class="fa-solid fa-arrow-right"></i>`;
+            }
         }
 
         function checkQuizAnswer(selectedIdx, btnElement) {
@@ -1720,11 +1735,11 @@
 
             fb.classList.remove('hidden');
             if (selectedIdx === qObj.ans) {
-                quizScore += 100;
+                quizScore += 10;
                 document.getElementById('quiz-score').textContent = quizScore;
                 btnElement.className = 'btn-3d bg-emerald-500 text-white border-2 border-emerald-700 font-black py-3 px-4 rounded-2xl text-sm sm:text-base';
                 fb.className = 'rounded-2xl p-3.5 mb-4 text-sm font-bold bg-emerald-50 text-emerald-900 border border-emerald-200';
-                fb.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> 答對了！太棒了！<br><span class="text-xs font-medium">${qObj.exp}</span>`;
+                fb.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> 答對了！獲得 10 分！<br><span class="text-xs font-medium">${qObj.exp}</span>`;
                 pulseHighlightAll();
             } else {
                 btnElement.className = 'btn-3d bg-rose-500 text-white border-2 border-rose-700 font-black py-3 px-4 rounded-2xl text-sm sm:text-base';
@@ -1735,8 +1750,16 @@
         }
 
         function nextQuizQuestion() {
-            currentQuizIdx = (currentQuizIdx + 1) % QUIZ_BANK.length;
-            loadQuizQuestion(currentQuizIdx);
+            if (currentQuizIdx === QUIZ_BANK.length - 1) {
+                // 重新開始新一輪 100 分測驗
+                currentQuizIdx = 0;
+                quizScore = 0;
+                document.getElementById('quiz-score').textContent = quizScore;
+                loadQuizQuestion(0);
+            } else {
+                currentQuizIdx++;
+                loadQuizQuestion(currentQuizIdx);
+            }
         }
 
         /******************************************************************
