@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面的垂直與平行 ＆ 認識球體 3D 互動實驗室</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#bbf7d0 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .num-font {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+        }
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 26px;
+            width: 26px;
+            border-radius: 50%;
+            background: #10b981;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            margin-top: -9px;
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #059669;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 9px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-3d {
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        }
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 rgba(0,0,0,0.15);
+        }
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 230px;
+            touch-action: none;
+        }
+        .vertex-label {
+            position: absolute;
+            pointer-events: none;
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 1px 3px rgba(255,255,255,0.95), 0 0 5px rgba(255,255,255,0.95);
+            transition: opacity 0.15s;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800 pb-12 sm:pb-6 overflow-x-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-600 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-3 py-2 sm:px-4 sm:py-3 flex justify-between items-center gap-2">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <div class="bg-amber-400 text-teal-950 p-1.5 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-sm transform -rotate-6 shrink-0">
+                    <i class="fa-solid fa-shapes text-base sm:text-2xl"></i>
+                </div>
+                <div class="truncate">
+                    <h1 class="text-base sm:text-xl md:text-2xl font-black tracking-wide truncate flex items-center gap-2">
+                        <span>面的垂直與平行 ＆ 認識球體</span>
+                        <span class="hidden md:inline-block text-xs bg-amber-400 text-teal-950 font-bold px-2.5 py-0.5 rounded-full">3D 視覺化互動教具</span>
+                    </h1>
+                    <p class="text-xs text-emerald-100 hidden sm:block">動手轉一轉、切一切，觀察長方體與正方體的面關係，以及球體的奧祕！</p>
+                </div>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="flex bg-teal-950/40 p-1 rounded-xl sm:rounded-2xl border border-teal-300/30 shrink-0 gap-1">
+                <button id="top-planes-btn" onclick="switchMainTopic('planes')" class="px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-1 bg-amber-400 text-teal-950 shadow-sm">
+                    <i class="fa-solid fa-cube"></i> <span>面的垂直與平行</span>
+                </button>
+                <button id="top-sphere-btn" onclick="switchMainTopic('sphere')" class="px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-1 text-white hover:bg-white/10">
+                    <i class="fa-solid fa-basketball"></i> <span>認識球體</span>
+                </button>
+                <button id="top-quiz-btn" onclick="switchMainTopic('quiz')" class="px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-1 text-white hover:bg-white/10">
+                    <i class="fa-solid fa-trophy"></i> <span>挑戰</span><span class="hidden sm:inline">測驗</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-2.5 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
+
+        <!-- Left Column: Sub-Activity Selector & 3D Interactive Stage (7 cols on large) -->
+        <div class="lg:col-span-7 flex flex-col gap-2.5 sm:gap-4 w-full">
+
+            <!-- Sub-Activity Selector Card -->
+            <div id="sub-nav-card" class="bg-white rounded-2xl sm:rounded-3xl p-2.5 sm:p-3.5 shadow-md border-2 border-emerald-100">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <span id="topic-group-label" class="text-xs font-black text-teal-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-compass"></i> 主題一：面的垂直與平行（選擇實驗項目）
+                    </span>
+                    <span class="text-[11px] text-slate-400 font-bold hidden sm:inline">點擊切換不同教學實驗</span>
+                </div>
+                <div id="sub-tabs-container" class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+                    <!-- Dynamically populated via JS -->
+                </div>
+            </div>
+
+            <!-- 3D Viewport Card -->
+            <div class="bg-white rounded-2xl sm:rounded-3xl shadow-md border-2 border-emerald-100 overflow-hidden flex flex-col">
+                <!-- Viewport Top Bar -->
+                <div class="bg-gradient-to-r from-slate-50 to-emerald-50/50 px-3 py-2 sm:px-4 sm:py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-1.5">
+                    <div class="flex items-center gap-2">
+                        <span id="stage-badge" class="bg-teal-600 text-white text-xs sm:text-sm font-black px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg sm:rounded-xl shadow-sm">
+                            相鄰的面與垂直
+                        </span>
+                        <span class="text-[11px] text-slate-500 font-medium hidden md:inline">
+                            <i class="fa-solid fa-hand-pointer text-teal-600 mr-1"></i>拖曳旋轉 3D 視角 / 滾輪縮放
+                        </span>
+                    </div>
+
+                    <!-- View Helper Buttons -->
+                    <div class="flex items-center gap-1.5">
+                        <button id="toggle-labels-btn" onclick="toggleLabels()" class="px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition bg-amber-100 text-amber-900 border-amber-300 flex items-center gap-1" title="顯示或隱藏頂點與面標記">
+                            <i class="fa-solid fa-font"></i> 標記名稱
+                        </button>
+                        <button id="toggle-transparent-btn" onclick="toggleTransparency()" class="px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition bg-slate-100 text-slate-600 border-slate-300 flex items-center gap-1" title="半透明透視">
+                            <i class="fa-solid fa-eye"></i> 透視內部
+                        </button>
+                        <button onclick="resetCameraView()" class="px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200 hover:bg-sky-200 transition" title="重設視角">
+                            <i class="fa-solid fa-rotate-left"></i> 重設視角
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3D Canvas Container -->
+                <div class="relative w-full h-[235px] sm:h-[350px] lg:h-[400px] bg-gradient-to-b from-sky-50/60 via-white to-emerald-50/40 overflow-hidden">
+                    <div id="canvas-container"></div>
+                    <!-- 2D HTML Overlay for Crisp Labels (甲乙丙丁 / ABCDEFGH / 球心 / 半徑) -->
+                    <div id="labels-overlay" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+                    <!-- Floating Legend (Top Left) -->
+                    <div id="floating-legend" class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 text-[11px] sm:text-xs space-y-1 pointer-events-none">
+                        <!-- Dynamically updated per scene -->
+                    </div>
+
+                    <!-- Floating Status Badge (Top Right) -->
+                    <div id="floating-status" class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-teal-950/85 backdrop-blur-sm text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold pointer-events-none">
+                        互動觀察中
+                    </div>
+
+                    <!-- Zoom In / Out Buttons for Mobile & Touch -->
+                    <div class="absolute bottom-2 right-2 flex gap-1.5">
+                        <button onclick="zoomCamera(-0.85)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/90 hover:bg-white text-slate-700 shadow border border-slate-200 flex items-center justify-center text-xs font-bold active:scale-95" title="放大">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </button>
+                        <button onclick="zoomCamera(0.85)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/90 hover:bg-white text-slate-700 shadow border border-slate-200 flex items-center justify-center text-xs font-bold active:scale-95" title="縮小">
+                            <i class="fa-solid fa-magnifying-glass-minus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive Controls Footer (Dynamic per sub-mode) -->
+                <div id="stage-controls-footer" class="p-3 sm:p-4 bg-slate-50 border-t border-slate-200 flex flex-col gap-2.5">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Teaching Guide, Interactive Inspection & Quiz (5 cols on large) -->
+        <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-4 w-full">
+
+            <!-- EXPLORE TEACHING PANEL -->
+            <div id="panel-explore" class="flex flex-col gap-3 sm:gap-4">
+                <!-- Concept Explanation Card -->
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-md border-2 border-emerald-100">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                        <div>
+                            <span id="info-tag" class="text-[11px] sm:text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800">
+                                面的垂直與平行
+                            </span>
+                            <h2 id="info-title" class="text-xl sm:text-2xl font-black text-slate-800 mt-1">
+                                認識「相鄰的面」與互相垂直
+                            </h2>
+                        </div>
+                        <div id="info-icon-box" class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl sm:text-2xl font-black shrink-0">
+                            <i class="fa-solid fa-ruler-combined"></i>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Interactive Content Area -->
+                    <div id="info-body" class="space-y-3 text-sm text-slate-700">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Key Takeaway / Teacher Tip Box -->
+                <div class="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-md border-2 border-amber-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="bg-amber-400 text-teal-950 w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black shadow-sm shrink-0">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <h3 id="takeaway-title" class="font-black text-base sm:text-lg text-amber-950">
+                            觀念重點整理
+                        </h3>
+                    </div>
+                    <div id="takeaway-content" class="text-xs sm:text-sm text-amber-900 space-y-2 leading-relaxed font-medium">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUIZ PANEL (Hidden by default) -->
+            <div id="panel-quiz" class="hidden flex-col gap-3 sm:gap-4">
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-md border-2 border-teal-200">
+                    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-400 text-teal-950 font-black px-3 py-1 rounded-xl text-xs sm:text-sm">
+                                觀念大挑戰
+                            </span>
+                            <span id="quiz-progress" class="text-xs font-bold text-slate-500">第 1 / 10 題</span>
+                        </div>
+                        <div class="bg-teal-50 border border-teal-200 px-3 py-1 rounded-xl text-xs sm:text-sm font-black text-teal-800">
+                            得分：<span id="quiz-score" class="num-font text-base text-rose-600">0</span> <span class="text-xs text-slate-500">/ 100 分</span>
+                        </div>
+                    </div>
+
+                    <!-- Question Box -->
+                    <div class="bg-teal-50/70 rounded-2xl p-3.5 sm:p-4 border border-teal-100 mb-3.5">
+                        <p id="quiz-question-text" class="text-sm sm:text-base font-black text-slate-800 leading-relaxed">
+                            題目載入中...
+                        </p>
+                        <p class="text-[11px] sm:text-xs text-teal-700 font-bold mt-2">
+                            <i class="fa-solid fa-hand-point-left mr-1"></i>提示：可以直接操作左邊的 3D 圖形來幫忙找答案喔！
+                        </p>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3.5">
+                        <!-- Generated via JS -->
+                    </div>
+
+                    <!-- Feedback Box -->
+                    <div id="quiz-feedback" class="hidden rounded-2xl p-3 mb-3.5 text-xs sm:text-sm font-bold"></div>
+
+                    <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="w-full btn-3d bg-teal-600 hover:bg-teal-700 text-white font-black py-2.5 sm:py-3 rounded-2xl text-sm sm:text-base flex items-center justify-center gap-2">
+                        下一題 <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Summary Cheat Sheet Card -->
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-4 shadow-md border-2 border-slate-200">
+                    <h4 class="font-black text-xs sm:text-sm text-slate-700 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-book-open text-teal-600"></i> 面的垂直平行 ＆ 球體重點速記表
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2 text-xs">
+                        <div class="bg-rose-50/80 border border-rose-200 rounded-xl p-2.5">
+                            <span class="font-black text-rose-700">■ 相鄰的面（互相垂直）：</span>
+                            <span class="text-slate-700 font-medium">長方體或正方體中，有「一條邊相接」的兩個面稱為相鄰的面。每個面都有 <strong>4 個相鄰的面</strong>，且相鄰的面都<strong>互相垂直</strong>。</span>
+                        </div>
+                        <div class="bg-sky-50/80 border border-sky-200 rounded-xl p-2.5">
+                            <span class="font-black text-sky-700">■ 相對的面（互相平行）：</span>
+                            <span class="text-slate-700 font-medium">面對面、不相接的兩個面稱為相對的面。相對兩面之間的<strong>距離處處相等</strong>，所以相對的面都<strong>互相平行</strong>（共有 3 組相對的面）。</span>
+                        </div>
+                        <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-2.5">
+                            <span class="font-black text-amber-800">● 球體與切面：</span>
+                            <span class="text-slate-700 font-medium">球從任何方向平平切開，切面都是<strong>圓形</strong>。通過<strong>球心</strong>平分成兩半時，切出來的圓<strong>最大</strong>！</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        /******************************************************************
+         * 1. 教具主題與子單元定義
+         ******************************************************************/
+        const SUB_MODES = {
+            planes: [
+                {
+                    id: 'plane_life',
+                    shortTitle: '生活中的垂直與平行',
+                    badge: '櫃子與肥皂觀察',
+                    icon: 'fa-soap'
+                },
+                {
+                    id: 'plane_perp',
+                    shortTitle: '相鄰的面與垂直',
+                    badge: '長方體相鄰的面',
+                    icon: 'fa-border-top-left'
+                },
+                {
+                    id: 'plane_para',
+                    shortTitle: '相對的面與平行',
+                    badge: '相對的面與等距離',
+                    icon: 'fa-arrows-up-down'
+                },
+                {
+                    id: 'plane_ABCD',
+                    shortTitle: '頂點標記與工具檢查',
+                    badge: '面ABCD與垂直平行檢查',
+                    icon: 'fa-cube'
+                }
+            ],
+            sphere: [
+                {
+                    id: 'sphere_spin',
+                    shortTitle: '竹筷轉圓卡變球體',
+                    badge: '快速旋轉圓形紙卡',
+                    icon: 'fa-arrows-spin'
+                },
+                {
+                    id: 'sphere_fold',
+                    shortTitle: '圓形卡紙做紙球',
+                    badge: '半圓卡紙組合球體',
+                    icon: 'fa-layer-group'
+                },
+                {
+                    id: 'sphere_slice',
+                    shortTitle: '切開球體看截面',
+                    badge: '球心、半徑與最大切面',
+                    icon: 'fa-circle-half-stroke'
+                },
+                {
+                    id: 'sphere_cake',
+                    shortTitle: '素養挑戰：切長方體蛋糕',
+                    badge: '一刀切成兩個柱體',
+                    icon: 'fa-cake-candles'
+                }
+            ]
+        };
+
+        let currentTopic = 'planes';     // 'planes' | 'sphere' | 'quiz'
+        let currentSubMode = 'plane_perp';
+        let showLabels = true;
+        let isTransparent = false;
+
+        // Three.js 全域物件
+        let scene, camera, renderer, rootGroup;
+        let labelItems = []; // { pos: THREE.Vector3, text: string, className: string, el: HTMLElement }
+        let animCallbacks = [];
+
+        // 相機軌道參數
+        let isPointerDown = false;
+        let prevPointer = { x: 0, y: 0 };
+        let camSpherical = { theta: 0.65, phi: 1.1, radius: 7.5 };
+        let camTarget = new THREE.Vector3(0, 0, 0);
+
+        // 各互動場景專用狀態
+        let lifeSubState = { type: 'cabinet', cabinetTilt: 18, soapPose: 1, shelfLevels: 2, shelfTilted: false };
+        let perpSelectedFace = 0; // 0:甲(前), 1:乙(左), 2:戊(右), 3:己(上), 4:丙(下), 5:丁(後)
+        let paraPairIdx = 0;      // 0: 甲-丁(前後), 1: 乙-戊(左右), 2: 己-丙(上下)
+        let showParaRulers = true;
+        let abcdSubTab = 'vertex'; // 'vertex' | 'check_perp' | 'check_para'
+        let abcdPairIdx = 0;
+        let checkAngleDeg = 90;   // 用長方體檢查兩個平面夾角 (90, 72, 110)
+        let checkParaMatch = true; // 用正方體檢查柱體兩面是否平行
+
+        // 球體互動狀態
+        let spinSpeed = 0;        // 0 ~ 100 竹筷旋轉速度
+        let spinAngle = 0;
+        let foldCount = 8;        // 幾張半圓卡紙展開成紙球 (2 ~ 12)
+        let foldSpread = 100;     // 0 ~ 100% 展開成球
+        let sliceOffset = 0;      // -0.90 ~ +0.90 球切面位置 (0 = 通過球心)
+        let sliceDirection = 'horizontal'; // 'horizontal' | 'vertical' | 'slanted'
+        let sliceSeparate = 0.45; // 切開後兩半分離距離
+        let cakeCutType = 0;      // 0: 切出三角柱+四角柱, 1: 切出兩個三角柱(對角線), 2: 切出兩個四角柱(平行切), 3: 切出三角柱+五角柱(切一角)
+        let cakeSeparate = 0.5;   // 蛋糕切開後分離程度
+
+        /******************************************************************
+         * 2. Three.js 場景初始化
+         ******************************************************************/
+        function initThreeScene() {
+            const container = document.getElementById('canvas-container');
+            const w = container.clientWidth || 600;
+            const h = container.clientHeight || 380;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
+            updateCameraTransform();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.78);
+            scene.add(ambient);
+
+            const dir1 = new THREE.DirectionalLight(0xffffff, 0.6);
+            dir1.position.set(7, 12, 9);
+            scene.add(dir1);
+
+            const dir2 = new THREE.DirectionalLight(0xe0f2fe, 0.35);
+            dir2.position.set(-7, -6, -5);
+            scene.add(dir2);
+
+            const grid = new THREE.GridHelper(14, 14, 0xcbd5e1, 0xe2e8f0);
+            grid.position.y = -1.65;
+            scene.add(grid);
+
+            rootGroup = new THREE.Group();
+            scene.add(rootGroup);
+
+            const dom = renderer.domElement;
+            dom.addEventListener('pointerdown', onPointerDown);
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerup', onPointerUp);
+            dom.addEventListener('wheel', onMouseWheel, { passive: false });
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onPointerDown(e) {
+            isPointerDown = true;
+            prevPointer.x = e.clientX;
+            prevPointer.y = e.clientY;
+        }
+
+        function onPointerMove(e) {
+            if (!isPointerDown) return;
+            const dx = e.clientX - prevPointer.x;
+            const dy = e.clientY - prevPointer.y;
+            prevPointer.x = e.clientX;
+            prevPointer.y = e.clientY;
+
+            camSpherical.theta -= dx * 0.008;
+            camSpherical.phi = Math.max(0.15, Math.min(Math.PI / 2 + 0.35, camSpherical.phi - dy * 0.008));
+            updateCameraTransform();
+        }
+
+        function onPointerUp() {
+            isPointerDown = false;
+        }
+
+        function onMouseWheel(e) {
+            e.preventDefault();
+            camSpherical.radius = Math.max(4.0, Math.min(13.0, camSpherical.radius + e.deltaY * 0.004));
+            updateCameraTransform();
+        }
+
+        function updateCameraTransform() {
+            if (!camera) return;
+            const x = camSpherical.radius * Math.sin(camSpherical.phi) * Math.sin(camSpherical.theta);
+            const y = camSpherical.radius * Math.cos(camSpherical.phi);
+            const z = camSpherical.radius * Math.sin(camSpherical.phi) * Math.cos(camSpherical.theta);
+            camera.position.set(x + camTarget.x, y + camTarget.y, z + camTarget.z);
+            camera.lookAt(camTarget);
+        }
+
+        function resetCameraView() {
+            camSpherical = { theta: 0.62, phi: 1.08, radius: 7.4 };
+            camTarget.set(0, 0, 0);
+            updateCameraTransform();
+        }
+
+        function zoomCamera(delta) {
+            camSpherical.radius = Math.max(4.0, Math.min(13.0, camSpherical.radius + delta));
+            updateCameraTransform();
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            if (!container || !renderer) return;
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+
+        /******************************************************************
+         * 3. 2D 浮動標籤與 3D 輔助繪圖工具
+         ******************************************************************/
+        function clearSceneAndLabels() {
+            while (rootGroup.children.length > 0) {
+                rootGroup.remove(rootGroup.children[0]);
+            }
+            const overlay = document.getElementById('labels-overlay');
+            overlay.innerHTML = '';
+            labelItems = [];
+            animCallbacks = [];
+        }
+
+        function addFloatingLabel(posVec3, text, bgClass = 'bg-white/90 text-slate-800 border-slate-300', sizeClass = 'text-xs sm:text-sm px-2 py-0.5') {
+            const overlay = document.getElementById('labels-overlay');
+            const el = document.createElement('div');
+            el.className = `vertex-label rounded-lg border shadow-sm ${bgClass} ${sizeClass}`;
+            el.innerHTML = text;
+            el.style.display = showLabels ? 'block' : 'none';
+            overlay.appendChild(el);
+
+            const item = { pos: posVec3.clone(), el };
+            labelItems.push(item);
+            return item;
+        }
+
+        function updateFloatingLabelsPosition() {
+            if (!showLabels || !camera || !renderer) return;
+            const w = renderer.domElement.clientWidth;
+            const h = renderer.domElement.clientHeight;
+
+            labelItems.forEach(item => {
+                const v = item.pos.clone();
+                v.project(camera);
+                if (v.z > 1) {
+                    item.el.style.opacity = '0';
+                } else {
+                    const x = (v.x * 0.5 + 0.5) * w;
+                    const y = (-(v.y * 0.5) + 0.5) * h;
+                    item.el.style.left = `${x}px`;
+                    item.el.style.top = `${y}px`;
+                    item.el.style.opacity = '1';
+                }
+            });
+        }
+
+        function toggleLabels() {
+            showLabels = !showLabels;
+            labelItems.forEach(item => {
+                item.el.style.display = showLabels ? 'block' : 'none';
+            });
+            const btn = document.getElementById('toggle-labels-btn');
+            btn.className = showLabels
+                ? 'px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition bg-amber-100 text-amber-900 border-amber-300 flex items-center gap-1'
+                : 'px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition bg-slate-100 text-slate-400 border-slate-200 flex items-center gap-1';
+        }
+
+        function toggleTransparency() {
+            isTransparent = !isTransparent;
+            const btn = document.getElementById('toggle-transparent-btn');
+            btn.className = isTransparent
+                ? 'px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition bg-teal-100 text-teal-900 border-teal-300 flex items-center gap-1'
+                : 'px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition bg-slate-100 text-slate-600 border-slate-300 flex items-center gap-1';
+            rebuildCurrentScene();
+        }
+
+        // 建立帶有粗黑邊框的長方體六個獨立面 (方便個別指定顏色與高亮)
+        // 順序：0:前(甲,+Z), 1:左(乙,-X), 2:右(戊,+X), 3:上(己,+Y), 4:下(丙,-Y), 5:後(丁,-Z)
+        function createCustomBoxFaces(W, H, D, faceColors, faceOpacities) {
+            const group = new THREE.Group();
+            const hw = W / 2, hh = H / 2, hd = D / 2;
+
+            const faceDefs = [
+                { name: '甲', norm: [0, 0, 1], verts: [[-hw, -hh, hd], [hw, -hh, hd], [hw, hh, hd], [-hw, hh, hd]], labelPos: [0, 0, hd + 0.08] },
+                { name: '乙', norm: [-1, 0, 0], verts: [[-hw, -hh, -hd], [-hw, -hh, hd], [-hw, hh, hd], [-hw, hh, -hd]], labelPos: [-hw - 0.08, 0, 0] },
+                { name: '戊', norm: [1, 0, 0], verts: [[hw, -hh, hd], [hw, -hh, -hd], [hw, hh, -hd], [hw, hh, hd]], labelPos: [hw + 0.08, 0, 0] },
+                { name: '己', norm: [0, 1, 0], verts: [[-hw, hh, hd], [hw, hh, hd], [hw, hh, -hd], [-hw, hh, -hd]], labelPos: [0, hh + 0.08, 0] },
+                { name: '丙', norm: [0, -1, 0], verts: [[-hw, -hh, -hd], [hw, -hh, -hd], [hw, -hh, hd], [-hw, -hh, hd]], labelPos: [0, -hh - 0.08, 0] },
+                { name: '丁', norm: [0, 0, -1], verts: [[hw, -hh, -hd], [-hw, -hh, -hd], [-hw, hh, -hd], [hw, hh, -hd]], labelPos: [0, 0, -hd - 0.08] }
+            ];
+
+            const meshes = [];
+            faceDefs.forEach((f, idx) => {
+                const geom = new THREE.BufferGeometry();
+                const v = f.verts;
+                const pos = [
+                    ...v[0], ...v[1], ...v[2],
+                    ...v[0], ...v[2], ...v[3]
+                ];
+                geom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+                geom.computeVertexNormals();
+
+                const op = isTransparent ? Math.min(faceOpacities[idx], 0.45) : faceOpacities[idx];
+                const mat = new THREE.MeshStandardMaterial({
+                    color: faceColors[idx],
+                    roughness: 0.35,
+                    metalness: 0.05,
+                    transparent: op < 0.99,
+                    opacity: op,
+                    side: THREE.DoubleSide,
+                    polygonOffset: true,
+                    polygonOffsetFactor: 1,
+                    polygonOffsetUnits: 1
+                });
+
+                const mesh = new THREE.Mesh(geom, mat);
+                group.add(mesh);
+                meshes.push(mesh);
+
+                // 外框線
+                const pts = f.verts.map(p => new THREE.Vector3(...p));
+                pts.push(pts[0].clone());
+                const lineGeom = new THREE.BufferGeometry().setFromPoints(pts);
+                const line = new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color: 0x1e293b, linewidth: 2 }));
+                group.add(line);
+            });
+
+            return { group, meshes, faceDefs };
+        }
+
+        // 建立 3D 直角符號 (L型紅框)
+        function createRightAngleMarker(origin, dir1, dir2, size = 0.32) {
+            const p0 = origin.clone();
+            const p1 = origin.clone().add(dir1.clone().normalize().multiplyScalar(size));
+            const p2 = p1.clone().add(dir2.clone().normalize().multiplyScalar(size));
+            const p3 = origin.clone().add(dir2.clone().normalize().multiplyScalar(size));
+
+            const geom = new THREE.BufferGeometry().setFromPoints([p1, p2, p3]);
+            const mat = new THREE.LineBasicMaterial({ color: 0xe11d48, linewidth: 3 });
+            return new THREE.Line(geom, mat);
+        }
+
+        /******************************************************************
+         * 4. 各子單元 3D 場景與互動介面建構
+         ******************************************************************/
+        function switchMainTopic(topic) {
+            currentTopic = topic;
+
+            const btnPlanes = document.getElementById('top-planes-btn');
+            const btnSphere = document.getElementById('top-sphere-btn');
+            const btnQuiz = document.getElementById('top-quiz-btn');
+
+            const activeCls = 'px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-1 bg-amber-400 text-teal-950 shadow-sm';
+            const inactiveCls = 'px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-1 text-white hover:bg-white/10';
+
+            btnPlanes.className = (topic === 'planes') ? activeCls : inactiveCls;
+            btnSphere.className = (topic === 'sphere') ? activeCls : inactiveCls;
+            btnQuiz.className = (topic === 'quiz') ? activeCls : inactiveCls;
+
+            const subNavCard = document.getElementById('sub-nav-card');
+            const expPanel = document.getElementById('panel-explore');
+            const quizPanel = document.getElementById('panel-quiz');
+
+            if (topic === 'quiz') {
+                subNavCard.classList.add('hidden');
+                expPanel.classList.add('hidden');
+                quizPanel.classList.remove('hidden');
+                quizPanel.classList.add('flex');
+                loadQuizQuestion(currentQuizIdx);
+            } else {
+                subNavCard.classList.remove('hidden');
+                expPanel.classList.remove('hidden');
+                quizPanel.classList.add('hidden');
+                quizPanel.classList.remove('flex');
+
+                document.getElementById('topic-group-label').innerHTML = topic === 'planes'
+                    ? '<i class="fa-solid fa-cube text-teal-600"></i> 主題：面的垂直與平行（點擊切換實驗）'
+                    : '<i class="fa-solid fa-basketball text-amber-500"></i> 主題：認識球體（點擊切換實驗）';
+
+                const firstSub = SUB_MODES[topic][0].id;
+                selectSubMode(firstSub);
+            }
+        }
+
+        function renderSubTabs() {
+            const list = SUB_MODES[currentTopic === 'quiz' ? 'planes' : currentTopic];
+            const container = document.getElementById('sub-tabs-container');
+            container.innerHTML = '';
+
+            list.forEach(item => {
+                const isActive = (item.id === currentSubMode);
+                const btn = document.createElement('button');
+                btn.className = `btn-3d py-2 px-2 sm:px-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm border-2 transition flex items-center justify-center gap-1.5 ${
+                    isActive
+                        ? 'bg-teal-600 text-white border-teal-800'
+                        : 'bg-slate-50 hover:bg-teal-50 text-slate-700 border-slate-200'
+                }`;
+                btn.innerHTML = `<i class="fa-solid ${item.icon}"></i><span class="truncate">${item.shortTitle}</span>`;
+                btn.onclick = () => selectSubMode(item.id);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectSubMode(subId) {
+            currentSubMode = subId;
+            if (currentTopic !== 'quiz') {
+                renderSubTabs();
+            }
+            rebuildCurrentScene();
+        }
+
+        function rebuildCurrentScene() {
+            clearSceneAndLabels();
+
+            switch (currentSubMode) {
+                case 'plane_life':
+                    buildScenePlaneLife();
+                    break;
+                case 'plane_perp':
+                    buildScenePlanePerp();
+                    break;
+                case 'plane_para':
+                    buildScenePlanePara();
+                    break;
+                case 'plane_ABCD':
+                    buildScenePlaneABCD();
+                    break;
+                case 'sphere_spin':
+                    buildSceneSphereSpin();
+                    break;
+                case 'sphere_fold':
+                    buildSceneSphereFold();
+                    break;
+                case 'sphere_slice':
+                    buildSceneSphereSlice();
+                    break;
+                case 'sphere_cake':
+                    buildSceneSphereCake();
+                    break;
+            }
+        }
+
+        /* ==============================================================
+         * 單元 1-1：生活中的垂直與平行（櫃子歪斜 vs 正正的、手工皂三種擺放、書櫃層板）
+         * ============================================================== */
+        function buildScenePlaneLife() {
+            document.getElementById('stage-badge').textContent = '生活中的垂直與平行';
+            const legend = document.getElementById('floating-legend');
+            const status = document.getElementById('floating-status');
+
+            // 地板平面
+            const floorGeom = new THREE.BoxGeometry(6.2, 0.14, 3.2);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.6 });
+            const floor = new THREE.Mesh(floorGeom, floorMat);
+            floor.position.set(0, -1.35, 0);
+            rootGroup.add(floor);
+
+            if (lifeSubState.type === 'cabinet') {
+                legend.innerHTML = `
+                    <div class="font-bold text-slate-700 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-sky-400 inline-block"></span> 櫃子側面</div>
+                    <div class="font-bold text-slate-700 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-300 inline-block"></span> 地面/桌面</div>
+                    <div class="font-bold text-rose-600 flex items-center gap-1.5"><span class="w-3 h-3 border-t-2 border-r-2 border-rose-600 inline-block"></span> 垂直直角(90°)</div>
+                `;
+
+                const tiltRad = (lifeSubState.cabinetTilt * Math.PI) / 180;
+                const isVertical = Math.abs(lifeSubState.cabinetTilt) < 1;
+                status.innerHTML = isVertical
+                    ? '<span class="text-emerald-300">✓ 櫃子側面與地面「互相垂直」(90°)</span>'
+                    : `<span class="text-amber-300">⚠ 櫃子歪歪的！傾斜了 ${lifeSubState.cabinetTilt}° (沒有與地面垂直)</span>`;
+
+                // 左邊：可調傾斜的櫃子；右邊：正正的對照櫃子
+                const createCabinet = (centerX, shearAngleRad, labelTitle) => {
+                    const g = new THREE.Group();
+                    g.position.set(centerX, -1.28, 0);
+                    const H = 2.4, W = 1.4, D = 0.9;
+                    const dx = Math.sin(shearAngleRad) * H;
+                    const dy = Math.cos(shearAngleRad) * H;
+
+                    const mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4, side: THREE.DoubleSide });
+                    // 左右兩側板與四層橫板
+                    const buildBoard = (p1, p2, depth) => {
+                        const v = [
+                            [p1.x, p1.y, depth / 2], [p2.x, p2.y, depth / 2],
+                            [p2.x, p2.y, -depth / 2], [p1.x, p1.y, -depth / 2]
+                        ];
+                        const geom = new THREE.BufferGeometry();
+                        geom.setAttribute('position', new THREE.Float32BufferAttribute([
+                            ...v[0], ...v[1], ...v[2], ...v[0], ...v[2], ...v[3]
+                        ], 3));
+                        geom.computeVertexNormals();
+                        const m = new THREE.Mesh(geom, mat);
+                        g.add(m);
+                        const line = new THREE.Line(
+                            new THREE.BufferGeometry().setFromPoints([...v, v[0]].map(p => new THREE.Vector3(...p))),
+                            new THREE.LineBasicMaterial({ color: 0x0f172a })
+                        );
+                        g.add(line);
+                    };
+
+                    // 左側板、右側板
+                    buildBoard({ x: -W / 2, y: 0 }, { x: -W / 2 + dx, y: dy }, D);
+                    buildBoard({ x: W / 2, y: 0 }, { x: W / 2 + dx, y: dy }, D);
+
+                    // 4 層水平層板
+                    for (let i = 0; i <= 3; i++) {
+                        const frac = i / 3;
+                        const sx = frac * dx;
+                        const sy = frac * dy;
+                        buildBoard({ x: -W / 2 + sx, y: sy }, { x: W / 2 + sx, y: sy }, D);
+                    }
+
+                    // 若垂直則加上直角標記
+                    if (Math.abs(shearAngleRad) < 0.02) {
+                        const marker = createRightAngleMarker(
+                            new THREE.Vector3(W / 2, 0, D / 2 + 0.02),
+                            new THREE.Vector3(1, 0, 0),
+                            new THREE.Vector3(0, 1, 0),
+                            0.32
+                        );
+                        g.add(marker);
+                    }
+
+                    rootGroup.add(g);
+                    addFloatingLabel(new THREE.Vector3(centerX + dx / 2, -1.28 + dy + 0.35, 0), labelTitle,
+                        Math.abs(shearAngleRad) < 0.02 ? 'bg-emerald-600 text-white border-emerald-800' : 'bg-rose-500 text-white border-rose-700');
+                };
+
+                createCabinet(-1.55, -tiltRad, isVertical ? '一號櫃：正正的 (垂直)' : '一號櫃：歪歪的 (未垂直)');
+                createCabinet(1.55, 0, '二號櫃：正正的 (側面與地面垂直)');
+
+            } else if (lifeSubState.type === 'soap') {
+                legend.innerHTML = `
+                    <div class="font-bold text-amber-800 flex items-center gap-1.5">⭐ 有星星記號的面</div>
+                    <div class="font-bold text-rose-600 flex items-center gap-1.5"><span class="w-3 h-3 border-t-2 border-r-2 border-rose-600 inline-block"></span> 與桌面垂直(90°)</div>
+                `;
+                status.innerHTML = `<span class="text-emerald-300">圖(${lifeSubState.soapPose === 1 ? '一' : lifeSubState.soapPose === 2 ? '二' : '三'})：改變擺放方向，有 ★ 的面仍然與桌面垂直！</span>`;
+
+                // 依據擺放方式設定長方體手工皂長寬高 (正面 +Z 永遠是有星星記號的面)
+                let W = 2.2, H = 1.4, D = 0.9;
+                if (lifeSubState.soapPose === 2) { W = 2.0; H = 1.5; D = 0.9; }
+                if (lifeSubState.soapPose === 3) { W = 1.1; H = 2.3; D = 1.1; }
+
+                const colors = [0xfef08a, 0xfde68a, 0xfde68a, 0xfef3c7, 0xd97706, 0xfde68a];
+                const boxObj = createCustomBoxFaces(W, H, D, colors, [1, 1, 1, 1, 1, 1]);
+                boxObj.group.position.set(0, -1.28 + H / 2, 0);
+                if (lifeSubState.soapPose === 2) {
+                    boxObj.group.rotation.y = -0.45;
+                }
+                rootGroup.add(boxObj.group);
+
+                // 直角符號
+                const marker = createRightAngleMarker(
+                    new THREE.Vector3(0, -1.28, D / 2),
+                    new THREE.Vector3(0, 1, 0),
+                    new THREE.Vector3(0, 0, 1),
+                    0.38
+                );
+                boxObj.group.add(marker);
+
+                const starWorldPos = new THREE.Vector3(0, 0, D / 2 + 0.08);
+                boxObj.group.localToWorld(starWorldPos);
+                addFloatingLabel(starWorldPos, '⭐ 有星星記號的面', 'bg-amber-400 text-indigo-950 border-amber-600', 'text-xs sm:text-sm px-2.5 py-1');
+                addFloatingLabel(new THREE.Vector3(0, -1.5, 1.2), '桌面（水平面）', 'bg-slate-700 text-white border-slate-900');
+
+            } else if (lifeSubState.type === 'shelf') {
+                legend.innerHTML = `
+                    <div class="font-bold text-amber-800 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-300 inline-block"></span> 書櫃上下底面與層板</div>
+                    <div class="font-bold text-sky-600 flex items-center gap-1.5"><i class="fa-solid fa-arrows-up-down"></i> 兩側高度一樣＝互相平行</div>
+                `;
+                status.innerHTML = lifeSubState.shelfTilted
+                    ? '<span class="text-rose-300">⚠ 層板兩邊不一樣高！放東西會歪歪的（不平行）</span>'
+                    : '<span class="text-emerald-300">✓ 層板兩邊一樣高，和上下底面「互相平行」！</span>';
+
+                const W = 2.4, H = 2.8, D = 1.2;
+                const g = new THREE.Group();
+                g.position.set(0, -1.28 + H / 2, 0);
+                rootGroup.add(g);
+
+                const woodMat = new THREE.MeshStandardMaterial({ color: 0xfcd34d, roughness: 0.5 });
+                const shelfMat = new THREE.MeshStandardMaterial({ color: lifeSubState.shelfTilted ? 0xfda4af : 0x38bdf8, roughness: 0.4 });
+
+                // 左右木板與上下木板
+                const leftB = new THREE.Mesh(new THREE.BoxGeometry(0.12, H, D), woodMat);
+                leftB.position.x = -W / 2;
+                const rightB = new THREE.Mesh(new THREE.BoxGeometry(0.12, H, D), woodMat);
+                rightB.position.x = W / 2;
+                const topB = new THREE.Mesh(new THREE.BoxGeometry(W, 0.12, D), woodMat);
+                topB.position.y = H / 2;
+                const botB = new THREE.Mesh(new THREE.BoxGeometry(W, 0.12, D), woodMat);
+                botB.position.y = -H / 2;
+                g.add(leftB, rightB, topB, botB);
+
+                // 中間層板
+                const s1 = new THREE.Mesh(new THREE.BoxGeometry(W - 0.12, 0.1, D - 0.05), shelfMat);
+                s1.position.y = 0.45;
+                if (lifeSubState.shelfTilted) s1.rotation.z = 0.18;
+                const s2 = new THREE.Mesh(new THREE.BoxGeometry(W - 0.12, 0.1, D - 0.05), woodMat);
+                s2.position.y = -0.45;
+                g.add(s1, s2);
+
+                addFloatingLabel(new THREE.Vector3(0, -1.28 + H, D / 2), '最上面', 'bg-amber-100 text-amber-950 border-amber-400');
+                addFloatingLabel(new THREE.Vector3(0, -1.28 + H / 2 + 0.45, D / 2), lifeSubState.shelfTilted ? '新加層板 (兩邊不一樣高!)' : '層板 (兩邊一樣高，互相平行)',
+                    lifeSubState.shelfTilted ? 'bg-rose-500 text-white border-rose-700' : 'bg-sky-500 text-white border-sky-700');
+                addFloatingLabel(new THREE.Vector3(0, -1.28, D / 2), '最下面', 'bg-amber-100 text-amber-950 border-amber-400');
+            }
+
+            // 下方控制列
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setLifeMode('cabinet')" class="btn-3d py-2 px-2 rounded-xl font-bold text-xs sm:text-sm ${lifeSubState.type === 'cabinet' ? 'bg-teal-600 text-white' : 'bg-white text-slate-700 border border-slate-200'}">
+                        1. 兩個櫃子(垂直)
+                    </button>
+                    <button onclick="setLifeMode('soap')" class="btn-3d py-2 px-2 rounded-xl font-bold text-xs sm:text-sm ${lifeSubState.type === 'soap' ? 'bg-teal-600 text-white' : 'bg-white text-slate-700 border border-slate-200'}">
+                        2. 手工皂換方向
+                    </button>
+                    <button onclick="setLifeMode('shelf')" class="btn-3d py-2 px-2 rounded-xl font-bold text-xs sm:text-sm ${lifeSubState.type === 'shelf' ? 'bg-teal-600 text-white' : 'bg-white text-slate-700 border border-slate-200'}">
+                        3. 書櫃層板(平行)
+                    </button>
+                </div>
+                <div id="life-sub-controls" class="pt-1"></div>
+            `;
+
+            const subCtrl = document.getElementById('life-sub-controls');
+            if (lifeSubState.type === 'cabinet') {
+                subCtrl.innerHTML = `
+                    <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-600 shrink-0">調整一號櫃角度：</span>
+                        <input type="range" min="0" max="25" value="${lifeSubState.cabinetTilt}" oninput="lifeSubState.cabinetTilt=parseInt(this.value);rebuildCurrentScene();">
+                        <button onclick="lifeSubState.cabinetTilt=0;rebuildCurrentScene();" class="btn-3d bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shrink-0">扶正(垂直)</button>
+                    </div>
+                `;
+            } else if (lifeSubState.type === 'soap') {
+                subCtrl.innerHTML = `
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="lifeSubState.soapPose=1;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${lifeSubState.soapPose===1?'bg-amber-500 text-white':'bg-white border'}">圖(一) 平放</button>
+                        <button onclick="lifeSubState.soapPose=2;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${lifeSubState.soapPose===2?'bg-amber-500 text-white':'bg-white border'}">圖(二) 斜轉擺放</button>
+                        <button onclick="lifeSubState.soapPose=3;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${lifeSubState.soapPose===3?'bg-amber-500 text-white':'bg-white border'}">圖(三) 直立擺放</button>
+                    </div>
+                `;
+            } else {
+                subCtrl.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="lifeSubState.shelfTilted=false;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${!lifeSubState.shelfTilted?'bg-sky-500 text-white':'bg-white border'}">✓ 層板兩邊一樣高 (互相平行)</button>
+                        <button onclick="lifeSubState.shelfTilted=true;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${lifeSubState.shelfTilted?'bg-rose-500 text-white':'bg-white border'}">✗ 層板一邊高一邊低 (歪歪的)</button>
+                    </div>
+                `;
+            }
+
+            // 右側教學說明
+            document.getElementById('info-tag').textContent = '生活中的垂直與平行';
+            document.getElementById('info-title').textContent = '觀察櫃子、手工皂與書櫃層板';
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
+                    <p class="font-bold text-teal-800"><i class="fa-solid fa-circle-question mr-1"></i>1. 為什麼左邊的櫃子看起來歪歪的，右邊看起來正正的？</p>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        因為右邊櫃子的<strong>側面與地面互相垂直</strong>（夾角是直角 90°）。拉動左下方滑桿把一號櫃扶正，當側面與地面垂直時，櫃子就會正正的！
+                    </p>
+                </div>
+                <div class="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                    <p class="font-bold text-amber-900"><i class="fa-solid fa-star text-amber-500 mr-1"></i>2. 改變手工皂的擺放方向後，有 ⭐ 記號的面還和桌面垂直嗎？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        點擊下方切換「圖(一)、圖(二)、圖(三)」，不管是正放、斜轉或直立擺放，<strong>有 ⭐ 記號的面都和桌面保持互相垂直喔！</strong>
+                    </p>
+                </div>
+                <div class="bg-sky-50/70 p-3.5 rounded-2xl border border-sky-200 space-y-2">
+                    <p class="font-bold text-sky-900"><i class="fa-solid fa-layer-group text-sky-600 mr-1"></i>3. 替書櫃多加一層層板，應該注意什麼？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        書櫃的層板都和上下兩個面一樣平平的（<strong>互相平行</strong>）。安裝層板時，<strong>要讓層板的兩邊一樣高</strong>，放東西才不會歪歪的！
+                    </p>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 生活中常見的櫃子側面與地面<strong>互相垂直</strong>；書櫃的每一層層板與上下底面則<strong>互相平行</strong>。</p>
+                <p>• 兩個平面只要互相垂直，不論在桌面上怎麼轉動方向，它們依然互相垂直！</p>
+            `;
+        }
+
+        function setLifeMode(m) {
+            lifeSubState.type = m;
+            rebuildCurrentScene();
+        }
+
+        /* ==============================================================
+         * 單元 1-2：認識相鄰的面與互相垂直（甲面與乙、戊、己、丙四個相鄰面）
+         * ============================================================== */
+        function buildScenePlanePerp() {
+            document.getElementById('stage-badge').textContent = '相鄰的面與互相垂直';
+            const W = 2.7, H = 1.8, D = 1.8;
+
+            // 每個面與哪些面相鄰 (0:甲, 1:乙, 2:戊, 3:己, 4:丙, 5:丁)
+            // 對面配對: (0,5), (1,2), (3,4)
+            const oppositeMap = { 0: 5, 5: 0, 1: 2, 2: 1, 3: 4, 4: 3 };
+            const faceNames = ['甲', '乙', '戊', '己', '丙', '丁'];
+            const adjColors = [0xfda4af, 0x38bdf8, 0x2563eb, 0x84cc16, 0x65a30d, 0xfbcfe8];
+
+            const oppIdx = oppositeMap[perpSelectedFace];
+            const colors = [];
+            const opacities = [];
+
+            for (let i = 0; i < 6; i++) {
+                if (i === perpSelectedFace) {
+                    colors.push(0xf43f5e); // 選中的主面（鮮粉紅）
+                    opacities.push(0.95);
+                } else if (i === oppIdx) {
+                    colors.push(0xf1f5f9); // 相對的面（不相鄰，淡灰透明）
+                    opacities.push(0.25);
+                } else {
+                    colors.push(adjColors[i]); // 4個相鄰的面
+                    opacities.push(0.88);
+                }
+            }
+
+            const boxObj = createCustomBoxFaces(W, H, D, colors, opacities);
+            rootGroup.add(boxObj.group);
+
+            // 標示各面名稱
+            boxObj.faceDefs.forEach((f, idx) => {
+                const isMain = (idx === perpSelectedFace);
+                const isOpp = (idx === oppIdx);
+                const cls = isMain
+                    ? 'bg-rose-600 text-white border-rose-800 scale-110'
+                    : (isOpp ? 'bg-slate-200/80 text-slate-500 border-slate-300' : 'bg-sky-500 text-white border-sky-700');
+                addFloatingLabel(new THREE.Vector3(...f.labelPos), `${f.name}面${isMain ? ' (基準)' : isOpp ? ' (相對)' : ' (相鄰)'}`, cls);
+            });
+
+            // 繪製直角符號在相鄰邊上
+            const hw = W / 2, hh = H / 2, hd = D / 2;
+            const m1 = createRightAngleMarker(new THREE.Vector3(-hw, 0, hd), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, -1), 0.35);
+            const m2 = createRightAngleMarker(new THREE.Vector3(hw, 0, hd), new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 0, -1), 0.35);
+            const m3 = createRightAngleMarker(new THREE.Vector3(0, hh, hd), new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 0, -1), 0.35);
+            const m4 = createRightAngleMarker(new THREE.Vector3(0, -hh, hd), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, -1), 0.35);
+            rootGroup.add(m1, m2, m3, m4);
+
+            const adjListNames = faceNames.filter((_, i) => i !== perpSelectedFace && i !== oppIdx);
+
+            document.getElementById('floating-legend').innerHTML = `
+                <div class="font-bold text-rose-600 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> 主觀察面：${faceNames[perpSelectedFace]}面</div>
+                <div class="font-bold text-sky-700 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-sky-400 inline-block"></span> 相鄰且垂直：${adjListNames.join('、')}面 (共4個)</div>
+                <div class="font-bold text-slate-400 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200 inline-block"></span> 不相鄰的面：${faceNames[oppIdx]}面</div>
+            `;
+            document.getElementById('floating-status').innerHTML = `
+                <span class="text-amber-300">${faceNames[perpSelectedFace]}面有 4 個相鄰的面，且都與${faceNames[perpSelectedFace]}面互相垂直！</span>
+            `;
+
+            // 下方按鈕：切換觀察哪一個面，或單獨高亮甲與乙/戊/己/丙
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-xs font-black text-slate-600"><i class="fa-solid fa-hand-pointer text-teal-600 mr-1"></i>點擊切換基準面（看看誰和它相鄰且垂直）：</span>
+                    <div class="grid grid-cols-6 gap-1.5 w-full">
+                        ${faceNames.map((n, idx) => `
+                            <button onclick="perpSelectedFace=${idx};rebuildCurrentScene();" class="btn-3d py-2 rounded-xl font-black text-xs sm:text-sm ${perpSelectedFace === idx ? 'bg-rose-600 text-white' : 'bg-white text-slate-700 border border-slate-200'}">
+                                ${n}面
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // 右側教學說明
+            document.getElementById('info-tag').textContent = '認識相鄰的面與垂直';
+            document.getElementById('info-title').textContent = `長方體中與「${faceNames[perpSelectedFace]}面」相鄰的面`;
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-rose-50 p-3.5 rounded-2xl border border-rose-200 space-y-2">
+                    <p class="font-black text-rose-800 text-sm sm:text-base">
+                        <i class="fa-solid fa-magnifying-glass mr-1"></i>什麼是「相鄰的面」？
+                    </p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        長方體中的<strong>甲面</strong>和<strong>乙面</strong>有「一條邊相接」，甲面和戊面也有一條邊相接，我們就說它們是<strong>相鄰的面</strong>。
+                    </p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                    <p class="font-black text-slate-800">
+                        算算看，長方體中每一個面有幾個相鄰的面？
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm font-bold">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-teal-800">
+                            ● 與<strong>${faceNames[perpSelectedFace]}面</strong>相鄰的面：<br>
+                            <span class="text-base text-rose-600 font-black">${adjListNames.map(x => x + '面').join('、')}</span>（共 <strong>4 個</strong>）
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-slate-600">
+                            ● 與<strong>${faceNames[perpSelectedFace]}面</strong>不相鄰的面：<br>
+                            只有對面的 <span class="text-base text-slate-800 font-black">${faceNames[oppIdx]}面</span>（1 個）
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200">
+                    <p class="font-black text-emerald-900 text-sm">
+                        <i class="fa-solid fa-check-double text-emerald-600 mr-1"></i>重要結論：
+                    </p>
+                    <p class="text-xs sm:text-sm text-emerald-800 font-bold mt-1">
+                        長方體（和正方體）中，<strong>相鄰的面都互相垂直</strong>！
+                    </p>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 長方體與正方體共有 6 個面，每一個面都有 <strong>4 個相鄰的面</strong>（上下左右四邊相接的面）。</p>
+                <p>• 只要是<strong>相鄰的兩個面</strong>，它們一定<strong>互相垂直</strong>！</p>
+            `;
+        }
+
+        /* ==============================================================
+         * 單元 1-3：認識相對的面與互相平行（甲與丁、乙與戊、丙與己 + 4條藍線等距離）
+         * ============================================================== */
+        function buildScenePlanePara() {
+            document.getElementById('stage-badge').textContent = '相對的面與互相平行';
+            const W = 2.4, H = 2.0, D = 2.0;
+
+            // 三組相對的面：
+            // Pair 0: 甲(0,前) 與 丁(5,後)
+            // Pair 1: 乙(1,左) 與 戊(2,右)
+            // Pair 2: 己(3,上) 與 丙(4,下)
+            const pairs = [
+                { indices: [0, 5], names: ['甲面', '丁面'], color: 0xf43f5e, distText: 'AE、BF、CG、DH 長度都相等' },
+                { indices: [1, 2], names: ['乙面', '戊面'], color: 0x0284c7, distText: 'AB、DC、EF、HG 長度都相等' },
+                { indices: [3, 4], names: ['己面', '丙面'], color: 0x65a30d, distText: 'AE、BF、CG、DH 垂直高度都相等' }
+            ];
+            const activePair = pairs[paraPairIdx];
+
+            const colors = [];
+            const opacities = [];
+            for (let i = 0; i < 6; i++) {
+                if (activePair.indices.includes(i)) {
+                    colors.push(activePair.color);
+                    opacities.push(0.88);
+                } else {
+                    colors.push(0xf8fafc);
+                    opacities.push(0.22);
+                }
+            }
+
+            const boxObj = createCustomBoxFaces(W, H, D, colors, opacities);
+            rootGroup.add(boxObj.group);
+
+            // 標示相對的兩個面
+            boxObj.faceDefs.forEach((f, idx) => {
+                if (activePair.indices.includes(idx)) {
+                    addFloatingLabel(new THREE.Vector3(...f.labelPos), `${f.name}面 (相對的面)`, 'bg-indigo-600 text-white border-indigo-800', 'text-xs sm:text-sm px-2.5 py-1');
+                }
+            });
+
+            // 繪製課本上的「藍色等距離測量線」證明兩相對面距離處處相等
+            if (showParaRulers) {
+                const hw = W / 2, hh = H / 2, hd = D / 2;
+                const rulerMat = new THREE.LineBasicMaterial({ color: 0x0284c7, linewidth: 3 });
+                const sphereGeom = new THREE.SphereGeometry(0.065, 12, 12);
+                const sphereMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
+
+                const addRulerLine = (p1, p2) => {
+                    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([p1, p2]), rulerMat);
+                    const b1 = new THREE.Mesh(sphereGeom, sphereMat); b1.position.copy(p1);
+                    const b2 = new THREE.Mesh(sphereGeom, sphereMat); b2.position.copy(p2);
+                    rootGroup.add(l, b1, b2);
+                };
+
+                if (paraPairIdx === 0) {
+                    // 前後相對 (Z軸距離)
+                    [-0.6, 0, 0.6].forEach(x => {
+                        addRulerLine(new THREE.Vector3(x, -hh, hd), new THREE.Vector3(x, -hh, -hd));
+                        addRulerLine(new THREE.Vector3(x, hh, hd), new THREE.Vector3(x, hh, -hd));
+                    });
+                } else if (paraPairIdx === 1) {
+                    // 左右相對 (X軸距離)
+                    [-0.6, 0, 0.6].forEach(z => {
+                        addRulerLine(new THREE.Vector3(-hw, -hh, z), new THREE.Vector3(hw, -hh, z));
+                        addRulerLine(new THREE.Vector3(-hw, hh, z), new THREE.Vector3(hw, hh, z));
+                    });
+                } else {
+                    // 上下相對 (Y軸距離)
+                    [-0.6, 0, 0.6].forEach(x => {
+                        addRulerLine(new THREE.Vector3(x, hh, hd), new THREE.Vector3(x, -hh, hd));
+                    });
+                    [-0.6, 0, 0.6].forEach(z => {
+                        addRulerLine(new THREE.Vector3(hw, hh, z), new THREE.Vector3(hw, -hh, z));
+                    });
+                }
+            }
+
+            document.getElementById('floating-legend').innerHTML = `
+                <div class="font-bold text-indigo-700 flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-500 inline-block"></span> 相對的面：${activePair.names[0]} ＆ ${activePair.names[1]}</div>
+                <div class="font-bold text-sky-600 flex items-center gap-1.5"><span class="w-3 h-1 bg-sky-500 inline-block"></span> 藍線：兩面之間的垂直距離都一樣長</div>
+            `;
+            document.getElementById('floating-status').innerHTML = `
+                <span class="text-emerald-300">✓ ${activePair.names[0]}和${activePair.names[1]}距離處處相等，所以「互相平行」！</span>
+            `;
+
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <div class="grid grid-cols-3 gap-2 w-full">
+                        <button onclick="paraPairIdx=0;rebuildCurrentScene();" class="btn-3d py-2 px-2 rounded-xl font-black text-xs sm:text-sm ${paraPairIdx===0?'bg-rose-600 text-white':'bg-white text-slate-700 border'}">
+                            第1組：甲面 ＆ 丁面
+                        </button>
+                        <button onclick="paraPairIdx=1;rebuildCurrentScene();" class="btn-3d py-2 px-2 rounded-xl font-black text-xs sm:text-sm ${paraPairIdx===1?'bg-sky-600 text-white':'bg-white text-slate-700 border'}">
+                            第2組：乙面 ＆ 戊面
+                        </button>
+                        <button onclick="paraPairIdx=2;rebuildCurrentScene();" class="btn-3d py-2 px-2 rounded-xl font-black text-xs sm:text-sm ${paraPairIdx===2?'bg-lime-600 text-white':'bg-white text-slate-700 border'}">
+                            第3組：己面 ＆ 丙面
+                        </button>
+                    </div>
+                    <button onclick="showParaRulers=!showParaRulers;rebuildCurrentScene();" class="btn-3d py-2 px-3 rounded-xl font-bold text-xs w-full sm:w-auto shrink-0 ${showParaRulers?'bg-amber-400 text-indigo-950':'bg-slate-200 text-slate-700'}">
+                        <i class="fa-solid fa-ruler"></i> ${showParaRulers ? '隱藏等距藍線' : '顯示等距藍線'}
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('info-tag').textContent = '認識互相平行的面';
+            document.getElementById('info-title').textContent = `相對的面互相平行（${activePair.names[0]}與${activePair.names[1]}）`;
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-sky-50 p-3.5 rounded-2xl border border-sky-200 space-y-2">
+                    <p class="font-black text-sky-900 text-sm sm:text-base">
+                        <i class="fa-solid fa-ruler-vertical text-sky-600 mr-1"></i>為什麼相對的兩個面會「互相平行」？
+                    </p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        觀察 3D 圖形上的藍色線段：<strong>${activePair.names[0]}</strong>到<strong>${activePair.names[1]}</strong>之間的每條藍線量起來<strong>都一樣長</strong>！<br>
+                        像這樣<strong>相對兩個面之間的距離都一樣長，我們就說這兩個面互相平行</strong>。
+                    </p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                    <p class="font-black text-slate-800">長方體與正方體共有 3 組互相平行的面：</p>
+                    <ul class="text-xs sm:text-sm space-y-1.5 font-bold text-slate-700">
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> 前後相對：<strong>甲面 和 丁面</strong> 互相平行</li>
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-sky-600 inline-block"></span> 左右相對：<strong>乙面 和 戊面</strong> 互相平行</li>
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-lime-600 inline-block"></span> 上下相對：<strong>己面 和 丙面</strong> 互相平行</li>
+                    </ul>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 長方體與正方體中，<strong>相對的面不相接，而且互相平行</strong>（共有 3 組相對的面）。</p>
+                <p>• 判斷記憶口訣：<strong>「相鄰的面互相垂直，相對的面互相平行！」</strong></p>
+            `;
+        }
+
+        /* ==============================================================
+         * 單元 1-4：頂點標記(面ABCD) 與 用長方體/正方體檢查垂直與平行
+         * ============================================================== */
+        function buildScenePlaneABCD() {
+            document.getElementById('stage-badge').textContent = '面ABCD與工具檢查法';
+
+            if (abcdSubTab === 'vertex') {
+                const W = 2.6, H = 1.9, D = 1.9;
+                const hw = W / 2, hh = H / 2, hd = D / 2;
+
+                // 對應課本頂點命名：
+                // 上底面 A(-hw,hh,-hd), B(-hw,hh,hd), C(hw,hh,hd), D(hw,hh,-hd)
+                // 下底面 E(-hw,-hh,-hd), F(-hw,-hh,hd), G(hw,-hh,hd), H(hw,-hh,-hd)
+                // 6個面順序: 0:前(BFGC), 1:左(ABFE), 2:右(DCGH), 3:上(ABCD), 4:下(EFGH), 5:後(AEHD)
+                const pairDefs = [
+                    { f1: 3, f2: 4, title: '面ABCD 和 面EFGH', rel: '互相平行（上下相對的面）', c1: 0xf43f5e, c2: 0xf43f5e },
+                    { f1: 1, f2: 0, title: '面ABFE 和 面BFGC', rel: '互相垂直（共用BF邊，相鄰的面）', c1: 0x0284c7, c2: 0xf59e0b },
+                    { f1: 5, f2: 2, title: '面AEHD 和 面CGHD', rel: '互相垂直（共用DH邊，相鄰的面）', c1: 0x10b981, c2: 0x8b5cf6 },
+                    { f1: 1, f2: 2, title: '面ABFE 和 面DCGH', rel: '互相平行（左右相對的面）', c1: 0x0284c7, c2: 0x0284c7 }
+                ];
+                const cur = pairDefs[abcdPairIdx];
+
+                const colors = [0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xffffff];
+                const opacities = [0.18, 0.18, 0.18, 0.18, 0.18, 0.18];
+                colors[cur.f1] = cur.c1; opacities[cur.f1] = 0.85;
+                colors[cur.f2] = cur.c2; opacities[cur.f2] = 0.85;
+
+                const boxObj = createCustomBoxFaces(W, H, D, colors, opacities);
+                rootGroup.add(boxObj.group);
+
+                // 標示 8 個頂點 A ~ H
+                const vCoords = [
+                    { name: 'A', p: [-hw, hh, -hd] },
+                    { name: 'B', p: [-hw, hh, hd] },
+                    { name: 'C', p: [hw, hh, hd] },
+                    { name: 'D', p: [hw, hh, -hd] },
+                    { name: 'E', p: [-hw, -hh, -hd] },
+                    { name: 'F', p: [-hw, -hh, hd] },
+                    { name: 'G', p: [hw, -hh, hd] },
+                    { name: 'H', p: [hw, -hh, -hd] }
+                ];
+                const dotGeom = new THREE.SphereGeometry(0.075, 12, 12);
+                const dotMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+                vCoords.forEach(v => {
+                    const dot = new THREE.Mesh(dotGeom, dotMat);
+                    dot.position.set(...v.p);
+                    rootGroup.add(dot);
+                    const offset = new THREE.Vector3(...v.p).multiplyScalar(1.16);
+                    addFloatingLabel(offset, v.name, 'bg-slate-800 text-amber-300 border-slate-600', 'text-xs sm:text-sm px-2 py-0.5');
+                });
+
+                document.getElementById('floating-legend').innerHTML = `
+                    <div class="font-bold text-slate-800">目前觀察：<span class="text-teal-700">${cur.title}</span></div>
+                    <div class="font-bold text-rose-600">關係判斷：${cur.rel}</div>
+                `;
+                document.getElementById('floating-status').innerHTML = `<span class="text-amber-300">${cur.title} ➔ ${cur.rel.split('（')[0]}</span>`;
+
+            } else if (abcdSubTab === 'check_perp') {
+                // 用長方體檢查兩個平面是否垂直 (課本右頁下方實驗)
+                const isMatch = (checkAngleDeg === 90);
+                document.getElementById('floating-legend').innerHTML = `
+                    <div class="font-bold text-rose-600">■ 彩色長方體（檢查工具：相鄰兩面必為90°）</div>
+                    <div class="font-bold text-slate-600">■ 灰色待測板（夾角 ${checkAngleDeg}°）</div>
+                `;
+                document.getElementById('floating-status').innerHTML = isMatch
+                    ? '<span class="text-emerald-300">✓ 相鄰兩面和兩個平面「完全密合」➔ 兩平面互相垂直！</span>'
+                    : `<span class="text-rose-300">✗ 有縫隙、無法完全密合（${checkAngleDeg}°）➔ 兩平面沒有互相垂直！</span>`;
+
+                // 建立待測灰色L型折板與彩色檢查長方體
+                const g = new THREE.Group();
+                g.position.set(0, -1.1, 0);
+                rootGroup.add(g);
+
+                const boardMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.5, side: THREE.DoubleSide });
+                // 水平底板
+                const baseBoard = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.08, 2.4), boardMat);
+                baseBoard.position.set(-0.6, 0, 0);
+                g.add(baseBoard);
+
+                // 右側立板 (依 checkAngleDeg 旋轉)
+                const wallPivot = new THREE.Group();
+                wallPivot.position.set(0.6, 0, 0);
+                wallPivot.rotation.z = ((checkAngleDeg - 90) * Math.PI) / 180;
+                g.add(wallPivot);
+
+                const wallBoard = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 2.4), boardMat);
+                wallBoard.position.set(0.04, 1.15, 0);
+                wallPivot.add(wallBoard);
+
+                // 彩色檢查小長方體 (相鄰兩面緊靠角隅)
+                const cW = 1.0, cH = 1.0, cD = 1.0;
+                const checkBox = createCustomBoxFaces(cW, cH, cD, [0xf43f5e, 0x38bdf8, 0xfacc15, 0x84cc16, 0xa855f7, 0xf97316], [1, 1, 1, 1, 1, 1]);
+                // 若夾角 < 90 則方塊被卡住往左退一點點避免穿模
+                const shiftX = checkAngleDeg < 90 ? -0.32 : 0;
+                checkBox.group.position.set(0.6 - cW / 2 + shiftX, 0.04 + cH / 2, 0);
+                g.add(checkBox.group);
+
+                addFloatingLabel(new THREE.Vector3(0.1 + shiftX, -0.5, 0.8), '檢查用長方體', 'bg-rose-600 text-white border-rose-800');
+                addFloatingLabel(new THREE.Vector3(0.8, 0.9, 0), isMatch ? '✓ 完全密合 (垂直)' : '✗ 出現縫隙 (不垂直)',
+                    isMatch ? 'bg-emerald-600 text-white border-emerald-800' : 'bg-amber-500 text-indigo-950 border-amber-700');
+
+            } else {
+                // 用正方體檢查淡藍色柱體的ㄅ面和ㄆ面是否平行 (課本左頁下方實驗)
+                document.getElementById('floating-legend').innerHTML = `
+                    <div class="font-bold text-rose-600">■ 橘紅正方體（甲、戊、丁面互相垂直）</div>
+                    <div class="font-bold text-sky-600">■ 淡藍色柱體（檢查ㄅ面和ㄆ面是否平行）</div>
+                `;
+                document.getElementById('floating-status').innerHTML = checkParaMatch
+                    ? '<span class="text-emerald-300">✓ 正方體與ㄅ面、ㄆ面都完全密合 ➔ ㄅ面和ㄆ面互相平行！</span>'
+                    : '<span class="text-rose-300">✗ ㄆ面歪斜無法與正方體密合 ➔ ㄅ面和ㄆ面沒有平行！</span>';
+
+                const g = new THREE.Group();
+                g.position.set(0, -0.9, 0);
+                rootGroup.add(g);
+
+                // 橘紅色檢查正方體
+                const cBox = createCustomBoxFaces(1.4, 1.4, 1.4, [0xf97316, 0xfb7185, 0xf43f5e, 0xfda4af, 0xe11d48, 0xfb923c], [1, 1, 1, 1, 1, 1]);
+                cBox.group.position.set(-0.75, 0.7, 0);
+                g.add(cBox.group);
+                addFloatingLabel(new THREE.Vector3(-0.75, 0.6, 0.8), '甲', 'bg-rose-700 text-white');
+                addFloatingLabel(new THREE.Vector3(-0.75, 1.5, 0), '戊', 'bg-rose-700 text-white');
+
+                // 淡藍色待測柱體 (緊貼在正方體右側)
+                const blueBox = createCustomBoxFaces(1.4, 1.4, 1.4, [0x7dd3fc, 0x38bdf8, 0x7dd3fc, 0x0284c7, 0x0284c7, 0x7dd3fc], [0.95, 0.95, 0.95, 0.95, 0.95, 0.95]);
+                blueBox.group.position.set(0.66, 0.7, 0);
+                if (!checkParaMatch) {
+                    blueBox.group.rotation.z = -0.18;
+                    blueBox.group.position.x = 0.82;
+                }
+                g.add(blueBox.group);
+                addFloatingLabel(new THREE.Vector3(0.66, 1.55, 0), 'ㄅ面 (上底)', 'bg-sky-600 text-white');
+                addFloatingLabel(new THREE.Vector3(0.66, -0.15, 0), 'ㄆ面 (下底)', 'bg-sky-600 text-white');
+            }
+
+            // 下方控制列
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="abcdSubTab='vertex';rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-xl font-bold text-xs sm:text-sm ${abcdSubTab==='vertex'?'bg-teal-600 text-white':'bg-white border'}">
+                        1. 頂點表示法(面ABCD)
+                    </button>
+                    <button onclick="abcdSubTab='check_perp';rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-xl font-bold text-xs sm:text-sm ${abcdSubTab==='check_perp'?'bg-teal-600 text-white':'bg-white border'}">
+                        2. 用長方體檢查垂直
+                    </button>
+                    <button onclick="abcdSubTab='check_para';rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-xl font-bold text-xs sm:text-sm ${abcdSubTab==='check_para'?'bg-teal-600 text-white':'bg-white border'}">
+                        3. 用正方體檢查平行
+                    </button>
+                </div>
+                <div id="abcd-sub-controls" class="pt-1"></div>
+            `;
+
+            const subEl = document.getElementById('abcd-sub-controls');
+            if (abcdSubTab === 'vertex') {
+                subEl.innerHTML = `
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <button onclick="abcdPairIdx=0;rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-lg font-bold text-xs ${abcdPairIdx===0?'bg-rose-600 text-white':'bg-white border'}">面ABCD 與 面EFGH</button>
+                        <button onclick="abcdPairIdx=1;rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-lg font-bold text-xs ${abcdPairIdx===1?'bg-sky-600 text-white':'bg-white border'}">面ABFE 與 面BFGC</button>
+                        <button onclick="abcdPairIdx=2;rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-lg font-bold text-xs ${abcdPairIdx===2?'bg-emerald-600 text-white':'bg-white border'}">面AEHD 與 面CGHD</button>
+                        <button onclick="abcdPairIdx=3;rebuildCurrentScene();" class="btn-3d py-1.5 px-2 rounded-lg font-bold text-xs ${abcdPairIdx===3?'bg-indigo-600 text-white':'bg-white border'}">面ABFE 與 面DCGH</button>
+                    </div>
+                `;
+            } else if (abcdSubTab === 'check_perp') {
+                subEl.innerHTML = `
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="checkAngleDeg=90;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-lg font-bold text-xs ${checkAngleDeg===90?'bg-emerald-600 text-white':'bg-white border'}">完全密合 (90°垂直)</button>
+                        <button onclick="checkAngleDeg=72;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-lg font-bold text-xs ${checkAngleDeg===72?'bg-rose-600 text-white':'bg-white border'}">開口太小 (72°不垂直)</button>
+                        <button onclick="checkAngleDeg=112;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-lg font-bold text-xs ${checkAngleDeg===112?'bg-rose-600 text-white':'bg-white border'}">開口太大 (112°不垂直)</button>
+                    </div>
+                `;
+            } else {
+                subEl.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="checkParaMatch=true;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-lg font-bold text-xs ${checkParaMatch?'bg-emerald-600 text-white':'bg-white border'}">✓ ㄅ面、ㄆ面都與正方體密合 (平行)</button>
+                        <button onclick="checkParaMatch=false;rebuildCurrentScene();" class="btn-3d py-1.5 rounded-lg font-bold text-xs ${!checkParaMatch?'bg-rose-600 text-white':'bg-white border'}">✗ 有縫隙無法密合 (不平行)</button>
+                    </div>
+                `;
+            }
+
+            document.getElementById('info-tag').textContent = '頂點命名與實作檢驗';
+            document.getElementById('info-title').textContent = '用「面ABCD」表示面 ＆ 檢查垂直與平行';
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                    <p class="font-black text-teal-800"><i class="fa-solid fa-tag mr-1"></i>1. 用頂點英文字母表示長方體的面：</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        長方體的「甲面」由頂點 A、B、C、D 圍成，也可以稱為「<strong>面ABCD</strong>」。<br>
+                        • <strong>面ABCD 和 面EFGH</strong>：上下相對 ➔ <strong>互相平行</strong><br>
+                        • <strong>面ABFE 和 面BFGC</strong>：共用邊BF相鄰 ➔ <strong>互相垂直</strong><br>
+                        • <strong>面AEHD 和 面CGHD</strong>：共用邊DH相鄰 ➔ <strong>互相垂直</strong>
+                    </p>
+                </div>
+                <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                    <p class="font-black text-amber-900"><i class="fa-solid fa-toolbox mr-1"></i>2. 怎麼用長方體或正方體當「檢查工具」？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        • <strong>檢查垂直：</strong>因為長方體相鄰兩面互相垂直，如果放進兩個平面中間能<strong>完全密合</strong>，就代表這兩個平面互相垂直！<br>
+                        • <strong>檢查平行：</strong>將正方體靠齊淡藍色柱體側面，如果ㄅ面和ㄆ面都和正方體上下兩面一樣平（同時垂直於側面），就代表ㄅ面和ㄆ面<strong>互相平行</strong>！
+                    </p>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 小訣竅：看到兩個面的英文字母裡有<strong>「2個字母相同」</strong>（例如面AB<strong>FE</strong>與面B<strong>F</strong>GC共用BF邊），它們就是<strong>相鄰的面（互相垂直）</strong>；如果<strong>完全沒有相同字母</strong>（如面ABCD與面EFGH），就是<strong>相對的面（互相平行）</strong>！</p>
+            `;
+        }
+
+        /* ==============================================================
+         * 單元 2-1：認識球體 — 竹筷轉圓形紙卡變球體 (視覺暫留與多圓軌跡)
+         * ============================================================== */
+        function buildSceneSphereSpin() {
+            document.getElementById('stage-badge').textContent = '圓形紙卡快速旋轉變球體';
+            const R = 1.65;
+
+            const holder = new THREE.Group();
+            holder.position.set(0, 0.15, 0);
+            rootGroup.add(holder);
+
+            // 竹筷子 (必須通過圓心)
+            const stickGeom = new THREE.CylinderGeometry(0.06, 0.06, 4.6, 16);
+            const stickMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6 });
+            const stick = new THREE.Mesh(stickGeom, stickMat);
+            stick.position.y = -0.35;
+            holder.add(stick);
+
+            // 圓心紅點
+            const centerDot = new THREE.Mesh(
+                new THREE.SphereGeometry(0.11, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0xe11d48 })
+            );
+            holder.add(centerDot);
+
+            // 主圓形紙卡 (上面有彩色圓點圖案，模擬課本附件)
+            const cardGroup = new THREE.Group();
+            holder.add(cardGroup);
+
+            const cardGeom = new THREE.CircleGeometry(R, 48);
+            const cardMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                roughness: 0.3
+            });
+            const cardMesh = new THREE.Mesh(cardGeom, cardMat);
+            cardGroup.add(cardMesh);
+
+            const rimPts = [];
+            for (let i = 0; i <= 48; i++) {
+                const a = (i / 48) * Math.PI * 2;
+                rimPts.push(new THREE.Vector3(R * Math.cos(a), R * Math.sin(a), 0));
+            }
+            const rimLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(rimPts), new THREE.LineBasicMaterial({ color: 0x0284c7, linewidth: 2 }));
+            cardGroup.add(rimLine);
+
+            // 在圓卡上加上彩色小圓點裝飾
+            const dotColors = [0xf43f5e, 0x3b82f6, 0x10b981, 0xf59e0b, 0x8b5cf6];
+            for (let ring = 1; ring <= 4; ring++) {
+                const rDist = (ring / 4.5) * R;
+                const count = ring * 6;
+                for (let k = 0; k < count; k++) {
+                    const ang = (k / count) * Math.PI * 2;
+                    const d = new THREE.Mesh(
+                        new THREE.CircleGeometry(0.065, 10),
+                        new THREE.MeshBasicMaterial({ color: dotColors[(ring + k) % dotColors.length], side: THREE.DoubleSide })
+                    );
+                    d.position.set(rDist * Math.cos(ang), rDist * Math.sin(ang), 0.015);
+                    const dBack = d.clone();
+                    dBack.position.z = -0.015;
+                    cardGroup.add(d, dBack);
+                }
+            }
+
+            // 當快速旋轉時，出現殘影圓片與半透明球體輪廓
+            const ghostGroup = new THREE.Group();
+            holder.add(ghostGroup);
+            for (let i = 1; i < 8; i++) {
+                const gCard = new THREE.Mesh(
+                    cardGeom,
+                    new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0, side: THREE.DoubleSide })
+                );
+                gCard.rotation.y = (i * Math.PI) / 8;
+                ghostGroup.add(gCard);
+            }
+
+            const ghostSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(R, 32, 32),
+                new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0, roughness: 0.2 })
+            );
+            holder.add(ghostSphere);
+
+            addFloatingLabel(new THREE.Vector3(0, 0.15, 0), '圓心（竹筷通過處）', 'bg-rose-600 text-white border-rose-800');
+            addFloatingLabel(new THREE.Vector3(0, -1.9, 0), '竹筷子（旋轉軸）', 'bg-amber-600 text-white border-amber-800');
+
+            // 註冊旋轉動畫回呼
+            animCallbacks.push(() => {
+                if (spinSpeed > 0) {
+                    spinAngle += (spinSpeed / 100) * 0.42;
+                    cardGroup.rotation.y = spinAngle;
+                    ghostGroup.rotation.y = spinAngle * 0.5;
+                }
+                const ratio = spinSpeed / 100;
+                ghostGroup.children.forEach(c => {
+                    c.material.opacity = ratio * 0.28;
+                });
+                ghostSphere.material.opacity = ratio * 0.35;
+            });
+
+            document.getElementById('floating-legend').innerHTML = `
+                <div class="font-bold text-sky-700">● 圓形紙卡（半徑處處相等）</div>
+                <div class="font-bold text-amber-700">┃ 竹筷子（一定要通過圓心）</div>
+            `;
+            document.getElementById('floating-status').innerHTML = spinSpeed > 50
+                ? '<span class="text-emerald-300">✨ 快速旋轉時，看起來就像一顆立體的「球體」！</span>'
+                : '<span class="text-amber-300">拉動下方滑桿或按「快速轉動竹筷」，看看會變什麼形體？</span>';
+
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-black text-slate-600 shrink-0"><i class="fa-solid fa-gauge-high text-teal-600 mr-1"></i>竹筷轉動速度：</span>
+                        <input id="spin-slider" type="range" min="0" max="100" value="${spinSpeed}" oninput="spinSpeed=parseInt(this.value);updateSpinStatusText();">
+                        <span id="spin-val-text" class="text-xs font-black text-teal-700 w-12 text-right num-font">${spinSpeed}%</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="spinSpeed=0;document.getElementById('spin-slider').value=0;updateSpinStatusText();" class="btn-3d bg-slate-600 text-white font-bold py-2 rounded-xl text-xs sm:text-sm">
+                            <i class="fa-solid fa-stop mr-1"></i> 停止轉動 (看圓卡)
+                        </button>
+                        <button onclick="spinSpeed=95;document.getElementById('spin-slider').value=95;updateSpinStatusText();" class="btn-3d bg-amber-500 text-white font-bold py-2 rounded-xl text-xs sm:text-sm">
+                            <i class="fa-solid fa-arrows-spin mr-1"></i> 快速轉動竹筷 (變成球體!)
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('info-tag').textContent = '認識生活中的球體';
+            document.getElementById('info-title').textContent = '轉動圓形紙卡，看它變成一顆球！';
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                    <p class="font-black text-amber-900"><i class="fa-solid fa-basketball text-amber-600 mr-1"></i>什麼是「球體」？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        日常生活中（像籃球、排球、棒球、彈珠），有一種<strong>不論從哪個角度看都是圓形的形體</strong>，我們稱這種形體為「<strong>球體</strong>」。
+                    </p>
+                </div>
+                <div class="bg-sky-50 p-3.5 rounded-2xl border border-sky-200 space-y-2">
+                    <p class="font-black text-sky-900"><i class="fa-solid fa-wand-magic-sparkles text-sky-600 mr-1"></i>竹筷轉圓形紙卡實驗：</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        將圓形紙卡貼上一根竹筷子（<strong>注意：竹筷子一定要經過圓心！</strong>），垂直快速轉動竹筷子時，看起來就像<strong>很多很多個圓形組成的球體</strong>！
+                    </p>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 球體不論從上下、左右或任何斜角觀察，外型看起來都是<strong>圓形</strong>。</p>
+                <p>• 竹筷子必須通過圓形紙卡的<strong>圓心（直徑）</strong>，轉起來才會是一顆正圓的球體喔！</p>
+            `;
+        }
+
+        function updateSpinStatusText() {
+            const el = document.getElementById('spin-val-text');
+            if (el) el.textContent = spinSpeed + '%';
+            const st = document.getElementById('floating-status');
+            if (st) {
+                st.innerHTML = spinSpeed > 50
+                    ? '<span class="text-emerald-300">✨ 快速旋轉時，看起來就像一顆立體的「球體」！</span>'
+                    : '<span class="text-amber-300">拉動下方滑桿或按「快速轉動竹筷」，看看會變什麼形體？</span>';
+            }
+        }
+
+        /* ==============================================================
+         * 單元 2-2：用一樣大的圓形卡紙對摺，做出一顆紙球
+         * ============================================================== */
+        function buildSceneSphereFold() {
+            document.getElementById('stage-badge').textContent = '半圓卡紙組合紙球';
+            const R = 1.65;
+
+            const holder = new THREE.Group();
+            rootGroup.add(holder);
+
+            // 中央摺痕軸線
+            const axisLine = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -R * 1.15, 0), new THREE.Vector3(0, R * 1.15, 0)]),
+                new THREE.LineBasicMaterial({ color: 0x0f172a, linewidth: 3 })
+            );
+            holder.add(axisLine);
+
+            // 建立一個半圓形 Geometry (X >= 0)
+            const semiShape = new THREE.Shape();
+            semiShape.moveTo(0, -R);
+            semiShape.absarc(0, 0, R, -Math.PI / 2, Math.PI / 2, false);
+            semiShape.lineTo(0, -R);
+            const semiGeom = new THREE.ShapeGeometry(semiShape, 36);
+
+            const arcPts = [];
+            for (let j = 0; j <= 36; j++) {
+                const a = -Math.PI / 2 + (j / 36) * Math.PI;
+                arcPts.push(new THREE.Vector3(R * Math.cos(a), R * Math.sin(a), 0));
+            }
+            const edgeGeom = new THREE.BufferGeometry().setFromPoints(arcPts);
+
+            const palette = [0x6ee7b7, 0x34d399, 0x10b981, 0xa7f3d0, 0x5eead4, 0x2dd4bf];
+            const totalFins = foldCount * 2; // 每一張圓卡對摺後有2片半圓翼
+
+            for (let i = 0; i < totalFins; i++) {
+                const targetAngle = (i / totalFins) * Math.PI * 2;
+                const curAngle = targetAngle * (foldSpread / 100);
+
+                const finGroup = new THREE.Group();
+                finGroup.rotation.y = curAngle;
+
+                const mat = new THREE.MeshStandardMaterial({
+                    color: palette[i % palette.length],
+                    roughness: 0.35,
+                    side: THREE.DoubleSide,
+                    transparent: isTransparent,
+                    opacity: isTransparent ? 0.5 : 0.95
+                });
+                const mesh = new THREE.Mesh(semiGeom, mat);
+                finGroup.add(mesh);
+
+                const line = new THREE.Line(edgeGeom, new THREE.LineBasicMaterial({ color: 0x065f46, linewidth: 2 }));
+                finGroup.add(line);
+
+                holder.add(finGroup);
+            }
+
+            addFloatingLabel(new THREE.Vector3(0, R + 0.3, 0), `共 ${foldCount} 張一樣大的圓卡（${totalFins} 片半圓）`, 'bg-emerald-600 text-white border-emerald-800');
+
+            document.getElementById('floating-legend').innerHTML = `
+                <div class="font-bold text-emerald-700">● 一樣大的圓形卡紙對摺成半圓</div>
+                <div class="font-bold text-slate-700">┃ 中央摺痕（全部通過球心與直徑）</div>
+            `;
+            document.getElementById('floating-status').innerHTML = foldSpread > 85
+                ? '<span class="text-emerald-300">✓ 半圓卡紙全部展開黏合，完成一顆立體紙球！</span>'
+                : `<span class="text-amber-300">展開進度：${foldSpread}%（拉動滑桿把半圓卡紙展開成紙球）</span>`;
+
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-black text-slate-600 shrink-0">攤開成紙球進度：</span>
+                        <input type="range" min="5" max="100" value="${foldSpread}" oninput="foldSpread=parseInt(this.value);rebuildCurrentScene();">
+                        <span class="text-xs font-black text-teal-700 w-10 text-right num-font">${foldSpread}%</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-slate-600">圓形卡紙張數：</span>
+                        <div class="grid grid-cols-4 gap-1.5 flex-grow">
+                            ${[3, 5, 8, 12].map(n => `
+                                <button onclick="foldCount=${n};rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${foldCount===n?'bg-teal-600 text-white':'bg-white border'}">
+                                    ${n} 張圓卡
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('info-tag').textContent = '認識球體結構';
+            document.getElementById('info-title').textContent = '用一樣大的圓形卡紙做出一顆紙球';
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200 space-y-2">
+                    <p class="font-black text-emerald-900">動手做紙球的 3 個步驟：</p>
+                    <ol class="text-xs sm:text-sm text-slate-700 space-y-1.5 list-decimal list-inside font-medium">
+                        <li>準備好幾張<strong>一樣大的圓形卡紙</strong>，沿著通過圓心的摺痕對摺成<strong>半圓</strong>。</li>
+                        <li>把一張一張的半圓卡紙互相黏貼起來（下方可切換 3張、5張、8張、12張觀察）。</li>
+                        <li>拉動滑桿把半圓卡紙攤開一圈黏起來，就完成一顆<strong>紙球</strong>了！</li>
+                    </ol>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs sm:text-sm text-slate-700">
+                    <p class="font-black text-teal-800 mb-1"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>想一想：</p>
+                    為什麼每一張圓形卡紙都要「一樣大」？因為球體從球心到表面的距離（球的半徑）都一樣長喔！
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 紙球裡每一張圓形卡紙的<strong>圓心</strong>都會重合在球的正中心，稱為「<strong>球心</strong>」；圓卡的半徑就是「<strong>球的半徑</strong>」！</p>
+            `;
+        }
+
+        /* ==============================================================
+         * 單元 2-3：把球從各個方向平平切開（球心、球的半徑、最大切面）
+         * ============================================================== */
+        function buildSceneSphereSlice() {
+            document.getElementById('stage-badge').textContent = '球體切面、球心與半徑';
+            const R = 1.65;
+            const d = sliceOffset * R; // 切面距離球心的距離
+            const cutR = Math.sqrt(Math.max(0.01, R * R - d * d)); // 截面圓半徑
+            const isMaxCircle = Math.abs(sliceOffset) < 0.04;
+
+            // 外層旋轉群組（支援水平切、垂直切、斜切三種方向）
+            const orientGroup = new THREE.Group();
+            if (sliceDirection === 'vertical') {
+                orientGroup.rotation.z = Math.PI / 2;
+            } else if (sliceDirection === 'slanted') {
+                orientGroup.rotation.z = Math.PI / 5;
+                orientGroup.rotation.x = 0.2;
+            }
+            rootGroup.add(orientGroup);
+
+            // 建立下半球/主體 (y 從 -R 到 d) 與 上球蓋 (y 從 d 到 +R)
+            // SphereGeometry phi: 0~2PI, theta: 0(北極 +Y) ~ PI(南極 -Y)
+            // y = R * cos(theta) => thetaCut = acos(d / R)
+            const thetaCut = Math.acos(Math.max(-0.98, Math.min(0.98, d / R)));
+            const sep = sliceSeparate;
+
+            const sphereMat = new THREE.MeshStandardMaterial({
+                color: 0x3b82f6,
+                roughness: 0.3,
+                metalness: 0.05,
+                transparent: isTransparent,
+                opacity: isTransparent ? 0.42 : 0.92,
+                side: THREE.DoubleSide
+            });
+
+            const capMat = new THREE.MeshStandardMaterial({
+                color: isMaxCircle ? 0xfef08a : 0xbae6fd,
+                roughness: 0.25,
+                side: THREE.DoubleSide
+            });
+
+            // 1. 上半部 (theta: 0 ~ thetaCut)
+            const topGroup = new THREE.Group();
+            topGroup.position.y = sep;
+            orientGroup.add(topGroup);
+
+            const topSphereGeom = new THREE.SphereGeometry(R, 40, 24, 0, Math.PI * 2, 0, thetaCut);
+            topGroup.add(new THREE.Mesh(topSphereGeom, sphereMat));
+
+            const topDisc = new THREE.Mesh(new THREE.CircleGeometry(cutR, 40), capMat);
+            topDisc.rotation.x = Math.PI / 2;
+            topDisc.position.y = d;
+            topGroup.add(topDisc);
+
+            // 截面圓周黑框線
+            const circlePts = [];
+            for (let i = 0; i <= 40; i++) {
+                const a = (i / 40) * Math.PI * 2;
+                circlePts.push(new THREE.Vector3(cutR * Math.cos(a), d, cutR * Math.sin(a)));
+            }
+            const topRim = new THREE.Line(new THREE.BufferGeometry().setFromPoints(circlePts), new THREE.LineBasicMaterial({ color: isMaxCircle ? 0xe11d48 : 0x0284c7, linewidth: 3 }));
+            topGroup.add(topRim);
+
+            // 2. 下半部 (theta: thetaCut ~ PI)
+            const botGroup = new THREE.Group();
+            botGroup.position.y = -sep * 0.4;
+            orientGroup.add(botGroup);
+
+            const botSphereGeom = new THREE.SphereGeometry(R, 40, 24, 0, Math.PI * 2, thetaCut, Math.PI - thetaCut);
+            botGroup.add(new THREE.Mesh(botSphereGeom, sphereMat));
+
+            const botDisc = new THREE.Mesh(new THREE.CircleGeometry(cutR, 40), capMat);
+            botDisc.rotation.x = -Math.PI / 2;
+            botDisc.position.y = d;
+            botGroup.add(botDisc);
+
+            const botRim = new THREE.Line(new THREE.BufferGeometry().setFromPoints(circlePts), new THREE.LineBasicMaterial({ color: isMaxCircle ? 0xe11d48 : 0x0284c7, linewidth: 3 }));
+            botGroup.add(botRim);
+
+            // 標示「球心(圓心)」與「球的半徑」在包含球心的那一半上
+            const centerOwner = (d >= 0) ? botGroup : topGroup;
+            const centerDot = new THREE.Mesh(
+                new THREE.SphereGeometry(0.09, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0xe11d48 })
+            );
+            centerDot.position.set(0, 0, 0);
+            centerOwner.add(centerDot);
+
+            // 畫出球的半徑線 (黃色或紅色粗線)
+            const radiusLine = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(R, 0, 0)]),
+                new THREE.LineBasicMaterial({ color: 0xe11d48, linewidth: 3 })
+            );
+            centerOwner.add(radiusLine);
+
+            // 畫出當前切面圓的半徑線
+            const cutRadiusLine = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, d + 0.01, 0), new THREE.Vector3(0, d + 0.01, cutR)]),
+                new THREE.LineBasicMaterial({ color: 0x0f172a, linewidth: 2 })
+            );
+            botGroup.add(cutRadiusLine);
+
+            // 計算世界座標來放置浮動標籤
+            orientGroup.updateMatrixWorld(true);
+            const worldCenter = new THREE.Vector3(0, 0, 0);
+            centerOwner.localToWorld(worldCenter);
+            addFloatingLabel(worldCenter, '● 球心（圓心）', 'bg-rose-600 text-white border-rose-800');
+
+            const worldRadiusMid = new THREE.Vector3(R * 0.55, 0, 0);
+            centerOwner.localToWorld(worldRadiusMid);
+            addFloatingLabel(worldRadiusMid, '球的半徑 ＝ 最大圓的半徑', 'bg-amber-400 text-indigo-950 border-amber-600');
+
+            const worldCutPos = new THREE.Vector3(0, d, cutR * 0.7);
+            topGroup.localToWorld(worldCutPos);
+            addFloatingLabel(
+                worldCutPos,
+                isMaxCircle ? '★ 球的最大切面（通過球心！）' : `圓形切面（半徑為最大圓的 ${Math.round((cutR / R) * 100)}%）`,
+                isMaxCircle ? 'bg-amber-500 text-white border-amber-700' : 'bg-sky-600 text-white border-sky-800'
+            );
+
+            document.getElementById('floating-legend').innerHTML = `
+                <div class="font-bold text-rose-600">● 球心（球正中心的點）</div>
+                <div class="font-bold text-amber-600">━ 球的半徑（球心到球面的距離）</div>
+                <div class="font-bold text-sky-700">◯ 切開的面永遠是「圓形」</div>
+            `;
+            document.getElementById('floating-status').innerHTML = isMaxCircle
+                ? '<span class="text-amber-300">★ 通過「球心」平分成兩半時，切出來的圓最大！</span>'
+                : '<span class="text-sky-200">切的位置越偏離球心，切出來的圓就越小喔！</span>';
+
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="flex flex-col gap-2.5">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-black text-slate-600 shrink-0"><i class="fa-solid fa-scissors text-rose-500 mr-1"></i>切開位置：</span>
+                        <input id="slice-pos-slider" type="range" min="-80" max="80" value="${Math.round(sliceOffset * 100)}" oninput="sliceOffset=parseInt(this.value)/100;rebuildCurrentScene();">
+                        <button onclick="sliceOffset=0;rebuildCurrentScene();" class="btn-3d bg-amber-500 hover:bg-amber-600 text-white font-black text-xs px-3 py-1.5 rounded-xl shrink-0">
+                            切過球心 (最大圓!)
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="sliceDirection='horizontal';rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${sliceDirection==='horizontal'?'bg-teal-600 text-white':'bg-white border'}">
+                            橫著平切 (水平)
+                        </button>
+                        <button onclick="sliceDirection='vertical';rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${sliceDirection==='vertical'?'bg-teal-600 text-white':'bg-white border'}">
+                            直著平切 (垂直)
+                        </button>
+                        <button onclick="sliceDirection='slanted';rebuildCurrentScene();" class="btn-3d py-1.5 rounded-xl font-bold text-xs ${sliceDirection==='slanted'?'bg-teal-600 text-white':'bg-white border'}">
+                            斜著平切 (斜切)
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('info-tag').textContent = '認識球的截面、球心和半徑';
+            document.getElementById('info-title').textContent = '把球從各個方向平平切開，是什麼形狀？';
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-sky-50 p-3.5 rounded-2xl border border-sky-200 space-y-2">
+                    <p class="font-black text-sky-900">1. 切開的面是什麼形狀？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        試著切換下方的「橫著切、直著切、斜著切」並拉動位置滑桿：<strong>不管從哪個方向平平切開，切開的面都是「圓形」</strong>！只是切的位置不同，圓的大小也不同。
+                    </p>
+                </div>
+                <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                    <p class="font-black text-amber-900">2. 怎麼切，切出來的圓會「最大」？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        <strong>將球平分成兩半（通過球心切開）時，切出來的圓最大！</strong><br>
+                        這時候「<strong>球心</strong>」就是這個最大圓的<strong>圓心</strong>，「<strong>球的半徑</strong>」就是這個最大圓的<strong>半徑</strong>！
+                    </p>
+                </div>
+                <div class="bg-rose-50 p-3.5 rounded-2xl border border-rose-200 space-y-1.5">
+                    <p class="font-black text-rose-900"><i class="fa-solid fa-ruler-horizontal mr-1"></i>3. 你能找出球的「直徑」嗎？</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        球的直徑 ＝ <strong>球的半徑 × 2</strong>（通過球心、連接球面兩端的線段）。在生活中也可以用兩塊木板平行夾住球，量兩塊木板之間的垂直距離就是球的直徑！
+                    </p>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 球體的切面必為<strong>圓形</strong>；<strong>通過球心</strong>切開的平面是<strong>最大的圓</strong>（離球心越遠，切出來的圓越小）。</p>
+            `;
+        }
+
+        /* ==============================================================
+         * 單元 2-4：素養評量 — 切一刀把長方體蛋糕分成兩個柱體
+         * ============================================================== */
+        function buildSceneSphereCake() {
+            document.getElementById('stage-badge').textContent = '素養評量：切長方體蛋糕';
+
+            // 建立一個由頂點多邊形擠出高度的柱體 (Extruded Prism)
+            const createCakePiece = (poly2D, H, topColor, sideColor, shiftVec) => {
+                const g = new THREE.Group();
+                g.position.copy(shiftVec);
+
+                const shape = new THREE.Shape();
+                shape.moveTo(poly2D[0][0], poly2D[0][1]);
+                for (let i = 1; i < poly2D.length; i++) {
+                    shape.lineTo(poly2D[i][0], poly2D[i][1]);
+                }
+                shape.closePath();
+
+                const extrudeSettings = { depth: H, bevelEnabled: false };
+                const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                geom.rotateX(Math.PI / 2);
+                geom.translate(0, H / 2, 0);
+
+                // 奶油頂面材質與海綿蛋糕側面材質
+                const mats = [
+                    new THREE.MeshStandardMaterial({ color: topColor, roughness: 0.35 }),
+                    new THREE.MeshStandardMaterial({ color: sideColor, roughness: 0.5 })
+                ];
+                const mesh = new THREE.Mesh(geom, mats);
+                g.add(mesh);
+
+                const edges = new THREE.EdgesGeometry(geom);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x78350f, linewidth: 2 }));
+                g.add(line);
+
+                return g;
+            };
+
+            const W = 2.8, D = 2.0, H = 1.15;
+            const hw = W / 2, hd = D / 2;
+            const sep = cakeSeparate * 0.55;
+
+            let piece1Poly, piece2Poly, s1, s2, label1, label2, cutDesc;
+
+            if (cakeCutType === 0) {
+                // 皮皮的切法：從前邊中間斜切到左後角 -> 1個三角柱 + 1個四角柱(梯形底面)
+                piece1Poly = [[-hw, -hd], [0.2, -hd], [-hw, hd]];
+                piece2Poly = [[0.2, -hd], [hw, -hd], [hw, hd], [-hw, hd]];
+                s1 = new THREE.Vector3(-sep, -0.3, -sep * 0.5);
+                s2 = new THREE.Vector3(sep, -0.3, sep * 0.5);
+                label1 = '三角柱 (底面是三角形)';
+                label2 = '四角柱 (底面是四邊形)';
+                cutDesc = '皮皮的切法：分成「1個三角柱」和「1個四角柱」';
+            } else if (cakeCutType === 1) {
+                // 方法一：沿著對角線切一刀 -> 2個三角柱
+                piece1Poly = [[-hw, -hd], [hw, -hd], [-hw, hd]];
+                piece2Poly = [[hw, -hd], [hw, hd], [-hw, hd]];
+                s1 = new THREE.Vector3(-sep, -0.3, -sep);
+                s2 = new THREE.Vector3(sep, -0.3, sep);
+                label1 = '三角柱 (第1塊)';
+                label2 = '三角柱 (第2塊)';
+                cutDesc = '對角線切法：分成「2個三角柱」！';
+            } else if (cakeCutType === 2) {
+                // 方法二：平行於邊長直直切一刀 -> 2個四角柱
+                piece1Poly = [[-hw, -hd], [0, -hd], [0, hd], [-hw, hd]];
+                piece2Poly = [[0, -hd], [hw, -hd], [hw, hd], [0, hd]];
+                s1 = new THREE.Vector3(-sep, -0.3, 0);
+                s2 = new THREE.Vector3(sep, -0.3, 0);
+                label1 = '四角柱 (第1塊)';
+                label2 = '四角柱 (第2塊)';
+                cutDesc = '平行邊長切法：分成「2個四角柱」！';
+            } else {
+                // 方法三：只切掉長方體的一個小角落 -> 1個三角柱 + 1個五角柱
+                piece1Poly = [[-hw, -hd], [-0.1, -hd], [-hw, 0.2]];
+                piece2Poly = [[-0.1, -hd], [hw, -hd], [hw, hd], [-hw, hd], [-hw, 0.2]];
+                s1 = new THREE.Vector3(-sep * 1.2, -0.3, -sep * 1.2);
+                s2 = new THREE.Vector3(sep * 0.6, -0.3, sep * 0.6);
+                label1 = '三角柱 (底面3個邊)';
+                label2 = '五角柱 (底面5個邊!)';
+                cutDesc = '切一角切法：分成「1個三角柱」和「1個五角柱」！';
+            }
+
+            const p1 = createCakePiece(piece1Poly, H, 0xfde047, 0xf59e0b, s1);
+            const p2 = createCakePiece(piece2Poly, H, 0xfef08a, 0xd97706, s2);
+            rootGroup.add(p1, p2);
+
+            addFloatingLabel(s1.clone().add(new THREE.Vector3(-0.6, H * 0.8, 0)), label1, 'bg-rose-600 text-white border-rose-800');
+            addFloatingLabel(s2.clone().add(new THREE.Vector3(0.6, H * 0.8, 0)), label2, 'bg-teal-600 text-white border-teal-800');
+
+            document.getElementById('floating-legend').innerHTML = `
+                <div class="font-bold text-amber-800">🍰 長方體蛋糕垂直切一刀</div>
+                <div class="font-bold text-teal-700">✨ 觀察上下底面有幾條邊，就是「幾角柱」！</div>
+            `;
+            document.getElementById('floating-status').innerHTML = `<span class="text-amber-300">${cutDesc}</span>`;
+
+            document.getElementById('stage-controls-footer').innerHTML = `
+                <div class="flex flex-col gap-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <button onclick="cakeCutType=0;rebuildCurrentScene();" class="btn-3d py-2 px-1.5 rounded-xl font-bold text-xs ${cakeCutType===0?'bg-amber-500 text-white':'bg-white border'}">
+                            皮皮：三角柱+四角柱
+                        </button>
+                        <button onclick="cakeCutType=1;rebuildCurrentScene();" class="btn-3d py-2 px-1.5 rounded-xl font-bold text-xs ${cakeCutType===1?'bg-teal-600 text-white':'bg-white border'}">
+                            切法A：兩個三角柱
+                        </button>
+                        <button onclick="cakeCutType=2;rebuildCurrentScene();" class="btn-3d py-2 px-1.5 rounded-xl font-bold text-xs ${cakeCutType===2?'bg-teal-600 text-white':'bg-white border'}">
+                            切法B：兩個四角柱
+                        </button>
+                        <button onclick="cakeCutType=3;rebuildCurrentScene();" class="btn-3d py-2 px-1.5 rounded-xl font-bold text-xs ${cakeCutType===3?'bg-teal-600 text-white':'bg-white border'}">
+                            切法C：三角柱+五角柱
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-slate-600 shrink-0">把切開的蛋糕拉開：</span>
+                        <input type="range" min="0" max="100" value="${Math.round(cakeSeparate * 100)}" oninput="cakeSeparate=parseInt(this.value)/100;rebuildCurrentScene();">
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('info-tag').textContent = '素養評量：動手切蛋糕';
+            document.getElementById('info-title').textContent = '長方體蛋糕切一刀，會變成哪兩個柱體？';
+            document.getElementById('info-body').innerHTML = `
+                <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                    <p class="font-black text-amber-900">🍰 課本素養題目：</p>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        一個長方體蛋糕，垂直切一刀可把它分成兩個柱體。皮皮把它切成了「<strong>一個三角柱</strong>」和「<strong>一個四角柱</strong>」。<br>
+                        試試看點擊左下方按鈕，觀察另外三種超酷的切法：
+                    </p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1.5 text-xs sm:text-sm">
+                    <p>1️⃣ <strong>沿對角線切一刀：</strong>分成 <strong>2 個三角柱</strong>。</p>
+                    <p>2️⃣ <strong>平行邊長切一刀：</strong>分成 <strong>2 個四角柱</strong>。</p>
+                    <p>3️⃣ <strong>只切掉一個角落：</strong>分成 <strong>1 個三角柱 和 1 個五角柱</strong>（剩下的大塊底面變成 5 個邊）！</p>
+                </div>
+            `;
+            document.getElementById('takeaway-content').innerHTML = `
+                <p>• 因為長方體原本的上下兩個底面就<strong>互相平行</strong>，而且側面和底面<strong>互相垂直</strong>，所以只要垂直切一刀，切出來的兩塊蛋糕都還是「角柱」喔！</p>
+            `;
+        }
+
+        /******************************************************************
+         * 5. 100分滿分制隨堂測驗題庫 (10題 × 10分)
+         ******************************************************************/
+        const QUIZ_BANK = [
+            {
+                subMode: 'plane_perp',
+                q: '長方體或正方體中，每一個面都有幾個「相鄰的面」？',
+                options: ['2 個', '3 個', '4 個', '5 個'],
+                ans: 2,
+                exp: '每個面都是四邊形，四周有 4 條邊分別與 4 個面相接，所以有 4 個相鄰的面！'
+            },
+            {
+                subMode: 'plane_perp',
+                q: '長方體中「相鄰的兩個面」它們之間的關係是什麼？',
+                options: ['互相平行', '互相垂直', '不相交', '不一定'],
+                ans: 1,
+                exp: '長方體與正方體中，所有「相鄰的面」都互相垂直！'
+            },
+            {
+                subMode: 'plane_para',
+                q: '在長方體中，面對面、沒有邊相接的兩個面稱為「相對的面」，相對的面有什麼關係？',
+                options: ['互相垂直', '互相平行', '會相交於一點', '距離越來越近'],
+                ans: 1,
+                exp: '相對的兩個面之間距離處處相等，所以「相對的面互相平行」！'
+            },
+            {
+                subMode: 'plane_ABCD',
+                setupFn: () => { abcdSubTab = 'vertex'; abcdPairIdx = 0; },
+                q: '觀察左邊標有 A~H 頂點的長方體，「面ABCD」和「面EFGH」是什麼關係？',
+                options: ['互相垂直', '互相平行', '相鄰的面', '沒有關係'],
+                ans: 1,
+                exp: '面ABCD是上底面、面EFGH是下底面，它們是上下相對的面，所以「互相平行」！'
+            },
+            {
+                subMode: 'plane_ABCD',
+                setupFn: () => { abcdSubTab = 'vertex'; abcdPairIdx = 1; },
+                q: '承上題，請問長方體中的「面ABFE」和「面BFGC」是什麼關係？',
+                options: ['互相平行', '互相垂直', '相對的面', '無法判斷'],
+                ans: 1,
+                exp: '面ABFE和面BFGC共用同一條邊 BF，是相鄰的面，所以「互相垂直」！'
+            },
+            {
+                subMode: 'plane_life',
+                setupFn: () => { lifeSubState.type = 'soap'; lifeSubState.soapPose = 2; },
+                q: '把桌上的長方體手工皂轉個方向擺放，原本和桌面垂直的 ⭐ 面，現在還和桌面垂直嗎？',
+                options: ['還是互相垂直', '變成互相平行', '不再垂直了', '要看桌子大小'],
+                ans: 0,
+                exp: '手工皂的側面與底面本來就垂直，不管在水平桌面上怎麼轉動方向，有 ⭐ 的面依然和桌面互相垂直！'
+            },
+            {
+                subMode: 'sphere_spin',
+                setupFn: () => { spinSpeed = 85; },
+                q: '將圓形紙卡貼上竹筷子快速旋轉變成一顆球，竹筷子一定要通過圓形紙卡的哪裡？',
+                options: ['隨便一個邊緣', '圓心', '圓周外面', '不用碰到圓卡'],
+                ans: 1,
+                exp: '竹筷子一定要經過「圓心」（沿著直徑），快速旋轉時才會看起來像一顆球體！'
+            },
+            {
+                subMode: 'sphere_slice',
+                setupFn: () => { sliceOffset = 0.45; sliceDirection = 'slanted'; },
+                q: '把一顆球從不同方向（橫切、直切或斜切）平平的切開，切開的面是什麼形狀？',
+                options: ['長方形', '橢圓形', '永遠都是圓形', '三角形'],
+                ans: 2,
+                exp: '不管從哪個方向把球平平切開，切開的面永遠都是「圓形」！'
+            },
+            {
+                subMode: 'sphere_slice',
+                setupFn: () => { sliceOffset = 0; sliceDirection = 'horizontal'; },
+                q: '想一想，要怎麼把球切開，切出來的圓形截面才會「最大」？',
+                options: ['靠近最上面切開', '通過「球心」把球平分成兩半', '斜斜的切最邊緣', '不管怎麼切都一樣大'],
+                ans: 1,
+                exp: '通過「球心」切開（把球平分成兩半）時，切出來的圓最大，這時球的半徑就是這個最大圓的半徑！'
+            },
+            {
+                subMode: 'sphere_cake',
+                setupFn: () => { cakeCutType = 1; },
+                q: '最後一題！把一個長方體蛋糕沿著底面的「對角線」垂直切一刀，會分成哪兩個柱體？',
+                options: ['兩個四角柱', '兩個三角柱', '一個圓柱和一個圓錐', '兩個五角柱'],
+                ans: 1,
+                exp: '長方形底面沿對角線切開會變成 2 個三角形，所以會分成「兩個三角柱」！'
+            }
+        ];
+
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+
+        function loadQuizQuestion(idx) {
+            quizAnswered = false;
+            const qObj = QUIZ_BANK[idx];
+
+            currentSubMode = qObj.subMode;
+            if (qObj.setupFn) qObj.setupFn();
+            rebuildCurrentScene();
+
+            document.getElementById('quiz-progress').textContent = `第 ${idx + 1} / ${QUIZ_BANK.length} 題（每題 10 分）`;
+            document.getElementById('quiz-question-text').textContent = qObj.q;
+
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = '';
+
+            qObj.options.forEach((optText, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-3d bg-slate-50 hover:bg-teal-50 text-slate-800 border-2 border-slate-200 font-black py-2.5 px-3 rounded-2xl text-xs sm:text-sm transition';
+                btn.textContent = optText;
+                btn.onclick = () => checkQuizAnswer(i, btn);
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.innerHTML = (idx === QUIZ_BANK.length - 1)
+                ? `重新挑戰滿分 100 分 <i class="fa-solid fa-rotate-right"></i>`
+                : `下一題 <i class="fa-solid fa-arrow-right"></i>`;
+        }
+
+        function checkQuizAnswer(selectedIdx, btnElement) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const qObj = QUIZ_BANK[currentQuizIdx];
+            const fb = document.getElementById('quiz-feedback');
+            const allBtns = document.getElementById('quiz-options').children;
+
+            fb.classList.remove('hidden');
+            if (selectedIdx === qObj.ans) {
+                quizScore += 10;
+                document.getElementById('quiz-score').textContent = quizScore;
+                btnElement.className = 'btn-3d bg-emerald-500 text-white border-2 border-emerald-700 font-black py-2.5 px-3 rounded-2xl text-xs sm:text-sm';
+                fb.className = 'rounded-2xl p-3 mb-3.5 text-xs sm:text-sm font-bold bg-emerald-50 text-emerald-900 border border-emerald-200';
+                fb.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> 答對了！獲得 10 分！<br><span class="text-xs font-medium">${qObj.exp}</span>`;
+            } else {
+                btnElement.className = 'btn-3d bg-rose-500 text-white border-2 border-rose-700 font-black py-2.5 px-3 rounded-2xl text-xs sm:text-sm';
+                allBtns[qObj.ans].className = 'btn-3d bg-emerald-500 text-white border-2 border-emerald-700 font-black py-2.5 px-3 rounded-2xl text-xs sm:text-sm';
+                fb.className = 'rounded-2xl p-3 mb-3.5 text-xs sm:text-sm font-bold bg-rose-50 text-rose-900 border border-rose-200';
+                fb.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> 差一點點！正確答案是「${qObj.options[qObj.ans]}」。<br><span class="text-xs font-medium">${qObj.exp}</span>`;
+            }
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizIdx === QUIZ_BANK.length - 1) {
+                currentQuizIdx = 0;
+                quizScore = 0;
+                document.getElementById('quiz-score').textContent = quizScore;
+                loadQuizQuestion(0);
+            } else {
+                currentQuizIdx++;
+                loadQuizQuestion(currentQuizIdx);
+            }
+        }
+
+        /******************************************************************
+         * 6. 主動畫迴圈與啟動
+         ******************************************************************/
+        function animateLoop() {
+            requestAnimationFrame(animateLoop);
+
+            animCallbacks.forEach(fn => fn());
+
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+                updateFloatingLabelsPosition();
+            }
+        }
+
+        window.onload = function () {
+            initThreeScene();
+            switchMainTopic('planes');
+            animateLoop();
+        };
+    </script>
+</body>
+</html>
