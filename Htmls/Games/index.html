@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-layout="kawaii" data-palette="mint">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="WebIndexGenerator 1.1.0">
+<title>Student&#x27;s Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&amp;family=Nunito:wght@400;700;800&amp;display=swap">
+<style>
+:root{--bg:#f0fff4;--deco:#c9f2dc;--surface:#ffffff;--surface2:#ebfbf2;--text:#35524a;--muted:#7a9990;--accent:#3fc28f;--accent2:#7ab8ff;--on-accent:#ffffff;--border:#c8eedb;--shadow:rgba(63,194,143,.25);--font:'Nunito','M PLUS Rounded 1c','jf-openhuninn','Microsoft JhengHei',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{--gap:18px;--card-min:240px;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.hero{padding:48px 0 28px}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.8rem);line-height:1.25;overflow-wrap:anywhere}
+.hero .sub{margin-top:10px;color:var(--muted);font-size:1.05rem}
+.stats{margin-top:14px;color:var(--muted);font-size:.9rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:26px}
+.search{flex:1 1 260px;min-width:0;display:flex;align-items:center;gap:8px}
+.search input{flex:1;min-width:0;border:0;background:transparent;outline:none;padding:4px 0}
+.sortbox{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.92rem}
+.sortbox select{cursor:pointer}
+.group{margin-bottom:38px}
+.group-title{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:1.25rem}
+.group-title .count{font-size:.8rem;font-weight:600}
+.group-title .gname{min-width:0;overflow-wrap:anywhere}
+.items{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr))}
+.packed{display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));column-gap:var(--gap);row-gap:34px;margin-bottom:38px}
+.packed .group{margin:0;min-width:0}
+.item .folder{display:inline-block;margin-top:6px;font-size:.78rem;color:var(--accent);overflow-wrap:anywhere}
+.item{position:relative;display:flex;gap:14px;align-items:flex-start;min-width:0}
+.item .icon{flex:none;display:grid;place-items:center}
+.item .main{flex:1;min-width:0}
+.item .title{display:block;font-weight:700;overflow-wrap:anywhere}
+.item .meta{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:6px;font-size:.8rem;color:var(--muted)}
+.item .file{overflow-wrap:anywhere}
+.list-head{display:none}
+.no-meta .item .meta{display:none}
+.empty{padding:60px 0;text-align:center;color:var(--muted)}
+.hidden{display:none!important}
+footer{padding:30px 0 40px;text-align:center;color:var(--muted);font-size:.82rem}
+mark{background:var(--accent);color:var(--on-accent);border-radius:3px;padding:0 2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:560px){.hero{padding:32px 0 20px}.items{grid-template-columns:1fr}}
+body{background-color:var(--bg);background-image:radial-gradient(var(--deco) 2px,transparent 2.5px);background-size:26px 26px}
+.hero{text-align:center}
+.hero h1{color:var(--accent);font-weight:800;letter-spacing:.02em;text-shadow:3px 3px 0 var(--surface)}
+.hero h1::before{content:"🎀 "}.hero h1::after{content:" 🎀"}
+.stats>span{display:inline-block;padding:4px 16px;border-radius:50px;background:var(--surface);border:3px solid var(--border)}
+.search,.sortbox select{background:var(--surface);border:3px solid var(--border);border-radius:50px;padding:10px 20px;box-shadow:0 6px 14px var(--shadow)}
+.search::before{content:"🔍"}
+.search:focus-within{border-color:var(--accent)}
+.sortbox select{padding:10px 16px}
+.group-title{font-weight:800;color:var(--text)}
+.group-title::before{content:"🌸"}
+.group-title .count{background:var(--accent);color:var(--on-accent);border-radius:50px;padding:2px 12px}
+.item{background:var(--surface);border:3px solid var(--border);border-radius:26px;padding:18px;box-shadow:0 8px 16px var(--shadow);transition:transform .2s ease,box-shadow .2s ease,border-color .2s}
+.item:hover,.item:focus-visible{transform:translateY(-4px) scale(1.03);border-color:var(--accent);box-shadow:0 14px 26px var(--shadow);outline:none}
+.item:hover .icon{animation:bounce .6s ease}
+.item .icon{width:52px;height:52px;border-radius:50%;background:var(--surface2);border:3px solid var(--border);font-size:1.6rem}
+.item .title{font-size:1.05rem;color:var(--text)}
+.item .meta span{background:var(--surface2);border-radius:50px;padding:0 8px}
+.empty::before{content:"🥺";display:block;font-size:3rem}
+@keyframes bounce{0%,100%{transform:translateY(0)}35%{transform:translateY(-8px)}65%{transform:translateY(2px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Student&#x27;s Games</h1>
+    <p class="stats"><span>共 <b id="total">0</b> 個網頁<span id="shown"></span></span></p>
+  </header>
+  <div class="toolbar">
+    <label class="search"><input id="q" type="search" placeholder="搜尋名稱或檔名…（按 / 快速搜尋）" autocomplete="off" aria-label="搜尋"></label>
+    <label class="sortbox">排序
+      <select id="sort">
+        <option value="name">名稱（A→Z）</option>
+        <option value="newest">最新修改在前</option>
+        <option value="oldest">最舊修改在前</option>
+        <option value="size">檔案大小（大→小）</option>
+      </select>
+    </label>
+  </div>
+  <main id="list"></main>
+  <p id="empty" class="empty hidden"></p>
+  <noscript>
+    <ul>
+      <li><a href="KnockOut.html" target="_blank" rel="noopener">Knockout Void - Vs CPU</a></li>
+      <li><a href="S%C2%A5S%C5%A6%E2%82%ACM_A%C5%A6%C5%A6ACK_M0DE.html" target="_blank" rel="noopener">S¥SŦ€M_AŦŦACK_M0DE</a></li>
+      <li><a href="S%C2%A5S%C5%A6%E2%82%ACM_C0RRUP%C5%A6I0N.html" target="_blank" rel="noopener">S¥SŦ€M_C0RRUPŦI0N</a></li>
+      <li><a href="%E4%BF%84%E7%BE%85%E6%96%AF%E6%96%B9%E5%A1%8A.html" target="_blank" rel="noopener">夢幻馬卡龍 俄羅斯方塊 ✨</a></li>
+      <li><a href="%E5%83%8F%E7%B4%A0%E6%A9%AB%E8%BB%B8%E9%96%8B%E6%94%BE%E4%B8%96%E7%95%8C.html" target="_blank" rel="noopener">2D 像素橫軸開放世界 - 角色與多層地貌優化版</a></li>
+      <li><a href="%E5%85%89%E9%80%9F%E7%A5%9E%E8%A9%B1%E8%B3%BD%E8%BB%8A%E5%B0%8F%E9%81%8A%E6%88%B2.html" target="_blank" rel="noopener">光速神話賽車小遊戲 🌌💨</a></li>
+      <li><a href="%E5%8D%A1%E5%93%87%E4%BC%8A%E7%8E%A9%E5%81%B6%E5%A4%A7%E5%B0%8D%E6%B1%BA.html" target="_blank" rel="noopener">可愛玩偶大對決！</a></li>
+      <li><a href="%E5%8D%A1%E9%80%9A%E7%94%9F%E5%AD%98%E5%B0%84%E6%93%8A.html" target="_blank" rel="noopener">卡通生存射擊</a></li>
+      <li><a href="%E5%8E%9F%E7%A5%9E%E5%8F%AF%E6%84%9B%E6%8A%BD%E5%8D%A1%E6%A8%A1%E6%93%AC%E5%99%A8%20Pro%20Max.html" target="_blank" rel="noopener">✨ 原神可愛抽卡模擬器 Pro Max ✨</a></li>
+      <li><a href="%E5%8F%AF%E6%84%9B%E6%88%B0%E6%A9%9F%E5%A4%A7%E5%86%92%E9%9A%AA-%E7%B3%96%E6%9E%9C%E6%98%9F%E4%BF%9D%E8%A1%9B%E6%88%B0.html" target="_blank" rel="noopener">可愛戰機大冒險 🚀</a></li>
+      <li><a href="%E5%8F%AF%E6%84%9B%E6%88%B0%E6%A9%9F%E5%A4%A7%E5%86%92%E9%9A%AA.html" target="_blank" rel="noopener">可愛戰機大冒險 🚀</a></li>
+      <li><a href="%E5%8F%AF%E6%84%9B%E7%B1%83%E7%90%83%E6%A9%9F.html" target="_blank" rel="noopener">可愛籃球機 🏀</a></li>
+      <li><a href="%E5%8F%AF%E6%84%9B%E7%B6%B2%E7%90%83%E5%B0%8F%E9%81%8A%E6%88%B2.html" target="_blank" rel="noopener">可愛網球小遊戲 🎾</a></li>
+      <li><a href="%E5%98%9F%E5%98%9F%E7%B2%89%E7%B4%85%E8%B3%BD%E8%BB%8A.html" target="_blank" rel="noopener">嘟嘟粉紅賽車 🏎️💨</a></li>
+      <li><a href="%E5%9C%B0%E4%B8%8B%E6%8B%B3%E6%93%8A.html" target="_blank" rel="noopener">地下拳擊：絕對相容版</a></li>
+      <li><a href="%E5%9F%83%E5%8F%8A%E9%A2%A8%E9%9B%B2%EF%BC%9A%E9%87%91%E5%AD%97%E5%A1%94%E5%A4%A7%E6%BC%A0%E4%B9%8B%E6%88%B0.html" target="_blank" rel="noopener">埃及風雲：金字塔大漠之戰！</a></li>
+      <li><a href="%E5%B0%8F%E6%9C%8B%E5%8F%8B%E4%B8%8B%E6%A8%93%E6%A2%AF.html" target="_blank" rel="noopener">小朋友下樓梯</a></li>
+      <li><a href="%E5%B0%8F%E6%9C%8B%E5%8F%8B%E6%A3%AE%E6%9E%97%E7%A5%9E%E5%B0%84%E6%89%8B.html" target="_blank" rel="noopener">森林神射手 🏹 萌萌蘋果大挑戰</a></li>
+      <li><a href="%E6%80%A5%E9%80%9F%E9%96%83%E9%81%BF.html" target="_blank" rel="noopener">極速閃避：網頁賽車遊戲</a></li>
+      <li><a href="%E6%89%8B%E6%A9%9F%E5%B0%84%E6%93%8A%E9%81%8A%E6%88%B2.html" target="_blank" rel="noopener">無盡生存射擊遊戲（道具散射版 v7）</a></li>
+      <li><a href="%E6%A5%B5%E7%B0%A12D%E9%96%8B%E6%94%BE%E4%B8%96%E7%95%8C%E5%86%92%E9%9A%AA.html" target="_blank" rel="noopener">極簡 2D 開放世界冒險</a></li>
+      <li><a href="%E6%A5%B5%E9%80%9F%E8%B3%BD%E9%81%93.html" target="_blank" rel="noopener">極速賽道：方程式爭奪戰 🏎️</a></li>
+      <li><a href="%E6%A5%B5%E9%80%9F%E9%96%83%E9%81%BF%E8%B3%BD%E8%BB%8A%20.html" target="_blank" rel="noopener">極速飆車小遊戲 🏎️💨</a></li>
+      <li><a href="%E6%B3%95%E8%80%81Q%E7%89%88%E5%A4%A7%E6%8E%A2%E9%9A%AA.html" target="_blank" rel="noopener">法老Q版大探險 👑</a></li>
+      <li><a href="%E6%B7%98%E9%87%91%E5%A4%A7%E4%BD%9C%E6%88%B0.html" target="_blank" rel="noopener">網頁小遊戲：接金幣！</a></li>
+      <li><a href="%E6%B7%B1%E5%A4%9C%E5%9C%B0%E4%B8%8B%E5%AE%A4.html" target="_blank" rel="noopener">深夜的地下室</a></li>
+      <li><a href="%E7%89%A0%E5%9C%A8%E5%BE%8C%E9%9D%A2...%E5%88%A5%E5%9B%9E%E9%A0%AD%EF%BC%81%20-%20%E9%80%83%E9%81%BF%E7%8F%BE%E5%AF%A6%E7%89%88.html" target="_blank" rel="noopener">牠在後面...別回頭！ - 逃避現實版</a></li>
+      <li><a href="%E7%89%A0%E5%9C%A8%E5%BE%8C%E9%9D%A2...%E5%88%A5%E5%9B%9E%E9%A0%AD%EF%BC%81.html" target="_blank" rel="noopener">牠在後面...別回頭！</a></li>
+      <li><a href="%E7%94%9C%E9%BB%9E%E8%B2%93%E5%92%AA%E6%94%B6%E9%9B%86%E8%B3%BD.html" target="_blank" rel="noopener">甜點貓咪收集賽 🐾</a></li>
+      <li><a href="%E7%A5%88%E9%A1%98%E6%A8%A1%E6%93%AC%E5%99%A8%20%E6%A5%B5%E9%99%90%E7%89%88.html" target="_blank" rel="noopener">🔥 原神祈願模擬器 極限版 🔥</a></li>
+      <li><a href="%E7%B6%B2%E9%A0%81%E7%89%88%E8%B6%85%E7%B4%9A%E7%91%AA%E5%88%A9%E6%AD%90.html" target="_blank" rel="noopener">網頁版超級瑪利歐 - 完整圖片版</a></li>
+      <li><a href="%E8%8B%B1%E9%9B%84%E5%A4%A7%E5%86%92%E9%9A%AA.html" target="_blank" rel="noopener">✨ 英雄大冒險 ✨</a></li>
+      <li><a href="%E8%8D%92%E9%87%8E%E7%AB%B6%E6%8A%80%E5%A0%B4_%E9%9C%93%E8%99%B9%E6%96%AC%E6%AE%BA%E8%80%85.html" target="_blank" rel="noopener">荒野競技場：霓虹斬殺者</a></li>
+      <li><a href="%E8%8D%92%E9%87%8E%E7%AB%B6%E6%8A%80%E5%A0%B4_%E9%9C%93%E8%99%B9%E7%94%9F%E5%AD%98%E6%88%B0.html" target="_blank" rel="noopener">荒野競技場：霓虹生存戰</a></li>
+      <li><a href="%E9%87%8F%E5%AD%90%E5%B4%A9%E8%A7%A3%E8%B3%BD%E8%BB%8A%E5%B0%8F%E9%81%8A%E6%88%B2.html" target="_blank" rel="noopener">量子崩解賽車小遊戲 🌀⚡</a></li>
+      <li><a href="%E9%96%83%E9%81%BF%E8%B3%BD%E8%BB%8A%E5%B0%8F%E9%81%8A%E6%88%B2.html" target="_blank" rel="noopener">閃避賽車小遊戲 🏎️</a></li>
+      <li><a href="%E9%A6%AC%E5%8A%9B%E6%AD%90%E8%B7%B3%E8%B7%B3.html" target="_blank" rel="noopener">瑪利歐跳跳 🍄</a></li>
+      <li><a href="%E9%AC%BC%E6%8A%93%E4%BA%BA_%E6%81%90%E6%80%96%E7%94%9F%E5%AD%98.html" target="_blank" rel="noopener">鬼抓人 - 恐怖生存</a></li>
+      <li><a href="%E9%BB%9E%E6%93%8A%E7%B4%85%E9%BB%9E%E5%8F%8D%E6%87%89%E5%8A%9B%E6%B8%AC%E8%A9%A6.html" target="_blank" rel="noopener">點擊紅點小遊戲</a></li>
+    </ul>
+  </noscript>
+  <footer>更新時間 <span id="gen"></span> · 由「網頁索引產生器」產生</footer>
+</div>
+<script type="application/json" id="index-data">{"v":1,"target":"_blank","sort":"name","icon":"emoji","kind":"grid","group":"auto","showMeta":true,"generated":1793236134364,"groups":[{"name":"Games","items":[{"t":"Knockout Void - Vs CPU","f":"KnockOut.html","h":"KnockOut.html","m":1792110573441,"s":15522},{"t":"S¥SŦ€M_AŦŦACK_M0DE","f":"S¥SŦ€M_AŦŦACK_M0DE.html","h":"S%C2%A5S%C5%A6%E2%82%ACM_A%C5%A6%C5%A6ACK_M0DE.html","m":1792110573441,"s":18896},{"t":"S¥SŦ€M_C0RRUPŦI0N","f":"S¥SŦ€M_C0RRUPŦI0N.html","h":"S%C2%A5S%C5%A6%E2%82%ACM_C0RRUP%C5%A6I0N.html","m":1792110573444,"s":17863},{"t":"夢幻馬卡龍 俄羅斯方塊 ✨","f":"俄羅斯方塊.html","h":"%E4%BF%84%E7%BE%85%E6%96%AF%E6%96%B9%E5%A1%8A.html","m":1792110573444,"s":15080},{"t":"2D 像素橫軸開放世界 - 角色與多層地貌優化版","f":"像素橫軸開放世界.html","h":"%E5%83%8F%E7%B4%A0%E6%A9%AB%E8%BB%B8%E9%96%8B%E6%94%BE%E4%B8%96%E7%95%8C.html","m":1792110573444,"s":15442},{"t":"光速神話賽車小遊戲 🌌💨","f":"光速神話賽車小遊戲.html","h":"%E5%85%89%E9%80%9F%E7%A5%9E%E8%A9%B1%E8%B3%BD%E8%BB%8A%E5%B0%8F%E9%81%8A%E6%88%B2.html","m":1792110573444,"s":9406},{"t":"可愛玩偶大對決！","f":"卡哇伊玩偶大對決.html","h":"%E5%8D%A1%E5%93%87%E4%BC%8A%E7%8E%A9%E5%81%B6%E5%A4%A7%E5%B0%8D%E6%B1%BA.html","m":1792110573444,"s":13072},{"t":"卡通生存射擊","f":"卡通生存射擊.html","h":"%E5%8D%A1%E9%80%9A%E7%94%9F%E5%AD%98%E5%B0%84%E6%93%8A.html","m":1792110573444,"s":59976},{"t":"✨ 原神可愛抽卡模擬器 Pro Max ✨","f":"原神可愛抽卡模擬器 Pro Max.html","h":"%E5%8E%9F%E7%A5%9E%E5%8F%AF%E6%84%9B%E6%8A%BD%E5%8D%A1%E6%A8%A1%E6%93%AC%E5%99%A8%20Pro%20Max.html","m":1792110573444,"s":14052},{"t":"可愛戰機大冒險 🚀","f":"可愛戰機大冒險-糖果星保衛戰.html","h":"%E5%8F%AF%E6%84%9B%E6%88%B0%E6%A9%9F%E5%A4%A7%E5%86%92%E9%9A%AA-%E7%B3%96%E6%9E%9C%E6%98%9F%E4%BF%9D%E8%A1%9B%E6%88%B0.html","m":1792110573444,"s":17403},{"t":"可愛戰機大冒險 🚀","f":"可愛戰機大冒險.html","h":"%E5%8F%AF%E6%84%9B%E6%88%B0%E6%A9%9F%E5%A4%A7%E5%86%92%E9%9A%AA.html","m":1792110573444,"s":20051},{"t":"可愛籃球機 🏀","f":"可愛籃球機.html","h":"%E5%8F%AF%E6%84%9B%E7%B1%83%E7%90%83%E6%A9%9F.html","m":1792110573444,"s":8407},{"t":"可愛網球小遊戲 🎾","f":"可愛網球小遊戲.html","h":"%E5%8F%AF%E6%84%9B%E7%B6%B2%E7%90%83%E5%B0%8F%E9%81%8A%E6%88%B2.html","m":1792110573444,"s":8193},{"t":"嘟嘟粉紅賽車 🏎️💨","f":"嘟嘟粉紅賽車.html","h":"%E5%98%9F%E5%98%9F%E7%B2%89%E7%B4%85%E8%B3%BD%E8%BB%8A.html","m":1792110573444,"s":15558},{"t":"地下拳擊：絕對相容版","f":"地下拳擊.html","h":"%E5%9C%B0%E4%B8%8B%E6%8B%B3%E6%93%8A.html","m":1792110573444,"s":10768},{"t":"埃及風雲：金字塔大漠之戰！","f":"埃及風雲：金字塔大漠之戰.html","h":"%E5%9F%83%E5%8F%8A%E9%A2%A8%E9%9B%B2%EF%BC%9A%E9%87%91%E5%AD%97%E5%A1%94%E5%A4%A7%E6%BC%A0%E4%B9%8B%E6%88%B0.html","m":1792110573444,"s":12532},{"t":"小朋友下樓梯","f":"小朋友下樓梯.html","h":"%E5%B0%8F%E6%9C%8B%E5%8F%8B%E4%B8%8B%E6%A8%93%E6%A2%AF.html","m":1792110573444,"s":6858},{"t":"森林神射手 🏹 萌萌蘋果大挑戰","f":"小朋友森林神射手.html","h":"%E5%B0%8F%E6%9C%8B%E5%8F%8B%E6%A3%AE%E6%9E%97%E7%A5%9E%E5%B0%84%E6%89%8B.html","m":1792110573444,"s":13257},{"t":"極速閃避：網頁賽車遊戲","f":"急速閃避.html","h":"%E6%80%A5%E9%80%9F%E9%96%83%E9%81%BF.html","m":1792110573444,"s":7638},{"t":"無盡生存射擊遊戲（道具散射版 v7）","f":"手機射擊遊戲.html","h":"%E6%89%8B%E6%A9%9F%E5%B0%84%E6%93%8A%E9%81%8A%E6%88%B2.html","m":1792110573444,"s":8348},{"t":"極簡 2D 開放世界冒險","f":"極簡2D開放世界冒險.html","h":"%E6%A5%B5%E7%B0%A12D%E9%96%8B%E6%94%BE%E4%B8%96%E7%95%8C%E5%86%92%E9%9A%AA.html","m":1792110573444,"s":8986},{"t":"極速賽道：方程式爭奪戰 🏎️","f":"極速賽道.html","h":"%E6%A5%B5%E9%80%9F%E8%B3%BD%E9%81%93.html","m":1792110573444,"s":17339},{"t":"極速飆車小遊戲 🏎️💨","f":"極速閃避賽車 .html","h":"%E6%A5%B5%E9%80%9F%E9%96%83%E9%81%BF%E8%B3%BD%E8%BB%8A%20.html","m":1792110573444,"s":9138},{"t":"法老Q版大探險 👑","f":"法老Q版大探險.html","h":"%E6%B3%95%E8%80%81Q%E7%89%88%E5%A4%A7%E6%8E%A2%E9%9A%AA.html","m":1792110573444,"s":16501},{"t":"網頁小遊戲：接金幣！","f":"淘金大作戰.html","h":"%E6%B7%98%E9%87%91%E5%A4%A7%E4%BD%9C%E6%88%B0.html","m":1792110573444,"s":7781},{"t":"深夜的地下室","f":"深夜地下室.html","h":"%E6%B7%B1%E5%A4%9C%E5%9C%B0%E4%B8%8B%E5%AE%A4.html","m":1792110573444,"s":7635},{"t":"牠在後面...別回頭！ - 逃避現實版","f":"牠在後面...別回頭！ - 逃避現實版.html","h":"%E7%89%A0%E5%9C%A8%E5%BE%8C%E9%9D%A2...%E5%88%A5%E5%9B%9E%E9%A0%AD%EF%BC%81%20-%20%E9%80%83%E9%81%BF%E7%8F%BE%E5%AF%A6%E7%89%88.html","m":1792110573444,"s":21730},{"t":"牠在後面...別回頭！","f":"牠在後面...別回頭！.html","h":"%E7%89%A0%E5%9C%A8%E5%BE%8C%E9%9D%A2...%E5%88%A5%E5%9B%9E%E9%A0%AD%EF%BC%81.html","m":1792110573444,"s":13362},{"t":"甜點貓咪收集賽 🐾","f":"甜點貓咪收集賽.html","h":"%E7%94%9C%E9%BB%9E%E8%B2%93%E5%92%AA%E6%94%B6%E9%9B%86%E8%B3%BD.html","m":1792110573444,"s":15170},{"t":"🔥 原神祈願模擬器 極限版 🔥","f":"祈願模擬器 極限版.html","h":"%E7%A5%88%E9%A1%98%E6%A8%A1%E6%93%AC%E5%99%A8%20%E6%A5%B5%E9%99%90%E7%89%88.html","m":1792110573444,"s":14026},{"t":"網頁版超級瑪利歐 - 完整圖片版","f":"網頁版超級瑪利歐.html","h":"%E7%B6%B2%E9%A0%81%E7%89%88%E8%B6%85%E7%B4%9A%E7%91%AA%E5%88%A9%E6%AD%90.html","m":1792110573444,"s":9986},{"t":"✨ 英雄大冒險 ✨","f":"英雄大冒險.html","h":"%E8%8B%B1%E9%9B%84%E5%A4%A7%E5%86%92%E9%9A%AA.html","m":1792110573444,"s":13174},{"t":"荒野競技場：霓虹斬殺者","f":"荒野競技場_霓虹斬殺者.html","h":"%E8%8D%92%E9%87%8E%E7%AB%B6%E6%8A%80%E5%A0%B4_%E9%9C%93%E8%99%B9%E6%96%AC%E6%AE%BA%E8%80%85.html","m":1792110573444,"s":17435},{"t":"荒野競技場：霓虹生存戰","f":"荒野競技場_霓虹生存戰.html","h":"%E8%8D%92%E9%87%8E%E7%AB%B6%E6%8A%80%E5%A0%B4_%E9%9C%93%E8%99%B9%E7%94%9F%E5%AD%98%E6%88%B0.html","m":1792110573444,"s":15564},{"t":"量子崩解賽車小遊戲 🌀⚡","f":"量子崩解賽車小遊戲.html","h":"%E9%87%8F%E5%AD%90%E5%B4%A9%E8%A7%A3%E8%B3%BD%E8%BB%8A%E5%B0%8F%E9%81%8A%E6%88%B2.html","m":1792110573444,"s":9282},{"t":"閃避賽車小遊戲 🏎️","f":"閃避賽車小遊戲.html","h":"%E9%96%83%E9%81%BF%E8%B3%BD%E8%BB%8A%E5%B0%8F%E9%81%8A%E6%88%B2.html","m":1792110573451,"s":9254},{"t":"瑪利歐跳跳 🍄","f":"馬力歐跳跳.html","h":"%E9%A6%AC%E5%8A%9B%E6%AD%90%E8%B7%B3%E8%B7%B3.html","m":1792110573451,"s":9544},{"t":"鬼抓人 - 恐怖生存","f":"鬼抓人_恐怖生存.html","h":"%E9%AC%BC%E6%8A%93%E4%BA%BA_%E6%81%90%E6%80%96%E7%94%9F%E5%AD%98.html","m":1792110573451,"s":10357},{"t":"點擊紅點小遊戲","f":"點擊紅點反應力測試.html","h":"%E9%BB%9E%E6%93%8A%E7%B4%85%E9%BB%9E%E5%8F%8D%E6%87%89%E5%8A%9B%E6%B8%AC%E8%A9%A6.html","m":1792110573451,"s":2901}]}]}</script>
+<script>(function(){
+  var D = JSON.parse(document.getElementById('index-data').textContent);
+  var EMOJI = ['🎀','🍓','🧁','🌸','🍭','⭐','🐰','🍩','🌈','🎈','🍰','🐱','🦄','🍡','🐣','🍒'];
+  var list = document.getElementById('list');
+  var q = document.getElementById('q');
+  var sortSel = document.getElementById('sort');
+  var empty = document.getElementById('empty');
+  var total = 0;
+  D.groups.forEach(function(g){ total += g.items.length; });
+  document.getElementById('total').textContent = total;
+  if (D.showMeta === false) document.body.classList.add('no-meta');
+  sortSel.value = D.sort || 'name';
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function fmtDate(ms){ var d = new Date(ms); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()); }
+  function fmtSize(b){ if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
+  function hash(s){ var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) % 9973; }
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  var collator = window.Intl && Intl.Collator ? new Intl.Collator('zh-Hant', {numeric: true, sensitivity: 'base'}) : null;
+  function cmpName(a, b){ return collator ? collator.compare(a.t, b.t) : (a.t < b.t ? -1 : a.t > b.t ? 1 : 0); }
+  var SORTS = {
+    name: cmpName,
+    newest: function(a, b){ return b.m - a.m || cmpName(a, b); },
+    oldest: function(a, b){ return a.m - b.m || cmpName(a, b); },
+    size: function(a, b){ return b.s - a.s || cmpName(a, b); }
+  };
+  function iconText(it, i){
+    if (D.icon === 'emoji') return EMOJI[hash(it.t) % EMOJI.length];
+    if (D.icon === 'initial') return (Array.from ? Array.from(it.t)[0] : it.t.charAt(0)) || '•';
+    if (D.icon === 'index') return pad(i + 1);
+    return '';
+  }
+  function highlight(node, text, kw){
+    if (!kw) { node.textContent = text; return; }
+    var low = text.toLowerCase(), pos = 0, idx;
+    while ((idx = low.indexOf(kw, pos)) !== -1) {
+      node.appendChild(document.createTextNode(text.slice(pos, idx)));
+      node.appendChild(el('mark', null, text.slice(idx, idx + kw.length)));
+      pos = idx + kw.length;
+    }
+    node.appendChild(document.createTextNode(text.slice(pos)));
+  }
+  var isList = D.kind === 'list';      // 清單／表格式：一行一筆
+  var SMALL = 3;                       // 清單式：網頁數 ≤ 3 的相鄰資料夾合併成一個表格
+  var lastCols = 0;
+  // 依可用寬度算出一列可以放幾張卡片（與 .items 的 auto-fill 規則相同）
+  function cols(){
+    if (window.matchMedia && matchMedia('(max-width:560px)').matches) return 1;
+    var cs = getComputedStyle(document.body);
+    var gap = parseFloat(cs.getPropertyValue('--gap')) || 18;
+    var min = parseFloat(cs.getPropertyValue('--card-min')) || 240;
+    return Math.max(1, Math.floor((list.clientWidth + gap) / (min + gap)));
+  }
+  // e = {it: 網頁, g: 所屬資料夾名稱（不分組／合併時才有）}
+  function card(e, i, kw){
+    var it = e.it;
+    var a = el('a', 'item');
+    a.href = it.h;
+    a.title = e.g ? e.g + ' / ' + it.t : it.t;
+    if (D.target === '_blank') { a.target = '_blank'; a.rel = 'noopener'; }
+    a.appendChild(el('span', 'icon', iconText(it, i))).setAttribute('aria-hidden', 'true');
+    var main = el('span', 'main');
+    var t = el('span', 'title'); highlight(t, it.t, kw); main.appendChild(t);
+    if (e.g && !isList) { var fd = el('span', 'folder'); highlight(fd, '📁 ' + e.g, kw); main.appendChild(fd); }
+    var meta = el('span', 'meta');
+    var f = el('span', 'file'); highlight(f, e.g && isList ? e.g + '/' + it.f : it.f, kw); meta.appendChild(f);
+    meta.appendChild(el('span', 'date', fmtDate(it.m)));
+    meta.appendChild(el('span', 'size', fmtSize(it.s)));
+    main.appendChild(meta);
+    a.appendChild(main);
+    return a;
+  }
+  // 一個區塊：標題（name 為 null 時不顯示）＋卡片清單
+  function section(name, countText, entries, kw){
+    var sec = el('section', 'group');
+    if (name != null) {
+      var h = el('h2', 'group-title');
+      h.appendChild(el('span', 'gname', name));
+      h.appendChild(el('span', 'count', countText));
+      sec.appendChild(h);
+    }
+    var box = el('div', 'items');
+    var head = el('div', 'list-head');
+    ['#', '名稱', '檔案', '修改日期', '大小'].forEach(function(t){ head.appendChild(el('span', null, t)); });
+    box.appendChild(head);
+    entries.forEach(function(e, i){ box.appendChild(card(e, i, kw)); });
+    sec.appendChild(box);
+    return sec;
+  }
+  function wrapEntries(items, g){ return items.map(function(it){ return {it: it, g: g}; }); }
+  function render(){
+    var kw = q.value.trim().toLowerCase();
+    var cmp = SORTS[sortSel.value] || cmpName;
+    var mode = D.group || 'auto';
+    var multi = D.groups.length > 1;
+    var shown = 0;
+    list.textContent = '';
+    var groups = [];
+    D.groups.forEach(function(g){
+      var inName = kw && g.name.toLowerCase().indexOf(kw) !== -1;   // 搜尋資料夾名稱也算符合
+      var items = g.items.filter(function(it){
+        return !kw || inName || it.t.toLowerCase().indexOf(kw) !== -1 || it.f.toLowerCase().indexOf(kw) !== -1;
+      }).sort(cmp);
+      if (!items.length) return;
+      shown += items.length;
+      groups.push({name: g.name, all: g.items.length, items: items});
+    });
+    function countText(g){ return g.items.length + (kw ? ' / ' + g.all : ''); }
+
+    if (multi && mode === 'flat') {
+      // 不分組：全部網頁排在一起，資料夾名稱變成卡片上的小標籤
+      var all = [];
+      groups.forEach(function(g){ all = all.concat(wrapEntries(g.items, g.name)); });
+      all.sort(function(a, b){ return cmp(a.it, b.it); });
+      if (all.length) list.appendChild(section(null, '', all, kw));
+    } else if (multi && mode === 'auto' && !isList) {
+      // 自動並排：每個資料夾佔「網頁數」格（最多一整列），小資料夾就能排在同一列
+      var n = lastCols = cols();
+      var pack = el('div', 'packed');
+      pack.style.setProperty('--cols', n);
+      groups.forEach(function(g){
+        var k = Math.min(g.items.length, n);
+        var sec = section(g.name, countText(g), wrapEntries(g.items), kw);
+        sec.style.gridColumn = 'span ' + k;
+        sec.lastChild.style.gridTemplateColumns = 'repeat(' + k + ',minmax(0,1fr))';
+        pack.appendChild(sec);
+      });
+      list.appendChild(pack);
+    } else if (multi && mode === 'auto' && isList) {
+      // 清單式：相鄰的小資料夾合併成一個表格，檔案欄顯示「資料夾/檔名」
+      var run = [];
+      var flush = function(){
+        if (run.length === 1) list.appendChild(section(run[0].name, countText(run[0]), wrapEntries(run[0].items), kw));
+        else if (run.length > 1) {
+          var es = [];
+          run.forEach(function(g){ es = es.concat(wrapEntries(g.items, g.name)); });
+          list.appendChild(section(run.length + ' 個資料夾', es.length + ' 個網頁', es, kw));
+        }
+        run = [];
+      };
+      groups.forEach(function(g){
+        if (g.items.length <= SMALL) { run.push(g); return; }
+        flush();
+        list.appendChild(section(g.name, countText(g), wrapEntries(g.items), kw));
+      });
+      flush();
+    } else {
+      // 每個資料夾各自一列（只有一個資料夾時不顯示標題）
+      groups.forEach(function(g){ list.appendChild(section(multi ? g.name : null, countText(g), wrapEntries(g.items), kw)); });
+    }
+    document.getElementById('shown').textContent = kw ? '，符合 ' + shown + ' 個' : '';
+    empty.classList.toggle('hidden', shown > 0);
+    empty.textContent = total ? '找不到符合「' + q.value.trim() + '」的網頁' : '這裡還沒有任何網頁';
+  }
+  q.addEventListener('input', render);
+  sortSel.addEventListener('change', render);
+  // 視窗寬度改變、一列能放的卡片數跟著變時，重新排列
+  if ((D.group || 'auto') === 'auto' && !isList) {
+    var rt = 0;
+    var onResize = function(){ clearTimeout(rt); rt = setTimeout(function(){ if (cols() !== lastCols) render(); }, 100); };
+    if (window.ResizeObserver) new ResizeObserver(onResize).observe(list); else window.addEventListener('resize', onResize);
+  }
+  document.addEventListener('keydown', function(e){
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; render(); }
+  });
+  var gen = document.getElementById('gen');
+  if (gen && D.generated) gen.textContent = fmtDate(D.generated);
+  render();
+})();</script>
+</body>
+</html>
