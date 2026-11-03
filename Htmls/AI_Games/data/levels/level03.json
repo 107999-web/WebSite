@@ -1,0 +1,46 @@
+{
+  "name": "廢棄礦坑",
+  "desc": "陷阱：地雷（敵人踩到也會爆）",
+  "theme": {
+    "background": "#17131a", "fog": "#17131a", "fogNear": 24, "fogFar": 48,
+    "hemiSky": "#9a8fb0", "hemiGround": "#2a2018", "hemiIntensity": 0.6,
+    "moon": "#e8d2b4", "moonIntensity": 1.1,
+    "outside": "#141014",
+    "wall": { "a": "#5f5048", "b": "#4a3d37", "gate": "#6e5c4e" },
+    "ground": { "base": "#463a2f", "speck": [1.2, 1, 0.8], "stone": [12, 4, -6], "stoneBase": 62,
+      "paths": [[-20, 3, 20, 3, 3], [-8, -15, -8, 3, 3], [9, -15, 9, 3, 3]], "plaza": 0 }
+  },
+  "arena": {
+    "halfWidth": 20, "halfDepth": 15,
+    "gates": [{ "side": "north", "at": -8, "width": 5 }, { "side": "north", "at": 9, "width": 5 }],
+    "lowSides": ["south"]
+  },
+  "playerStart": [0, 8],
+  "spawnPoints": [{ "at": [-8, -12] }, { "at": [9, -12] }, { "at": [-17, -4] }, { "at": [17, -4] }, { "at": [-16, 11] }, { "at": [16, 11] }, { "at": [0, -4] }],
+  "hazards": [
+    { "type": "mine", "at": [-6, 3], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 },
+    { "type": "mine", "at": [5.5, 3.4], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 },
+    { "type": "mine", "at": [-12, -3], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 },
+    { "type": "mine", "at": [12, -3], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 },
+    { "type": "mine", "at": [0.5, -8], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 },
+    { "type": "mine", "at": [-13, 8], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 },
+    { "type": "mine", "at": [13, 8], "radius": 2.4, "fuse": 0.9, "rearm": 9, "damage": 2, "enemyDamage": 3 }
+  ],
+  "waves": [
+    { "spawns": [{ "enemy": "骷髏人", "count": 5 }, { "enemy": "狼人", "count": 3 }], "interval": 1, "maxAlive": 5 },
+    { "spawns": [{ "enemy": "狼人", "count": 5 }, { "enemy": "半獸人", "count": 4 }], "chest": { "type": "寶箱", "at": [-3, -8.5] }, "interval": 1, "maxAlive": 6, "items": [{ "item": "紅藥水", "at": 8 }] },
+    { "spawns": [{ "enemy": "骷髏人", "count": 6 }, { "enemy": "忍者", "count": 4 }, { "enemy": "半獸人", "count": 3 }], "interval": 0.9, "maxAlive": 7, "items": [{ "item": "藍藥水", "at": 7 }] },
+    { "spawns": [{ "enemy": "忍者", "count": 6 }, { "enemy": "半獸人", "count": 4 }, { "enemy": "山豬半獸人", "count": 2 }], "chest": { "type": "寶箱", "at": [9, 6] }, "interval": 0.8, "maxAlive": 7, "items": [{ "item": "紅藥水", "at": 12 }] },
+    { "spawns": [{ "enemy": "狼人", "count": 8 }, { "enemy": "忍者", "count": 5 }, { "enemy": "山豬半獸人", "count": 3 }], "interval": 0.8, "maxAlive": 8, "items": [{ "item": "黃藥水", "at": 10 }, { "item": "紅藥水", "at": 18 }] },
+    { "boss": ["死靈骷髏王"], "bossChest": "大寶箱", "healPlayer": true, "interval": 1, "maxAlive": 6, "items": [{ "item": "紅藥水", "at": 15 }, { "item": "藍藥水", "at": 30 }, { "item": "紅藥水", "at": 45 }] }
+  ],
+  "props": [
+    { "type": "torch", "at": [-3.4, 0.6] }, { "type": "torch", "at": [3.4, 0.6] }, { "type": "torch", "at": [-15.4, 2.6] }, { "type": "torch", "at": [15.4, 2.6] },
+    { "type": "crystal", "at": [-17.5, -11.5], "scale": 1.3 }, { "type": "crystal", "at": [17, -11], "scale": 1.2 }, { "type": "crystal", "at": [0.6, -13], "scale": 1 },
+    { "type": "crystal", "at": [-18, 7.5] }, { "type": "crystal", "at": [17.8, 7.2], "scale": 1.1 },
+    { "type": "minecart", "at": [-4.2, -3], "rot": 12 }, { "type": "minecart", "at": [15, -9], "rot": 80 },
+    { "type": "crate", "at": [-14.5, -9] }, { "type": "crate", "at": [-13, -10.4], "scale": 0.8 }, { "type": "crate", "at": [6.2, -7.4] }, { "type": "crate", "at": [8.2, 11.8], "scale": 0.9 }, { "type": "crate", "at": [-8, 11.6] },
+    { "type": "woodPost", "at": [-11.4, -1] }, { "type": "woodPost", "at": [11.4, -8] }, { "type": "woodPost", "at": [4.4, -4] }, { "type": "woodPost", "at": [-4.6, 11.4] }, { "type": "woodPost", "at": [4.8, 12.2] },
+    { "type": "rock", "at": [-18, 13], "scale": 1 }, { "type": "rock", "at": [16.4, 12.6], "scale": 1.1 }, { "type": "rock", "at": [-18, -2], "scale": 0.8 }, { "type": "rock", "at": [18, -2], "scale": 0.8 }
+  ]
+}

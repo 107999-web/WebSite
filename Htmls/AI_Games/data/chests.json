@@ -1,0 +1,11 @@
+{
+  "closedModel": "寶箱關閉",
+  "openModel": "寶箱開啟",
+  "hits": 2,
+  "fadeAfterOpen": 5,
+  "featherCoins": 15,
+  "types": {
+    "寶箱": { "size": 0.95, "radius": 0.65, "coins": [10, 20], "potion": true, "featherChance": 0.05, "color": "#f2c14e" },
+    "大寶箱": { "size": 1.5, "radius": 1, "coins": [25, 35], "potion": false, "featherChance": 0.15, "color": "#ffd76a" }
+  }
+}

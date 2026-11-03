@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>騎士與骷髏</title>
+<link rel="stylesheet" href="src/ui/style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" hidden>
+  <div id="hearts" aria-label="生命"></div>
+  <div id="waveInfo"></div>
+  <div id="scoreBox">
+    <div id="score"></div>
+    <div id="coins" aria-label="金幣"><i></i><span id="coinCount">0</span></div>
+  </div>
+</div>
+<div id="bossBar" hidden>
+  <b id="bossName"></b>
+  <div id="bossTrack"><i id="bossFill"></i></div>
+</div>
+<div id="buffs" hidden></div>
+<div id="abilities"></div>
+<div id="banner"></div>
+<div id="flash"></div>
+
+<div id="overlay">
+  <div class="panel">
+    <h1 id="overlayTitle">騎士與骷髏</h1>
+    <p id="overlayText">載入中…</p>
+    <div id="characterList" hidden></div>
+    <div id="levelList" hidden></div>
+    <div id="overlayButtons">
+      <button id="overlayButton" hidden>開始遊戲</button>
+      <button id="overlaySecond" hidden></button>
+      <button id="overlayThird" hidden></button>
+    </div>
+    <div id="legend"></div>
+    <div id="controls">
+      <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵 移動</span>
+      <span><kbd>空白鍵</kbd> 或滑鼠左鍵 攻擊</span>
+      <span><kbd>K</kbd> 或滑鼠右鍵 特殊技能</span>
+      <span><kbd>L</kbd> 喝攜帶的藥水</span>
+      <span><kbd>P</kbd> 暫停</span>
+    </div>
+  </div>
+</div>
+
+<div id="shopBubble" hidden></div>
+<div id="shop" hidden>
+  <div id="shopHead">
+    <h1>商店</h1>
+    <div id="shopTabs"></div>
+    <div id="shopWallet"><i></i><span id="shopCoins">0</span></div>
+  </div>
+  <div id="shopList"></div>
+  <div id="shopFoot">
+    <button id="shopBack">離開商店</button>
+    <small>↑↓ 選商品　←→ 換角色　Enter 購買　Esc 離開</small>
+    <button id="shopReset">重置進度</button>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

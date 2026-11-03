@@ -1,0 +1,37 @@
+{
+  "stage": {
+    "building": null,
+    "buildingHeight": 4.4,
+    "buildingAt": [0, -2.5],
+    "buildingRotation": 0,
+    "keeper": "商店老闆",
+    "keeperHeight": 1.75,
+    "keeperAt": [0, 0],
+    "keeperRotation": 0,
+    "camera": { "position": [0, 1.35, 5.4], "look": [0, 1.1, 0], "fov": 30, "shiftDown": 0.34 }
+  },
+  "lines": {
+    "hello": ["歡迎光臨！想變強就看看吧。", "打怪辛苦了，來挑點好東西！", "金幣帶夠了嗎？"],
+    "buy": ["謝謝惠顧！", "好眼光！", "這個很適合你！", "拿好，別弄丟了！"],
+    "poor": ["金幣不夠喔，再去打幾隻怪吧！", "差一點點，下次再來！"],
+    "max": ["這個已經是最強了！"],
+    "locked": ["要先學會技能才能強化喔。"],
+    "reset": ["全部重新開始了，加油！"]
+  },
+  "upgrades": {
+    "愛心上限": { "icon": "❤️", "desc": "生命上限 +1，不會回血", "effect": "maxHp", "amount": 1, "for": "all", "prices": [80, 120, 160, 200] },
+    "多重射擊": { "icon": "🏹", "desc": "一次多射一發，往前方散開", "effect": "shots", "amount": 1, "for": ["弓箭手", "魔法師"], "prices": [200, 400] },
+    "震退": { "icon": "💥", "desc": "按 K：把周圍的敵人全部彈開", "effect": "skill", "amount": 1, "for": ["騎士"], "prices": [250] },
+    "隱身": { "icon": "👻", "desc": "按 K：隱身 5 秒，現身第一刀 2 倍傷害", "effect": "skill", "amount": 1, "for": ["盜賊"], "prices": [250] },
+    "技能強化": { "icon": "⏱️", "desc": "特殊技能冷卻變短：15 → 12 → 10 秒", "effect": "cooldown", "needs": "skill", "cooldowns": [12, 10], "for": ["騎士", "盜賊"], "prices": [200, 300] },
+    "金幣磁鐵": { "icon": "🧲", "desc": "撿金幣的範圍變大（所有角色）", "effect": "magnet", "amount": 1, "shared": true, "prices": [100, 200] }
+  },
+  "potions": {
+    "綠藥水": { "icon": "🟢", "name": "攜帶加速藥水", "desc": "帶著出發，遊戲中按 L 使用", "price": 40, "max": 1 },
+    "紅藥水": { "icon": "🔴", "name": "攜帶補血藥水", "desc": "帶著出發，遊戲中按 L 使用", "price": 40, "max": 1 }
+  },
+  "charms": {
+    "復活羽毛": { "icon": "🪶", "name": "復活羽毛", "desc": "倒下時自動復活一次（回 2 顆心）", "price": 150, "max": 1,
+      "heal": 2, "invulnerable": 2, "shove": { "radius": 5, "knockback": 28, "stun": 1.2 }, "color": "#fde68a" }
+  }
+}
