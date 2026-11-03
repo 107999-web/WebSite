@@ -62,7 +62,7 @@ export class Hud {
 
   // 畫面下方的技能與攜帶藥水。list：[{ key, name, color, state: ready／cooling／active, seconds }]
   setAbilities(list) {
-    const html = list.map((a) => `<div class="ability ${a.state}" style="--c:${a.color}"><kbd>${a.key}</kbd><b>${a.name}</b>${a.seconds ? `<span>${Math.ceil(a.seconds)}</span>` : ''}</div>`).join('');
+    const html = list.map((a) => `<div class="ability ${a.state}" data-key="${a.key}" style="--c:${a.color}"><kbd>${a.key}</kbd><b>${a.name}</b>${a.seconds ? `<span>${Math.ceil(a.seconds)}</span>` : ''}</div>`).join('');
     if (html !== this.abilitiesHtml) $('abilities').innerHTML = html; // 每格都會呼叫，內容沒變就不動畫面
     this.abilitiesHtml = html;
   }
@@ -96,7 +96,7 @@ export class Hud {
   showCharacterList({ characters, selected, levels, selectedLevel, onPick, onPickLevel, onConfirm, onBack, onShop }) {
     this.showOverlay({
       title: '選擇角色',
-      text: '←→ 選角色，↑↓ 選關卡，按 Enter 出發。',
+      text: document.body.classList.contains('touch') ? '點一下選角色和關卡，再按「出發」。' : '←→ 選角色，↑↓ 選關卡，按 Enter 出發。',
       button: '出發',
       onClick: onConfirm,
       second: '返回',

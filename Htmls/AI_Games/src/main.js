@@ -21,6 +21,7 @@ import { WaveDirector } from './game/waves.js';
 import { Hud } from './ui/hud.js';
 import { renderPortraits } from './ui/portraits.js';
 import { ShopPanel } from './ui/shopPanel.js';
+import { TouchControls } from './ui/touch.js';
 import { Level } from './world/level.js';
 import { ShopStage } from './world/shopStage.js';
 
@@ -65,6 +66,7 @@ class Game {
     this.assets = new Assets();
     this.input = new Input(this.canvas);
     this.input.onPause = () => this.togglePause();
+    this.touch = new TouchControls(this.input, { onPause: () => this.togglePause() });
     this.sfx = new Sfx();
     this.hud = new Hud();
     this.fx = new Fx(this.scene);
@@ -302,6 +304,7 @@ class Game {
 
   startRun() {
     this.sfx.unlock();
+    this.enterFullscreen();
     this.clearField();
     this.input.clear(); // 確認用的空白鍵不算攻擊
     this.score = 0;
@@ -321,6 +324,15 @@ class Game {
     this.canvas.focus?.();
     document.activeElement?.blur();
     this.cameraTarget.copy(this.player.position);
+  }
+
+  // 手機瀏覽器的網址列會吃掉一大塊畫面：觸控模式出發時（按鈕的點擊裡才允許）切全螢幕並鎖橫向。
+  // iPhone Safari 不支援全螢幕，失敗就照常玩
+  enterFullscreen() {
+    if (!this.touch.mode || document.fullscreenElement || !document.documentElement.requestFullscreen) return;
+    document.documentElement.requestFullscreen({ navigationUI: 'hide' })
+      .then(() => screen.orientation?.lock?.('landscape'))
+      .catch(() => {});
   }
 
   togglePause() {
@@ -487,6 +499,7 @@ class Game {
       if (this.shop.charmCount(id)) list.push({ key: charm.icon, name: charm.name, color: charm.color, state: 'ready' });
     }
     this.hud.setAbilities(list);
+    this.touch.setAbilities(list);
   }
 
   showDamage(enemy, amount) {
@@ -586,6 +599,7 @@ class Game {
     this.items.clearBuffs();
     this.skills.reveal();
     this.hud.setAbilities([]);
+    this.touch.setAbilities([]);
   }
 
   // Boss 不會被小怪推動，只把小怪推開
@@ -671,6 +685,7 @@ class Game {
   frame() {
     const raw = Math.min(this.clock.getDelta(), 0.05);
     this.input.update(raw);
+    this.touch.update(this.state);
     this.fx.update(raw);
     if (this.state === 'shop') {
       this.shopStage.update(raw);

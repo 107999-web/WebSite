@@ -1,4 +1,4 @@
-// 輸入：把實體按鍵對應成遊戲動作，遊戲邏輯只讀 move 和 consumeAttack()。
+// 輸入：把實體按鍵（和 src/ui/touch.js 的觸控搖桿）對應成遊戲動作，遊戲邏輯只讀 move 和 consumeAttack()。
 const MOVE_KEYS = {
   up: ['KeyW', 'ArrowUp'],
   down: ['KeyS', 'ArrowDown'],
@@ -17,6 +17,8 @@ export class Input {
     this.skillPressed = false;
     this.potionPressed = false;
     this.onPause = null;
+    this.touchMove = null; // 觸控搖桿：{ x, z }，長度 0～1（推得越遠走得越快）
+    this.attackHeld = false; // 觸控攻擊鍵按住＝連續攻擊
     addEventListener('keydown', (e) => {
       if (e.repeat) return;
       this.down.add(e.code);
@@ -38,6 +40,7 @@ export class Input {
   // 出發時清掉選單裡按過的鍵
   clear() {
     this.attackBuffer = 0;
+    this.attackHeld = false;
     this.skillPressed = false;
     this.potionPressed = false;
   }
@@ -61,13 +64,14 @@ export class Input {
   get move() {
     let x = (this.pressed('right') ? 1 : 0) - (this.pressed('left') ? 1 : 0);
     let z = (this.pressed('down') ? 1 : 0) - (this.pressed('up') ? 1 : 0);
+    if (!x && !z && this.touchMove) return { ...this.touchMove, moving: true }; // 鍵盤優先
     const len = Math.hypot(x, z);
     if (len > 0) { x /= len; z /= len; }
     return { x, z, moving: len > 0 };
   }
 
   update(dt) {
-    this.attackBuffer = Math.max(0, this.attackBuffer - dt);
+    this.attackBuffer = this.attackHeld ? ATTACK_BUFFER : Math.max(0, this.attackBuffer - dt);
   }
 
   consumeAttack() {

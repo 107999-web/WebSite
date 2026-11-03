@@ -30,7 +30,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #0c1020; col
   color: var(--gold); text-shadow: 0 4px 12px #000; opacity: 0; transition: opacity .25s; pointer-events: none; }
 #banner.show { opacity: 1; }
 
-#overlay { position: fixed; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 32px 16px; }
+/* 面板靠下；比畫面高時（手機橫放）可以捲動，不會把上半部切掉 */
+#overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 32px 16px; overflow-y: auto; }
+#overlay > .panel { margin-top: auto; flex: none; }
 #overlay[hidden] { display: none; }
 .panel { background: var(--panel); border: 2px solid rgba(242, 193, 78, .5); border-radius: 18px; padding: 24px 40px;
   text-align: center; max-width: 620px; width: 100%; backdrop-filter: blur(4px); }
@@ -145,3 +147,93 @@ kbd { background: #2b3050; border-radius: 4px; padding: 1px 6px; margin: 0 1px; 
 #flash { position: fixed; inset: 0; opacity: 0; pointer-events: none; }
 #flash.go { animation: flash .5s ease-out; }
 @keyframes flash { from { opacity: .75; } to { opacity: 0; } }
+
+/* ===== 觸控操作（src/ui/touch.js）：body.touch 時才出現 ===== */
+html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+body.touch { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+body.touch #game { touch-action: none; }
+#touchHelp { display: none; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin-top: 16px; font-size: 15px; opacity: .9; }
+body.touch #touchHelp { display: flex; }
+body.touch #controls, body.touch #shopFoot small, body.touch .ability kbd,
+body.touch .ability[data-key="K"], body.touch .ability[data-key="L"] { display: none; }
+
+#touch { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+#touch[hidden] { display: none; }
+#touch button { font: inherit; color: var(--ink); touch-action: none; -webkit-user-select: none; user-select: none; }
+/* 左半邊（避開上方 HUD）任何地方按下，搖桿就出現在手指下面 */
+#stickZone { position: absolute; left: 0; bottom: 0; width: 50%; top: 22%; pointer-events: auto; touch-action: none; }
+#stick { position: absolute; left: calc(env(safe-area-inset-left, 0px) + 96px); top: calc(100% - 96px); width: 112px; height: 112px; margin: -56px 0 0 -56px;
+  border-radius: 50%; background: rgba(255, 255, 255, .08); border: 3px solid rgba(255, 255, 255, .28); opacity: .55; transition: opacity .15s; }
+#stick.active { opacity: 1; background: rgba(255, 255, 255, .14); border-color: rgba(242, 193, 78, .7); transition: none; }
+#stickKnob { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff8e1, #f2c14e 60%, #b8862a); box-shadow: 0 3px 10px rgba(0, 0, 0, .5); }
+
+#tButtons { position: absolute; right: calc(env(safe-area-inset-right, 0px) + 20px); bottom: 20px; width: 210px; height: 200px; }
+.tBtn { position: absolute; border-radius: 50%; pointer-events: auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(16, 20, 38, .6); border: 3px solid rgba(255, 255, 255, .4); box-shadow: 0 3px 10px rgba(0, 0, 0, .45); }
+.tBtn[hidden] { display: none; }
+.tBtn.down { transform: scale(.92); filter: brightness(1.35); }
+.tBtn.big { right: 0; bottom: 0; width: 108px; height: 108px; background: rgba(242, 193, 78, .35); border-color: var(--gold); gap: 0; }
+.tBtn.big svg { width: 56%; height: 56%; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .6)); }
+.tBtn.big b { font-size: 15px; text-shadow: 0 1px 2px #000; margin-top: -2px; }
+.tBtn.small { width: 72px; height: 72px; border-color: var(--c, #fff); line-height: 1.05; }
+.tBtn.small b { font-size: 15px; color: var(--c, #fff); text-shadow: 0 1px 2px #000; max-width: 64px; text-align: center; }
+.tBtn.small .cd { font-size: 16px; font-weight: 800; min-height: 1em; }
+.tBtn.cooling { opacity: .5; filter: grayscale(.8); }
+.tBtn.active { box-shadow: 0 0 16px var(--c); }
+#tSkill { right: 122px; bottom: 6px; }
+#tPotion { right: 22px; bottom: 122px; }
+#tPause { position: absolute; top: 92px; right: calc(env(safe-area-inset-right, 0px) + 18px); width: 50px; height: 50px; border-radius: 12px; pointer-events: auto;
+  font-size: 24px; background: rgba(16, 20, 38, .6); border: 2px solid rgba(255, 255, 255, .4); }
+
+/* 直立拿著：提示轉橫向（遊戲中會自動暫停） */
+#rotateHint { display: none; position: fixed; inset: 0; z-index: 20; align-items: center; justify-content: center; padding: 24px; text-align: center; background: rgba(8, 10, 22, .94); }
+#rotateHint div { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+#rotateHint span { font-size: 64px; display: inline-block; animation: tilt 1.6s ease-in-out infinite; }
+#rotateHint b { font-size: 24px; color: var(--gold); }
+#rotateHint small { font-size: 16px; opacity: .85; }
+@keyframes tilt { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+@media (orientation: portrait) { body.touch #rotateHint { display: flex; } }
+
+/* 矮螢幕（手機橫放約 360～430 px 高）：字和間距縮小，按鈕縮一點 */
+@media (max-height: 520px) {
+  #hud { top: 8px; left: 14px; right: 14px; font-size: 16px; }
+  #hearts { font-size: 19px; letter-spacing: 1px; }
+  #coins i { width: 15px; height: 15px; }
+  #bossBar { top: 40px; }
+  #bossBar b { font-size: 15px; }
+  #bossTrack { height: 11px; }
+  #buffs { top: 40px; left: 14px; gap: 4px; }
+  .buff { font-size: 13px; padding: 2px 8px; }
+  #abilities { bottom: 8px; }
+  .ability { font-size: 13px; padding: 3px 8px; }
+  #banner { top: 18%; }
+  #overlay { padding: 10px 12px; }
+  .panel { padding: 12px 20px; }
+  .panel h1 { font-size: 26px; margin-bottom: 4px; }
+  .panel p { font-size: 15px; margin-bottom: 10px; line-height: 1.45; }
+  #overlayButton { font-size: 19px; padding: 8px 36px; }
+  #overlaySecond, #overlayThird { font-size: 16px; padding: 8px 20px; }
+  #legend, #controls, #touchHelp { margin-top: 8px; font-size: 13px; }
+  .panel.selecting { padding: 10px 16px; }
+  #characterList { gap: 8px; margin-bottom: 8px; max-height: none; }
+  .char { width: 112px; padding: 4px; }
+  .panel.selecting .char img { width: 52px; height: 52px; }
+  .char b { font-size: 15px; }
+  .char small { font-size: 11px; white-space: normal; }
+  .levelCard { padding: 4px 6px; }
+  .levelCard b { font-size: 13px; }
+  .levelCard small { font-size: 11px; }
+  #shop, #shop.dense { top: 6px; max-height: calc(100vh - 12px); padding: 8px 14px; gap: 6px; }
+  .shopTab img { width: 30px; height: 30px; }
+  #shopBubble { display: none; }
+  #stick { width: 96px; height: 96px; margin: -48px 0 0 -48px; left: calc(env(safe-area-inset-left, 0px) + 80px); top: calc(100% - 80px); }
+  #tButtons { right: calc(env(safe-area-inset-right, 0px) + 12px); bottom: 12px; width: 180px; height: 170px; }
+  .tBtn.big { width: 92px; height: 92px; }
+  .tBtn.big b { font-size: 13px; }
+  .tBtn.small { width: 62px; height: 62px; }
+  .tBtn.small b { font-size: 13px; }
+  #tSkill { right: 104px; bottom: 4px; }
+  #tPotion { right: 18px; bottom: 104px; }
+  #tPause { top: 68px; right: calc(env(safe-area-inset-right, 0px) + 12px); width: 42px; height: 42px; font-size: 20px; }
+}

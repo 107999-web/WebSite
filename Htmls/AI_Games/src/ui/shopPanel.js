@@ -8,6 +8,12 @@ function priceLabel(offer) {
   return `💰 ${offer.price}`;
 }
 
+// 平板、手機沒有鍵盤：說明裡的「按 K／按 L」換成畫面上的按鈕
+function touchText(text) {
+  if (!document.body.classList.contains('touch')) return text;
+  return text.replace(/按 ?K/g, '按技能鈕').replace(/按 ?L/g, '按藥水鈕');
+}
+
 function pips(offer) {
   if (offer.max <= 1) return '';
   return `<span class="pips">${'●'.repeat(offer.level)}${'○'.repeat(offer.max - offer.level)}</span>`;
@@ -111,7 +117,7 @@ export class ShopPanel {
       const state = [i === this.index ? 'selected' : '', offer.price === null ? 'done' : '', offer.locked || (offer.price !== null && !offer.affordable) ? 'cant' : ''].join(' ');
       return `<button class="offer ${state}" data-index="${i}" tabindex="-1">
         <span class="icon">${offer.icon}</span>
-        <span class="info"><b>${offer.name}${offer.shared ? '<em>共用</em>' : ''}</b>${pips(offer)}<small>${offer.desc}</small></span>
+        <span class="info"><b>${offer.name}${offer.shared ? '<em>共用</em>' : ''}</b>${pips(offer)}<small>${touchText(offer.desc)}</small></span>
         <span class="price">${priceLabel(offer)}</span></button>`;
     }).join('');
     $('shopList').children[this.index]?.scrollIntoView({ block: 'nearest' });
