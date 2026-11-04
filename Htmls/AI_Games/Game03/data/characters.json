@@ -1,0 +1,288 @@
+{
+  "騎士": {
+    "model": "騎士",
+    "role": "player",
+    "scale": 1,
+    "moveSpeed": 5.4,
+    "attackRange": 2.8,
+    "attackArcDegrees": 150,
+    "attackSpeed": 1.5,
+    "attackHitTime": 0.28,
+    "radius": 0.45,
+    "invulnerableTime": 1.5
+  },
+  "盜賊": {
+    "model": "盜賊",
+    "role": "player",
+    "scale": 1,
+    "moveSpeed": 6.6,
+    "attackRange": 2.2,
+    "attackArcDegrees": 110,
+    "attackSpeed": 2.7,
+    "attackHitTime": 0.28,
+    "radius": 0.45,
+    "invulnerableTime": 1.3,
+    "slash": "cross"
+  },
+  "弓箭手": {
+    "model": "弓箭手",
+    "role": "player",
+    "scale": 1,
+    "moveSpeed": 5.4,
+    "attackRange": 2.8,
+    "attackArcDegrees": 150,
+    "attackSpeed": 1.08,
+    "attackHitTime": 0.35,
+    "radius": 0.45,
+    "invulnerableTime": 1.5,
+    "lunge": false,
+    "shot": {
+      "visual": "arrow",
+      "model": "弓箭",
+      "modelScale": 1.5,
+      "speed": 24,
+      "range": 12,
+      "width": 0.35,
+      "color": "#ffe9a8",
+      "muzzle": {
+        "side": 0.15,
+        "height": 0.95,
+        "ahead": 0.6
+      }
+    }
+  },
+  "魔法師": {
+    "model": "魔法師",
+    "role": "player",
+    "scale": 1,
+    "moveSpeed": 5.2,
+    "attackRange": 2.8,
+    "attackArcDegrees": 150,
+    "attackSpeed": 0.85,
+    "attackHitTime": 0.28,
+    "radius": 0.45,
+    "invulnerableTime": 1.5,
+    "lunge": false,
+    "shot": {
+      "visual": "fireball",
+      "speed": 13,
+      "range": 10,
+      "width": 0.42,
+      "color": "#ff8a3d",
+      "blast": 2,
+      "burn": {
+        "interval": 3,
+        "damage": 1,
+        "duration": 6
+      },
+      "model": "火球",
+      "modelScale": 0.95,
+      "modelRotation": [
+        -90,
+        0,
+        0
+      ],
+      "modelGlow": 0.9,
+      "muzzle": {
+        "side": -0.25,
+        "height": 1,
+        "ahead": 0.7
+      }
+    },
+    "cast": {
+      "color": "#ff9a3d",
+      "size": 1.5
+    }
+  },
+  "骷髏人": {
+    "model": "骷髏人",
+    "role": "enemy",
+    "scale": 0.92,
+    "hp": 4,
+    "moveSpeed": 2.3,
+    "attackDamage": 1,
+    "attackRange": 1.5,
+    "attackCooldown": 1.6,
+    "attackHitTime": 0.35,
+    "radius": 0.45,
+    "score": 10,
+    "gold": 2
+  },
+  "狼人": {
+    "model": "狼人",
+    "role": "enemy",
+    "attackHitTime": 0.35,
+    "radius": 0.45,
+    "scale": 1,
+    "hp": 5,
+    "moveSpeed": 3.4,
+    "attackDamage": 1,
+    "attackRange": 1.5,
+    "attackCooldown": 1.2,
+    "score": 20,
+    "gold": 3
+  },
+  "半獸人": {
+    "model": "半獸人",
+    "role": "enemy",
+    "attackHitTime": 0.35,
+    "radius": 0.5,
+    "scale": 1.05,
+    "hp": 10,
+    "moveSpeed": 2,
+    "attackDamage": 1,
+    "attackRange": 1.7,
+    "attackCooldown": 2,
+    "stunTime": 0.25,
+    "score": 30,
+    "gold": 5
+  },
+  "山豬半獸人": {
+    "model": "山豬半獸人",
+    "role": "enemy",
+    "attackHitTime": 0.35,
+    "radius": 0.6,
+    "scale": 1.2,
+    "hp": 28,
+    "moveSpeed": 1.6,
+    "attackDamage": 2,
+    "attackRange": 2,
+    "attackCooldown": 2.8,
+    "poise": true,
+    "score": 60,
+    "gold": 12
+  },
+  "森林小熊": {
+    "model": "森林小熊",
+    "role": "enemy",
+    "scale": 0.9,
+    "hp": 4,
+    "moveSpeed": 3,
+    "attackDamage": 1,
+    "attackRange": 1.5,
+    "attackCooldown": 1.5,
+    "attackHitTime": 0.35,
+    "radius": 0.45,
+    "score": 10,
+    "gold": 2
+  },
+  "死靈骷髏王": {
+    "model": "死靈骷髏王",
+    "role": "boss",
+    "scale": 1.5,
+    "hp": 1400,
+    "moveSpeed": 1.4,
+    "attackDamage": 2,
+    "attackRange": 2.6,
+    "attackCooldown": 2.4,
+    "attackHitTime": 0.35,
+    "radius": 1,
+    "score": 500,
+    "poise": true,
+    "gold": 50,
+    "boss": {
+      "name": "死靈骷髏王",
+      "skillEvery": 5,
+      "skills": [
+        {
+          "type": "slam",
+          "radius": 3.2,
+          "damage": 20,
+          "windup": 1.4,
+          "recover": 1
+        },
+        {
+          "type": "summon",
+          "enemy": "骷髏人",
+          "count": 4,
+          "windup": 0.9,
+          "recover": 0.8
+        }
+      ],
+      "reinforce": {
+        "first": 4,
+        "every": 5,
+        "count": 6,
+        "enemies": [
+          "骷髏人",
+          "骷髏人",
+          "狼人"
+        ]
+      }
+    }
+  },
+  "森林大熊": {
+    "model": "森林大熊",
+    "role": "boss",
+    "scale": 1.5,
+    "hp": 1500,
+    "moveSpeed": 1.4,
+    "attackDamage": 2,
+    "attackRange": 2.6,
+    "attackCooldown": 2.4,
+    "attackHitTime": 0.35,
+    "radius": 1,
+    "score": 500,
+    "poise": true,
+    "gold": 50,
+    "boss": {
+      "name": "森林大熊",
+      "skillEvery": 5,
+      "skills": [
+        {
+          "type": "slam",
+          "radius": 3.2,
+          "damage": 20,
+          "windup": 1.4,
+          "recover": 1
+        },
+        {
+          "type": "summon",
+          "enemy": "森林小熊",
+          "count": 4,
+          "windup": 0.9,
+          "recover": 0.8
+        }
+      ],
+      "reinforce": {
+        "first": 4,
+        "every": 5,
+        "count": 6,
+        "enemies": [
+          "森林小熊",
+          "森林小熊",
+          "狼人"
+        ]
+      }
+    }
+  },
+  "忍者": {
+    "model": "忍者",
+    "role": "enemy",
+    "scale": 1,
+    "hp": 6,
+    "moveSpeed": 4,
+    "attackDamage": 1,
+    "attackRange": 1.5,
+    "attackCooldown": 1,
+    "attackHitTime": 0.35,
+    "radius": 0.45,
+    "score": 25,
+    "gold": 4
+  },
+  "死靈盔甲武士": {
+    "model": "死靈盔甲武士",
+    "role": "enemy",
+    "scale": 1,
+    "hp": 16,
+    "moveSpeed": 1.9,
+    "attackDamage": 2,
+    "attackRange": 1.7,
+    "attackCooldown": 2.4,
+    "attackHitTime": 0.35,
+    "radius": 0.5,
+    "stunTime": 0.25,
+    "score": 45,
+    "gold": 8
+  }
+}

@@ -1,0 +1,324 @@
+{
+  "title": "勇者衝衝衝",
+  "hero": "騎士",
+  "levels": [
+    "level01",
+    "level02",
+    "level03",
+    "level04"
+  ],
+  "runSpeed": 7,
+  "strafeSpeed": 10,
+  "maxCount": 60,
+  "maxDrawn": 30,
+  "unitScale": 0.95,
+  "heroHpMult": 3,
+  "spawnAhead": 55,
+  "defaultDifficulty": "普通",
+  "difficulties": {
+    "簡單": {
+      "desc": "加法、減法，數字 10 以內",
+      "color": "#86efac",
+      "enemyHpMult": 1,
+      "mixedAbility": 0,
+      "math": {
+        "steps": [
+          1,
+          1
+        ],
+        "closeChance": 0.3,
+        "ops": {
+          "+": [
+            1,
+            9
+          ],
+          "−": [
+            1,
+            5
+          ]
+        }
+      },
+      "enemyCountMult": 1,
+      "bossHpMult": 0.4,
+      "mysteryChance": 0.25
+    },
+    "普通": {
+      "desc": "加減乘除",
+      "color": "#fbbf24",
+      "enemyHpMult": 1.3,
+      "mixedAbility": 0.4,
+      "math": {
+        "steps": [
+          1,
+          1
+        ],
+        "closeChance": 0.45,
+        "ops": {
+          "+": [
+            2,
+            12
+          ],
+          "−": [
+            1,
+            8
+          ],
+          "×": [
+            2,
+            3
+          ],
+          "÷": [
+            2,
+            3
+          ]
+        }
+      },
+      "enemyCountMult": 1.1,
+      "bossHpMult": 0.7,
+      "mysteryChance": 0.35
+    },
+    "困難": {
+      "desc": "兩個步驟的算式、數字更大",
+      "color": "#f87171",
+      "enemyHpMult": 2.0,
+      "mixedAbility": 0.5,
+      "math": {
+        "steps": [
+          1,
+          2
+        ],
+        "closeChance": 0.55,
+        "ops": {
+          "+": [
+            3,
+            15
+          ],
+          "−": [
+            2,
+            10
+          ],
+          "×": [
+            2,
+            4
+          ],
+          "÷": [
+            2,
+            4
+          ]
+        }
+      },
+      "enemyCountMult": 1.25,
+      "bossHpMult": 0.95,
+      "mysteryChance": 0.45
+    }
+  },
+  "abilities": [
+    {
+      "id": "atkUp",
+      "good": true,
+      "title": "攻擊 +1",
+      "sub": "全隊",
+      "effect": {
+        "stat": "damage",
+        "add": 1
+      }
+    },
+    {
+      "id": "rateUp",
+      "good": true,
+      "title": "攻速 ×1.5",
+      "sub": "全隊",
+      "effect": {
+        "stat": "rate",
+        "mult": 1.5
+      }
+    },
+    {
+      "id": "hpUp",
+      "good": true,
+      "title": "生命 +1",
+      "sub": "全隊",
+      "effect": {
+        "stat": "hp",
+        "add": 1
+      }
+    },
+    {
+      "id": "rangeUp",
+      "good": true,
+      "title": "射程 +3",
+      "sub": "弓箭手、魔法師",
+      "effect": {
+        "stat": "range",
+        "add": 3
+      }
+    },
+    {
+      "id": "multiShot",
+      "good": true,
+      "title": "多重箭 +1",
+      "sub": "只有弓箭手",
+      "effect": {
+        "class": "弓箭手",
+        "stat": "shots",
+        "add": 1
+      }
+    },
+    {
+      "id": "bigBlast",
+      "good": true,
+      "title": "爆炸 ×1.5",
+      "sub": "只有魔法師",
+      "effect": {
+        "class": "魔法師",
+        "stat": "blast",
+        "mult": 1.5
+      }
+    },
+    {
+      "id": "knightHp",
+      "good": true,
+      "title": "生命 +3",
+      "sub": "只有騎士",
+      "effect": {
+        "class": "騎士",
+        "stat": "hp",
+        "add": 3
+      }
+    },
+    {
+      "id": "rogueRate",
+      "good": true,
+      "title": "攻速 ×2",
+      "sub": "只有盜賊",
+      "effect": {
+        "class": "盜賊",
+        "stat": "rate",
+        "mult": 2
+      }
+    },
+    {
+      "id": "atkDown",
+      "good": false,
+      "title": "攻擊 −1",
+      "sub": "全隊",
+      "effect": {
+        "stat": "damage",
+        "add": -1
+      }
+    },
+    {
+      "id": "rateDown",
+      "good": false,
+      "title": "攻速 ×0.6",
+      "sub": "全隊",
+      "effect": {
+        "stat": "rate",
+        "mult": 0.6
+      }
+    },
+    {
+      "id": "hpDown",
+      "good": false,
+      "title": "生命 −1",
+      "sub": "全隊",
+      "effect": {
+        "stat": "hp",
+        "add": -1
+      }
+    },
+    {
+      "id": "rangeDown",
+      "good": false,
+      "title": "射程 −3",
+      "sub": "弓箭手、魔法師",
+      "effect": {
+        "stat": "range",
+        "add": -3
+      }
+    }
+  ],
+  "trapLoss": 0.35,
+  "mystery": [
+    {
+      "steps": [
+        [
+          "×",
+          2
+        ]
+      ],
+      "weight": 2
+    },
+    {
+      "steps": [
+        [
+          "+",
+          12
+        ]
+      ],
+      "weight": 2
+    },
+    {
+      "steps": [
+        [
+          "×",
+          3
+        ]
+      ],
+      "weight": 1
+    },
+    {
+      "gold": 40,
+      "weight": 1
+    },
+    {
+      "steps": [
+        [
+          "÷",
+          2
+        ]
+      ],
+      "weight": 2
+    },
+    {
+      "steps": [
+        [
+          "−",
+          6
+        ]
+      ],
+      "weight": 1
+    },
+    {
+      "ambush": [
+        {
+          "enemy": "狼人",
+          "count": 6
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "potions": {
+    "紅藥水": {
+      "effect": "partners",
+      "amount": 5,
+      "text": "紅藥水：夥伴 +5",
+      "color": "#f87171"
+    },
+    "黃藥水": {
+      "effect": "shield",
+      "seconds": 6,
+      "text": "黃藥水：護盾 6 秒",
+      "color": "#fde047"
+    },
+    "紫藥水": {
+      "effect": "blast",
+      "range": 30,
+      "bossRatio": 0.15,
+      "text": "紫藥水：前面的怪全倒！",
+      "color": "#c084fc"
+    }
+  },
+  "stairCost": 3,
+  "trapKillChance": 0.5
+}

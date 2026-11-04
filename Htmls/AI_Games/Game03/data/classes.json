@@ -1,0 +1,117 @@
+{
+  "騎士": {
+    "desc": "扇形揮砍，一次打好幾隻，很耐打",
+    "hp": 3,
+    "damage": 2,
+    "cooldown": 1.0,
+    "range": 1.8,
+    "cleave": 2,
+    "skill": {
+      "type": "shield",
+      "name": "盾牆",
+      "desc": "全隊 4 秒不受傷",
+      "cooldown": 15,
+      "seconds": 4,
+      "color": "#7dd3fc"
+    }
+  },
+  "盜賊": {
+    "desc": "雙刀快砍，攻擊最快",
+    "hp": 2,
+    "damage": 1,
+    "cooldown": 0.45,
+    "range": 1.6,
+    "slash": "cross",
+    "skill": {
+      "type": "frenzy",
+      "name": "疾風",
+      "desc": "全隊攻速 ×2，6 秒",
+      "cooldown": 15,
+      "seconds": 6,
+      "rate": 2,
+      "color": "#a78bfa"
+    }
+  },
+  "弓箭手": {
+    "desc": "遠距射箭，打得最遠",
+    "hp": 2,
+    "damage": 2,
+    "cooldown": 1.1,
+    "range": 10,
+    "shot": true,
+    "skill": {
+      "type": "volley",
+      "name": "箭雨",
+      "desc": "前方所有敵人受傷",
+      "cooldown": 14,
+      "range": 22,
+      "damage": 10,
+      "color": "#fde68a"
+    }
+  },
+  "魔法師": {
+    "desc": "火球爆炸＋燃燒，打一整群",
+    "hp": 2,
+    "damage": 2,
+    "cooldown": 1.8,
+    "range": 8,
+    "shot": true,
+    "blast": 1.6,
+    "burn": {
+      "interval": 1,
+      "damage": 1,
+      "duration": 3
+    },
+    "skill": {
+      "type": "meteor",
+      "name": "隕石",
+      "desc": "砸向最多敵人的地方",
+      "cooldown": 16,
+      "radius": 4,
+      "damage": 30,
+      "color": "#ff7a2a",
+      "burn": {
+        "interval": 1,
+        "damage": 2,
+        "duration": 3
+      }
+    }
+  },
+  "忍者": {
+    "desc": "出手最快，技能讓陷阱傷不到",
+    "hp": 2,
+    "damage": 2,
+    "cooldown": 0.4,
+    "range": 1.6,
+    "slash": "cross",
+    "locked": true,
+    "skill": {
+      "type": "smoke",
+      "name": "煙遁",
+      "desc": "8 秒內陷阱傷不到、敵人暈 2 秒",
+      "cooldown": 15,
+      "seconds": 8,
+      "stun": 2,
+      "color": "#94a3b8"
+    }
+  },
+  "死靈盔甲武士": {
+    "desc": "超耐打的重甲，一次砍兩隻",
+    "hp": 6,
+    "damage": 3,
+    "cooldown": 1.3,
+    "range": 1.8,
+    "cleave": 1,
+    "locked": true,
+    "skill": {
+      "type": "quake",
+      "name": "震地",
+      "desc": "附近敵人暈 3 秒並受傷",
+      "cooldown": 15,
+      "range": 12,
+      "stun": 3,
+      "damage": 8,
+      "color": "#f59e0b"
+    }
+  }
+}

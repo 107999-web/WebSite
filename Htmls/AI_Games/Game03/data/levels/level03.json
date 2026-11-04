@@ -1,0 +1,394 @@
+{
+  "name": "廢棄礦坑",
+  "desc": "礦坑裡的重甲武士",
+  "length": 520,
+  "width": 10,
+  "hpMult": 1.2,
+  "theme": {
+    "background": "#2a2230",
+    "fog": "#2a2230",
+    "fogNear": 36,
+    "fogFar": 85,
+    "hemiSky": "#c9b8d8",
+    "hemiGround": "#3a2c20",
+    "hemiIntensity": 0.9,
+    "sun": "#ffe2bd",
+    "sunIntensity": 1.6,
+    "grass": "#5a4634",
+    "speck": [
+      60,
+      45,
+      30
+    ],
+    "curb": "#7a6650",
+    "road": {
+      "gap": "#3a2d22",
+      "stone": [
+        130,
+        112,
+        92
+      ]
+    },
+    "propEvery": 5,
+    "props": [
+      {
+        "type": "crate"
+      },
+      {
+        "type": "crate"
+      },
+      {
+        "type": "minecart"
+      },
+      {
+        "type": "crystal"
+      },
+      {
+        "type": "woodPost"
+      },
+      {
+        "type": "rock",
+        "scale": [
+          0.7,
+          1.3
+        ]
+      }
+    ]
+  },
+  "gates": [
+    {
+      "d": 30,
+      "kind": "crowd",
+      "doors": 3
+    },
+    {
+      "d": 70,
+      "kind": "crowd",
+      "doors": 3
+    },
+    {
+      "d": 110,
+      "kind": "ability",
+      "doors": 4
+    },
+    {
+      "d": 150,
+      "kind": "crowd",
+      "doors": 2
+    },
+    {
+      "d": 190,
+      "kind": "crowd",
+      "doors": 4
+    },
+    {
+      "d": 230,
+      "kind": "crowd",
+      "doors": 3
+    },
+    {
+      "d": 270,
+      "kind": "ability",
+      "doors": 3
+    },
+    {
+      "d": 310,
+      "kind": "crowd",
+      "doors": 4
+    },
+    {
+      "d": 350,
+      "kind": "crowd",
+      "doors": 2
+    },
+    {
+      "d": 390,
+      "kind": "crowd",
+      "doors": 4
+    },
+    {
+      "d": 430,
+      "kind": "ability",
+      "doors": 3
+    },
+    {
+      "d": 470,
+      "kind": "crowd",
+      "doors": 3
+    }
+  ],
+  "enemies": [
+    {
+      "d": 50,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "d": 90,
+      "spawns": [
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 130,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 6
+        },
+        {
+          "enemy": "半獸人",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 170,
+      "spawns": [
+        {
+          "enemy": "狼人",
+          "count": 5
+        },
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 210,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 6
+        },
+        {
+          "enemy": "狼人",
+          "count": 4
+        },
+        {
+          "enemy": "半獸人",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 250,
+      "spawns": [
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 3
+        },
+        {
+          "enemy": "半獸人",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 290,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 8
+        },
+        {
+          "enemy": "山豬半獸人",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 330,
+      "spawns": [
+        {
+          "enemy": "忍者",
+          "count": 4
+        },
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 370,
+      "spawns": [
+        {
+          "enemy": "半獸人",
+          "count": 4
+        },
+        {
+          "enemy": "山豬半獸人",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 410,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 8
+        },
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 450,
+      "spawns": [
+        {
+          "enemy": "狼人",
+          "count": 6
+        },
+        {
+          "enemy": "半獸人",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "d": 490,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 5
+        }
+      ]
+    }
+  ],
+  "obstacles": [
+    {
+      "type": "coins",
+      "d": 16,
+      "x": 2.5,
+      "count": 6
+    },
+    {
+      "type": "spikes",
+      "x": -2.5,
+      "width": 5,
+      "period": 3,
+      "up": 1.2,
+      "d": 61
+    },
+    {
+      "type": "coins",
+      "x": -2.5,
+      "count": 8,
+      "d": 101
+    },
+    {
+      "type": "log",
+      "speed": 1.4,
+      "d": 141
+    },
+    {
+      "type": "potion",
+      "item": "紅藥水",
+      "x": 3.8,
+      "d": 181
+    },
+    {
+      "type": "spikes",
+      "x": 2.5,
+      "width": 5,
+      "period": 2.6,
+      "up": 1.1,
+      "offset": 1,
+      "d": 221
+    },
+    {
+      "type": "chest",
+      "x": 3.8,
+      "gold": [
+        25,
+        45
+      ],
+      "d": 261
+    },
+    {
+      "type": "log",
+      "speed": 1.8,
+      "offset": 1.5,
+      "d": 301
+    },
+    {
+      "type": "potion",
+      "item": "黃藥水",
+      "x": -2.5,
+      "d": 341
+    },
+    {
+      "type": "spikes",
+      "x": 0,
+      "width": 4,
+      "period": 2.4,
+      "up": 1.1,
+      "d": 381
+    },
+    {
+      "type": "potion",
+      "item": "紫藥水",
+      "x": 0,
+      "d": 421
+    },
+    {
+      "type": "spikes",
+      "x": -2.5,
+      "width": 5,
+      "period": 3,
+      "up": 1.2,
+      "d": 461
+    },
+    {
+      "type": "coins",
+      "x": 3.8,
+      "count": 8,
+      "d": 501
+    }
+  ],
+  "boss": [
+    "森林大熊"
+  ],
+  "bossEscort": [
+    {
+      "enemy": "骷髏人",
+      "count": 10
+    },
+    {
+      "enemy": "死靈盔甲武士",
+      "count": 4
+    },
+    {
+      "enemy": "山豬半獸人",
+      "count": 1
+    }
+  ],
+  "stairs": [
+    1.2,
+    1.4,
+    1.6,
+    1.8,
+    2,
+    2.5,
+    3,
+    3.5,
+    4,
+    5
+  ],
+  "stars": {
+    "three": 1,
+    "two": 0.75
+  }
+}

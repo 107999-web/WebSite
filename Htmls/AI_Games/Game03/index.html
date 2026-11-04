@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>勇者衝衝衝</title>
+<link rel="stylesheet" href="src/ui/style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" hidden>
+  <div class="chip" id="count" title="隊伍人數">👥 <b id="countNum">1</b></div>
+  <div id="comp"></div>
+  <div class="chip" id="gold" title="金幣"><i></i><b id="goldNum">0</b></div>
+  <b id="diffName"></b>
+  <button id="pauseBtn" title="P 暫停">⏸</button>
+</div>
+<div id="progress" hidden><i id="progressFill"></i></div>
+<div id="bossBar" hidden><b id="bossName"></b><div id="bossTrack"><i id="bossFill"></i></div></div>
+<div id="feedback"></div>
+<button id="skillBtn" hidden></button>
+<div id="banner"></div>
+<div id="flash"></div>
+
+<div id="overlay">
+  <div class="panel">
+    <h1 id="overlayTitle">勇者衝衝衝</h1>
+    <p id="overlayText">載入中…</p>
+    <div id="overlayBody"></div>
+    <div id="overlayButtons"></div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

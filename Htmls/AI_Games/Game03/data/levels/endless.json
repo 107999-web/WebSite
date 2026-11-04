@@ -1,0 +1,128 @@
+{
+  "name": "無盡模式",
+  "desc": "一直跑，看能跑多遠",
+  "length": 3000,
+  "width": 10,
+  "theme": {
+    "background": "#9fc7e8",
+    "fog": "#9fc7e8",
+    "fogNear": 40,
+    "fogFar": 95,
+    "hemiSky": "#dbeafe",
+    "hemiGround": "#3f6b35",
+    "hemiIntensity": 1.0,
+    "sun": "#fff4d6",
+    "sunIntensity": 2.0,
+    "grass": "#4f8a3c",
+    "curb": "#8b8f98",
+    "road": {
+      "gap": "#4b4038",
+      "stone": [
+        150,
+        140,
+        128
+      ]
+    },
+    "propEvery": 5,
+    "props": [
+      {
+        "type": "pineTree",
+        "scale": [
+          0.9,
+          1.4
+        ]
+      },
+      {
+        "type": "pineTree",
+        "scale": [
+          0.9,
+          1.4
+        ]
+      },
+      {
+        "type": "bush"
+      },
+      {
+        "type": "rock",
+        "scale": [
+          0.7,
+          1.3
+        ]
+      },
+      {
+        "type": "glowMushroom"
+      }
+    ]
+  },
+  "stars": {
+    "three": 1,
+    "two": 0.75
+  },
+  "endless": {
+    "firstGate": 30,
+    "segment": 40,
+    "lookAhead": 90,
+    "bossEvery": 500,
+    "bossGold": 60,
+    "rampEvery": 300,
+    "rampHp": 0.15,
+    "rampCount": 1,
+    "groupBase": 4,
+    "enemies": [
+      "骷髏人",
+      "狼人",
+      "半獸人",
+      "忍者"
+    ],
+    "boss": [
+      "死靈骷髏王",
+      "森林大熊"
+    ],
+    "bossEscort": [
+      {
+        "enemy": "骷髏人",
+        "count": 6
+      },
+      {
+        "enemy": "半獸人",
+        "count": 2
+      }
+    ],
+    "obstacles": [
+      {
+        "type": "spikes",
+        "x": "random",
+        "width": 5,
+        "period": 3,
+        "up": 1.2
+      },
+      {
+        "type": "log",
+        "speed": 1.4
+      },
+      {
+        "type": "coins",
+        "x": "random",
+        "count": 6
+      },
+      {
+        "type": "chest",
+        "x": "random",
+        "gold": [
+          20,
+          40
+        ]
+      },
+      {
+        "type": "potion",
+        "item": "紅藥水",
+        "x": "random"
+      },
+      {
+        "type": "potion",
+        "item": "黃藥水",
+        "x": "random"
+      }
+    ]
+  }
+}

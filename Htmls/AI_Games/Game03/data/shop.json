@@ -1,0 +1,113 @@
+{
+  "upgrades": [
+    {
+      "id": "startCrowd",
+      "icon": "👥",
+      "name": "開場夥伴",
+      "desc": "出發時多 2 個夥伴（每級）",
+      "costs": [
+        400,
+        880,
+        1520
+      ],
+      "effect": {
+        "stat": "startCrowd",
+        "add": 2
+      }
+    },
+    {
+      "id": "teamAtk",
+      "icon": "⚔️",
+      "name": "全隊攻擊",
+      "desc": "所有夥伴攻擊 +1（每級）",
+      "costs": [
+        1040,
+        2080
+      ],
+      "effect": {
+        "stat": "damage",
+        "add": 1
+      }
+    },
+    {
+      "id": "teamHp",
+      "icon": "❤️",
+      "name": "全隊生命",
+      "desc": "所有夥伴生命 +1（每級）",
+      "costs": [
+        800,
+        1680
+      ],
+      "effect": {
+        "stat": "hp",
+        "add": 1
+      }
+    },
+    {
+      "id": "maxCount",
+      "icon": "🏳️",
+      "name": "隊伍上限",
+      "desc": "隊伍最多人數 +10（每級）",
+      "costs": [
+        720,
+        1440
+      ],
+      "effect": {
+        "stat": "maxCount",
+        "add": 10
+      }
+    },
+    {
+      "id": "coinBonus",
+      "icon": "💰",
+      "name": "金幣加成",
+      "desc": "撿到、打怪的金幣 +25%（每級）",
+      "costs": [
+        480,
+        1040,
+        1680
+      ],
+      "effect": {
+        "stat": "coinBonus",
+        "add": 0.25
+      }
+    },
+    {
+      "id": "stairs",
+      "icon": "🪜",
+      "name": "爬階梯省力",
+      "desc": "終點階梯每階少用 1 人",
+      "costs": [
+        1200
+      ],
+      "effect": {
+        "stat": "stairCost",
+        "add": -1
+      }
+    },
+    {
+      "id": "skillCd",
+      "icon": "✨",
+      "name": "技能冷卻",
+      "desc": "英雄技能冷卻 −20%（每級）",
+      "costs": [
+        800,
+        1600
+      ],
+      "effect": {
+        "stat": "skillCd",
+        "add": -0.2
+      }
+    }
+  ],
+  "heroes": [
+    {
+      "id": "忍者",
+      "cost": 1600
+    },
+    {
+      "id": "死靈盔甲武士",
+      "cost": 2800
+    }
+  ]
+}

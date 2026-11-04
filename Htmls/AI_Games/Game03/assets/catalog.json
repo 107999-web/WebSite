@@ -1,0 +1,338 @@
+{
+  "models": {
+    "騎士": {
+      "file": "assets/models/%E9%A8%8E%E5%A3%AB/%E9%A8%8E%E5%A3%AB.glb",
+      "kind": "character",
+      "tris": 28944,
+      "sizeBytes": 6152552,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "騎士_TRELLIS_s0.zip"
+    },
+    "骷髏人": {
+      "file": "assets/models/%E9%AA%B7%E9%AB%8F%E4%BA%BA/%E9%AA%B7%E9%AB%8F%E4%BA%BA.glb",
+      "kind": "character",
+      "tris": 13950,
+      "sizeBytes": 5549216,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "骷髏人_TRELLIS_s0.zip"
+    },
+    "綠藥水": {
+      "file": "assets/models/%E7%B6%A0%E8%97%A5%E6%B0%B4/%E7%B6%A0%E8%97%A5%E6%B0%B4.glb",
+      "kind": "prop",
+      "tris": 5904,
+      "sizeBytes": 546076,
+      "clips": [],
+      "source": "綠藥水.glb"
+    },
+    "紅藥水": {
+      "file": "assets/models/%E7%B4%85%E8%97%A5%E6%B0%B4/%E7%B4%85%E8%97%A5%E6%B0%B4.glb",
+      "kind": "prop",
+      "tris": 5858,
+      "sizeBytes": 530516,
+      "clips": [],
+      "source": "紅藥水_TRELLIS_s0.glb"
+    },
+    "紫藥水": {
+      "file": "assets/models/%E7%B4%AB%E8%97%A5%E6%B0%B4/%E7%B4%AB%E8%97%A5%E6%B0%B4.glb",
+      "kind": "prop",
+      "tris": 5774,
+      "sizeBytes": 544412,
+      "clips": [],
+      "source": "紫藥水_TRELLIS_s0.glb"
+    },
+    "黃藥水": {
+      "file": "assets/models/%E9%BB%83%E8%97%A5%E6%B0%B4/%E9%BB%83%E8%97%A5%E6%B0%B4.glb",
+      "kind": "prop",
+      "tris": 5970,
+      "sizeBytes": 524844,
+      "clips": [],
+      "source": "黃藥水.glb"
+    },
+    "藍藥水": {
+      "file": "assets/models/%E8%97%8D%E8%97%A5%E6%B0%B4/%E8%97%8D%E8%97%A5%E6%B0%B4.glb",
+      "kind": "prop",
+      "tris": 5670,
+      "sizeBytes": 532420,
+      "clips": [],
+      "source": "藍藥水.glb"
+    },
+    "魔法師": {
+      "file": "assets/models/%E9%AD%94%E6%B3%95%E5%B8%AB/%E9%AD%94%E6%B3%95%E5%B8%AB.glb",
+      "kind": "character",
+      "tris": 26216,
+      "sizeBytes": 5948236,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "魔法師.zip"
+    },
+    "盜賊": {
+      "file": "assets/models/%E7%9B%9C%E8%B3%8A/%E7%9B%9C%E8%B3%8A.glb",
+      "kind": "character",
+      "tris": 28502,
+      "sizeBytes": 4949484,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "盜賊.zip"
+    },
+    "弓箭手": {
+      "file": "assets/models/%E5%BC%93%E7%AE%AD%E6%89%8B/%E5%BC%93%E7%AE%AD%E6%89%8B.glb",
+      "kind": "character",
+      "tris": 26470,
+      "sizeBytes": 5247640,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "弓箭手.zip"
+    },
+    "寶箱開啟": {
+      "file": "assets/models/%E5%AF%B6%E7%AE%B1%E9%96%8B%E5%95%9F/%E5%AF%B6%E7%AE%B1%E9%96%8B%E5%95%9F.glb",
+      "kind": "prop",
+      "tris": 5634,
+      "sizeBytes": 654448,
+      "clips": [],
+      "source": "寶箱開啟.glb"
+    },
+    "寶箱關閉": {
+      "file": "assets/models/%E5%AF%B6%E7%AE%B1%E9%97%9C%E9%96%89/%E5%AF%B6%E7%AE%B1%E9%97%9C%E9%96%89.glb",
+      "kind": "prop",
+      "tris": 5956,
+      "sizeBytes": 487524,
+      "clips": [],
+      "source": "寶箱關閉.glb"
+    },
+    "弓箭": {
+      "file": "assets/models/%E5%BC%93%E7%AE%AD/%E5%BC%93%E7%AE%AD.glb",
+      "kind": "prop",
+      "tris": 5996,
+      "sizeBytes": 403620,
+      "clips": [],
+      "source": "弓箭.glb"
+    },
+    "金幣": {
+      "file": "assets/models/%E9%87%91%E5%B9%A3/%E9%87%91%E5%B9%A3.glb",
+      "kind": "prop",
+      "tris": 558,
+      "sizeBytes": 126904,
+      "clips": [],
+      "source": "金幣.glb"
+    },
+    "半獸人": {
+      "file": "assets/models/%E5%8D%8A%E7%8D%B8%E4%BA%BA/%E5%8D%8A%E7%8D%B8%E4%BA%BA.glb",
+      "kind": "character",
+      "tris": 13972,
+      "sizeBytes": 5046832,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "半獸人.zip"
+    },
+    "山豬半獸人": {
+      "file": "assets/models/%E5%B1%B1%E8%B1%AC%E5%8D%8A%E7%8D%B8%E4%BA%BA/%E5%B1%B1%E8%B1%AC%E5%8D%8A%E7%8D%B8%E4%BA%BA.glb",
+      "kind": "character",
+      "tris": 13706,
+      "sizeBytes": 4051984,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "山豬半獸人.zip"
+    },
+    "狼人": {
+      "file": "assets/models/%E7%8B%BC%E4%BA%BA/%E7%8B%BC%E4%BA%BA.glb",
+      "kind": "character",
+      "tris": 13714,
+      "sizeBytes": 4362372,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "狼人.zip"
+    },
+    "森林大熊": {
+      "file": "assets/models/%E6%A3%AE%E6%9E%97%E5%A4%A7%E7%86%8A/%E6%A3%AE%E6%9E%97%E5%A4%A7%E7%86%8A.glb",
+      "kind": "character",
+      "tris": 13840,
+      "sizeBytes": 4563884,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "森林大熊.zip"
+    },
+    "死靈骷髏王": {
+      "file": "assets/models/%E6%AD%BB%E9%9D%88%E9%AA%B7%E9%AB%8F%E7%8E%8B/%E6%AD%BB%E9%9D%88%E9%AA%B7%E9%AB%8F%E7%8E%8B.glb",
+      "kind": "character",
+      "tris": 13792,
+      "sizeBytes": 5656568,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "死靈骷髏王.zip"
+    },
+    "忍者": {
+      "file": "assets/models/%E5%BF%8D%E8%80%85/%E5%BF%8D%E8%80%85.glb",
+      "kind": "character",
+      "tris": 13398,
+      "sizeBytes": 4120252,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "忍者.zip"
+    },
+    "森林小熊": {
+      "file": "assets/models/%E6%A3%AE%E6%9E%97%E5%B0%8F%E7%86%8A/%E6%A3%AE%E6%9E%97%E5%B0%8F%E7%86%8A.glb",
+      "kind": "character",
+      "tris": 13700,
+      "sizeBytes": 4089568,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "森林小熊.zip"
+    },
+    "死靈盔甲武士": {
+      "file": "assets/models/%E6%AD%BB%E9%9D%88%E7%9B%94%E7%94%B2%E6%AD%A6%E5%A3%AB/%E6%AD%BB%E9%9D%88%E7%9B%94%E7%94%B2%E6%AD%A6%E5%A3%AB.glb",
+      "kind": "character",
+      "tris": 13714,
+      "sizeBytes": 5688120,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "死靈盔甲武士.zip"
+    },
+    "火球": {
+      "file": "assets/models/%E7%81%AB%E7%90%83/%E7%81%AB%E7%90%83.glb",
+      "kind": "prop",
+      "tris": 1472,
+      "sizeBytes": 151488,
+      "clips": [],
+      "source": "火球.glb"
+    },
+    "火焰彈": {
+      "file": "assets/models/%E7%81%AB%E7%84%B0%E5%BD%88/%E7%81%AB%E7%84%B0%E5%BD%88.glb",
+      "kind": "prop",
+      "tris": 1460,
+      "sizeBytes": 190280,
+      "clips": [],
+      "source": "火焰彈.glb"
+    },
+    "商店": {
+      "file": "assets/models/%E5%95%86%E5%BA%97/%E5%95%86%E5%BA%97.glb",
+      "kind": "prop",
+      "tris": 5918,
+      "sizeBytes": 541064,
+      "clips": [],
+      "source": "商店.glb"
+    },
+    "商店老闆": {
+      "file": "assets/models/%E5%95%86%E5%BA%97%E8%80%81%E9%97%86/%E5%95%86%E5%BA%97%E8%80%81%E9%97%86.glb",
+      "kind": "character",
+      "tris": 13588,
+      "sizeBytes": 4433376,
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Jump",
+        "Attack",
+        "Wave",
+        "Hit",
+        "Death"
+      ],
+      "source": "商店老闆.zip"
+    }
+  }
+}

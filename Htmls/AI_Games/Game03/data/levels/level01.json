@@ -1,0 +1,325 @@
+{
+  "name": "月光森林大道",
+  "length": 440,
+  "width": 10,
+  "theme": {
+    "background": "#9fc7e8",
+    "fog": "#9fc7e8",
+    "fogNear": 40,
+    "fogFar": 95,
+    "hemiSky": "#dbeafe",
+    "hemiGround": "#3f6b35",
+    "hemiIntensity": 1.0,
+    "sun": "#fff4d6",
+    "sunIntensity": 2.0,
+    "grass": "#4f8a3c",
+    "curb": "#8b8f98",
+    "road": {
+      "gap": "#4b4038",
+      "stone": [
+        150,
+        140,
+        128
+      ]
+    },
+    "propEvery": 5,
+    "props": [
+      {
+        "type": "pineTree",
+        "scale": [
+          0.9,
+          1.4
+        ]
+      },
+      {
+        "type": "pineTree",
+        "scale": [
+          0.9,
+          1.4
+        ]
+      },
+      {
+        "type": "bush"
+      },
+      {
+        "type": "rock",
+        "scale": [
+          0.7,
+          1.3
+        ]
+      },
+      {
+        "type": "glowMushroom"
+      }
+    ]
+  },
+  "gates": [
+    {
+      "d": 30,
+      "kind": "crowd",
+      "doors": 2
+    },
+    {
+      "d": 70,
+      "kind": "crowd",
+      "doors": 3
+    },
+    {
+      "d": 110,
+      "kind": "ability",
+      "doors": 3
+    },
+    {
+      "d": 175,
+      "kind": "crowd",
+      "doors": 3
+    },
+    {
+      "d": 215,
+      "kind": "crowd",
+      "doors": 4
+    },
+    {
+      "d": 255,
+      "kind": "ability",
+      "doors": 2
+    },
+    {
+      "d": 320,
+      "kind": "crowd",
+      "doors": 3
+    },
+    {
+      "d": 360,
+      "kind": "crowd",
+      "doors": 4
+    },
+    {
+      "d": 400,
+      "kind": "crowd",
+      "doors": 2
+    }
+  ],
+  "enemies": [
+    {
+      "d": 50,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "d": 90,
+      "spawns": [
+        {
+          "enemy": "狼人",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "d": 140,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 6
+        },
+        {
+          "enemy": "半獸人",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 195,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "d": 237,
+      "spawns": [
+        {
+          "enemy": "狼人",
+          "count": 4
+        },
+        {
+          "enemy": "半獸人",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 285,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 6
+        },
+        {
+          "enemy": "狼人",
+          "count": 4
+        },
+        {
+          "enemy": "半獸人",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "d": 340,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 5
+        },
+        {
+          "enemy": "半獸人",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 380,
+      "spawns": [
+        {
+          "enemy": "半獸人",
+          "count": 3
+        },
+        {
+          "enemy": "山豬半獸人",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "d": 418,
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 4
+        },
+        {
+          "enemy": "狼人",
+          "count": 3
+        }
+      ]
+    }
+  ],
+  "boss": [
+    "死靈骷髏王",
+    "森林大熊"
+  ],
+  "stars": {
+    "three": 1,
+    "two": 0.75
+  },
+  "bossEscort": [
+    {
+      "enemy": "骷髏人",
+      "count": 12
+    },
+    {
+      "enemy": "半獸人",
+      "count": 5
+    },
+    {
+      "enemy": "山豬半獸人",
+      "count": 1
+    }
+  ],
+  "obstacles": [
+    {
+      "type": "coins",
+      "d": 18,
+      "x": 2.5,
+      "count": 6
+    },
+    {
+      "type": "spikes",
+      "d": 60,
+      "x": -2.5,
+      "width": 5,
+      "period": 3,
+      "up": 1.2
+    },
+    {
+      "type": "potion",
+      "item": "紅藥水",
+      "d": 100,
+      "x": 3.8
+    },
+    {
+      "type": "log",
+      "d": 160,
+      "speed": 1.2
+    },
+    {
+      "type": "chest",
+      "d": 205,
+      "x": -3.8,
+      "gold": [
+        20,
+        40
+      ]
+    },
+    {
+      "type": "spikes",
+      "d": 247,
+      "x": 2.5,
+      "width": 5,
+      "period": 2.6,
+      "up": 1.1,
+      "offset": 1
+    },
+    {
+      "type": "coins",
+      "d": 263,
+      "x": -2.5,
+      "count": 8
+    },
+    {
+      "type": "log",
+      "d": 300,
+      "speed": 1.6,
+      "offset": 1.5
+    },
+    {
+      "type": "potion",
+      "item": "黃藥水",
+      "d": 333,
+      "x": -3.8
+    },
+    {
+      "type": "spikes",
+      "d": 372,
+      "x": 0,
+      "width": 4,
+      "period": 2.4,
+      "up": 1.1
+    },
+    {
+      "type": "potion",
+      "item": "紫藥水",
+      "d": 410,
+      "x": 3.8
+    }
+  ],
+  "stairs": [
+    1.2,
+    1.4,
+    1.6,
+    1.8,
+    2,
+    2.5,
+    3,
+    3.5,
+    4,
+    5
+  ]
+}
