@@ -1,0 +1,628 @@
+{
+  "name": "廢棄礦坑",
+  "desc": "岔路、地雷、落石",
+  "intro": "路會分岔！落石會讓塔暈眩，地雷可以炸怪物（英雄別踩）",
+  "hpMult": 1.1,
+  "theme": {
+    "background": "#17131a",
+    "fog": "#17131a",
+    "fogNear": 45,
+    "fogFar": 95,
+    "hemiSky": "#9a8fb0",
+    "hemiGround": "#2a2018",
+    "hemiIntensity": 0.6,
+    "moon": "#e8d2b4",
+    "moonIntensity": 1.1,
+    "outside": "#141014",
+    "wall": {
+      "a": "#5f5048",
+      "b": "#4a3d37",
+      "gate": "#6e5c4e"
+    },
+    "ground": {
+      "base": "#463a2f",
+      "speck": [
+        1.2,
+        1,
+        0.8
+      ],
+      "stone": [
+        12,
+        4,
+        -6
+      ],
+      "stoneBase": 62
+    }
+  },
+  "arena": {
+    "halfWidth": 20,
+    "halfDepth": 13,
+    "gates": [
+      {
+        "side": "west",
+        "at": -1,
+        "width": 5
+      },
+      {
+        "side": "east",
+        "at": 7,
+        "width": 6
+      }
+    ],
+    "lowSides": [
+      "south"
+    ]
+  },
+  "paths": [
+    {
+      "width": 3.4,
+      "corner": 2.4,
+      "points": [
+        [
+          -24,
+          -1
+        ],
+        [
+          -13,
+          -1
+        ],
+        [
+          -13,
+          -8
+        ],
+        [
+          5,
+          -8
+        ],
+        [
+          5,
+          -1
+        ],
+        [
+          12,
+          -1
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          19.5,
+          7
+        ]
+      ]
+    },
+    {
+      "width": 3.4,
+      "corner": 2.4,
+      "points": [
+        [
+          -24,
+          -1
+        ],
+        [
+          -13,
+          -1
+        ],
+        [
+          -13,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          5,
+          -1
+        ],
+        [
+          12,
+          -1
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          19.5,
+          7
+        ]
+      ]
+    }
+  ],
+  "rockfall": {
+    "first": 20,
+    "every": 22,
+    "warn": 2,
+    "stun": 4,
+    "damage": 2
+  },
+  "heroStart": [
+    16,
+    10
+  ],
+  "previewAt": [
+    -4,
+    -1
+  ],
+  "pedestals": [
+    [
+      -8.5,
+      -4
+    ],
+    [
+      -8.5,
+      2.5
+    ],
+    [
+      0,
+      -1
+    ],
+    [
+      -4,
+      -11.5
+    ],
+    [
+      -4,
+      10
+    ],
+    [
+      9,
+      -5
+    ],
+    [
+      8.5,
+      3.5
+    ],
+    [
+      16,
+      3
+    ]
+  ],
+  "lockedPedestals": [
+    3,
+    4
+  ],
+  "hazards": [
+    {
+      "type": "mine",
+      "at": [
+        -4,
+        -8
+      ],
+      "radius": 2.4,
+      "fuse": 0.9,
+      "rearm": 9,
+      "damage": 2,
+      "enemyDamage": 6
+    },
+    {
+      "type": "mine",
+      "at": [
+        -4,
+        6
+      ],
+      "radius": 2.4,
+      "fuse": 0.9,
+      "rearm": 9,
+      "damage": 2,
+      "enemyDamage": 6
+    },
+    {
+      "type": "mine",
+      "at": [
+        12,
+        3
+      ],
+      "radius": 2.4,
+      "fuse": 0.9,
+      "rearm": 9,
+      "damage": 2,
+      "enemyDamage": 6
+    }
+  ],
+  "firstWait": 30,
+  "waves": [
+    {
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 10
+        }
+      ],
+      "interval": 1.2
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 8
+        },
+        {
+          "enemy": "忍者",
+          "count": 4
+        }
+      ],
+      "interval": 1.1
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "狼人",
+          "count": 8
+        },
+        {
+          "enemy": "忍者",
+          "count": 4
+        },
+        {
+          "enemy": "半獸人",
+          "count": 2
+        }
+      ],
+      "interval": 1.0
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 10
+        },
+        {
+          "enemy": "半獸人",
+          "count": 5
+        },
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 2,
+          "from": "普通"
+        }
+      ],
+      "interval": 1.0
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "忍者",
+          "count": 8
+        },
+        {
+          "enemy": "狼人",
+          "count": 8
+        },
+        {
+          "enemy": "死靈祭司",
+          "count": 2,
+          "from": "普通"
+        }
+      ],
+      "interval": 0.9
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 12
+        },
+        {
+          "enemy": "半獸人",
+          "count": 6
+        },
+        {
+          "enemy": "山豬半獸人",
+          "count": 2
+        },
+        {
+          "enemy": "忍者",
+          "count": 4
+        }
+      ],
+      "interval": 0.9
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "忍者",
+          "count": 10
+        },
+        {
+          "enemy": "半獸人",
+          "count": 6
+        },
+        {
+          "enemy": "山豬半獸人",
+          "count": 2
+        },
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 3,
+          "from": "普通"
+        },
+        {
+          "enemy": "死靈祭司",
+          "count": 2,
+          "from": "普通"
+        }
+      ],
+      "interval": 0.85
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 14
+        },
+        {
+          "enemy": "忍者",
+          "count": 10
+        },
+        {
+          "enemy": "半獸人",
+          "count": 8
+        },
+        {
+          "enemy": "山豬半獸人",
+          "count": 3
+        },
+        {
+          "enemy": "死靈盔甲武士",
+          "count": 3,
+          "from": "普通"
+        },
+        {
+          "enemy": "死靈祭司",
+          "count": 3,
+          "from": "困難"
+        }
+      ],
+      "interval": 0.75
+    },
+    {
+      "spawns": [
+        {
+          "enemy": "骷髏人",
+          "count": 10
+        },
+        {
+          "enemy": "忍者",
+          "count": 6
+        }
+      ],
+      "boss": [
+        "死靈骷髏王"
+      ],
+      "interval": 1.1
+    }
+  ],
+  "props": [
+    {
+      "type": "torch",
+      "at": [
+        17.4,
+        3.6
+      ]
+    },
+    {
+      "type": "torch",
+      "at": [
+        17.4,
+        10.4
+      ]
+    },
+    {
+      "type": "woodPost",
+      "at": [
+        -4.8,
+        2.5
+      ],
+      "rot": 270
+    },
+    {
+      "type": "rock",
+      "at": [
+        -16.0,
+        -11.1
+      ],
+      "rot": 225,
+      "scale": 0.83
+    },
+    {
+      "type": "crystal",
+      "at": [
+        -9.8,
+        11.5
+      ],
+      "rot": 255
+    },
+    {
+      "type": "woodPost",
+      "at": [
+        8.1,
+        8.8
+      ],
+      "rot": 195
+    },
+    {
+      "type": "crate",
+      "at": [
+        13.9,
+        -9.2
+      ],
+      "rot": 225
+    },
+    {
+      "type": "crystal",
+      "at": [
+        -4.2,
+        -3.3
+      ],
+      "rot": 195
+    },
+    {
+      "type": "woodPost",
+      "at": [
+        3.1,
+        9.4
+      ],
+      "rot": 0
+    },
+    {
+      "type": "woodPost",
+      "at": [
+        13.1,
+        11.4
+      ],
+      "rot": 330
+    },
+    {
+      "type": "crystal",
+      "at": [
+        -16.1,
+        8.2
+      ],
+      "rot": 30
+    },
+    {
+      "type": "crate",
+      "at": [
+        15.5,
+        -5.0
+      ],
+      "rot": 15
+    },
+    {
+      "type": "rock",
+      "at": [
+        -6.9,
+        10.6
+      ],
+      "rot": 180,
+      "scale": 0.89
+    },
+    {
+      "type": "rock",
+      "at": [
+        -14.6,
+        11.0
+      ],
+      "rot": 240,
+      "scale": 0.84
+    },
+    {
+      "type": "minecart",
+      "at": [
+        16.1,
+        -1.3
+      ],
+      "rot": 240
+    },
+    {
+      "type": "minecart",
+      "at": [
+        10.6,
+        11.3
+      ],
+      "rot": 0
+    },
+    {
+      "type": "rock",
+      "at": [
+        12.7,
+        -5.3
+      ],
+      "rot": 180,
+      "scale": 0.75
+    },
+    {
+      "type": "woodPost",
+      "at": [
+        17.0,
+        -9.6
+      ],
+      "rot": 300
+    },
+    {
+      "type": "minecart",
+      "at": [
+        -17.2,
+        10.6
+      ],
+      "rot": 270
+    },
+    {
+      "type": "rock",
+      "at": [
+        11.4,
+        -10.4
+      ],
+      "rot": 330,
+      "scale": 0.96
+    },
+    {
+      "type": "crystal",
+      "at": [
+        -17.2,
+        5.0
+      ],
+      "rot": 240
+    },
+    {
+      "type": "crystal",
+      "at": [
+        9.3,
+        -8.0
+      ],
+      "rot": 150
+    },
+    {
+      "type": "minecart",
+      "at": [
+        -2.3,
+        0.7
+      ],
+      "rot": 45
+    },
+    {
+      "type": "rock",
+      "at": [
+        6.3,
+        10.3
+      ],
+      "rot": 120,
+      "scale": 0.75
+    },
+    {
+      "type": "woodPost",
+      "at": [
+        -16.2,
+        -4.6
+      ],
+      "rot": 270
+    },
+    {
+      "type": "crate",
+      "at": [
+        -0.1,
+        11.5
+      ],
+      "rot": 120
+    },
+    {
+      "type": "crystal",
+      "at": [
+        -7.0,
+        0.0
+      ],
+      "rot": 315
+    },
+    {
+      "type": "crate",
+      "at": [
+        18.2,
+        11.6
+      ],
+      "rot": 30
+    }
+  ]
+}

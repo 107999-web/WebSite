@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>騎士塔防</title>
+<link rel="stylesheet" href="src/ui/style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" hidden>
+  <div id="hudLeft">
+    <div id="castle" class="chip" title="城門的愛心">🏰 <b id="castleHp">20</b></div>
+    <div id="gold" class="chip" title="金幣"><i></i><b id="goldCount">0</b></div>
+  </div>
+  <div id="waveInfo"></div>
+  <div id="hudRight">
+    <button id="speedBtn" title="F 切換速度">⏩ ×1</button>
+    <button id="pauseBtn" title="P 暫停">⏸</button>
+  </div>
+</div>
+<button id="nextWave" hidden></button>
+<div id="heroCard" hidden>
+  <img id="heroFace" alt="">
+  <div><b id="heroName"></b><div class="hpTrack"><i id="heroHp"></i></div><small id="heroState"></small></div>
+  <div id="heroSkill"></div>
+</div>
+<div id="hint"></div>
+<div id="bossBar" hidden>
+  <b id="bossName"></b>
+  <div id="bossTrack"><i id="bossFill"></i></div>
+</div>
+<div id="buildMenu" hidden></div>
+<div id="banner"></div>
+<div id="flash"></div>
+
+<div id="overlay">
+  <div class="panel">
+    <h1 id="overlayTitle">騎士塔防</h1>
+    <p id="overlayText">載入中…</p>
+    <div id="overlayBody"></div>
+    <div id="overlayButtons"></div>
+    <div id="controls" hidden>
+      <span class="keys">點台座（或站在台座旁按 <kbd>E</kbd>）蓋塔</span>
+      <span class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動英雄</span>
+      <span class="keys"><kbd>空白鍵</kbd> 攻擊　<kbd>K</kbd> 技能</span>
+      <span class="keys"><kbd>N</kbd> 提早出兵　<kbd>F</kbd> 速度　<kbd>P</kbd> 暫停</span>
+      <span class="taps">點台座蓋塔、升級</span>
+      <span class="taps">🕹️ 左半邊拖曳移動英雄</span>
+      <span class="taps">⚔️ 右下攻擊鍵、技能鍵</span>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

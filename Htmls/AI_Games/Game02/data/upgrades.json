@@ -1,0 +1,12 @@
+[
+  {"id": "archerRange", "group": "塔", "icon": "🏹", "name": "精良弓弦", "desc": "弓箭塔射程 +12%", "cost": [1, 2], "effect": {"tower": "弓箭手", "stat": "range", "mult": 0.12}},
+  {"id": "mageBlast", "group": "塔", "icon": "🔥", "name": "火焰魔典", "desc": "魔法塔爆炸範圍 +15%", "cost": [1, 2], "effect": {"tower": "魔法師", "stat": "blast", "mult": 0.15}},
+  {"id": "rogueDamage", "group": "塔", "icon": "🗡️", "name": "淬毒雙刀", "desc": "盜賊傷害 +1", "cost": [2], "effect": {"tower": "盜賊", "stat": "damage", "add": 1}},
+  {"id": "knightHp", "group": "塔", "icon": "🛡️", "name": "鐵壁盾牌", "desc": "騎士兵生命 +5", "cost": [1, 2], "effect": {"tower": "騎士", "stat": "hp", "add": 5}},
+  {"id": "startGold", "group": "城堡", "icon": "💰", "name": "軍餉充足", "desc": "開場金幣 +40", "cost": [1, 1], "effect": {"stat": "startGold", "add": 40}},
+  {"id": "castle", "group": "城堡", "icon": "🏰", "name": "城牆加固", "desc": "城門愛心 +5", "cost": [1], "effect": {"stat": "castle", "add": 5}},
+  {"id": "cheapBuild", "group": "城堡", "icon": "🔨", "name": "熟練工匠", "desc": "蓋塔和升級便宜 10%", "cost": [3], "effect": {"stat": "towerCost", "mult": -0.1}},
+  {"id": "heroHp", "group": "英雄", "icon": "❤️", "name": "英雄體魄", "desc": "英雄生命 +4", "cost": [1, 2], "effect": {"stat": "heroHp", "add": 4}},
+  {"id": "heroRespawn", "group": "英雄", "icon": "⏱️", "name": "快速歸隊", "desc": "英雄復活時間 -30%", "cost": [1], "effect": {"stat": "heroRespawn", "mult": -0.3}},
+  {"id": "heroSkill", "group": "英雄", "icon": "✨", "name": "技能精通", "desc": "英雄技能冷卻 -25%", "cost": [2], "effect": {"stat": "heroSkill", "mult": -0.25}}
+]

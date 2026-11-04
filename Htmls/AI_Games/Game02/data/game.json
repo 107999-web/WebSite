@@ -1,0 +1,54 @@
+{
+  "title": "騎士塔防",
+  "hero": "騎士",
+  "levels": [
+    "level01",
+    "level02",
+    "level03",
+    "level04"
+  ],
+  "castleHearts": 20,
+  "firstWait": 25,
+  "waveBreak": 14,
+  "earlyGoldPerSecond": 1,
+  "sellRefund": 0.7,
+  "modelScale": 1.3,
+  "stars": {
+    "three": 0.75,
+    "two": 0.4
+  },
+  "defaultDifficulty": "普通",
+  "difficulties": {
+    "簡單": {
+      "desc": "第一次玩、熟悉操作",
+      "color": "#86efac",
+      "hpMult": 1,
+      "countMult": 1,
+      "startGold": 220,
+      "goldMult": 1,
+      "heroRespawn": 8
+    },
+    "普通": {
+      "desc": "忍者、盔甲兵、補血祭司登場",
+      "color": "#fbbf24",
+      "hpMult": 1.45,
+      "countMult": 1.2,
+      "startGold": 200,
+      "goldMult": 1,
+      "heroRespawn": 10,
+      "damageMult": 1.5
+    },
+    "困難": {
+      "desc": "台座只剩 6 個、敵人更痛、Boss 多一招",
+      "color": "#f87171",
+      "hpMult": 1.6,
+      "countMult": 1.3,
+      "startGold": 190,
+      "goldMult": 1,
+      "heroRespawn": 12,
+      "lockPedestals": true,
+      "bossExtra": true,
+      "damageMult": 2
+    }
+  }
+}
