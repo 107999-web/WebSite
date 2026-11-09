@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>快打高手 在家練習版</title>
+<style>
+:root{
+  --bg:#FFF0F5; --bg2:#FFFDE7; --card:#FFFFFF; --ink:#5D4037; --ink2:#8D6E63; --line:#FADADD;
+  --pink:#FF8FAB; --pink2:#FFC2D1; --orange:#FFB74D; --mint:#7ED6A5; --mint2:#E3F9EC; --sky:#8EC5FC; --sky2:#E3F2FD;
+  --red:#F06277; --red2:#FFE3E8; --gold:#F4B400; --shadow:0 8px 18px rgba(255,143,171,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);background-image:radial-gradient(#FFD6E2 1.5px,transparent 1.6px);background-size:26px 26px;
+  color:var(--ink);font-family:"Nunito","M PLUS Rounded 1c","Microsoft JhengHei UI","Microsoft JhengHei","PingFang TC",sans-serif;
+  line-height:1.6;font-size:18px}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-bottom:3px solid var(--line);position:sticky;top:0;z-index:5}
+header.top .logo{font-size:24px;font-weight:900;color:var(--pink);letter-spacing:1px}
+header.top .who{margin-left:auto;font-weight:700}
+.pill{display:inline-block;border-radius:50px;padding:2px 12px;background:var(--pink2);font-size:15px;font-weight:700}
+.btn{border:none;border-radius:50px;padding:10px 24px;background:var(--pink);color:#fff;font-weight:800;font-size:18px;
+  box-shadow:0 4px 12px rgba(255,143,171,.45);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:scale(1.05)}
+.btn:disabled{opacity:.5;transform:none;cursor:default}
+.btn.o{background:var(--orange);box-shadow:0 4px 12px rgba(255,183,77,.45)}
+.btn.g{background:var(--mint);box-shadow:0 4px 12px rgba(126,214,165,.45)}
+.btn.s{background:#fff;color:var(--ink);border:3px solid var(--line);box-shadow:none}
+.btn.sm{padding:5px 14px;font-size:15px}
+.card{background:var(--card);border-radius:24px;border:3px solid var(--line);box-shadow:var(--shadow);padding:20px}
+h1,h2,h3{margin:.2em 0 .5em;line-height:1.3}
+h2{font-size:26px}
+.muted{color:var(--ink2);font-size:15px}
+.center{text-align:center}
+.grid{display:grid;gap:14px}
+.msg{min-height:1.6em;color:var(--red);font-weight:700}
+
+/* 登入 */
+.cls-btn{font-size:26px;font-weight:900;padding:18px 10px;border-radius:24px;border:3px solid var(--line);background:#fff;box-shadow:var(--shadow);transition:transform .15s}
+.cls-btn:hover,.stu-btn:hover{transform:scale(1.05)}
+.stu-btn{border-radius:20px;border:3px solid var(--line);background:#fff;padding:10px 6px;font-size:20px;font-weight:800;transition:transform .15s}
+.stu-btn small{display:block;font-size:14px;color:var(--ink2);font-weight:700}
+.stu-btn.busy{opacity:.45;background:#F4EFEA;cursor:not-allowed;transform:none}
+.lock-note{display:inline-block;background:#FFF3D6;border:2px dashed var(--orange);border-radius:50px;padding:2px 16px;font-weight:800;margin:0 0 8px}
+.confirm{position:fixed;inset:0;background:rgba(93,64,55,.35);display:flex;align-items:center;justify-content:center;z-index:30}
+.confirm .card{min-width:320px;text-align:center}
+.confirm .big{font-size:34px;font-weight:900;margin:8px 0 16px}
+
+/* 首頁 */
+.test-banner{background:linear-gradient(135deg,#FFE0E9,#FFF3D6);border:3px solid var(--pink);animation:glow 1.6s infinite}
+@keyframes glow{50%{box-shadow:0 0 0 8px rgba(255,143,171,.25)}}
+.test-item{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border-radius:18px;padding:10px 14px;margin-top:10px;border:3px solid var(--line)}
+.test-item b{font-size:22px}
+.menu{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.menu button{text-align:left;border-radius:24px;border:3px solid var(--line);background:#fff;padding:16px 18px;box-shadow:var(--shadow);transition:transform .15s}
+.menu button:hover{transform:scale(1.04) rotate(-.5deg)}
+.menu .ic{font-size:36px;display:block}
+.menu b{font-size:21px;display:block}
+.menu span{font-size:15px;color:var(--ink2)}
+
+/* 關卡 */
+.levels{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.levels button{border-radius:20px;border:3px solid var(--line);background:#fff;padding:12px;text-align:left;transition:transform .15s}
+.levels button:hover{transform:scale(1.04)}
+.levels b{display:block;font-size:19px}
+.levels small{color:var(--ink2);font-size:14px}
+.levels .best{float:right;font-size:13px;background:var(--mint2);border-radius:50px;padding:0 8px}
+
+/* 鍵位練習 */
+.drill-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:10px}
+.stat{background:#fff;border:3px solid var(--line);border-radius:18px;padding:4px 14px;font-weight:800;min-width:96px;text-align:center}
+.stat small{display:block;font-size:12px;color:var(--ink2);font-weight:700}
+.stage{display:flex;align-items:center;justify-content:center;gap:14px;min-height:150px;flex-wrap:wrap}
+.big-key{font-size:88px;font-weight:900;min-width:150px;height:150px;border-radius:30px;background:#fff;border:4px solid var(--pink);
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);padding:0 20px}
+.big-key.ok{animation:pop .25s}
+.big-key.bad{animation:shake .3s;border-color:var(--red);background:var(--red2)}
+@keyframes pop{50%{transform:scale(1.12)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.queue{display:flex;gap:8px;opacity:.7}
+.queue span{font-size:34px;font-weight:800;min-width:56px;height:62px;border-radius:16px;background:#fff;border:3px solid var(--line);display:flex;align-items:center;justify-content:center;padding:0 8px}
+.seq{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:30px;font-weight:900}
+.seq span{min-width:46px;border-radius:12px;background:#fff;border:3px solid var(--line);text-align:center;padding:0 6px}
+.seq span.done{background:var(--mint2);border-color:var(--mint);color:#2E7D55}
+.seq span.cur{border-color:var(--pink);background:#FFE0E9}
+.hint{text-align:center;font-weight:800;min-height:1.7em;margin:8px 0}
+.hint.warn{color:var(--red)}
+
+/* 螢幕鍵盤 */
+.kb{margin:10px auto 0;display:flex;flex-direction:column;gap:6px;width:max-content;max-width:100%;padding:12px;background:#fff;border-radius:24px;border:3px solid var(--line);box-shadow:var(--shadow);user-select:none}
+.kb .row{display:flex;gap:6px}
+.kb .k{position:relative;width:52px;height:52px;border-radius:12px;border:2px solid rgba(93,64,55,.18);font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+.kb .k .zy{position:absolute;right:5px;bottom:1px;font-size:15px;color:#6A4C93}
+.kb .k .sh{position:absolute;left:6px;top:0;font-size:12px;color:var(--ink2)}
+.kb.zy .k .main{position:absolute;left:6px;top:2px;font-size:12px;color:var(--ink2)}
+.kb.zy .k .zy{position:static;font-size:22px;color:var(--ink)}
+.kb .k.on{outline:4px solid var(--pink);transform:scale(1.12);z-index:2;background:#FFE0E9!important}
+.kb .k.miss{background:var(--red2)!important;border-color:var(--red)}
+.f0{background:#FFE5EC}.f1{background:#FFF1D6}.f2{background:#E7F7EC}.f3{background:#E3F2FD}
+.f4{background:#EDE4FA}.f5{background:#E3F2FD}.f6{background:#E7F7EC}.f7{background:#FFF1D6}.f8{background:#FFE5EC}.f9{background:#F4EFEA}
+.legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:14px;margin-top:8px}
+.legend span{border-radius:50px;padding:0 10px}
+
+/* 打字 */
+.type-head{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.type-head h2{margin:0;font-size:22px}
+.type-head .stats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.timer{font-size:30px;font-weight:900;color:var(--pink);min-width:110px}
+.timer.low{color:var(--red);animation:pop 1s infinite}
+.target{font-size:30px;line-height:2;letter-spacing:2px;background:#fff;border-radius:24px;border:3px solid var(--line);padding:16px 22px;
+  max-height:40vh;overflow:auto;word-break:break-all;white-space:pre-wrap}
+.target.en{font-family:Consolas,"Cascadia Mono","Courier New",monospace;letter-spacing:1px;word-break:normal}
+.target span{border-radius:6px}
+.target .ok{color:#2E9E62}
+.target .bad{background:var(--red2);color:var(--red);text-decoration:underline wavy}
+.target .miss{background:#FFF1B8;color:#B7791F}
+.target .cur{box-shadow:inset 0 -4px 0 var(--pink);background:#FFE0E9;animation:blink 1s infinite}
+@keyframes blink{50%{background:#fff}}
+.target .fw{outline:2px dashed #C9A7F5;outline-offset:-2px}
+.target .sp.bad:before,.target .sp.miss:before{content:"␣"}
+textarea.typing{width:100%;font-size:28px;line-height:1.7;border-radius:24px;border:3px solid var(--pink2);padding:14px 20px;margin-top:12px;resize:none;height:130px;color:var(--ink);font-family:inherit;background:#FFFDF8}
+textarea.typing.en{font-family:Consolas,"Cascadia Mono","Courier New",monospace}
+textarea.typing:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 5px rgba(255,143,171,.2)}
+.countdown{position:fixed;inset:0;background:rgba(255,240,245,.88);display:flex;align-items:center;justify-content:center;z-index:20;font-size:180px;font-weight:900;color:var(--pink)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:50px;padding:10px 24px;font-weight:800;z-index:40;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.bar{height:14px;border-radius:50px;background:#F3E5EA;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--orange));border-radius:50px;transition:width .4s}
+
+/* 結果 */
+.score-big{font-size:96px;font-weight:900;color:var(--pink);line-height:1}
+.res-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.res-grid .stat{font-size:26px}
+.formula{background:var(--bg2);border-radius:18px;padding:12px 16px;border:3px dashed var(--orange);font-weight:700}
+.wrong-list span{display:inline-block;margin:4px;border-radius:14px;background:var(--red2);padding:2px 12px;font-size:22px;font-weight:800}
+.wrong-list small{font-size:13px;color:var(--ink2)}
+table{border-collapse:collapse;width:100%;background:#fff;border-radius:18px;overflow:hidden}
+th,td{padding:8px 10px;border-bottom:2px solid #FBE7EC;text-align:left;font-size:16px}
+th{background:#FFE8EF}
+
+/* 全半形 */
+.width-card{text-align:center}
+.width-char{font-size:110px;font-weight:900;line-height:1.1;display:inline-block;min-width:170px;border-radius:30px;background:#fff;border:4px solid var(--sky);padding:0 20px;font-family:"Microsoft JhengHei",sans-serif}
+.width-tag{font-size:24px;font-weight:900;margin:8px 0}
+.width-tag .full{background:#EDE4FA;border-radius:50px;padding:2px 14px}
+.width-tag .half{background:var(--sky2);border-radius:50px;padding:2px 14px}
+input.wide{font-size:40px;width:220px;text-align:center;border-radius:24px;border:3px solid var(--pink2);padding:6px;font-family:inherit;color:var(--ink)}
+input.wide:focus{outline:none;border-color:var(--pink)}
+.tips{font-size:15px;text-align:left;background:var(--sky2);border-radius:18px;padding:10px 16px;margin-top:14px}
+.net{position:fixed;right:12px;bottom:12px;background:var(--red);color:#fff;border-radius:50px;padding:6px 16px;font-weight:800;z-index:50}
+@media (max-width:760px){.kb .k{width:30px;height:38px;font-size:12px}.kb .k .zy{font-size:11px}.big-key{font-size:60px;height:110px;min-width:110px}.target{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="logo">⌨️ 快打高手</span>
+  <span class="who" id="who"></span>
+  <button class="btn s sm" id="btnHome" hidden>🏠 首頁</button>
+  <button class="btn s sm" id="btnOut" hidden>登出</button>
+</header>
+
+<div class="wrap">
+
+<!-- 登入 -->
+<section id="scrLogin" hidden>
+  <div class="card center">
+    <h2>🌸 歡迎來到快打高手</h2>
+    <p class="lock-note" id="lockNote" hidden></p>
+    <div id="loginStep1">
+      <p>請選你的<b>班級</b></p>
+      <div class="grid" id="clsList" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))"></div>
+      <p class="muted" id="noClass" hidden>老師還沒有匯入名單，請等一下 🙏</p>
+    </div>
+    <div id="loginStep2" hidden>
+      <p><button class="btn s sm" id="backCls">← 換班級</button>　<b id="clsName"></b>　請點你的<b>名字</b></p>
+      <div class="grid" id="stuList" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))"></div>
+    </div>
+    <p class="msg" id="loginMsg"></p>
+  </div>
+</section>
+
+<!-- 首頁 -->
+<section id="scrHome" hidden>
+  <div class="card test-banner" id="testBox" hidden style="margin-bottom:18px">
+    <h2>📝 老師指派的測驗</h2>
+    <div id="testList"></div>
+  </div>
+  <p class="center muted" style="margin:0 0 14px">🏠 在家練習版：不用登入，也不會記錄任何成績，想練多久就練多久！</p>
+  <div class="grid menu">
+    <button data-go="keys_en"><span class="ic">🔤</span><b>英文鍵位練習</b><span>字母、數字、符號，一個一個按</span></button>
+    <button data-go="keys_zy"><span class="ic">ㄅ</span><b>注音鍵位練習</b><span>記住每個注音在哪個鍵</span></button>
+    <button data-go="spell"><span class="ic">🐻</span><b>注音拼字</b><span>看國字，按出注音和聲調</span></button>
+    <button data-go="width"><span class="ic">，,</span><b>全形半形符號</b><span>分清楚「，」和「,」</span></button>
+    <button data-go="text"><span class="ic">📖</span><b>文章練習</b><span>中文、英文文章，練速度和準確</span></button>
+  </div>
+</section>
+
+<!-- 關卡選擇 -->
+<section id="scrLevels" hidden>
+  <div class="card">
+    <h2 id="lvTitle"></h2>
+    <p class="muted" id="lvDesc"></p>
+    <div class="grid levels" id="lvList"></div>
+  </div>
+</section>
+
+<!-- 鍵位練習 -->
+<section id="scrDrill" hidden>
+  <div class="drill-top">
+    <b id="drTitle" style="font-size:20px"></b>
+    <div class="stat"><small>進度</small><span id="drProg">0/0</span></div>
+    <div class="stat"><small>準確率</small><span id="drAcc">-</span></div>
+    <div class="stat"><small>每分鐘按鍵</small><span id="drKpm">-</span></div>
+    <div class="stat"><small>時間</small><span id="drTime">0</span></div>
+    <button class="btn s sm" id="drQuit">結束</button>
+  </div>
+  <div class="bar"><i id="drBar" style="width:0"></i></div>
+  <div class="stage" style="margin-top:14px">
+    <div class="big-key" id="drKey"></div>
+    <div class="queue" id="drQueue"></div>
+  </div>
+  <div class="seq" id="drSeq"></div>
+  <div class="hint" id="drHint"></div>
+  <div class="kb" id="kb"></div>
+  <div class="legend" id="kbLegend"></div>
+</section>
+
+<!-- 練習結果（鍵位、全半形） -->
+<section id="scrDrillEnd" hidden>
+  <div class="card center">
+    <h2 id="deTitle"></h2>
+    <div class="grid res-grid" id="deStats" style="margin:14px 0"></div>
+    <div id="deWeak"></div>
+    <p style="margin-top:18px"><button class="btn" id="deAgain">🔁 再練一次</button>　<button class="btn o" id="deLevels">換關卡</button></p>
+  </div>
+</section>
+
+<!-- 全形半形 -->
+<section id="scrWidth" hidden>
+  <div class="drill-top">
+    <b style="font-size:20px">，, 全形半形符號</b>
+    <div class="stat"><small>進度</small><span id="wdProg">0/0</span></div>
+    <div class="stat"><small>答對</small><span id="wdOk">0</span></div>
+    <button class="btn s sm" id="wdQuit">結束</button>
+  </div>
+  <div class="card width-card">
+    <div class="width-tag" id="wdTag"></div>
+    <div class="width-char" id="wdChar"></div>
+    <p style="margin:14px 0 4px">在下面的框框打出這個符號 👇</p>
+    <input class="wide" id="wdInput" autocomplete="off" spellcheck="false">
+    <div class="hint" id="wdHint"></div>
+    <div class="tips">
+      <b>💡 怎麼打？</b>（Windows 注音輸入法）<br>
+      ・<b>全形標點</b>：輸入法在「中」的時候，按住 <b>Ctrl</b> 再按符號鍵：<b>Ctrl + ,</b> 是「，」、<b>Ctrl + .</b> 是「。」、<b>Ctrl + '</b> 是「、」、<b>Ctrl + ;</b> 是「；」、<b>Ctrl + [</b> 是「「」、<b>Ctrl + ]</b> 是「」」<br>・<b>要按 Shift 的全形標點</b>：<b>Ctrl + Shift + /</b> 是「？」、<b>Ctrl + Shift + 1</b> 是「！」、<b>Ctrl + Shift + ;</b> 是「：」、<b>Ctrl + Shift + 9</b> 是「（」、<b>Ctrl + Shift + 0</b> 是「）」<br>
+      ・<b>半形符號</b>：先按一下 <b>Shift</b> 切成「英」，再按鍵盤上的符號<br>
+      ・<b>全形的英文和數字</b>（像 Ａ、１）：按 <b>Shift + 空白鍵</b> 切換成全形，打完記得再按一次切回來<br>
+      ・全形字比較「胖」，佔一個中文字的寬度；半形字比較「瘦」
+    </div>
+  </div>
+</section>
+
+<!-- 文章選擇 -->
+<section id="scrPick" hidden>
+  <div class="card">
+    <h2>📖 文章練習</h2>
+    <div id="pickBanks" class="grid levels"></div>
+    <div id="pickPassages" hidden>
+      <p><button class="btn s sm" id="pickBack">← 換題庫</button>　<b id="pickBankName"></b></p>
+      <div class="grid levels" id="pickList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 測驗準備 -->
+<section id="scrReady" hidden>
+  <div class="card center">
+    <h2 id="rdTitle"></h2>
+    <div id="rdInfo" style="font-size:20px"></div>
+    <p style="margin-top:20px"><button class="btn" id="rdGo" style="font-size:26px;padding:14px 44px">準備好了，開始！</button></p>
+    <p class="msg" id="rdMsg"></p>
+  </div>
+</section>
+
+<!-- 打字 -->
+<section id="scrType" hidden>
+  <div class="type-head">
+    <h2 id="tyTitle"></h2>
+    <span class="pill" id="tyMode"></span>
+    <div class="stats">
+      <div class="stat"><small id="tyUnit">速度</small><span id="tySpeed">0</span></div>
+      <div class="stat"><small>準確率</small><span id="tyAcc">-</span></div>
+      <div class="stat"><small>完成</small><span id="tyPct">0%</span></div>
+      <div class="stat"><small id="tyTimeLbl">剩下</small><span class="timer" id="tyTime" style="font-size:22px">-</span></div>
+    </div>
+  </div>
+  <div class="bar" style="margin-bottom:12px"><i id="tyBar" style="width:0"></i></div>
+  <div class="target" id="tyTarget"></div>
+  <textarea class="typing" id="tyInput" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="在這裡打字⋯⋯"></textarea>
+  <p class="center" style="margin-top:10px">
+    <span class="muted" id="tyNote"></span>
+    <button class="btn o" id="tyDone">✅ 我打完了</button>
+  </p>
+</section>
+
+<!-- 結果 -->
+<section id="scrResult" hidden>
+  <div class="card center">
+    <h2 id="rsTitle">🎉 完成！</h2>
+    <div id="rsScore"></div>
+    <div class="grid res-grid" id="rsStats" style="margin:16px 0"></div>
+    <div class="formula" id="rsFormula"></div>
+    <div id="rsWrong" style="margin-top:14px"></div>
+    <details style="margin-top:14px;text-align:left"><summary><b>看看哪裡打錯了</b></summary>
+      <div class="target" id="rsTarget" style="font-size:22px;margin-top:10px"></div>
+      <p class="muted">綠色：打對　紅色：打錯　黃色：漏打</p>
+    </details>
+    <p style="margin-top:18px"><button class="btn" id="rsHome">🏠 回首頁</button> <button class="btn o" id="rsAgain" hidden>🔁 再練一次</button></p>
+  </div>
+</section>
+
+<!-- 紀錄 -->
+<section id="scrRecords" hidden>
+  <div class="card">
+    <h2>📊 我的紀錄</h2>
+    <h3>測驗</h3>
+    <div id="recTests"></div>
+    <h3 style="margin-top:20px">練習（最近 60 次）</h3>
+    <div id="recPractice"></div>
+  </div>
+</section>
+
+</div>
+
+<div class="confirm" id="confirmBox" hidden>
+  <div class="card">
+    <div>你是⋯⋯</div>
+    <div class="big" id="confirmName"></div>
+    <button class="btn g" id="confirmYes">✔ 是我</button>　<button class="btn s" id="confirmNo">不是</button>
+  </div>
+</div>
+<div class="countdown" id="countdown" hidden></div>
+<div class="toast" id="toast"></div>
+<div class="net" id="net" hidden>🔌 正在重新連線⋯</div>
+
+<script>
+"use strict";
+const BUILD = "web-1.0";
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let token = "";
+try { token = localStorage.getItem("tm_token") || ""; } catch (e) {}
+let me = null, ver = 0, offset = 0, screen = "", polling = false, lastState = null, hideOut = false;
+const sNow = () => (Date.now() + offset) / 1000;
+
+function show(id) {
+  document.querySelectorAll("section").forEach(s => s.hidden = s.id !== id);
+  screen = id;
+  $("btnHome").hidden = !me || id === "scrHome" || id === "scrType" || id === "scrLogin";
+  $("btnOut").hidden = hideOut || !me || id === "scrType";
+  window.scrollTo(0, 0);
+}
+let toastT = 0;
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200);
+}
+/* ---- 在家練習版：沒有伺服器，題庫內嵌、計分在瀏覽器算、不存任何成績 ---- */
+const WEB_BANKS = [{"file": "範例_中文短文_三年級.txt", "title": "三年級 中文短文", "passages": [{"title": "台灣黑熊", "lang": "zh", "kind": "timed", "seconds": 180, "text": "台灣黑熊住在高高的山上，牠的胸前有一塊白色的 V 字形花紋，好像掛著一彎月亮，所以大家也叫牠「月熊」。黑熊喜歡吃果子和蜂蜜，是台灣很珍貴的動物。"}, {"title": "下課十分鐘", "lang": "zh", "kind": "timed", "seconds": 180, "text": "下課鐘聲一響，同學們像小鳥一樣飛出教室。有人在操場上跑步，有人在樹下跳繩，還有人坐在走廊上看故事書。短短的十分鐘，校園裡充滿了笑聲。"}, {"title": "我的家人", "lang": "zh", "kind": "timed", "seconds": 180, "text": "我的家裡有爸爸、媽媽、哥哥和我。爸爸會做好吃的炒飯，媽媽喜歡種花，哥哥每天陪我練習打球。星期天晚上，我們常常一起看電視、聊天，覺得好溫暖。"}, {"title": "雨後的公園", "lang": "zh", "kind": "timed", "seconds": 180, "text": "下了一整天的雨，公園裡的草地又綠又亮。小水窪裡映著藍藍的天空，蝸牛慢慢的爬出來散步，樹葉上的水珠閃閃發光。空氣清清涼涼的，吸一口就覺得很舒服。"}, {"title": "圖書館", "lang": "zh", "kind": "timed", "seconds": 180, "text": "學校的圖書館又安靜又明亮，書架上排滿了各種書。我最喜歡看動物的書，裡面有會飛的魚、會變色的蜥蜴，還有住在海底的章魚。每次借書回家，我都捨不得放下來。"}, {"title": "做蛋餅", "lang": "zh", "kind": "timed", "seconds": 180, "text": "早上，媽媽教我做蛋餅。先把蛋打在碗裡，加一點點鹽，再把蔥花放進去攪一攪。鍋子熱了以後，倒入蛋汁，蓋上餅皮，翻一面就完成了。我吃著自己做的蛋餅，心裡好得意。"}, {"title": "四季", "lang": "zh", "kind": "timed", "seconds": 180, "text": "春天，花開了，蝴蝶在花叢裡跳舞；夏天，太陽好熱，我們去海邊玩水；秋天，樹葉變黃了，風一吹就沙沙的落下；冬天，天氣變冷，全家人圍在一起吃火鍋。"}, {"title": "小小科學家", "lang": "zh", "kind": "timed", "seconds": 180, "text": "老師帶我們做實驗：把一顆雞蛋放進清水裡，蛋沉到杯底；在水裡加很多鹽，攪一攪，蛋竟然慢慢浮起來了！原來鹽水比清水重，可以把蛋托起來。科學真是太有趣了。"}]}, {"file": "範例_數字與符號.txt", "title": "數字與符號", "passages": [{"title": "日期與時間", "lang": "zh", "kind": "timed", "seconds": 120, "text": "今天是 2026 年 9 月 25 日，早上 8:30 上課，下午 4:00 放學。"}, {"title": "算術", "lang": "en", "kind": "timed", "seconds": 120, "text": "3 + 5 = 8, 12 - 7 = 5, 6 * 4 = 24, 20 / 5 = 4"}, {"title": "電話與信箱", "lang": "en", "kind": "timed", "seconds": 120, "text": "Phone: 02-2345-6789 Email: amy@school.edu.tw"}, {"title": "購物清單", "lang": "zh", "kind": "timed", "seconds": 120, "text": "鉛筆 3 支 $45、橡皮擦 2 個 $30、筆記本 5 本 $150，一共 $225。"}]}, {"file": "範例_標點符號與全半形.txt", "title": "標點符號與全形半形", "passages": [{"title": "中文標點(全形)", "lang": "zh", "strict_width": true, "kind": "fixed", "seconds": 180, "text": "你好！今天天氣很好，我們一起去公園吧？媽媽說：「記得帶水壺。」"}, {"title": "頓號和分號", "lang": "zh", "strict_width": true, "kind": "fixed", "seconds": 180, "text": "水果有蘋果、香蕉、芭樂；蔬菜有高麗菜、紅蘿蔔、青椒。"}, {"title": "英文標點(半形)", "lang": "en", "strict_width": true, "kind": "fixed", "seconds": 180, "text": "Wow! Is it your book? Yes, it is. \"Thank you,\" said Tom."}, {"title": "中英混合", "lang": "zh", "strict_width": true, "kind": "fixed", "seconds": 240, "text": "我最喜歡的英文單字是 apple，因為它很好記。老師問：「What is this?」我說：「It's an apple.」"}, {"title": "全形數字與半形數字", "lang": "zh", "strict_width": true, "kind": "fixed", "seconds": 240, "text": "半形：1 2 3 A B C。全形：１２３ＡＢＣ。"}]}, {"file": "範例_英文句子.txt", "title": "英文句子", "passages": [{"title": "Hello", "lang": "en", "kind": "timed", "seconds": 120, "text": "Hello, my name is Amy. I am nine years old. I like dogs and cats."}, {"title": "My School", "lang": "en", "kind": "timed", "seconds": 120, "text": "This is my school. It is big and clean. I have many good friends here."}, {"title": "Colors", "lang": "en", "kind": "timed", "seconds": 120, "text": "The sky is blue. The grass is green. The apple is red. The banana is yellow."}, {"title": "Animals", "lang": "en", "kind": "timed", "seconds": 120, "text": "A bird can fly. A fish can swim. A frog can jump. Can you run fast?"}, {"title": "My Day", "lang": "en", "kind": "timed", "seconds": 180, "text": "I get up at seven. I eat breakfast with my mom. Then I go to school by bus."}, {"title": "The Quick Fox", "lang": "en", "kind": "timed", "seconds": 120, "text": "The quick brown fox jumps over the lazy dog."}]}];
+function webScore(typed, p, secs) {
+  const lang = p.lang, cfg = {target: p.target || 10, w_speed: 60, acc_floor: 80, penalty: 1, strict_width: !!p.strict_width};
+  typed = String(typed || "").slice(0, 6000);
+  const al = align(typed, p.text, cfg.strict_width), c = al.correct, e = al.errors;
+  secs = Math.max(1, +secs || 0);
+  const mins = secs / 60, div = lang === "zh" ? 1 : 5;
+  const accuracy = c + e ? c / (c + e) * 100 : 0;
+  const speed = Math.max(0, c - cfg.penalty * e) / div / mins;
+  const speed_score = Math.min(100, speed / cfg.target * 100);
+  const acc_score = c ? Math.min(100, Math.max(0, (accuracy - cfg.acc_floor) / (100 - cfg.acc_floor) * 100)) : 0;
+  const raw = speed_score * cfg.w_speed / 100 + acc_score * (1 - cfg.w_speed / 100);
+  const cnt = new Map(); al.wrong.forEach(ch => cnt.set(ch, (cnt.get(ch) || 0) + 1));
+  const wrong = Array.from(cnt.entries()).map((x, i) => [x[0], x[1], i]).sort((a, b) => b[1] - a[1] || a[2] - b[2]).slice(0, 8)
+    .map(x => [x[0], x[1], widthName(x[0])]);
+  const r1 = v => Math.round(v * 10) / 10, tl = Array.from(p.text).length;
+  return {lang, unit: lang === "zh" ? "字/分" : "WPM", correct: c, errors: e, elapsed: r1(secs), speed: r1(speed), accuracy: r1(accuracy),
+          completion: tl ? r1(al.end / tl * 100) : 0, speed_score: r1(speed_score), acc_score: r1(acc_score), raw: r1(raw), wrong, cfg};
+}
+async function api(path, body) {
+  const p = path.split("?")[0], q = new URLSearchParams(path.split("?")[1] || "");
+  const find = f => WEB_BANKS.find(b => b.file === f);
+  if (p === "/api/p/banks") return {banks: WEB_BANKS.map(b => ({file: b.file, title: b.title, count: b.passages.length}))};
+  if (p === "/api/p/bank") return find(q.get("file")) || {title: "", passages: []};
+  if (p === "/api/p/score") {
+    const b = find(body.bank), ps = b && b.passages[body.passage];
+    return ps ? {ok: true, result: webScore(body.typed, ps, body.elapsed)} : {ok: false};
+  }
+  return {ok: true};          // /api/p/practice 等：什麼都不記錄
+}
+
+/* ------------------------------------------------------------------ 計分（和伺服器相同） */
+const isCjk = ch => { const o = ch.codePointAt(0);
+  return (o >= 0x4E00 && o <= 0x9FFF) || (o >= 0x3400 && o <= 0x4DBF) || (o >= 0xF900 && o <= 0xFAFF) || (o >= 0x20000 && o <= 0x2FFFF) || (o >= 0x3100 && o <= 0x312F); };
+function isFull(ch) {
+  if (!ch || isCjk(ch)) return false;
+  const o = ch.codePointAt(0);
+  return (o >= 0x3000 && o <= 0x303F) || (o >= 0xFF01 && o <= 0xFF60) || (o >= 0xFFE0 && o <= 0xFFE6) || o === 0x2026 || o === 0x2014 || o === 0x2018 || o === 0x2019 || o === 0x201C || o === 0x201D || (o >= 0xFE30 && o <= 0xFE4F);
+}
+const widthName = ch => !ch || isCjk(ch) ? "" : (isFull(ch) ? "全形" : "半形");
+const fold = (ch, strict) => strict ? ch : (ch === "　" ? " " : ch.normalize("NFKC"));
+
+function align(typed, target, strict, band) {
+  band = band || 60;
+  const a = Array.from(typed).map(c => fold(c, strict)), b = Array.from(target).map(c => fold(c, strict));
+  const n = a.length, m = b.length;
+  const res = {correct: 0, sub: 0, ins: 0, dele: 0, errors: 0, end: 0, status: new Array(m).fill(0), wrong: []};
+  if (!n) return res;
+  const INF = 1 << 30, rows = [];
+  let hi0 = Math.min(m, band);
+  { const c = [], o = []; for (let j = 0; j <= hi0; j++) { c.push(j); o.push(2); } rows.push([0, c, o]); }
+  for (let i = 1; i <= n; i++) {
+    const lo = Math.min(Math.max(0, i - band), m), hi = Math.min(m, i + band);
+    const [plo, pc] = rows[i - 1], phi = plo + pc.length - 1;
+    const cost = new Array(hi - lo + 1).fill(INF), op = new Array(hi - lo + 1).fill(0), ai = a[i - 1];
+    for (let j = lo; j <= hi; j++) {
+      let best = INF, bo = 0, c;
+      if (j >= 1 && j - 1 >= plo && j - 1 <= phi) { c = pc[j - 1 - plo] + (ai === b[j - 1] ? 0 : 1); if (c < best) { best = c; bo = 0; } }
+      if (j >= plo && j <= phi) { c = pc[j - plo] + 1; if (c < best) { best = c; bo = 1; } }
+      if (j > lo) { c = cost[j - 1 - lo] + 1; if (c < best) { best = c; bo = 2; } }
+      cost[j - lo] = best; op[j - lo] = bo;
+    }
+    rows.push([lo, cost, op]);
+  }
+  const [lo, cost] = rows[n];
+  let best = Math.min(...cost), end = lo;
+  for (let k = 0; k < cost.length; k++) if (cost[k] === best) end = lo + k;
+  let i = n, j = end;
+  const tArr = Array.from(target);
+  while (i > 0 || j > 0) {
+    let o = 2;
+    if (i > 0) { const [rlo, , rop] = rows[i]; o = rop[j - rlo]; }
+    if (o === 0) {
+      if (a[i - 1] === b[j - 1]) { res.correct++; res.status[j - 1] = 1; }
+      else { res.sub++; res.status[j - 1] = 2; res.wrong.push(tArr[j - 1]); }
+      i--; j--;
+    } else if (o === 1) { res.ins++; i--; }
+    else { res.dele++; res.status[j - 1] = 3; res.wrong.push(tArr[j - 1]); j--; }
+  }
+  res.errors = res.sub + res.ins + res.dele; res.end = end;
+  return res;
+}
+const DEF = {target: 10, w_speed: 60, acc_floor: 80, penalty: 1, strict_width: false};
+function scoreLive(typed, target, secs, cfg, lang, al) {
+  cfg = Object.assign({}, DEF, cfg || {});
+  al = al || align(typed, target, cfg.strict_width);
+  const c = al.correct, e = al.errors, mins = Math.max(1, secs) / 60, div = lang === "zh" ? 1 : 5;
+  const acc = c + e ? c / (c + e) * 100 : 0;
+  const speed = Math.max(0, c - cfg.penalty * e) / div / mins;
+  const tl = Array.from(target).length;
+  return {speed: Math.round(speed * 10) / 10, accuracy: Math.round(acc * 10) / 10, errors: e, correct: c,
+          completion: tl ? Math.round(al.end / tl * 1000) / 10 : 0, al};
+}
+
+/* ------------------------------------------------------------------ 登入 */
+let pendingStu = null, curCls = "", lockedCls = [];
+async function showLogin(msg) {
+  me = null; $("who").textContent = "";
+  show("scrLogin");
+  $("loginMsg").textContent = msg || "";
+  $("loginStep1").hidden = false; $("loginStep2").hidden = true;
+  try {
+    const v = await api("/api/lobby");
+    const box = $("clsList"); box.innerHTML = "";
+    $("noClass").hidden = v.classes.length > 0;
+    lockedCls = v.locked || [];
+    $("lockNote").hidden = !lockedCls.length;
+    $("lockNote").textContent = "🔒 這節課是 " + lockedCls.join("、") + " 上課";
+    v.classes.forEach(c => {
+      const b = document.createElement("button");
+      b.className = "cls-btn"; b.innerHTML = esc(c.cls) + "<div class='muted'>" + c.count + " 人</div>";
+      b.onclick = () => pickClass(c.cls);
+      box.appendChild(b);
+    });
+    if (v.classes.length === 1) pickClass(v.classes[0].cls);
+  } catch (e) { $("loginMsg").textContent = "連不上伺服器，請確認網址，或請老師檢查"; setTimeout(() => showLogin(), 3000); }
+}
+async function pickClass(cls) {
+  curCls = cls;
+  const v = await api("/api/roster?cls=" + encodeURIComponent(cls));
+  $("clsName").textContent = cls;
+  const box = $("stuList"); box.innerHTML = "";
+  v.students.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "stu-btn" + (s.busy ? " busy" : "");
+    b.innerHTML = "<small>" + s.seat + " 號" + (s.busy ? "・已登入" : "") + "</small>" + esc(s.name);
+    b.onclick = s.busy
+      ? () => { $("loginMsg").textContent = "「" + s.name + "」已經在別台電腦登入了。如果你真的是 " + s.name + "，請告訴老師"; }
+      : () => { pendingStu = s; $("loginMsg").textContent = ""; $("confirmName").textContent = s.seat + " 號 " + s.name; $("confirmBox").hidden = false; };
+    box.appendChild(b);
+  });
+  $("loginStep1").hidden = true; $("loginStep2").hidden = false;
+  $("backCls").hidden = lockedCls.length === 1;      // 鎖定一班時不用「換班級」
+}
+$("backCls").onclick = () => { $("loginStep1").hidden = false; $("loginStep2").hidden = true; };
+$("confirmNo").onclick = () => { $("confirmBox").hidden = true; };
+$("confirmYes").onclick = async () => {
+  $("confirmBox").hidden = true;
+  const r = await api("/api/login", {sid: pendingStu.id});
+  if (!r.ok) { $("loginMsg").textContent = r.msg; if (curCls) pickClass(curCls).catch(() => {}); return; }
+  token = r.token;
+  try { localStorage.setItem("tm_token", token); localStorage.setItem("tm_sid", String(r.me.id)); } catch (e) {}
+  ver = 0; startPoll();
+};
+$("btnOut").onclick = async () => {
+  if (hideOut) return;
+  if (!confirmTwice("btnOut", "再按一次登出")) return;
+  await api("/api/p/logout", {token}).catch(() => {});
+  token = ""; try { localStorage.removeItem("tm_token"); } catch (e) {}
+  showLogin();
+};
+const armed = {};
+function confirmTwice(key, msg) {
+  if (armed[key] && Date.now() - armed[key] < 3000) { armed[key] = 0; return true; }
+  armed[key] = Date.now(); toast(msg); return false;
+}
+
+/* ------------------------------------------------------------------ 狀態（長輪詢） */
+async function startPoll() {
+  if (polling) return;
+  polling = true;
+  while (token) {
+    try {
+      const v = await api("/api/p/state?token=" + encodeURIComponent(token) + "&since=" + ver);
+      $("net").hidden = true;
+      if (v.error === "gone") {
+        token = ""; try { localStorage.removeItem("tm_token"); } catch (e) {}
+        polling = false;
+        if (SEAT) { seatRelogin(); return; }       // 放棄時 seatRelogin 自己會顯示原因
+        showLogin("你已經登出了（可能在別台電腦登入，或老師更新了名單、改了上課班級），請重新選名字");
+        return;
+      }
+      if (v.build && v.build !== BUILD && screen !== "scrType" && screen !== "scrDrill") { location.reload(); return; }
+      offset = v.now * 1000 - Date.now();
+      ver = v.ver; onState(v);
+    } catch (e) {
+      $("net").hidden = false; await sleep(2000);
+    }
+  }
+  polling = false;
+}
+function onState(v) {
+  const first = !me;
+  me = v.me; lastState = v;
+  hideOut = !!(v.guard && v.guard.hide_logout);
+  $("btnOut").hidden = hideOut || !me || screen === "scrType";
+  $("who").innerHTML = esc(me.cls) + "　" + me.seat + " 號 <b>" + esc(me.name) + "</b>";
+  renderTests(v.tests);
+  if (v.attempt && v.attempt.status === "running" && !(screen === "scrType" && ty && ty.mode === "test")) {
+    enterTest(v.attempt); return;
+  }
+  if (first || screen === "scrLogin") goHome();
+}
+function renderTests(tests) {
+  $("testBox").hidden = !tests.length;
+  $("testList").innerHTML = "";
+  tests.forEach(t => {
+    const d = document.createElement("div"); d.className = "test-item";
+    const info = (t.kind === "timed" ? "限時 " : "定量，最多 ") + fmtSec(t.seconds) + "　" + (t.lang === "zh" ? "中文" : "英文") + "　" + t.len + " 字";
+    d.innerHTML = "<b>" + esc(t.title) + "</b><span class='muted'>" + info + "</span>";
+    const b = document.createElement("button");
+    b.style.marginLeft = "auto";
+    if (t.my === "done") { b.className = "btn g sm"; b.textContent = "✔ 已完成"; b.disabled = true; }
+    else { b.className = "btn"; b.textContent = t.my === "running" ? "繼續測驗 ▶" : "開始測驗 ▶"; b.onclick = () => readyTest(t); }
+    d.appendChild(b); $("testList").appendChild(d);
+  });
+}
+const fmtSec = s => s >= 60 ? (Math.floor(s / 60) + " 分" + (s % 60 ? " " + s % 60 + " 秒" : "")) : s + " 秒";
+function goHome() { show("scrHome"); if (lastState) renderTests(lastState.tests); }
+$("btnHome").onclick = () => { stopDrill(); goHome(); };
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => {
+  const g = b.dataset.go;
+  if (g === "keys_en" || g === "keys_zy" || g === "spell") showLevels(g);
+  else if (g === "width") startWidth();
+  else if (g === "text") showPick();
+  else if (g === "records") showRecords();
+});
+
+/* ------------------------------------------------------------------ 鍵盤資料 */
+// [code, 一般, Shift, 注音(大千), 寬度, 手指]  手指：0 左小指 1 左無名 2 左中 3 左食 4 拇指 5 右食 6 右中 7 右無名 8 右小指
+const KB = [
+  [["Backquote","`","~","",1,0],["Digit1","1","!","ㄅ",1,0],["Digit2","2","@","ㄉ",1,1],["Digit3","3","#","ˇ",1,2],["Digit4","4","$","ˋ",1,3],["Digit5","5","%","ㄓ",1,3],["Digit6","6","^","ˊ",1,5],["Digit7","7","&","˙",1,5],["Digit8","8","*","ㄚ",1,6],["Digit9","9","(","ㄞ",1,7],["Digit0","0",")","ㄢ",1,8],["Minus","-","_","ㄦ",1,8],["Equal","=","+","",1,8],["Backspace","⌫","","",1.8,9]],
+  [["Tab","Tab","","",1.5,9],["KeyQ","q","Q","ㄆ",1,0],["KeyW","w","W","ㄊ",1,1],["KeyE","e","E","ㄍ",1,2],["KeyR","r","R","ㄐ",1,3],["KeyT","t","T","ㄔ",1,3],["KeyY","y","Y","ㄗ",1,5],["KeyU","u","U","ㄧ",1,5],["KeyI","i","I","ㄛ",1,6],["KeyO","o","O","ㄟ",1,7],["KeyP","p","P","ㄣ",1,8],["BracketLeft","[","{","",1,8],["BracketRight","]","}","",1,8],["Backslash","\\","|","",1.3,8]],
+  [["CapsLock","Caps","","",1.8,9],["KeyA","a","A","ㄇ",1,0],["KeyS","s","S","ㄋ",1,1],["KeyD","d","D","ㄎ",1,2],["KeyF","f","F","ㄑ",1,3],["KeyG","g","G","ㄕ",1,3],["KeyH","h","H","ㄘ",1,5],["KeyJ","j","J","ㄨ",1,5],["KeyK","k","K","ㄜ",1,6],["KeyL","l","L","ㄠ",1,7],["Semicolon",";",":","ㄤ",1,8],["Quote","'","\"","",1,8],["Enter","Enter","","",2,9]],
+  [["ShiftLeft","Shift","","",2.3,0],["KeyZ","z","Z","ㄈ",1,0],["KeyX","x","X","ㄌ",1,1],["KeyC","c","C","ㄏ",1,2],["KeyV","v","V","ㄒ",1,3],["KeyB","b","B","ㄖ",1,3],["KeyN","n","N","ㄙ",1,5],["KeyM","m","M","ㄩ",1,5],["Comma",",","<","ㄝ",1,6],["Period",".",">","ㄡ",1,7],["Slash","/","?","ㄥ",1,8],["ShiftRight","Shift","","",2.5,8]],
+  [["Space","空白鍵","","一聲",7,4]],
+];
+const FINGER = ["左手小指","左手無名指","左手中指","左手食指","大拇指","右手食指","右手中指","右手無名指","右手小指",""];
+const CHAR2KEY = {}, ZY2CODE = {}, CODE2KEY = {};
+KB.flat().forEach(k => {
+  CODE2KEY[k[0]] = k;
+  if (k[1].length === 1) CHAR2KEY[k[1]] = {code: k[0], shift: false, f: k[5]};
+  if (k[2].length === 1) CHAR2KEY[k[2]] = {code: k[0], shift: true, f: k[5]};
+  if (k[3]) ZY2CODE[k[3]] = k[0];
+});
+CHAR2KEY[" "] = {code: "Space", shift: false, f: 4};
+ZY2CODE[" "] = "Space";
+
+function buildKb(zy) {
+  const kb = $("kb"); kb.innerHTML = ""; kb.className = "kb" + (zy ? " zy" : "");
+  KB.forEach(row => {
+    const r = document.createElement("div"); r.className = "row";
+    row.forEach(k => {
+      const d = document.createElement("div");
+      d.className = "k f" + k[5]; d.id = "k_" + k[0];
+      d.style.width = (52 * k[4] + 6 * (k[4] - 1)) + "px";
+      if (zy) d.innerHTML = (k[3] ? "<span class='main'>" + esc(k[1]) + "</span><span class='zy'>" + esc(k[3]) + "</span>" : "<span style='font-size:13px'>" + esc(k[1]) + "</span>");
+      else d.innerHTML = (k[2] && k[2] !== k[1].toUpperCase() ? "<span class='sh'>" + esc(k[2]) + "</span>" : "") + "<span>" + esc(k[1].length === 1 ? k[1].toUpperCase() : k[1]) + "</span>";
+      r.appendChild(d);
+    });
+    kb.appendChild(r);
+  });
+  const lg = $("kbLegend"); lg.innerHTML = "";
+  [0,1,2,3,4].forEach(f => { const s = document.createElement("span"); s.className = "f" + f; s.textContent = FINGER[f].replace("左手", "") ; lg.appendChild(s); });
+  lg.insertAdjacentHTML("afterbegin", "<b>手指顏色：</b>");
+}
+function lightKey(code, shift) {
+  document.querySelectorAll(".kb .k.on").forEach(e => e.classList.remove("on"));
+  const e = $("k_" + code); if (e) e.classList.add("on");
+  if (shift) { const k = CODE2KEY[code]; const sh = k && k[5] <= 3 ? "ShiftRight" : "ShiftLeft"; const s = $("k_" + sh); if (s) s.classList.add("on"); }
+}
+function flashMiss(code) { const e = $("k_" + code); if (!e) return; e.classList.add("miss"); setTimeout(() => e.classList.remove("miss"), 350); }
+
+/* ------------------------------------------------------------------ 關卡 */
+const WORDS = "cat dog sun red cup box pen map hat bus fish bird book tree milk cake frog duck star moon rain blue pink girl boy desk ball kite lion bear apple happy water sweet".split(" ");
+const PUNCT = [",", ".", ";", ":", "'", "\"", "?", "!", "-", "_", "(", ")", "/"];
+const ZY_INIT = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙ".split("");
+const ZY_MED = "ㄧㄨㄩ".split("");
+const ZY_FIN = "ㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ".split("");
+const ZY_TONE = ["ˊ", "ˇ", "ˋ", "˙", " "];
+const SPELL = ("大ㄉㄚˋ 小ㄒㄧㄠˇ 人ㄖㄣˊ 天ㄊㄧㄢ 山ㄕㄢ 水ㄕㄨㄟˇ 火ㄏㄨㄛˇ 木ㄇㄨˋ 土ㄊㄨˇ 日ㄖˋ 月ㄩㄝˋ 花ㄏㄨㄚ 草ㄘㄠˇ 魚ㄩˊ 鳥ㄋㄧㄠˇ " +
+  "貓ㄇㄠ 狗ㄍㄡˇ 牛ㄋㄧㄡˊ 羊ㄧㄤˊ 馬ㄇㄚˇ 雨ㄩˇ 風ㄈㄥ 雲ㄩㄣˊ 書ㄕㄨ 筆ㄅㄧˇ 紙ㄓˇ 桌ㄓㄨㄛ 門ㄇㄣˊ 家ㄐㄧㄚ 學ㄒㄩㄝˊ 校ㄒㄧㄠˋ 老ㄌㄠˇ 師ㄕ " +
+  "我ㄨㄛˇ 你ㄋㄧˇ 他ㄊㄚ 好ㄏㄠˇ 吃ㄔ 喝ㄏㄜ 走ㄗㄡˇ 跑ㄆㄠˇ 跳ㄊㄧㄠˋ 看ㄎㄢˋ 聽ㄊㄧㄥ 說ㄕㄨㄛ 唱ㄔㄤˋ 歌ㄍㄜ 玩ㄨㄢˊ 手ㄕㄡˇ 口ㄎㄡˇ 耳ㄦˇ " +
+  "心ㄒㄧㄣ 爸ㄅㄚˋ 媽ㄇㄚ 哥ㄍㄜ 姐ㄐㄧㄝˇ 弟ㄉㄧˋ 妹ㄇㄟˋ 紅ㄏㄨㄥˊ 黃ㄏㄨㄤˊ 藍ㄌㄢˊ 綠ㄌㄩˋ 白ㄅㄞˊ 黑ㄏㄟ 春ㄔㄨㄣ 夏ㄒㄧㄚˋ 秋ㄑㄧㄡ 冬ㄉㄨㄥ " +
+  "東ㄉㄨㄥ 西ㄒㄧ 南ㄋㄢˊ 北ㄅㄟˇ 上ㄕㄤˋ 下ㄒㄧㄚˋ 左ㄗㄨㄛˇ 右ㄧㄡˋ 中ㄓㄨㄥ 一ㄧ 二ㄦˋ 三ㄙㄢ 四ㄙˋ 五ㄨˇ 六ㄌㄧㄡˋ 七ㄑㄧ 八ㄅㄚ 九ㄐㄧㄡˇ 十ㄕˊ " +
+  "百ㄅㄞˇ 千ㄑㄧㄢ 車ㄔㄜ 船ㄔㄨㄢˊ 飛ㄈㄟ 光ㄍㄨㄤ 星ㄒㄧㄥ 海ㄏㄞˇ 河ㄏㄜˊ 石ㄕˊ 田ㄊㄧㄢˊ 米ㄇㄧˇ 果ㄍㄨㄛˇ 菜ㄘㄞˋ 茶ㄔㄚˊ 蛋ㄉㄢˋ 肉ㄖㄡˋ " +
+  "雪ㄒㄩㄝˇ 冰ㄅㄧㄥ 熊ㄒㄩㄥˊ 虎ㄏㄨˇ 兔ㄊㄨˋ 龍ㄌㄨㄥˊ 蛇ㄕㄜˊ 猴ㄏㄡˊ 雞ㄐㄧ 豬ㄓㄨ 鼠ㄕㄨˇ 快ㄎㄨㄞˋ 樂ㄌㄜˋ 愛ㄞˋ 謝ㄒㄧㄝˋ 字ㄗˋ 打ㄉㄚˇ 高ㄍㄠ " +
+  "會ㄏㄨㄟˋ 要ㄧㄠˋ 去ㄑㄩˋ 來ㄌㄞˊ 有ㄧㄡˇ 是ㄕˋ 在ㄗㄞˋ 不ㄅㄨˋ 早ㄗㄠˇ 晚ㄨㄢˇ 安ㄢ 生ㄕㄥ 年ㄋㄧㄢˊ 朋ㄆㄥˊ 友ㄧㄡˇ 森ㄙㄣ 林ㄌㄧㄣˊ " +
+  "鞋ㄒㄧㄝˊ 衣ㄧ 帽ㄇㄠˋ 窗ㄔㄨㄤ 燈ㄉㄥ 錢ㄑㄧㄢˊ 刀ㄉㄠ 尺ㄔˇ 瓜ㄍㄨㄚ 皮ㄆㄧˊ 毛ㄇㄠˊ").split(" ").map(s => {
+    const ch = Array.from(s)[0]; let zy = Array.from(s).slice(1);
+    if (!["ˊ","ˇ","ˋ","˙"].includes(zy[zy.length - 1])) zy.push(" ");
+    return {ch, zy};
+  });
+const LEVELS = {
+  keys_en: {title: "🔤 英文鍵位練習", desc: "請先把輸入法切成「英」（按一下 Shift）。手指放在基準列 A S D F　J K L ;，看螢幕上的鍵盤找位置，眼睛不要看手喔！", list: [
+    {id: "home", name: "① 基準列", sub: "a s d f g h j k l ;", keys: "asdfghjkl;"},
+    {id: "top", name: "② 上排", sub: "q w e r t y u i o p", keys: "qwertyuiop"},
+    {id: "bottom", name: "③ 下排", sub: "z x c v b n m , . /", keys: "zxcvbnm,./"},
+    {id: "all", name: "④ 全部字母", sub: "26 個小寫字母", keys: "abcdefghijklmnopqrstuvwxyz"},
+    {id: "upper", name: "⑤ 大寫字母", sub: "按住另一手的 Shift", keys: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"},
+    {id: "num", name: "⑥ 數字", sub: "1 2 3 4 5 6 7 8 9 0", keys: "1234567890"},
+    {id: "shift", name: "⑦ 上排符號", sub: "! @ # $ % ^ & * ( )", keys: "!@#$%^&*()"},
+    {id: "punct", name: "⑧ 標點符號（半形）", sub: ", . ; : ' \" ? ! - _ ( ) /", keys: PUNCT.join("")},
+    {id: "words", name: "⑨ 常用英文單字", sub: "cat dog apple…", words: true},
+  ]},
+  keys_zy: {title: "ㄅ 注音鍵位練習", desc: "請把輸入法切成「中」。這裡看的是你按了鍵盤上的哪一個鍵，所以不用選字。先記住聲母，再記韻母和聲調。", list: [
+    {id: "zy_init1", name: "① 聲母（上）", sub: "ㄅㄆㄇㄈ ㄉㄊㄋㄌ ㄍㄎㄏ", zy: ZY_INIT.slice(0, 11)},
+    {id: "zy_init2", name: "② 聲母（下）", sub: "ㄐㄑㄒ ㄓㄔㄕㄖ ㄗㄘㄙ", zy: ZY_INIT.slice(11)},
+    {id: "zy_fin", name: "③ 介音和韻母", sub: "ㄧㄨㄩ ㄚㄛㄜㄝ ㄞㄟㄠㄡ ㄢㄣㄤㄥㄦ", zy: ZY_MED.concat(ZY_FIN)},
+    {id: "zy_tone", name: "④ 聲調", sub: "ˊ ˇ ˋ ˙ 和一聲（空白鍵）", zy: ZY_TONE},
+    {id: "zy_all", name: "⑤ 全部注音", sub: "37 個注音＋聲調", zy: ZY_INIT.concat(ZY_MED, ZY_FIN, ZY_TONE)},
+  ]},
+  spell: {title: "🐻 注音拼字", desc: "看國字，照順序按出注音和聲調（一聲按空白鍵）。這裡只看按鍵，不用選字喔！", list: [
+    {id: "spell_1", name: "① 簡單的字", sub: "大、小、山、水⋯", spell: SPELL.filter(s => s.zy.length <= 3)},
+    {id: "spell_2", name: "② 有介音的字", sub: "天、花、鳥、學⋯", spell: SPELL.filter(s => s.zy.length >= 4)},
+    {id: "spell_all", name: "③ 全部混合", sub: SPELL.length + " 個常用字", spell: SPELL},
+  ]},
+};
+let lvGroup = "";
+function bestKey(id) { return null; }
+function saveBest(id, v) {}
+function showLevels(g) {
+  lvGroup = g; const L = LEVELS[g];
+  $("lvTitle").textContent = L.title; $("lvDesc").textContent = L.desc;
+  const box = $("lvList"); box.innerHTML = "";
+  L.list.forEach(lv => {
+    const b = document.createElement("button"); const best = bestKey(lv.id);
+    b.innerHTML = (best ? "<span class='best'>最佳 " + best.kpm + "</span>" : "") + "<b>" + esc(lv.name) + "</b><small>" + esc(lv.sub) + "</small>";
+    b.onclick = () => startDrill(g, lv);
+    box.appendChild(b);
+  });
+  show("scrLevels");
+}
+
+/* ------------------------------------------------------------------ 鍵位練習 */
+let dr = null;
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function pickN(pool, n) { const out = []; while (out.length < n) out.push(...shuffle(pool)); return out.slice(0, n); }
+function makeUnits(g, lv) {
+  if (lv.words) return pickN(WORDS, 12).map(w => ({label: w, keys: Array.from(w).map(c => ({want: c, show: c}))}));
+  if (lv.spell) return pickN(lv.spell, 15).map(s => ({label: s.ch, sub: s.zy.join("").replace(" ", ""), keys: s.zy.map(z => ({want: ZY2CODE[z], show: z === " " ? "空白" : z}))}));
+  if (lv.zy) return pickN(lv.zy, 30).map(z => ({label: z === " " ? "一聲" : z, keys: [{want: ZY2CODE[z], show: z === " " ? "空白" : z}]}));
+  return pickN(Array.from(lv.keys), 30).map(c => ({label: c, keys: [{want: c, show: c}]}));
+}
+function startDrill(g, lv) {
+  const zy = g !== "keys_en";
+  buildKb(zy);
+  dr = {g, lv, zy, units: makeUnits(g, lv), u: 0, k: 0, hits: 0, miss: 0, presses: 0, t0: 0, weak: {}, timer: 0, done: false};
+  $("drTitle").textContent = lv.name;
+  show("scrDrill");
+  drRender();
+  dr.timer = setInterval(drTick, 250);
+}
+function stopDrill() { if (dr) { clearInterval(dr.timer); dr.done = true; } }
+function drTick() {
+  if (!dr || !dr.t0) return;
+  const s = (Date.now() - dr.t0) / 1000;
+  $("drTime").textContent = Math.floor(s);
+  $("drKpm").textContent = s > 2 ? Math.round(dr.hits / s * 60) : "-";
+}
+function drRender() {
+  const u = dr.units[dr.u]; if (!u) return;
+  const key = $("drKey"); key.textContent = u.label;
+  key.style.fontSize = Array.from(u.label).length > 3 ? "60px" : "";
+  $("drQueue").innerHTML = dr.units.slice(dr.u + 1, dr.u + 6).map(x => "<span>" + esc(x.label) + "</span>").join("");
+  const seq = $("drSeq");
+  seq.innerHTML = u.keys.length > 1 || dr.lv.spell ? u.keys.map((k, i) => "<span class='" + (i < dr.k ? "done" : i === dr.k ? "cur" : "") + "'>" + esc(k.show) + "</span>").join("") : "";
+  const want = u.keys[dr.k];
+  let code, shift = false, f;
+  if (dr.zy) { code = want.want; f = CODE2KEY[code] ? CODE2KEY[code][5] : 9; }
+  else { const m = CHAR2KEY[want.want] || {}; code = m.code; shift = m.shift; f = m.f; }
+  lightKey(code, shift);
+  const hint = $("drHint"); hint.classList.remove("warn");
+  hint.textContent = "用 " + (FINGER[f] || "") + " 按" + (shift ? "（另一手按住 Shift）" : "");
+  $("drProg").textContent = dr.u + "/" + dr.units.length;
+  $("drBar").style.width = (dr.u / dr.units.length * 100) + "%";
+  $("drAcc").textContent = dr.presses ? Math.round(dr.hits / dr.presses * 100) + "%" : "-";
+}
+document.addEventListener("keydown", e => {
+  if (screen !== "scrDrill" || !dr || dr.done) return;
+  if (["Shift", "Control", "Alt", "Meta", "CapsLock", "Tab", "Escape"].includes(e.key) || /^F\d+$/.test(e.key) || e.ctrlKey || e.altKey || e.metaKey) return;
+  e.preventDefault();
+  const u = dr.units[dr.u], want = u.keys[dr.k];
+  if (!dr.zy && (e.key === "Process" || e.key === "Unidentified" || e.keyCode === 229)) {
+    const h = $("drHint"); h.textContent = "⚠ 輸入法現在是「中」，請按一下 Shift 切成「英」"; h.classList.add("warn"); return;
+  }
+  if (!dr.t0) dr.t0 = Date.now();
+  dr.presses++;
+  const ok = dr.zy ? e.code === want.want : e.key === want.want;
+  const key = $("drKey");
+  if (ok) {
+    dr.hits++; dr.k++;
+    key.classList.remove("ok", "bad"); void key.offsetWidth; key.classList.add("ok");
+    if (dr.k >= u.keys.length) { dr.u++; dr.k = 0; }
+    if (dr.u >= dr.units.length) return drFinish();
+    drRender();
+  } else {
+    dr.miss++;
+    const w = want.show; dr.weak[w] = (dr.weak[w] || 0) + 1;
+    key.classList.remove("ok", "bad"); void key.offsetWidth; key.classList.add("bad");
+    flashMiss(e.code);
+    $("drAcc").textContent = Math.round(dr.hits / dr.presses * 100) + "%";
+    if (!dr.zy && want.want.toLowerCase() === e.key.toLowerCase() && want.want !== e.key) {
+      const h = $("drHint"); h.textContent = want.want === want.want.toUpperCase() ? "要打大寫喔：按住 Shift" : "要打小寫喔：放開 Shift，或檢查 Caps Lock"; h.classList.add("warn");
+    }
+  }
+});
+function drFinish() {
+  stopDrill();
+  const s = Math.max(1, (Date.now() - dr.t0) / 1000);
+  const kpm = Math.round(dr.hits / s * 60), acc = Math.round(dr.hits / Math.max(1, dr.presses) * 1000) / 10;
+  saveBest(dr.lv.id, {kpm, acc});
+  const kind = dr.g === "keys_en" ? "key_en" : dr.g === "keys_zy" ? "key_zy" : "spell";
+  const weak = Object.entries(dr.weak).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  api("/api/p/practice", {token, kind, title: dr.lv.name, speed: kpm, unit: "鍵/分", accuracy: acc,
+    extra: weak.length ? "常錯：" + weak.map(w => w[0] + "×" + w[1]).join(" ") : ""}).catch(() => {});
+  showDrillEnd("🎉 " + dr.lv.name + " 完成！", [["每分鐘按鍵", kpm], ["準確率", acc + "%"], ["用時", Math.round(s) + " 秒"], ["按錯", dr.miss + " 次"]], weak,
+    () => startDrill(dr.g, dr.lv), () => showLevels(dr.g));
+}
+function showDrillEnd(title, stats, weak, again, back) {
+  $("deTitle").textContent = title;
+  $("deStats").innerHTML = stats.map(s => "<div class='stat'><small>" + s[0] + "</small>" + esc(s[1]) + "</div>").join("");
+  $("deWeak").innerHTML = weak.length ? "<p><b>要多練習的鍵：</b></p><div class='wrong-list'>" + weak.map(w => "<span>" + esc(w[0]) + " <small>錯 " + w[1] + " 次</small></span>").join("") + "</div>" : "<p>🌟 全部都對，太厲害了！</p>";
+  $("deAgain").onclick = again; $("deLevels").onclick = back;
+  show("scrDrillEnd");
+}
+$("drQuit").onclick = () => { stopDrill(); showLevels(dr.g); };
+
+/* ------------------------------------------------------------------ 全形半形 */
+const WIDTH_ITEMS = [
+  ["，", "全形逗號"], ["。", "句號（中文）"], ["？", "全形問號"], ["！", "全形驚嘆號"], ["：", "全形冒號"], ["「", "上引號"], ["」", "下引號"],
+  ["、", "頓號"], ["；", "全形分號"], ["（", "全形左括號"], ["）", "全形右括號"], ["Ａ", "全形 A"], ["１", "全形 1"],
+  [",", "半形逗號"], [".", "半形句點"], ["?", "半形問號"], ["!", "半形驚嘆號"], [":", "半形冒號"], [";", "半形分號"],
+  ["(", "半形左括號"], [")", "半形右括號"], ["A", "半形 A"], ["1", "半形 1"], ["\"", "半形雙引號"], ["@", "半形小老鼠"],
+];
+let wd = null;
+function startWidth() {
+  wd = {items: pickN(WIDTH_ITEMS, 16), i: 0, ok: 0, miss: 0, t0: Date.now(), weak: {}, tries: 0};
+  show("scrWidth"); wdRender();
+}
+function wdRender() {
+  const it = wd.items[wd.i];
+  const full = widthName(it[0]) === "全形" || it[0] === "。" || it[0] === "、";
+  $("wdChar").textContent = it[0];
+  $("wdTag").innerHTML = "<span class='" + (full ? "full" : "half") + "'>" + (full ? "全形" : "半形") + "</span>　" + esc(it[1]);
+  $("wdProg").textContent = wd.i + "/" + wd.items.length; $("wdOk").textContent = wd.ok;
+  $("wdHint").textContent = ""; $("wdHint").classList.remove("warn");
+  const inp = $("wdInput"); inp.value = ""; inp.focus();
+  wd.tries = 0;
+}
+let wdComposing = false;
+$("wdInput").addEventListener("compositionstart", () => wdComposing = true);
+$("wdInput").addEventListener("compositionend", () => { wdComposing = false; wdCheck(); });
+$("wdInput").addEventListener("input", e => { if (!wdComposing && !e.isComposing) wdCheck(); });
+function wdCheck() {
+  const inp = $("wdInput"), v = Array.from(inp.value.trim());
+  if (!v.length || !wd) return;
+  const got = v[v.length - 1], it = wd.items[wd.i], h = $("wdHint");
+  if (got === it[0]) {
+    if (!wd.tries) wd.ok++;
+    wd.i++;
+    h.textContent = "✔ 答對了！"; h.classList.remove("warn");
+    if (wd.i >= wd.items.length) return setTimeout(wdFinish, 300);
+    setTimeout(wdRender, 350);
+  } else {
+    wd.tries++; wd.miss++; wd.weak[it[0]] = (wd.weak[it[0]] || 0) + 1;
+    const wn = widthName(got) || "中文字";
+    h.innerHTML = "✘ 你打的是「" + esc(got) + "」（" + wn + "），要打的是「" + esc(it[0]) + "」（" + (widthName(it[0]) || "全形") + "）";
+    h.classList.add("warn");
+    inp.value = "";
+  }
+}
+function wdFinish() {
+  const s = Math.round((Date.now() - wd.t0) / 1000), acc = Math.round(wd.ok / wd.items.length * 1000) / 10;
+  const weak = Object.entries(wd.weak).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  api("/api/p/practice", {token, kind: "width", title: "全形半形符號", speed: wd.ok, unit: "題對", accuracy: acc,
+    extra: weak.length ? "常錯：" + weak.map(w => w[0] + "×" + w[1]).join(" ") : ""}).catch(() => {});
+  showDrillEnd("🎉 全形半形練習完成！", [["一次就答對", wd.ok + " / " + wd.items.length], ["用時", s + " 秒"]], weak, startWidth, goHome);
+}
+$("wdQuit").onclick = goHome;
+
+/* ------------------------------------------------------------------ 文章練習 */
+let pickBank = null;
+async function showPick() {
+  show("scrPick");
+  $("pickPassages").hidden = true; $("pickBanks").hidden = false;
+  const v = await api("/api/p/banks?token=" + encodeURIComponent(token));
+  const box = $("pickBanks"); box.innerHTML = "";
+  (v.banks || []).forEach(b => {
+    const x = document.createElement("button");
+    x.innerHTML = "<b>" + esc(b.title) + "</b><small>" + b.count + " 篇</small>";
+    x.onclick = () => openBank(b.file);
+    box.appendChild(x);
+  });
+  if (!(v.banks || []).length) box.innerHTML = "<p class='muted'>目前沒有練習用的文章。</p>";
+}
+async function openBank(fn) {
+  pickBank = await api("/api/p/bank?token=" + encodeURIComponent(token) + "&file=" + encodeURIComponent(fn));
+  $("pickBankName").textContent = pickBank.title;
+  const box = $("pickList"); box.innerHTML = "";
+  pickBank.passages.forEach((p, i) => {
+    const x = document.createElement("button");
+    x.innerHTML = "<b>" + esc(p.title) + "</b><small>" + (p.lang === "zh" ? "中文" : "英文") + "・" + Array.from(p.text).length + " 字</small>";
+    x.onclick = () => startPractice(i);
+    box.appendChild(x);
+  });
+  $("pickBanks").hidden = true; $("pickPassages").hidden = false;
+}
+$("pickBack").onclick = showPick;
+function startPractice(i) {
+  const p = pickBank.passages[i];
+  const cfg = Object.assign({}, DEF, {target: p.target || 10, strict_width: !!p.strict_width});
+  startTyping({mode: "practice", title: p.title, passage: p.text, lang: p.lang, cfg, bank: pickBank.file, idx: i});
+}
+
+/* ------------------------------------------------------------------ 測驗 */
+let readyT = null;
+function readyTest(t) {
+  readyT = t;
+  $("rdTitle").textContent = "📝 " + t.title;
+  $("rdInfo").innerHTML = (t.kind === "timed" ? "⏱ 限時 <b>" + fmtSec(t.seconds) + "</b>，時間到就自動交卷。能打多少就打多少！" :
+    "📄 打完整篇就交卷，最多 <b>" + fmtSec(t.seconds) + "</b>。") +
+    "<br>按下開始後會倒數 3 秒。<br><span class='muted'>測驗中不能貼上，也不要切換到別的視窗喔。</span>";
+  $("rdMsg").textContent = "";
+  show("scrReady");
+}
+$("rdGo").onclick = async () => {
+  $("rdGo").disabled = true;
+  try {
+    const r = await api("/api/p/start", {token, test: readyT.id});
+    if (!r.ok) { $("rdMsg").textContent = r.msg; return; }
+    offset = r.attempt.now * 1000 - Date.now();
+    enterTest(r.attempt);
+  } finally { $("rdGo").disabled = false; }
+};
+function enterTest(a) {
+  if (a.now) offset = a.now * 1000 - Date.now();
+  startTyping({mode: "test", testId: a.test_id, title: a.title, passage: a.passage, lang: a.lang, cfg: a.cfg,
+    started: a.started, deadline: a.deadline, typed: a.typed, bs: a.backspaces, blurs: a.blurs});
+}
+
+/* ------------------------------------------------------------------ 打字畫面 */
+let ty = null;
+function startTyping(o) {
+  if (ty) clearInterval(ty.timer);
+  const chars = Array.from(o.passage);
+  ty = Object.assign({bs: 0, blurs: 0, flags: 0, typed: "", composing: false, prevStatus: [], t0: 0, finished: false, lastSent: "", lastSentAt: 0}, o);
+  ty.chars = chars;
+  const tg = $("tyTarget"); tg.className = "target" + (o.lang === "en" ? " en" : ""); tg.innerHTML = "";
+  chars.forEach((c, i) => {
+    const s = document.createElement("span"); s.textContent = c;
+    if (c === " ") s.classList.add("sp");
+    if (o.cfg.strict_width && isFull(c)) { s.classList.add("fw"); s.title = "全形"; }
+    tg.appendChild(s);
+  });
+  ty.spans = Array.from(tg.children);
+  const inp = $("tyInput"); inp.className = "typing" + (o.lang === "en" ? " en" : "");
+  inp.value = o.typed || ""; inp.disabled = false;
+  $("tyTitle").textContent = o.title;
+  $("tyMode").textContent = o.mode === "test" ? "📝 測驗" : "📖 練習";
+  $("tyUnit").textContent = o.lang === "zh" ? "字/分" : "WPM";
+  $("tyTimeLbl").textContent = o.mode === "test" ? "剩下" : "時間";
+  const noBs = o.mode === "test" && !o.cfg.allow_backspace;
+  $("tyNote").textContent = (o.cfg.strict_width ? "⚠ 這篇全形、半形要分清楚（虛線框的是全形）。" : "") + (noBs ? "⚠ 這次測驗不能按退格修改。" : "");
+  $("tyDone").textContent = o.mode === "test" ? "✅ 交卷" : "✅ 我打完了";
+  show("scrType");
+  if (o.mode === "test") {
+    ty.t0 = o.started;
+    if (sNow() < o.started) countdown();
+  }
+  typedChanged(true);
+  ty.timer = setInterval(tyTick, 200);
+  setTimeout(() => inp.focus(), 50);
+}
+function countdown() {
+  const box = $("countdown"), inp = $("tyInput");
+  inp.disabled = true; box.hidden = false;
+  const step = () => {
+    if (!ty || ty.mode !== "test") { box.hidden = true; return; }
+    const left = ty.started - sNow();
+    if (left <= 0) { box.hidden = true; inp.disabled = false; inp.focus(); return; }
+    box.textContent = Math.ceil(left);
+    setTimeout(step, 100);
+  };
+  step();
+}
+function elapsed() {
+  if (ty.mode === "test") return Math.max(0, Math.min(sNow(), ty.deadline) - ty.started);
+  return ty.t0 ? (Date.now() - ty.t0) / 1000 : 0;
+}
+function tyTick() {
+  if (!ty || ty.finished) return;
+  const tm = $("tyTime");
+  if (ty.mode === "test") {
+    const left = Math.max(0, ty.deadline - sNow());
+    tm.textContent = fmtClock(left);
+    tm.classList.toggle("low", left <= 10 && sNow() >= ty.started);
+    if (left <= 0) return finishTyping("time");
+    const now = Date.now();
+    if (sNow() >= ty.started && (ty.typed !== ty.lastSent && now - ty.lastSentAt > 2000 || now - ty.lastSentAt > 6000)) sendProgress();
+  } else {
+    tm.textContent = fmtClock(elapsed());
+  }
+  if (ty.al && Math.floor(Date.now() / 1000) !== ty.lastStatSec) { ty.lastStatSec = Math.floor(Date.now() / 1000); updateStats(); }
+}
+const fmtClock = s => { s = Math.ceil(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+function updateStats() {
+  const sc = scoreLive(ty.typed, ty.passage, elapsed(), ty.cfg, ty.lang, ty.al);
+  ty.live = {pct: sc.completion, speed: sc.speed, acc: sc.accuracy, errors: sc.errors};
+  $("tySpeed").textContent = elapsed() >= 3 ? sc.speed : "-";
+  $("tyAcc").textContent = ty.typed ? sc.accuracy + "%" : "-";
+  $("tyPct").textContent = Math.floor(sc.completion) + "%";
+  $("tyBar").style.width = sc.completion + "%";
+}
+async function sendProgress() {
+  ty.lastSentAt = Date.now(); ty.lastSent = ty.typed;
+  try {
+    const r = await api("/api/p/progress", {token, test: ty.testId, typed: ty.typed, bs: ty.bs, blurs: ty.blurs, flags: ty.flags, live: ty.live || {}});
+    if (!r.ok && r.msg === "done" && ty && !ty.finished) finishTyping("server");
+  } catch (e) {}
+}
+function typedChanged(force) {
+  const inp = $("tyInput");
+  let v = inp.value;
+  if (/[\r\n]/.test(v)) { v = v.replace(/[\r\n]/g, ""); inp.value = v; }
+  if (!force && v === ty.typed) return;
+  if (ty.mode === "practice" && !ty.t0 && v) ty.t0 = Date.now();
+  ty.typed = v;
+  const al = align(v, ty.passage, ty.cfg.strict_width);
+  ty.al = al;
+  const st = al.status, prev = ty.prevStatus;
+  const cls = ["", "ok", "bad", "miss"];
+  for (let i = 0; i < ty.spans.length; i++) {
+    const want = (st[i] || 0) + (i === al.end ? 10 : 0);
+    if (prev[i] !== want) {
+      const sp = ty.spans[i];
+      sp.classList.remove("ok", "bad", "miss", "cur");
+      if (st[i]) sp.classList.add(cls[st[i]]);
+      if (i === al.end) sp.classList.add("cur");
+      prev[i] = want;
+    }
+  }
+  const cur = ty.spans[Math.min(al.end, ty.spans.length - 1)];
+  if (cur) { const tg = $("tyTarget"); const top = cur.offsetTop - tg.offsetTop; if (top > tg.scrollTop + tg.clientHeight - 80 || top < tg.scrollTop) tg.scrollTop = top - 60; }
+  updateStats();
+  if (!ty.composing && al.end >= ty.chars.length) finishTyping("done");
+}
+const tyInp = $("tyInput");
+tyInp.addEventListener("compositionstart", () => { if (ty) ty.composing = true; });
+tyInp.addEventListener("compositionend", () => { if (ty) { ty.composing = false; typedChanged(); } });
+tyInp.addEventListener("input", e => {
+  if (!ty || ty.finished) return;
+  if (e.isComposing || ty.composing) return;
+  const grow = Array.from(tyInp.value).length - Array.from(ty.typed).length;
+  if (ty.lang === "en" && grow > 3 && e.inputType !== "insertCompositionText") ty.flags++;
+  typedChanged();
+});
+tyInp.addEventListener("keydown", e => {
+  if (!ty || ty.finished) return;
+  if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); return; }
+  const composing = e.isComposing || e.keyCode === 229;
+  const noBs = ty.mode === "test" && !ty.cfg.allow_backspace;
+  if ((e.key === "Backspace" || e.key === "Delete") && !composing) {
+    if (noBs) { e.preventDefault(); toast("這次測驗不能修改喔，繼續往下打！"); return; }
+    ty.bs++;
+  }
+  if (noBs && !composing && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"].includes(e.key)) e.preventDefault();
+  if ((e.ctrlKey || e.metaKey) && ["v", "V", "z", "Z", "y", "Y", "x", "X"].includes(e.key)) { e.preventDefault(); }
+});
+["paste", "drop", "cut"].forEach(ev => tyInp.addEventListener(ev, e => { e.preventDefault(); if (ty) { ty.flags++; toast("不能貼上喔，要自己打 😊"); } }));
+tyInp.addEventListener("contextmenu", e => e.preventDefault());
+tyInp.addEventListener("mouseup", () => { if (ty && ty.mode === "test" && !ty.cfg.allow_backspace) { const n = tyInp.value.length; tyInp.setSelectionRange(n, n); } });
+window.addEventListener("blur", () => { if (ty && !ty.finished && screen === "scrType" && ty.mode === "test" && sNow() >= ty.started) { ty.blurs++; } });
+window.addEventListener("focus", () => { if (ty && !ty.finished && screen === "scrType" && ty.mode === "test" && ty.blurs) toast("測驗中請不要離開這個視窗喔（第 " + ty.blurs + " 次）"); });
+$("tyDone").onclick = () => {
+  if (!ty || ty.finished) return;
+  if (ty.mode === "test" && !confirmTwice("submit", "確定要交卷嗎？再按一次「交卷」")) return;
+  if (ty.mode === "practice" && !ty.typed) { goHome(); return; }
+  finishTyping("button");
+};
+$("tyTarget").addEventListener("click", () => tyInp.focus());
+
+async function finishTyping(why) {
+  if (!ty || ty.finished) return;
+  if (ty.composing) typedChanged(true);
+  ty.finished = true;
+  clearInterval(ty.timer);
+  tyInp.disabled = true;
+  $("tyTime").classList.remove("low");
+  if (ty.mode === "test") {
+    toast(why === "time" ? "⏰ 時間到！交卷中⋯" : "交卷中⋯");
+    let r = null;
+    for (let i = 0; i < 6 && !r; i++) {
+      try { r = await api("/api/p/submit", {token, test: ty.testId, typed: ty.typed, bs: ty.bs, blurs: ty.blurs, flags: ty.flags}); }
+      catch (e) { await sleep(1500); }
+    }
+    if (!r || !r.ok || !r.attempt) { toast("交卷時連線不穩，老師那邊會用你最後的進度計分"); setTimeout(goHome, 2500); return; }
+    showResult(r.attempt.result, ty, why);
+  } else {
+    const secs = Math.max(1, elapsed());
+    let r = null;
+    try { r = await api("/api/p/score", {token, bank: ty.bank, passage: ty.idx, typed: ty.typed, elapsed: secs, title: ty.title}); } catch (e) {}
+    const s = r && r.result ? r.result : Object.assign(scoreLive(ty.typed, ty.passage, secs, ty.cfg, ty.lang), {unit: ty.lang === "zh" ? "字/分" : "WPM", elapsed: secs});
+    showResult(s, ty, why);
+  }
+}
+function showResult(s, t, why) {
+  const test = t.mode === "test";
+  $("toast").classList.remove("show");
+  $("rsTitle").textContent = test ? (why === "time" ? "⏰ 時間到！" : "🎉 交卷完成！") : "🎉 練習完成！";
+  $("rsAgain").hidden = test;
+  $("rsAgain").onclick = () => startPractice(t.idx);
+  $("rsHome").onclick = goHome;
+  if (s && s.hidden) {
+    $("rsScore").innerHTML = "<p style='font-size:22px'>已經交卷囉！分數老師之後會公布 😊</p>";
+    $("rsStats").innerHTML = stat("速度", s.speed + " " + s.unit) + stat("準確率", s.accuracy + "%");
+    $("rsFormula").hidden = true; $("rsWrong").innerHTML = "";
+  } else {
+    const cfg = Object.assign({}, DEF, s.cfg || t.cfg);
+    const raw = s.raw != null ? s.raw : null;
+    $("rsScore").innerHTML = raw != null ? "<div class='muted'>" + (test ? "測驗分數" : "練習分數") + "</div><div class='score-big'>" + raw + "</div>" +
+      (s.adj != null ? "<div class='pill'>老師調整後：" + s.adj + " 分</div>" : "") : "";
+    $("rsStats").innerHTML = stat("速度", s.speed + " " + s.unit) + stat("準確率", s.accuracy + "%") + stat("打對", s.correct + " 字") +
+      stat("打錯／漏打", s.errors + " 字") + stat("完成", Math.floor(s.completion) + "%") + stat("用時", Math.round(s.elapsed) + " 秒") +
+      (s.backspaces != null ? stat("修改次數", s.backspaces) : "");
+    $("rsFormula").hidden = raw == null;
+    if (raw != null) $("rsFormula").innerHTML =
+      "⚡ 速度分 <b>" + s.speed_score + "</b>（" + s.speed + " ÷ 目標 " + cfg.target + " " + s.unit + "）× " + cfg.w_speed + "%<br>" +
+      "🎯 準確分 <b>" + s.acc_score + "</b>（準確率 " + s.accuracy + "%，從 " + cfg.acc_floor + "% 起算）× " + (100 - cfg.w_speed) + "%<br>" +
+      "＝ <b>" + raw + " 分</b>";
+    $("rsWrong").innerHTML = s.wrong && s.wrong.length ? "<b>要多注意的字：</b><div class='wrong-list'>" +
+      s.wrong.map(w => "<span>" + (w[0] === " " ? "空白" : esc(w[0])) + (w[2] ? "<small>" + w[2] + "</small>" : "") + " <small>×" + w[1] + "</small></span>").join("") + "</div>" : "<p>🌟 沒有打錯的字，太棒了！</p>";
+  }
+  const al = align(t.typed, t.passage, t.cfg.strict_width);
+  const cls = ["", "ok", "bad", "miss"];
+  $("rsTarget").className = "target" + (t.lang === "en" ? " en" : "");
+  $("rsTarget").innerHTML = Array.from(t.passage).map((c, i) => "<span class='" + cls[al.status[i]] + (c === " " ? " sp" : "") + "'>" + esc(c) + "</span>").join("");
+  show("scrResult");
+  if (test) ty = null;
+}
+const stat = (k, v) => "<div class='stat'><small>" + k + "</small>" + esc(v) + "</div>";
+
+/* ------------------------------------------------------------------ 紀錄 */
+async function showRecords() {
+  show("scrRecords");
+  const v = await api("/api/p/records?token=" + encodeURIComponent(token));
+  $("recTests").innerHTML = v.tests && v.tests.length ? "<table><tr><th>時間</th><th>測驗</th><th>速度</th><th>準確率</th><th>分數</th></tr>" +
+    v.tests.map(t => "<tr><td>" + esc(t.time) + "</td><td>" + esc(t.title) + "</td><td>" + t.speed + " " + esc(t.unit) + "</td><td>" + t.accuracy + "%</td><td>" +
+      (t.raw == null ? "—" : t.raw + (t.adj != null ? "（調整後 " + t.adj + "）" : "")) + "</td></tr>").join("") + "</table>" : "<p class='muted'>還沒有測驗紀錄</p>";
+  $("recPractice").innerHTML = v.practice && v.practice.length ? "<table><tr><th>時間</th><th>練習</th><th>內容</th><th>速度</th><th>準確率</th><th>備註</th></tr>" +
+    v.practice.map(p => "<tr><td>" + esc(p.time) + "</td><td>" + esc(p.kind) + "</td><td>" + esc(p.title) + "</td><td>" + p.speed + " " + esc(p.unit) + "</td><td>" + p.accuracy + "%</td><td class='muted'>" + esc(p.extra) + "</td></tr>").join("") + "</table>" : "<p class='muted'>還沒有練習紀錄</p>";
+}
+
+/* ------------------------------------------------------------------ 開始 */
+// 網址帶 ?c=班級&s=座號（老師用任意快傳依座位送出的專屬網址）→ 直接登入成這位學生
+const Q = new URLSearchParams(location.search);
+const SEAT = (Q.get("c") || Q.get("cls")) && (Q.get("s") || Q.get("seat")) ? {c: Q.get("c") || Q.get("cls"), s: Q.get("s") || Q.get("seat")} : null;
+let seatKicks = [];
+async function seatLogin() {
+  try {
+    const r = await api("/api/who?c=" + encodeURIComponent(SEAT.c) + "&s=" + encodeURIComponent(SEAT.s));
+    if (r.locked) { showLogin(r.msg); return; }
+    if (!r.ok) { showLogin("這台電腦的網址是「" + SEAT.c + " 班 " + SEAT.s + " 號」，但名單裡找不到，請自己選名字，或告訴老師"); return; }
+    let mySid = ""; try { mySid = localStorage.getItem("tm_sid") || ""; } catch (e) {}
+    if (token && mySid === String(r.student.id)) { startPoll(); return; }
+    if (token) await api("/api/p/logout", {token}).catch(() => {});
+    const l = await api("/api/login", {sid: r.student.id});
+    if (!l.ok) { showLogin(l.msg); return; }
+    token = l.token;
+    try { localStorage.setItem("tm_token", token); localStorage.setItem("tm_sid", String(l.me.id)); } catch (e) {}
+    ver = 0; startPoll();
+  } catch (e) { $("net").hidden = false; setTimeout(seatLogin, 2000); }
+}
+function seatRelogin() {
+  // 伺服器重開（登入資料在記憶體裡）或被登出時，自動用網址上的座位再登入；
+  // 1 分鐘內被擠掉兩次，代表兩台電腦用了同一個網址，就停下來請學生自己選。
+  const now = Date.now();
+  seatKicks = seatKicks.filter(t => now - t < 60000);
+  seatKicks.push(now);
+  if (seatKicks.length > 2) { showLogin("「" + SEAT.c + " 班 " + SEAT.s + " 號」好像同時在另一台電腦登入了，請告訴老師"); return false; }
+  seatLogin(); return true;
+}
+me = {sid: "web"}; hideOut = true; $("who").textContent = "🏠 在家練習版"; goHome();
+</script>
+</body>
+</html>
