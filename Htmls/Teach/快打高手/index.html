@@ -69,6 +69,9 @@ h2{font-size:26px}
 .levels b{display:block;font-size:19px}
 .levels small{color:var(--ink2);font-size:14px}
 .levels .best{float:right;font-size:13px;background:var(--mint2);border-radius:50px;padding:0 8px}
+.levels button.sel{border-color:var(--pink);background:var(--red2);box-shadow:var(--shadow)}
+#rdPick{text-align:left;margin-top:14px}
+#rdPreview{font-size:24px;margin-top:12px}
 
 /* 鍵位練習 */
 .drill-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:10px}
@@ -151,6 +154,19 @@ th{background:#FFE8EF}
 input.wide{font-size:40px;width:220px;text-align:center;border-radius:24px;border:3px solid var(--pink2);padding:6px;font-family:inherit;color:var(--ink)}
 input.wide:focus{outline:none;border-color:var(--pink)}
 .tips{font-size:15px;text-align:left;background:var(--sky2);border-radius:18px;padding:10px 16px;margin-top:14px}
+/* 📖 鍵盤小幫手：跳出視窗，不換畫面，關掉就回到原本的練習或測驗 */
+.ref-mask{position:fixed;inset:0;background:rgba(93,64,55,.35);z-index:60;display:flex;align-items:center;justify-content:center;padding:14px}
+.ref-mask[hidden]{display:none}
+.ref-card:focus{outline:none}
+.ref-card{background:#fff;border-radius:24px;border:3px solid var(--pink2);box-shadow:var(--shadow);width:min(1200px,100%);max-height:100%;display:flex;flex-direction:column;padding:12px 16px}
+.ref-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ref-head b{font-size:20px;color:var(--pink)}
+.ref-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.ref-tabs button{border:2px solid var(--line);background:#fff;border-radius:50px;padding:4px 14px;font-weight:700;font-size:16px;color:var(--ink);cursor:pointer}
+.ref-tabs button.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.ref-body{flex:1;min-height:0;overflow:auto;margin-top:10px;text-align:center}
+.ref-body img{max-width:100%;max-height:calc(100vh - 160px);object-fit:contain}
+.ref-foot{margin:6px 0 0;font-size:14px;text-align:center}
 .net{position:fixed;right:12px;bottom:12px;background:var(--red);color:#fff;border-radius:50px;padding:6px 16px;font-weight:800;z-index:50}
 @media (max-width:760px){.kb .k{width:30px;height:38px;font-size:12px}.kb .k .zy{font-size:11px}.big-key{font-size:60px;height:110px;min-width:110px}.target{font-size:22px}}
 </style>
@@ -159,9 +175,22 @@ input.wide:focus{outline:none;border-color:var(--pink)}
 <header class="top">
   <span class="logo">⌨️ 快打高手</span>
   <span class="who" id="who"></span>
+  <button class="btn o sm" id="btnRef" hidden title="看鍵盤和標點符號的參考圖（不會離開現在的練習）">📖 鍵盤小幫手</button>
   <button class="btn s sm" id="btnHome" hidden>🏠 首頁</button>
   <button class="btn s sm" id="btnOut" hidden>登出</button>
 </header>
+
+<div class="ref-mask" id="refBox" hidden>
+  <div class="ref-card" id="refCard" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="refTitle">
+    <div class="ref-head">
+      <b id="refTitle">📖 鍵盤小幫手</b>
+      <div class="ref-tabs" id="refTabs"></div>
+      <button class="btn s sm" id="refClose">✖ 關閉</button>
+    </div>
+    <div class="ref-body"><img id="refImg" alt=""></div>
+    <p class="muted ref-foot" id="refFoot"></p>
+  </div>
+</div>
 
 <div class="wrap">
 
@@ -280,6 +309,11 @@ input.wide:focus{outline:none;border-color:var(--pink)}
   <div class="card center">
     <h2 id="rdTitle"></h2>
     <div id="rdInfo" style="font-size:20px"></div>
+    <div id="rdPick" hidden>
+      <p style="font-size:20px;margin:0 0 8px"><b>👉 先選一篇你要打的文章</b>　<span class="muted">可以先看內容；按「開始」以後就不能換了</span></p>
+      <div class="grid levels" id="rdChoices"></div>
+      <div class="target" id="rdPreview" hidden></div>
+    </div>
     <p style="margin-top:20px"><button class="btn" id="rdGo" style="font-size:26px;padding:14px 44px">準備好了，開始！</button></p>
     <p class="msg" id="rdMsg"></p>
   </div>
@@ -288,6 +322,7 @@ input.wide:focus{outline:none;border-color:var(--pink)}
 <!-- 打字 -->
 <section id="scrType" hidden>
   <div class="type-head">
+    <button class="btn s sm" id="tyBack" hidden>← 換文章</button>
     <h2 id="tyTitle"></h2>
     <span class="pill" id="tyMode"></span>
     <div class="stats">
@@ -348,7 +383,7 @@ input.wide:focus{outline:none;border-color:var(--pink)}
 
 <script>
 "use strict";
-const BUILD = "web-1.0";
+const BUILD = "web-1.6";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -360,10 +395,81 @@ const sNow = () => (Date.now() + offset) / 1000;
 function show(id) {
   document.querySelectorAll("section").forEach(s => s.hidden = s.id !== id);
   screen = id;
-  $("btnHome").hidden = !me || id === "scrHome" || id === "scrType" || id === "scrLogin";
+  // 打字畫面：測驗中不給回首頁；練習時可以回首頁（點錯文章要能換）
+  $("btnHome").hidden = !me || id === "scrHome" || id === "scrLogin" || (id === "scrType" && !(ty && ty.mode === "practice"));
   $("btnOut").hidden = hideOut || !me || id === "scrType";
+  $("btnRef").hidden = !me || !REFS.length;
   window.scrollTo(0, 0);
 }
+
+/* ------------------------------------------------------------------ 📖 鍵盤小幫手（跳出視窗） */
+// 只是蓋在畫面上面：不換畫面、不停止練習或測驗；開著的時候按鍵不會算進練習，關掉後游標回到原本的輸入框。
+const REFS = [["r1", "英文鍵盤", 1663, 435], ["r2", "注音鍵盤", 1648, 420], ["r3", "英文標點符號", 1147, 833], ["r4", "中文標點符號", 1146, 672]];                  // [[key, 標題, 寬, 高], ...]，伺服器從 REF_IMAGES 填入
+let refKey = "", refPrevFocus = null;
+function refDefault() {
+  // 第一次打開時，依現在在練什麼挑最相關的那張
+  const has = t => (REFS.find(r => r[1].indexOf(t) >= 0) || [])[0];
+  let want = "";
+  if (screen === "scrDrill" && dr && dr.zy) want = has("注音");
+  else if (screen === "scrWidth") want = has("中文標點");
+  else if (screen === "scrType" && ty) want = ty.lang === "en" ? has("英文鍵盤") : has("中文標點");
+  return want || REFS[0][0];
+}
+function refShow(key) {
+  refKey = key;
+  const r = REFS.find(x => x[0] === key) || REFS[0];
+  $("refImg").src = "ref/" + r[0] + ".webp";      // 用到才下載（瀏覽器會快取）
+  $("refImg").alt = r[1];
+  $("refImg").width = r[2]; $("refImg").height = r[3];
+  $("refTabs").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.k === r[0]));
+}
+function openRef() {
+  if (!REFS.length) return;
+  refPrevFocus = document.activeElement;
+  $("refTabs").innerHTML = "";
+  REFS.forEach(r => {
+    const b = document.createElement("button");
+    b.textContent = r[1]; b.dataset.k = r[0];
+    b.onclick = () => refShow(r[0]);
+    $("refTabs").appendChild(b);
+  });
+  refShow(refKey || refDefault());
+  const testing = screen === "scrType" && ty && ty.mode === "test" && !ty.finished;
+  $("refFoot").textContent = (testing ? "⏱ 測驗的時間還在繼續算喔！看完趕快按「關閉」回去打字。" : "看完按「關閉」或 Esc，就回到剛剛的地方繼續。") + "　← → 可以換下一張";
+  $("refBox").hidden = false;
+  document.querySelector(".wrap").inert = true;   // 後面的畫面暫時不能操作：字不可能打進打字框（練習、計時照常在跑）
+  $("refCard").focus();     // 焦點放在視窗本身（不是「關閉」鍵），練習中順手按空白鍵才不會把視窗關掉
+}
+function closeRef() {
+  if ($("refBox").hidden) return;
+  $("refBox").hidden = true;
+  document.querySelector(".wrap").inert = false;
+  const el = refPrevFocus;
+  refPrevFocus = null;
+  if (el && el.focus && !el.disabled && el.offsetParent !== null && el !== document.body) { el.focus(); return; }
+  // 原本的焦點不在了（例如看圖時測驗倒數剛好結束）：直接回到打字框
+  if (screen === "scrType" && ty && !ty.finished && !tyInp.disabled) tyInp.focus();
+  else if (screen === "scrWidth") $("wdInput").focus();
+}
+$("btnRef").onclick = () => $("refBox").hidden ? openRef() : closeRef();
+$("btnRef").addEventListener("mousedown", e => e.preventDefault());   // 點按鈕時不要搶走打字框的焦點，關掉後才回得去
+$("refClose").onclick = closeRef;
+$("refBox").addEventListener("click", e => { if (e.target === $("refBox")) closeRef(); });   // 點旁邊灰色的地方也會關
+// 視窗開著時先攔下所有按鍵（capture），練習關卡、打字框都收不到，不會被算成按錯
+window.addEventListener("keydown", e => {
+  if ($("refBox").hidden) return;
+  e.stopImmediatePropagation();
+  if (e.key === "Escape") { e.preventDefault(); closeRef(); return; }
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    e.preventDefault();
+    const i = REFS.findIndex(r => r[0] === refKey), n = REFS.length;
+    refShow(REFS[(i + (e.key === "ArrowRight" ? 1 : n - 1)) % n][0]);
+    return;
+  }
+  // 其他按鍵都不作用：別讓字打進後面的輸入框；只保留 Tab 換焦點、在按鈕上按 Enter／空白鍵
+  const onBtn = $("refBox").contains(document.activeElement) && document.activeElement.tagName === "BUTTON";
+  if (e.key !== "Tab" && !(onBtn && (e.key === "Enter" || e.key === " "))) e.preventDefault();
+}, true);
 let toastT = 0;
 function toast(msg) {
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
@@ -568,7 +674,8 @@ function renderTests(tests) {
   $("testList").innerHTML = "";
   tests.forEach(t => {
     const d = document.createElement("div"); d.className = "test-item";
-    const info = (t.kind === "timed" ? "限時 " : "定量，最多 ") + fmtSec(t.seconds) + "　" + (t.lang === "zh" ? "中文" : "英文") + "　" + t.len + " 字";
+    const info = (t.kind === "timed" ? "限時 " : "定量，最多 ") + fmtSec(t.seconds) + "　" + (t.lang === "zh" ? "中文" : "英文") + "　" +
+      (t.choices ? "自己選文章（" + t.choices.length + " 篇）" : t.len + " 字");
     d.innerHTML = "<b>" + esc(t.title) + "</b><span class='muted'>" + info + "</span>";
     const b = document.createElement("button");
     b.style.marginLeft = "auto";
@@ -579,7 +686,10 @@ function renderTests(tests) {
 }
 const fmtSec = s => s >= 60 ? (Math.floor(s / 60) + " 分" + (s % 60 ? " " + s % 60 + " 秒" : "")) : s + " 秒";
 function goHome() { show("scrHome"); if (lastState) renderTests(lastState.tests); }
-$("btnHome").onclick = () => { stopDrill(); goHome(); };
+$("btnHome").onclick = () => {
+  if (screen === "scrType" && !leavePractice("home")) return;
+  stopDrill(); goHome();
+};
 document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => {
   const g = b.dataset.go;
   if (g === "keys_en" || g === "keys_zy" || g === "spell") showLevels(g);
@@ -876,9 +986,28 @@ function startPractice(i) {
 }
 
 /* ------------------------------------------------------------------ 測驗 */
-let readyT = null;
+let readyT = null, readyPick = -1;
 function readyTest(t) {
-  readyT = t;
+  readyT = t; readyPick = -1;
+  // 學生自選：還沒開始的人先選文章（重新整理接著考的人，伺服器已經記住他選的那篇）
+  const pick = !!(t.choices && t.my !== "running");
+  $("rdPick").hidden = !pick;
+  $("rdPreview").hidden = true;
+  $("rdGo").disabled = pick;
+  $("rdChoices").innerHTML = "";
+  if (pick) t.choices.forEach((c, i) => {
+    const x = document.createElement("button");
+    x.innerHTML = "<b>" + esc(c.title) + "</b><small>" + c.len + " 字</small>";
+    x.onclick = () => {
+      readyPick = i;
+      $("rdChoices").querySelectorAll("button").forEach((b, j) => b.classList.toggle("sel", j === i));
+      const pv = $("rdPreview"); pv.className = "target" + (t.lang === "en" ? " en" : ""); pv.textContent = c.text; pv.hidden = false;
+      $("rdGo").disabled = false; $("rdMsg").textContent = "";
+      $("rdGo").textContent = "就打「" + c.title + "」，開始！";
+    };
+    $("rdChoices").appendChild(x);
+  });
+  $("rdGo").textContent = pick ? "先選一篇文章" : "準備好了，開始！";
   $("rdTitle").textContent = "📝 " + t.title;
   $("rdInfo").innerHTML = (t.kind === "timed" ? "⏱ 限時 <b>" + fmtSec(t.seconds) + "</b>，時間到就自動交卷。能打多少就打多少！" :
     "📄 打完整篇就交卷，最多 <b>" + fmtSec(t.seconds) + "</b>。") +
@@ -889,7 +1018,8 @@ function readyTest(t) {
 $("rdGo").onclick = async () => {
   $("rdGo").disabled = true;
   try {
-    const r = await api("/api/p/start", {token, test: readyT.id});
+    if (readyT.choices && readyT.my !== "running" && readyPick < 0) { $("rdMsg").textContent = "請先選一篇文章"; return; }
+    const r = await api("/api/p/start", {token, test: readyT.id, pidx: readyPick});
     if (!r.ok) { $("rdMsg").textContent = r.msg; return; }
     offset = r.attempt.now * 1000 - Date.now();
     enterTest(r.attempt);
@@ -897,7 +1027,7 @@ $("rdGo").onclick = async () => {
 };
 function enterTest(a) {
   if (a.now) offset = a.now * 1000 - Date.now();
-  startTyping({mode: "test", testId: a.test_id, title: a.title, passage: a.passage, lang: a.lang, cfg: a.cfg,
+  startTyping({mode: "test", testId: a.test_id, title: a.title + (a.ptitle && a.ptitle !== a.title ? "：" + a.ptitle : ""), passage: a.passage, lang: a.lang, cfg: a.cfg,
     started: a.started, deadline: a.deadline, typed: a.typed, bs: a.backspaces, blurs: a.blurs});
 }
 
@@ -925,6 +1055,7 @@ function startTyping(o) {
   const noBs = o.mode === "test" && !o.cfg.allow_backspace;
   $("tyNote").textContent = (o.cfg.strict_width ? "⚠ 這篇全形、半形要分清楚（虛線框的是全形）。" : "") + (noBs ? "⚠ 這次測驗不能按退格修改。" : "");
   $("tyDone").textContent = o.mode === "test" ? "✅ 交卷" : "✅ 我打完了";
+  $("tyBack").hidden = o.mode !== "practice";
   show("scrType");
   if (o.mode === "test") {
     ty.t0 = o.started;
@@ -1037,10 +1168,24 @@ window.addEventListener("focus", () => { if (ty && !ty.finished && screen === "s
 $("tyDone").onclick = () => {
   if (!ty || ty.finished) return;
   if (ty.mode === "test" && !confirmTwice("submit", "確定要交卷嗎？再按一次「交卷」")) return;
-  if (ty.mode === "practice" && !ty.typed) { goHome(); return; }
+  if (ty.mode === "practice" && !ty.typed) { leavePractice("done"); goHome(); return; }
   finishTyping("button");
 };
 $("tyTarget").addEventListener("click", () => tyInp.focus());
+// 練習中離開（換文章／回首頁）：已經打了幾個字要按兩次，免得不小心按到；不記錄成績
+function leavePractice(key) {
+  if (!ty || ty.mode !== "practice") return false;
+  if (!ty.finished && ty.typed && !confirmTwice("leave_" + key, "還沒打完喔，確定要離開嗎？再按一次")) return false;
+  ty.finished = true;
+  clearInterval(ty.timer);
+  tyInp.blur();
+  return true;
+}
+$("tyBack").onclick = () => {
+  if (!leavePractice("back")) return;
+  show("scrPick");
+  if (pickBank) { $("pickBanks").hidden = true; $("pickPassages").hidden = false; } else showPick();
+};
 
 async function finishTyping(why) {
   if (!ty || ty.finished) return;
